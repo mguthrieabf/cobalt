@@ -125,6 +125,9 @@ MEDIA_URL = '/media/'
 # Local settings for this Application
 GLOBAL_ORG="ABF"
 GLOBAL_TITLE="ABF Technology"
+GLOBAL_CONTACT="https://abf.com.au"
+GLOBAL_ABOUT="https://abf.com.au"
+GLOBAL_PRIVACY="https://abf.com.au"
 
 try:
     from .local_settings import *
