@@ -34,8 +34,8 @@
   <div class="wrapper ">
     <div class="sidebar" data-color="orange" data-background-color="white" data-image="/static/assets/img/abf_slider_1.jpg">
       <div class="logo text-center">
-        <a href="./welcome.html" class="simple-text logo-normal">
-          ABF Technology
+        <a href="/" class="simple-text logo-normal">
+          {{ GLOBAL_TITLE }}
           <br>
           <img src="/static/assets/img/ABF_logo.gif">
         </a>
@@ -100,7 +100,17 @@
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
-            <span>Welcome back {{ request.user.username }}</span>
+            <span>Hi,
+
+              {% if request.user.first_name %}
+                {{ request.user.first_name }}
+              {% else %}
+                {{ request.user.username }}
+              {% endif %}
+
+
+            {{ story }}
+            </span>
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
             <span class="sr-only">Toggle navigation</span>
@@ -109,31 +119,29 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-            <form class="navbar-form">
-              <div class="input-group no-border">
-                <input type="text" value="" class="form-control" placeholder="Search...">
-                <button type="submit" class="btn btn-white btn-round btn-just-icon">
-                  <i class="material-icons">search</i>
-                  <div class="ripple-container"></div>
-                </button>
-              </div>
-            </form>
+
             <ul class="navbar-nav">
+
+            {% if notifications %}
 
               <li class="nav-item dropdown">
                 <a class="nav-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">notifications</i>
-                  <span class="notification">4</span>
-                  <p class="d-lg-none d-md-block">
-                    Some Actions
-                  </p>
-                </a>
+
+                  <span class="notification">
+                    {{ notifications.items|length }}
+                  </span>
+
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">You were 2nd in SABA Friday Day event</a>
-                  <a class="dropdown-item" href="#">You were mentioned in 2 forum posts</a>
-                  <a class="dropdown-item" href="#">You're now following Andrew Mitchell</a>
-                  <a class="dropdown-item" href="#">Subscriptions are due for SABA</a>
+
+                  {% for id, msg in notifications.items %}
+                       <a class="dropdown-item" href="\somelink\id= {{ id }} ">{{ msg }}</a>
+                  {% endfor %}
+
+
                 </div>
+                {% endif %}
+
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -146,7 +154,7 @@
                   <a class="dropdown-item" href="profile.html">Profile</a>
                   <a class="dropdown-item" href="settings.html">Settings</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="./dashboard-admin.html">Log out</a>
+                  <a class="dropdown-item" href="./accounts/logout.html">Log out</a>
                 </div>
               </li>
             </ul>
@@ -155,77 +163,6 @@
       </nav>
   <div class="content">
 
-
-          <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-primary card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">equalizer</i>
-                  </div>
-                  <p class="card-category">Recent Average</p>
-                  <h3 class="card-title">53
-                    <small>%</small>
-                  </h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">equalizer</i>
-                    <a href="./stats.html">Get More Stats...</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-success card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">attach_money</i>
-                  </div>
-                  <p class="card-category">Account Balance</p>
-                  <h3 class="card-title">$101.00</h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">date_range</i> <a href="./payments.html">Last top up <span id="topup"></span> ($200)</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-warning card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">list_alt</i>
-                  </div>
-                  <p class="card-category">Booked Events</p>
-                  <h3 class="card-title">4</h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">local_offer</i>
-                      <a href="./events.html">See Events...</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-info card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">call_made</i>
-                  </div>
-                  <p class="card-category">Mpoints (PQPs)</p>
-                  <h3 class="card-title">1,407 (14)</h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">stars</i> <a href="./masterpoints.html">Grand Master</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
 
 

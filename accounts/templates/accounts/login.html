@@ -1,0 +1,30 @@
+{% extends './login_main.html' %}
+
+{% block content %}
+
+
+{% if error %}
+{{ error }}
+<br>
+<br>
+{% endif %}
+
+<h1>Login</h1>
+
+<form method="POST" action=" {% url 'login' %}">
+
+{% csrf_token %}
+Email or {{ GLOBAL_ORG }} Number:
+<br>
+<input type="text" name="username" />
+<br>
+Password:
+<br>
+<input type="password" name="password"/>
+<br>
+<br>
+<br>
+<input type="submit" value="Login" class="btn btn-primary"/>
+</form>
+
+{% endblock %}

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'calendar_app.apps.CalendarAppConfig',
+    'notifications.apps.NotificationsConfig',
     'events.apps.EventsConfig',
     'forums.apps.ForumsConfig',
     'masterpoints.apps.MasterpointsConfig',
@@ -135,6 +136,7 @@ MEDIA_URL = '/media/'
 
 # Local settings for this Application
 GLOBAL_ORG="ABF"
+GLOBAL_TITLE="ABF Technology"
 
 try:
     from .local_settings import *

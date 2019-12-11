@@ -18,5 +18,6 @@ urlpatterns = [
     path('masterpoints', include('masterpoints.urls')),
     path('payments', include('payments.urls')),
     path('support', include('support.urls')),
+    # path('logout', 'django.contrib.auth.views.logout', {'next_page': '/accounts/login'}),
 
 ]
