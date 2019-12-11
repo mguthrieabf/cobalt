@@ -7,7 +7,6 @@ from django.utils import timezone
 #from general.models import Club, Pair
 #from movements.models import Movement, MovementBoardRound
 
+@login_required
 def home(request):
     return render(request, 'dashboard/home.html')
-
-#@login_required

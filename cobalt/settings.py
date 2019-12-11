@@ -31,6 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'calendar_app.apps.CalendarAppConfig',
+    'events.apps.EventsConfig',
+    'forums.apps.ForumsConfig',
+    'masterpoints.apps.MasterpointsConfig',
+    'payments.apps.PaymentsConfig',
+    'support.apps.SupportConfig',
+    'accounts.apps.AccountsConfig',
     'dashboard.apps.DashboardConfig',
     'results.apps.ResultsConfig',
     'django.contrib.admin',
@@ -64,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cobalt.context_processors.global_settings',
             ],
         },
     },
@@ -124,6 +132,9 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
+
+# Local settings for this Application
+GLOBAL_ORG="ABF"
 
 try:
     from .local_settings import *
