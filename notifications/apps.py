@@ -8,9 +8,9 @@ class NotificationsConfig(AppConfig):
 class Notifications():
 
     def get_notifications_for_user(self, user):
-        print(user)
-        print(dir(user))
-        print(user.id)
+        # print(user)
+        # print(dir(user))
+        # print(user.id)
         notifications = {
                          3456: 'Notify 1 - test',
                          4567: 'Notify 2 - test'
@@ -29,3 +29,7 @@ class Notifications():
 
     def acknowledge_notification(self, id):
         pass
+
+    def add_notification(self, user, priority, msg):
+        when="now"
+        save="ok"
