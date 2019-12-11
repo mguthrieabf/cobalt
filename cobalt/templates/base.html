@@ -135,7 +135,7 @@
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 
                   {% for id, msg in notifications.items %}
-                       <a class="dropdown-item" href="\somelink\id= {{ id }} ">{{ msg }}</a>
+                       <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
 
 

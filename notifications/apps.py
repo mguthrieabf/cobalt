@@ -12,8 +12,8 @@ class Notifications():
         # print(dir(user))
         # print(user.id)
         notifications = {
-                         3456: 'Notify 1 - test',
-                         4567: 'Notify 2 - test'
+                         3456: ('You were 3rd at SABA', '/results/view=3456'),
+                         4567: ('Notification from NSWBA', '/forums/view=4567')
                          }
 
         return(notifications)
