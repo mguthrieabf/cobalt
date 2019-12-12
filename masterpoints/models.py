@@ -1,3 +1,4 @@
 from django.db import models
 
-# Create your models here.
+class CurrentMPs(models.Model):
+    abf=models.CharField(max_length=50)
