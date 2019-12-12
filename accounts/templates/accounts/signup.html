@@ -10,6 +10,12 @@
 {% endif %}
 
 <h1>Sign Up!</h1>
+<form method="POST" action=" {% url 'signup' %}">
+
+{% csrf_token %}
+
+<input type="submit" value="Create Account" class="btn btn-primary"/>
+</form>
 
 <form method="POST" action=" {% url 'signup' %}">
 

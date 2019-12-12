@@ -1,6 +1,34 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib import auth
+from .forms import LoginForm
+#from django.views.generic import TemplateView
+
+# from .forms import ExtendedUserCreationForm
+#
+# def signup(request):
+#     if request.method == "POST":
+#         # we have received details
+#         form=ExtendedUserCreationForm(request.POST)
+#
+#         if form.is_valid():
+#             form.save()
+#
+#             username= form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password1')
+#             user=authenticate(username=username, password=password)
+#             login(request.user)
+#             return redirect('/dashboard')
+#     else:
+#         form = ExtendedUserCreationForm()
+#
+#     context = {'form' : form}
+#     return render(request, 'accounts/signup.html
+def signup2(request):
+    form = LoginForm()
+    return render(request, 'accounts/signup2.html', {'form': form})
 
 def signup(request):
     if request.method=="POST":
@@ -18,6 +46,8 @@ def signup(request):
     else:
         # request for form only
         return render(request, 'accounts/signup.html')
+
+
 
 def login(request):
     if request.method=="POST":
