@@ -29,7 +29,6 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <link href="/static/assets/css/material-dashboard.css?v=2.1.1" rel="stylesheet" />
 </head>
-
 <body class="">
   <div class="wrapper ">
     <div class="sidebar" data-color="orange" data-background-color="white" data-image="/static/assets/img/abf_slider_1.jpg">
@@ -41,51 +40,53 @@
         </a>
       </div>
       <div class="sidebar-wrapper">
+  
         <ul class="nav">
-          <li class="nav-item {% if request.resolver_match.url_name == "dashboard" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":10" == "/dashboard" %}active{% endif %} ">
             <a class="nav-link" href="/dashboard">
               <i class="material-icons">dashboard</i>
               <p>Dashboard</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "results" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":8" == "/results" %}active{% endif %} ">
             <a class="nav-link" href="/results">
               <i class="material-icons">content_paste</i>
               <p>Results</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "masterpoints" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":13" == "/masterpoints" %}active{% endif %} ">
             <a class="nav-link" href="/masterpoints">
               <i class="material-icons">shopping_basket</i>
               <p>Masterpoints</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "events" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":7" == "/events" %}active{% endif %} ">
             <a class="nav-link" href="/events">
               <i class="material-icons">library_books</i>
               <p>Events</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "calendar" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":9" == "/calendar" %}active{% endif %} ">
             <a class="nav-link" href="/calendar">
               <i class="material-icons">date_range</i>
               <p>Calendar</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "forums" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":7" == "/forums" %}active{% endif %} ">
+
             <a class="nav-link" href="/forums">
               <i class="material-icons">bubble_chart</i>
               <p>Forums</p>
             </a>
           </li>
-          <li class="nav-item {% if request.resolver_match.url_name == "payments" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":9" == "/payments" %}active{% endif %} ">
             <a class="nav-link" href="/payments">
               <i class="material-icons">attach_money</i>
               <p>Payments</p>
             </a>
           </li>
           <hr>
-          <li class="nav-item {% if request.resolver_match.url_name == "support" %}active{% endif %} ">
+          <li class="nav-item {% if request.path|slice:":8" == "/support" %}active{% endif %} ">
             <a class="nav-link" href="/support">
               <i class="material-icons">language</i>
               <p>Support</p>
@@ -97,6 +98,7 @@
 
     <div class="main-panel">
       <!-- Navbar -->
+
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
