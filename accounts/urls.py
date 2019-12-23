@@ -7,3 +7,7 @@ from . import views
 #     url('login', views.login, name='login'),
 #     url('logout', views.logout, name='logout'),
 # ]
+
+urlpatterns = [
+    url('signup/', views.SignUp.as_view(), name='signup'),
+]

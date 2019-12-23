@@ -119,6 +119,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
+LOGIN_REDIRECT_URL="/dashboard"
+LOGOUT_REDIRECT_URL="/accounts/login"
+
 # Local settings for this Application
 GLOBAL_ORG="ABF"
 GLOBAL_TITLE="ABF Technology"
