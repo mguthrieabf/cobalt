@@ -9,5 +9,5 @@ from . import views
 # ]
 
 urlpatterns = [
-    url('signup/', views.SignUp.as_view(), name='signup'),
+    url('register', views.register, name='signup'),
 ]
