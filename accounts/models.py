@@ -10,13 +10,15 @@ class Profile(models.Model):
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     confirmed = models.BooleanField("Confirmed", default=False)
 
-    city = models.CharField("City", max_length=50, blank=True)
-    state = models.CharField("State", max_length=50, blank=True)
-    country = models.CharField("Country", max_length=50, blank=True)
-    referral = models.CharField("Referral", max_length=50, blank=True)
+    abf_number = models.IntegerField("ABF Number", blank="True", default="0")
+    mobile = models.IntegerField("Mobile Number", blank="True", default="0")
+    # city = models.CharField("City", max_length=50, blank=True)
+    # state = models.CharField("State", max_length=50, blank=True)
+    # country = models.CharField("Country", max_length=50, blank=True)
+    # referral = models.CharField("Referral", max_length=50, blank=True)
 
-def __str__(self):
-    return f'{self.user.username} Profile'
+    def __str__(self):
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

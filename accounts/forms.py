@@ -13,4 +13,4 @@ class UserRegisterForm(UserCreationForm):
 class ProfileRegisterForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['city', 'state', 'country', 'referral']
+        fields = ['abf_number', 'mobile']

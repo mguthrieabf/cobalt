@@ -2,15 +2,20 @@
 
 {% block content %}
 
-<div class="content container">
-    <div class="row">
-        <div class="col-md-8">
-          <h1>{{ post.title }}</h1>
-          {{ post.author }}
-
-          <h2>{{ post.text|linebreaksbr }}</h2>
-        </div>
-    </div>
+<div class="card card-nav-tabs">
+  <div class="card-header card-header-warning">
+    {{ post.title }}
+  </div>
+  <div class="card-body">
+    <p class="card-title text-right">Posted by {{ post.author }} on {{ post.created_date }}</p>
+    <p class="card-text">{{ post.text|linebreaksbr }}</p>
+    <a href="#0" class="btn btn-primary">Reply</a>
+    <span class="float-right">
+      <a href="#"> 10 <i class="material-icons">comment</i>
+      <a href="#"> 2 <i class="material-icons">thumb_up</i>
+    </span>
+  </div>
 </div>
+
 
 {% endblock %}

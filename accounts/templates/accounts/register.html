@@ -1,11 +1,63 @@
-{% extends 'base.html' %}
+{% extends 'signedout.html' %}
 
 {% block content %}
 
 <form method="post">
   {% csrf_token %}
-  {{ user_form.as_p }}
-  {{ profile_form.as_p }}
+
+  <table border="0">
+
+    <tr>
+      <th>{{ profile_form.abf_number.label_tag }}</th>
+      <td>
+        {{ profile_form.abf_number.errors }}
+        {{ profile_form.abf_number }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.username.label_tag }}</th>
+      <td>
+        {{ user_form.username.errors }}
+        {{ user_form.username }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.email.label_tag }}</th>
+      <td>
+        {{ user_form.email.errors }}
+        {{ user_form.email }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.password1.label_tag }}</th>
+      <td>
+        {{ user_form.password1.errors }}
+        {{ user_form.password1 }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.password2.label_tag }}</th>
+      <td>
+        {{ user_form.password2.errors }}
+        {{ user_form.password2 }}
+      </td>
+    </tr>
+    <tr>
+      <th>{{ profile_form.mobile.label_tag }}</th>
+      <td>
+        {{ profile_form.mobile.errors }}
+        {{ profile_form.mobile }}
+      </td>
+    </tr>
+
+  <!-- {{ user_form }}
+  {{ profile_form }} -->
+
+  </table>
   <button type="submit">Save changes</button>
 </form>
 
