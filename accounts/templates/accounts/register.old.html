@@ -1,0 +1,126 @@
+{% extends 'signedout.html' %}
+
+{% block content %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <table border="0">
+
+    <tr>
+      <th>{{ user_form.abf_number.label_tag }}</th>
+      <td>
+        {{ user_form.abf_number.errors }}
+        {{ user_form.abf_number }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.username.label_tag }}</th>
+      <td>
+        {{ user_form.username.errors }}
+        {{ user_form.username }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.first_name.label_tag }}</th>
+      <td>
+        {{ user_form.first_name.errors }}
+        {{ user_form.first_name }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.last_name.label_tag }}</th>
+      <td>
+        {{ user_form.last_name.errors }}
+        {{ user_form.last_name }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.email.label_tag }}</th>
+      <td>
+        {{ user_form.email.errors }}
+        {{ user_form.email }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.password1.label_tag }}</th>
+      <td>
+        {{ user_form.password1.errors }}
+        {{ user_form.password1 }}
+      </td>
+    </tr>
+
+    <tr>
+      <th>{{ user_form.password2.label_tag }}</th>
+      <td>
+        {{ user_form.password2.errors }}
+        {{ user_form.password2 }}
+      </td>
+    </tr>
+    <tr>
+      <th>{{ user_form.mobile.label_tag }}</th>
+      <td>
+        {{ user_form.mobile.errors }}
+        {{ user_form.mobile }}
+      </td>
+    </tr>
+
+  <!-- {{ user_form }}
+  {{ profile_form }} -->
+
+  </table>
+  <button type="submit">Save changes</button>
+</form>
+<script src="/static/assets/js/core/jquery.min.js"></script>
+<script>
+jQuery(document).ready(function() {
+
+function getPlayerName() {
+
+    var abf = document.getElementById('id_abf_number')
+    var fname = document.getElementById('id_first_name')
+    var lname = document.getElementById('id_last_name')
+
+
+    var trimmed_abf = abf.value.replace(/^\s+|\s+$/g, '');
+
+    if (trimmed_abf == '') {
+        return;
+    }
+
+    var strURL = "/masterpoints/abf_lookup?abf_number=" + trimmed_abf;
+
+    jQuery.ajax({
+        url: strURL,
+        context: document.body,
+        success: function(txt){
+
+
+            var res=txt.split(" ");
+            if (res.length==2) {
+                fname.value = res[0];
+                lname.value = res[1];
+            }
+            var n = txt.search("Invalid");
+            if (n>=0) {
+               abf.focus();
+               abf.value="";
+               alert(txt);
+            }
+        }
+    });
+}
+
+jQuery('#id_abf_number').on('change', function(e) {
+   getPlayerName();
+})
+
+});
+</script>
+
+{% endblock %}

@@ -1,8 +1,5 @@
 from django.db import models
 
-class CurrentMPs(models.Model):
-    abf = models.CharField(max_length=50)
-
 class MasterpointsCopy(models.Model):
     abf_number = models.IntegerField("ABF Number", blank=True, null=True)
     surname	 = models.CharField("Surname", max_length=50, blank=True, null=True)

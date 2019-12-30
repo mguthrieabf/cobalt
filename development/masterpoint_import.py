@@ -1,7 +1,6 @@
 import csv, sys, os
+from pathlib import Path
 
-# project_dir = "/Users/cohen/my-python-project/venv/ofac/ofac_project/ofac_sdn/import_save/"
-# sys.path.append(project_dir)
 os.environ['DJANGO_SETTINGS_MODULE']='cobalt.settings'
 
 import django
@@ -9,7 +8,7 @@ django.setup()
 
 from masterpoints.models import MasterpointsCopy
 
-file="MPData.csv"
+file = Path("development/MPData.csv")
 
 data = csv.reader(open(file),delimiter=",")
 count=0

@@ -11,11 +11,11 @@
           <i class="material-icons">attach_money</i>
         </div>
         <p class="card-category">Account Balance</p>
-        <h3 class="card-title">$101.00</h3>
+        <h3 class="card-title"> {{ payments.balance }}</h3>
       </div>
       <div class="card-footer">
         <div class="stats">
-          <i class="material-icons">date_range</i> <a href="./payments.html">Last top up <span id="topup"></span> ($200)</a>
+          <i class="material-icons">date_range</i> <a href="./payments.html"> {{ payments.last_top_up }}</a>
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@
       </div>
       <div class="card-footer">
         <div class="stats">
-          <i class="material-icons">stars</i> <a href="./masterpoints.html">{{ mp.rank }}</a>
+          <i class="material-icons">stars</i> <a href="./masterpoints">{{ mp.rank }}</a>
         </div>
       </div>
     </div>

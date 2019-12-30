@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from .models import MasterpointsCopy
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def home(request):
     number = MasterpointsCopy.objects.count()
     params = {'number' : number}
@@ -23,7 +23,11 @@ def abf_lookup(request):
         return render(request, 'masterpoints/abf_lookup.html', {'result' : result})
 
 def get_masterpoints(abf_number):
-    member = MasterpointsCopy.objects.filter(abf_number = abf_number)
-    points = member[0].total_MPs
-    rank = member[0].rank
+    try:
+        member = MasterpointsCopy.objects.filter(abf_number = abf_number)
+        points = member[0].total_MPs
+        rank = member[0].rank
+    except:
+        points = "Not found"
+        rank = "Not found"
     return({'points' : points, 'rank': rank})

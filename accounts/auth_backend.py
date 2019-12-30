@@ -4,9 +4,7 @@ from django.contrib.auth.backends import ModelBackend
 class OurBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
-        print(username.find("@"))
         if username.find("@")>=1:   # Email address
-            print("email")
             try:
                 user = UserModel.objects.get(email=username)
             except UserModel.DoesNotExist:

@@ -3,9 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from masterpoints.views import get_masterpoints
+from payments.views import get_balance
+from accounts.models import User
 
 @login_required(login_url='/accounts/login/')
 def home(request):
-    mp = get_masterpoints('620254')
-    print(mp)
-    return render(request, 'dashboard/home.html', {'mp': mp})
+    system_number = request.user.abf_number
+    mp = get_masterpoints(system_number)
+    payments = get_balance(system_number)
+    return render(request, 'dashboard/home.html', {'mp': mp, 'payments': payments})

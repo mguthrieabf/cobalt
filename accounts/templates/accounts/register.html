@@ -2,80 +2,84 @@
 
 {% block content %}
 
-<form method="post">
-  {% csrf_token %}
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
-  <table border="0">
+<style>
 
-    <tr>
-      <th>{{ user_form.abf_number.label_tag }}</th>
-      <td>
-        {{ user_form.abf_number.errors }}
-        {{ user_form.abf_number }}
-      </td>
-    </tr>
+.centered-form{
+	margin-top: 60px;
+}
 
-    <tr>
-      <th>{{ user_form.username.label_tag }}</th>
-      <td>
-        {{ user_form.username.errors }}
-        {{ user_form.username }}
-      </td>
-    </tr>
+.centered-form .panel{
+	background: rgba(255, 255, 255, 0.8);
+	box-shadow: rgba(0, 0, 0, 0.3) 20px 20px 20px;
+}
+</style>
 
-    <tr>
-      <th>{{ user_form.first_name.label_tag }}</th>
-      <td>
-        {{ user_form.first_name.errors }}
-        {{ user_form.first_name }}
-      </td>
-    </tr>
+<div class="container">
 
-    <tr>
-      <th>{{ user_form.last_name.label_tag }}</th>
-      <td>
-        {{ user_form.last_name.errors }}
-        {{ user_form.last_name }}
-      </td>
-    </tr>
+        <div class="row centered-form">
+        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+        	<div class="panel panel-default">
+        		<div class="panel-heading">
+			    		<h3 class="panel-title center-text">Please sign up</h3>
+              <h3><small>It's free for members!</small></h3>
+			 			</div>
+			 			<div class="panel-body">
+			    		<form role="form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+			    				<input type="text" name="abf_number" id="id_abf_number" class="form-control input-sm" placeholder="ABF Number">
+			    			</div>
 
-    <tr>
-      <th>{{ user_form.email.label_tag }}</th>
-      <td>
-        {{ user_form.email.errors }}
-        {{ user_form.email }}
-      </td>
-    </tr>
+			    			<div class="row">
+			    				<div class="col-xs-6 col-sm-6 col-md-6">
+			    					<div class="form-group">
+                      {{ user_form.first_name.errors }}
+			                <input type="text" name="first_name" id="id_first_name" class="form-control input-sm" placeholder="First Name">
+			    					</div>
+			    				</div>
+			    				<div class="col-xs-6 col-sm-6 col-md-6">
+			    					<div class="form-group">
+                    {{ user_form.last_name.errors }}
+			    						<input type="text" name="last_name" id="id_last_name" class="form-control input-sm" placeholder="Last Name">
+			    					</div>
+			    				</div>
+			    			</div>
 
-    <tr>
-      <th>{{ user_form.password1.label_tag }}</th>
-      <td>
-        {{ user_form.password1.errors }}
-        {{ user_form.password1 }}
-      </td>
-    </tr>
+			    			<div class="form-group">
+                  {{ user_form.email.errors }}
+			    				<input type="email" name="email" id="id_email" class="form-control input-sm" placeholder="Email Address">
+			    			</div>
 
-    <tr>
-      <th>{{ user_form.password2.label_tag }}</th>
-      <td>
-        {{ user_form.password2.errors }}
-        {{ user_form.password2 }}
-      </td>
-    </tr>
-    <tr>
-      <th>{{ user_form.mobile.label_tag }}</th>
-      <td>
-        {{ user_form.mobile.errors }}
-        {{ user_form.mobile }}
-      </td>
-    </tr>
+			    			<div class="row">
+			    				<div class="col-xs-6 col-sm-6 col-md-6">
+			    					<div class="form-group">
+                      {{ user_form.password1.errors }}
+			    						<input type="password" name="password1" id="id_password1" class="form-control input-sm" placeholder="Password">
+			    					</div>
+			    				</div>
+			    				<div class="col-xs-6 col-sm-6 col-md-6">
+			    					<div class="form-group">
+                      {{ user_form.password2.errors }}
+			    						<input type="password" name="password2" id="id_password2" class="form-control input-sm" placeholder="Confirm Password">
+			    					</div>
+			    				</div>
+			    			</div>
 
-  <!-- {{ user_form }}
-  {{ profile_form }} -->
+			    			<input type="submit" value="Register" class="btn btn-info btn-block">
 
-  </table>
-  <button type="submit">Save changes</button>
-</form>
+			    		</form>
+			    	</div>
+	    		</div>
+    		</div>
+    	</div>
+    </div>
+
+
+
 <script src="/static/assets/js/core/jquery.min.js"></script>
 <script>
 jQuery(document).ready(function() {
