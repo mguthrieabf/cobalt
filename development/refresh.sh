@@ -1,9 +1,9 @@
 find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
 find . -path "*/migrations/*.pyc"  -delete
 rm db.sqlite3
-# Use copy with Admin F1shcake in it
-cp development/dbsqlite3.master db.sqlite3
+
 python manage.py makemigrations
+python manage.py makemigrations payments
 python manage.py migrate
 ./development/superuser.sh
 
