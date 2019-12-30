@@ -24,3 +24,6 @@ def register(request):
         'profile_form': p_reg_form
     }
     return render(request, 'accounts/register.html', context)
+
+def loggedout(request):
+    return render(request, 'accounts/loggedout.html')

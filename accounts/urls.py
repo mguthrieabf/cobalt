@@ -9,5 +9,6 @@ from . import views
 # ]
 
 urlpatterns = [
-    url('register', views.register, name='signup'),
+    url('register', views.register, name='register'),
+    url('loggedout', views.loggedout, name='loggedout'),
 ]

@@ -12,6 +12,7 @@ class Profile(models.Model):
 
     abf_number = models.IntegerField("ABF Number", blank="True", default="0")
     mobile = models.IntegerField("Mobile Number", blank="True", default="0")
+
     # city = models.CharField("City", max_length=50, blank=True)
     # state = models.CharField("State", max_length=50, blank=True)
     # country = models.CharField("Country", max_length=50, blank=True)
