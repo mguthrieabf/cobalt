@@ -1,10 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'signedout.html' %}
 
 {% block content %}
 
 <h1>ABF Tech - Static Page</h1>
 You are not logged in.
 <a href=" {% url 'register' %}">Sign Up</a>
-<!-- <a href=" {% url 'signin' %}">Sign In</a> -->
+<a href=" {% url 'dashboard' %}">Sign In</a>
 
 {% endblock %}

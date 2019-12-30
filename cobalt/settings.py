@@ -15,7 +15,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -68,7 +67,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cobalt.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -79,6 +77,9 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL="accounts.User"
+
+AUTHENTICATION_BACKENDS = ['accounts.auth_backend.OurBackend']
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -98,7 +99,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.ipage.com'
+EMAIL_HOST_USER = 'test@drunkguthrie.com'
+EMAIL_HOST_PASSWORD = 'F1shcake'
+EMAIL_PORT = 587
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

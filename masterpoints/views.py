@@ -21,3 +21,9 @@ def abf_lookup(request):
         else:
             result = "Invalid or inactive number"
         return render(request, 'masterpoints/abf_lookup.html', {'result' : result})
+
+def get_masterpoints(abf_number):
+    member = MasterpointsCopy.objects.filter(abf_number = abf_number)
+    points = member[0].total_MPs
+    rank = member[0].rank
+    return({'points' : points, 'rank': rank})
