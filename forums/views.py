@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Post
+from .models import Post, Comment1, Comment2
 from .forms import PostForm
 
 @login_required
@@ -16,7 +16,13 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    return render(request, 'forums/post_detail.html', {'post': post})
+    comments1 = Comment1.objects.filter(post = post)
+    comments2 = {}
+    for c1 in comments1:
+        print(c1)
+        c2 = Comment2.objects.filter(comment1 = c1)
+        comments2[c1]=c2
+    return render(request, 'forums/post_detail.html', {'post': post, 'comments1' : comments1 })
 
 def post_new(request):
     if request.method == "POST":

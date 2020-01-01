@@ -14,8 +14,14 @@
       <a href="#"> 10 <i class="material-icons">comment</i>
       <a href="#"> 2 <i class="material-icons">thumb_up</i>
     </span>
+
   </div>
 </div>
+{% for c1 in comments1 %}
+<h4> {{ c1.user  }} </h4>
+{{ c1.text|linebreaksbr }}
+{% endfor %}
+
 
 
 {% endblock %}
