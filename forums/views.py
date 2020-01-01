@@ -22,7 +22,9 @@ def post_detail(request, pk):
         print(c1)
         c2 = Comment2.objects.filter(comment1 = c1)
         comments2[c1]=c2
-    return render(request, 'forums/post_detail.html', {'post': post, 'comments1' : comments1 })
+    return render(request, 'forums/post_detail.html', {'post': post,
+                                                       'comments1' : comments1,
+                                                       'comments2' : comments2 })
 
 def post_new(request):
     if request.method == "POST":
