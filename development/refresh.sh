@@ -13,5 +13,7 @@ rm add_static.py
 
 # hack for now
 cp development/masterpoint_import.py .
-python masterpoint_import.py
+echo "Kicking off masterpoint import in the background"
+nohup python masterpoint_import.py &>/dev/null &
 rm masterpoint_import.py
+python manage.py runserver

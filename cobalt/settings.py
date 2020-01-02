@@ -105,6 +105,8 @@ EMAIL_HOST = 'smtp.ipage.com'
 EMAIL_HOST_USER = 'test@drunkguthrie.com'
 EMAIL_HOST_PASSWORD = 'F1shcake'
 EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = 'donotreply@drunkguthrie.com'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
