@@ -24,13 +24,14 @@
         <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
         	<div class="panel panel-default">
         		<div class="panel-heading">
-			    		<h3 class="panel-title center-text">Please sign up</h3>
-              <h3><small>It's free for members!</small></h3>
+			    		<h3 class="panel-title center-text"> {{ GLOBAL_ORG }} Technology</h3>
+              <h3><small>Signup, it's free for members!</small></h3>
 			 			</div>
 			 			<div class="panel-body">
 			    		<form role="form" method="post">
                 {% csrf_token %}
                 <div class="form-group">
+                  <span id="system_number_error"></span>
 			    				<input type="text" name="abf_number" id="id_abf_number" class="form-control input-sm" placeholder="ABF Number">
 			    			</div>
 
@@ -54,22 +55,25 @@
 			    				<input type="email" name="email" id="id_email" class="form-control input-sm" placeholder="Email Address">
 			    			</div>
 
-			    			<div class="row">
-			    				<div class="col-xs-6 col-sm-6 col-md-6">
-			    					<div class="form-group">
-                      {{ user_form.password1.errors }}
-			    						<input type="password" name="password1" id="id_password1" class="form-control input-sm" placeholder="Password">
-			    					</div>
-			    				</div>
-			    				<div class="col-xs-6 col-sm-6 col-md-6">
-			    					<div class="form-group">
-                      {{ user_form.password2.errors }}
-			    						<input type="password" name="password2" id="id_password2" class="form-control input-sm" placeholder="Confirm Password">
-			    					</div>
-			    				</div>
+                <div class="form-group">
+                  {{ user_form.username.errors }}
+			    				<input type="text" name="username" id="id_username" class="form-control input-sm" placeholder="Choose a Username">
 			    			</div>
 
-			    			<input type="submit" value="Register" class="btn btn-info btn-block">
+	    					<div class="form-group">
+                  {{ user_form.password1.errors }}
+	    						<input type="password" name="password1" id="id_password1" class="form-control input-sm" placeholder="Password">
+	    					</div>
+
+
+	    					<div class="form-group">
+                  {{ user_form.password2.errors }}
+	    						<input type="password" name="password2" id="id_password2" class="form-control input-sm" placeholder="Confirm Password">
+	    					</div>
+
+
+
+			    			<input type="submit" value="Register" class="btn btn-block">
 
 			    		</form>
 			    	</div>
@@ -89,6 +93,9 @@ function getPlayerName() {
     var abf = document.getElementById('id_abf_number')
     var fname = document.getElementById('id_first_name')
     var lname = document.getElementById('id_last_name')
+    var err = document.getElementById('system_number_error')
+
+    err.innerHTML="";
 
 
     var trimmed_abf = abf.value.replace(/^\s+|\s+$/g, '');
@@ -113,8 +120,8 @@ function getPlayerName() {
             var n = txt.search("Invalid");
             if (n>=0) {
                abf.focus();
-               abf.value="";
-               alert(txt);
+              // abf.value="";
+               err.innerHTML=txt;
             }
         }
     });
