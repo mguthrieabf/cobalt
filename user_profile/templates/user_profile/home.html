@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+ <div class="container-fluid">
+   <div class="row">
+     <div class="col-md-8">
+       <div class="card">
+         <div class="card-header card-header-primary">
+           <h4 class="card-title">Edit Profile for {{ form.username.value }}</h4>
+           <p class="card-category">Basic details</p>
+         </div>
+         <div class="card-body">
+           <form method="post">
+             {% csrf_token %}
+             <div class="row">
+               <div class="col-md-3">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">ABF Number</label>
+                   <input type="text" class="form-control" value="{{ form.abf_number.value }}" readonly>
+                 </div>
+               </div>
+               <div class="col-md-4">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">Email address</label>
+                   <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value }}">
+                 </div>
+               </div>
+               <div class="col-md-4">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">Mobile Number</label>
+                   <input type="text" name="mobile" id="id_mobile" class="form-control" value="{{ form.mobile.value|default_if_none:""}}">
+                 </div>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">First Name</label>
+                   <input type="text"  name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value }}">
+                 </div>
+               </div>
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">Last Name</label>
+                   <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form.last_name.value }}">
+                 </div>
+               </div>
+             </div>
+
+
+
+             <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
+             <div class="clearfix"></div>
+           </form>
+         </div>
+       </div>
+     </div>
+     <div class="col-md-4">
+       <div class="card card-profile">
+         <div class="card-avatar">
+           <a href="#pablo">
+             <img class="img" src="../assets/img/faces/as.jpg" />
+           </a>
+         </div>
+         <div class="card-body">
+           <h6 class="card-category text-gray">Bridge Player and Lover of Life</h6>
+           <h4 class="card-title">Allison Stralow</h4>
+           <p class="card-description">
+             Fair play and competition makes me smile.
+           </p>
+           <a href="#pablo" class="btn btn-primary btn-round">Edit</a>
+         </div>
+       </div>
+     </div>
+   </div>
+
+
+   <div class="form-group">
+     <button class="btn-success btn">Change Password</button>
+   </div>
+</div>
+
+
+
+
+
+{% endblock %}

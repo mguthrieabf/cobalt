@@ -21,8 +21,6 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False   # not active until email confirmed
             user.save()
-    #        user.refresh_from_db()  # load the profile instance created by the signal
-
             current_site = get_current_site(request)
             mail_subject = 'Activate your account.'
             message = render_to_string('accounts/acc_active_email.html', {
@@ -33,8 +31,7 @@ def register(request):
             })
             to_email = form.cleaned_data.get('email')
             send_mail(mail_subject, message, 'test@drunkguthrie.com', [to_email], fail_silently=False)
-
-            return HttpResponse("An email confirmation has been sent to %s. If it does not arrive shortly please check in your spam folder." % to_email)
+            return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
     context = {
@@ -51,9 +48,8 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
-        # return redirect('home')
-        return redirect('/dashboard')
+        #login(request, user)
+        return render(request, 'accounts/activate_complete.html', { 'user' : user})
     else:
         return HttpResponse('Activation link is invalid!')
 
