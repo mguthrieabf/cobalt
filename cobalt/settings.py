@@ -72,11 +72,26 @@ WSGI_APPLICATION = 'cobalt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
+# DATABASE_APPS_MAPPING = {'masterpoints': 'abfmpc_db'}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+    # 'abfmpc_db' : {
+    #     'ENGINE': 'sql_server.pyodbc',
+    #     'NAME': 'adfmpc_db',
+    #     'HOST': 'tcp:202.146.210.45,2433',
+    #     'USER': 'xxx',
+    #     'PASSWORD': 'xxx',
+    #
+    #     'OPTIONS': {
+    #         'driver': 'ODBC Driver 13 for SQL Server',
+    #     }
+    # }
+
 }
 
 AUTH_USER_MODEL="accounts.User"

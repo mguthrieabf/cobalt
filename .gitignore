@@ -11,3 +11,4 @@ __pycache__/
 local_settings.py
 db.sqlite3
 migrations/
+development/masterpoints_details_download.sh

@@ -4,6 +4,7 @@
 
 
  <div class="container-fluid">
+   <h3>{{ msg }}</h3>
    <div class="row">
      <div class="col-md-8">
        <div class="card">
@@ -18,9 +19,10 @@
                <div class="col-md-3">
                  <div class="form-group">
                    <label class="bmd-label-floating">ABF Number</label>
-                   <input type="text" class="form-control" value="{{ form.abf_number.value }}" readonly>
+                   <input type="text" class="form-control" name="abf_number" id="id_abf_number" value="{{ form.abf_number.value }}" readonly>
                  </div>
                </div>
+
                <div class="col-md-4">
                  <div class="form-group">
                    <label class="bmd-label-floating">Email address</label>
@@ -61,14 +63,14 @@
        <div class="card card-profile">
          <div class="card-avatar">
            <a href="#pablo">
-             <img class="img" src="../assets/img/faces/as.jpg" />
+             <img class="img" src="  {{ form.pic.value }}" />
            </a>
          </div>
          <div class="card-body">
-           <h6 class="card-category text-gray">Bridge Player and Lover of Life</h6>
-           <h4 class="card-title">Allison Stralow</h4>
+           <h6 class="card-category text-gray">{{ form.headline.value }}</h6>
+           <h4 class="card-title">{{ form.first_name.value }} {{ form.last_name.value }}</h4>
            <p class="card-description">
-             Fair play and competition makes me smile.
+             {{ form.about.value }}
            </p>
            <a href="#pablo" class="btn btn-primary btn-round">Edit</a>
          </div>

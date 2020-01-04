@@ -13,7 +13,7 @@ def get_balance(system_number):
         member = Balance.objects.filter(system_number = system_number)
         balance = member[0].balance
         top_date = member[0].last_top_up_date.strftime('%d %b %Y at %-I:%M %p')
-        last_top_up = "Last top up %s (%s)" % (top_date,
+        last_top_up = "Last top up %s ($%s)" % (top_date,
                                                member[0].last_top_up_amount)
     except:
         balance = "Not setup"

@@ -27,3 +27,13 @@ class MasterpointsCopy(models.Model):
 
     def __str__(self):
         return("%s %s (ABF no: %s) Club: %s" % (self.given_name, self.surname, self.abf_number, self.home_club))
+
+
+class MasterpointDetails(models.Model):
+    system_number = models.IntegerField("ABF Number")
+    mps = models.DecimalField("Masterpoints", max_digits=10, decimal_places=2)
+    posting_month = models.IntegerField("Posting Month")
+    posting_year= models.IntegerField("Posting Year")
+    mp_colour = models.TextField(max_length=1)
+    event_description = models.TextField(max_length=50)
+    event_code = models.TextField(max_length=10)

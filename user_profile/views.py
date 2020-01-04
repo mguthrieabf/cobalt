@@ -1,28 +1,28 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from accounts.forms import UserRegisterForm
+from accounts.forms import UserUpdateForm
 
 @login_required
 def home(request):
     if request.method == 'POST':
-        form = UserRegisterForm(data=request.POST, instance=request.user)
-        if form.is_valid():
-        #     user = form.save(commit=False)
-        #     user.is_active = False   # not active until email confirmed
-        #     user.save()
-            print("later")
-        else:
-            print("Not valid")
+        form = UserUpdateForm(data=request.POST, instance=request.user)
+        # if form.is_valid():
+        #     print("later")
+        # else:
+        #     print("Not valid")
+        #     print(form.is_valid())
+        #     print(form.errors)
         u=request.user
-        print(u)
-        print(u.first_name)
-        u.first_name="Fred"
         u.save()
+        msg="Profile Updated"
     else:
-        user=request.user
-        form = UserRegisterForm(instance=user)
-        context = {
-            'form': form,
-        }
-        return render(request, 'user_profile/home.html', context)
+        msg=""
+
+    user=request.user
+    form = UserUpdateForm(instance=user)
+    context = {
+        'form': form,
+        'msg': msg,
+    }
+    return render(request, 'user_profile/home.html', context)
