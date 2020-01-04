@@ -8,6 +8,8 @@ django.setup()
 
 from masterpoints.models import MasterpointDetails
 
+months=["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
 file = Path("development/MPDataDetails.tsv")
 
 with open(file) as fp:
@@ -27,6 +29,8 @@ with open(file) as fp:
             post.mp_colour = data[4]
             post.event_description = data[5]
             post.event_code = data[6]
+            post.posting_date = "%s-%02d" % (post.posting_year, int(post.posting_month))
+            post.posting_date_display = "%s %s" % (months[int(post.posting_month)-1], post.posting_year)
 
             post.save()
        line = fp.readline()

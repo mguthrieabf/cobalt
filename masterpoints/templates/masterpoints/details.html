@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+         <div class="row">
+           <div class="card">
+             <div class="card-header card-header-primary">
+               <h4 class="card-title">
+                 <h1>{{ request.user.first_name }} {{ request.user.last_name }} - {{ summary.rank }}</h3>
+                 <h3>ABF Number: {{ request.user.abf_number }}</h3>
+             </div>
+             <div class="container w-100">
+               <div class="row d-flex flex-wrap">
+
+                 <div class="col-sm-3" >
+                   <div class="card">
+                     <div class="card-header card-header-info">
+                       <h4 class="card-title">
+                         Summary
+                     </div>
+
+                     <div class="card-body table-responsive">
+                       <table class="table table-hover">
+                         <tbody>
+                           <tr>
+                             <td style="color: orange;  font-weight: bold;">Gold<td style="text-align: right">{{ summary.total_gold }}
+                           </tr>
+                           <tr>
+                             <td style="color: red; font-weight: bold;">Red<td style="text-align: right">{{ summary.total_red }}
+                           </tr>
+                           <tr>
+                             <td style="color: green; font-weight: bold;">Green<td style="text-align: right">{{ summary.total_green }}
+                           </tr>
+                           <tr>
+                             <td style="color: black; font-weight: bold;">Total<td style="text-align: right; font-weight: bold;">{{ summary.total_MPs }}
+                           </tr>
+                         </tbody>
+                       </table>
+                     </div>
+                   </div>
+                 </div>
+
+                 <div class="col-sm-6">
+                   <div class="card">
+                     <div class="card-header card-header-icon card-header-warning">
+                       <div class="card-icon">
+                         <i class="material-icons">timeline</i>
+                       </div>
+                       <h4 class="card-title">Masterpoint Accumulation
+                       </h4>
+                     </div>
+                     <div class="card-body">
+                       <div id="colouredBarsChart" class="ct-chart"></div>
+                     </div>
+                   </div>
+                 </div>
+
+                 <div class="col-sm-3">
+                   <div class="card">
+                     <div class="card-header card-header-success">
+                       <h4 class="card-title">
+                         Lookup Masterpoints
+                     </div>
+
+                     <div class="card-body table-responsive">
+
+                       <form>
+                         <div class="row">
+                           <div class="col-md-12">
+                             <div class="form-group">
+                               <label class="bmd-label-floating">ABF Number</label>
+                               <input type="text" class="form-control" value="">
+                             </div>
+                           </div>
+                           <div class="col-md-12">
+                             <div class="form-group">
+                               <label class="bmd-label-floating">Last Name</label>
+                               <input type="text" class="form-control" value="">
+                             </div>
+                           </div>
+                           <div class="col-md-12">
+                             <div class="form-group">
+                               <label class="bmd-label-floating">First Name</label>
+                               <input type="text" class="form-control" value="">
+                             </div>
+                           </div>
+                         </div>
+
+
+
+
+                         <button type="submit" class="btn btn-primary">Search</button>
+                         <div class="clearfix"></div>
+                       </form>
+
+                   </div>
+                   </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+
+
+   <div>
+     <div class="card">
+       <div class="card-header card-header-warning">
+         <h4 class="card-title">
+           Recent Activity
+       </div>
+       <div class="card-body table-responsive">
+         <table class="table table-hover">
+           <thead class="text-info">
+             <th>Month</th>
+             <th>Details</th>
+             <th>Gold</th>
+             <th>Red</th>
+             <th>Green</th>
+             <th>Total</th>
+           </thead>
+           <tbody>
+             <tr>
+
+               <td>
+               <td><b>Brought Forward<b>
+               <td style="color: orange;">758.80
+               <td style="color: red;">536.36
+               <td style="color: green;">69.11
+               <td><b>1,364.27</b>
+             </tr>
+
+               {% for row in details %}
+
+               <tr>
+                 <td>{{ row.posting_date_display }}
+                 <td>{{ row.event_description }}
+                 <td style="color: orange;">
+                 <td style="color: red;">{{ row.mps }}
+                 <td style="color: green;">
+                 <td>-
+             </tr>
+             {% endfor %}
+           </tbody>
+         </table>
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+
+{% endblock %}

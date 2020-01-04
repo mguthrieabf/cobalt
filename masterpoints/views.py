@@ -2,13 +2,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import MasterpointsCopy
+from .models import MasterpointsCopy, MasterpointDetails
 
 @login_required(login_url='/accounts/login/')
 def home(request):
     number = MasterpointsCopy.objects.count()
-    params = {'number' : number}
+    # params = {'number' : number}
     return render(request, 'masterpoints/home.html', {'number' : number})
+
+@login_required(login_url='/accounts/login/')
+def masterpoints_detail(request,system_number):
+    details = MasterpointDetails.objects.filter(system_number = system_number).order_by('-posting_date')[:20]
+    summary = MasterpointsCopy.objects.filter(abf_number = system_number)
+    print(summary)
+    return render(request, 'masterpoints/details.html', {'details' : details, 'summary': summary[0]})
+
+
+
 
 def abf_lookup(request):
     if request.method == "GET":
