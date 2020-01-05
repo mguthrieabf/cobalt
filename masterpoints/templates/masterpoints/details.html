@@ -6,7 +6,7 @@
            <div class="card">
              <div class="card-header card-header-primary">
                <h4 class="card-title">
-                 <h1>{{ request.user.first_name }} {{ request.user.last_name }} - {{ summary.rank }}</h3>
+                 <h1>{{ request.user.first_name }} {{ request.user.last_name }} - {{ summary.rank }}</h1>
                  <h3>ABF Number: {{ request.user.abf_number }}</h3>
              </div>
              <div class="container w-100">
@@ -46,11 +46,11 @@
                        <div class="card-icon">
                          <i class="material-icons">timeline</i>
                        </div>
-                       <h4 class="card-title">Masterpoint Accumulation
+                       <h4 class="card-title">Last 12 Months
                        </h4>
                      </div>
                      <div class="card-body">
-                       <div id="colouredBarsChart" class="ct-chart"></div>
+                       <div id="mpChart" class="ct-chart"></div>
                      </div>
                    </div>
                  </div>
@@ -114,20 +114,20 @@
            <thead class="text-info">
              <th>Month</th>
              <th>Details</th>
-             <th>Gold</th>
-             <th>Red</th>
-             <th>Green</th>
-             <th>Total</th>
+             <th class="text-right">Gold</th>
+             <th class="text-right">Red</th>
+             <th class="text-right">Green</th>
+             <th class="text-right">Total</th>
            </thead>
            <tbody>
              <tr>
 
                <td>
-               <td><b>Brought Forward<b>
-               <td style="color: orange;">758.80
-               <td style="color: red;">536.36
-               <td style="color: green;">69.11
-               <td><b>1,364.27</b>
+               <td><b>Closing Total<b>
+               <td class="text-right" style="color: orange;">{{ summary.total_gold }}
+               <td class="text-right" style="color: red;">{{ summary.total_red }}
+               <td class="text-right" style="color: green;">{{ summary.total_green }}
+               <td class="text-right"><b>{{ summary.total_MPs }}</b>
              </tr>
 
                {% for row in details %}
@@ -135,19 +135,71 @@
                <tr>
                  <td>{{ row.posting_date_display }}
                  <td>{{ row.event_description }}
-                 <td style="color: orange;">
-                 <td style="color: red;">{{ row.mps }}
-                 <td style="color: green;">
-                 <td>-
+                 <td class="text-right" style="color: orange;">
+                   {% if row.mp_colour == "Y" %}
+                     {{ row.mps }}
+                   {% endif %}
+                 <td class="text-right" style="color: red;">
+                   {% if row.mp_colour == "R" %}
+                     {{ row.mps }}
+                   {% endif %}
+                 <td class="text-right" style="color: green;">
+                   {% if row.mp_colour == "G" %}
+                     {{ row.mps }}
+                   {% endif %}
+                 <td class="text-right">{{ row.running_total }}
              </tr>
              {% endfor %}
+
+            <tr>
+              <td>
+              <td><b>Opening Balance</b>
+                <td class="text-right" style="color: orange;"><b>{{ bottom.gold }}</b>
+                <td class="text-right" style="color: red;"><b>{{ bottom.red }}</b>
+                <td class="text-right" style="color: green;"><b>{{ bottom.green }}</b>
+                <td class="text-right"><b>{{ bottom.total }}</b>
+            </tr>
+
            </tbody>
          </table>
        </div>
      </div>
    </div>
- </div>
+
+<script src="/static/assets/js/core/jquery.min.js"></script>
+<script>
+ $(document).ready(function() {
+
+   chartData = {
+     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
+     series: [
+       [23, 26, 28, 32, 34, 46, 48, 54, 65, 68, 70],
+       [210, 230, 230, 280, 310, 410, 480, 490, 513, 521, 536],
+       [298, 311, 350, 387, 401, 420, 450, 630, 678, 712, 758]
+     ]
+   };
+
+   chartOptions = {
+     lineSmooth: Chartist.Interpolation.cardinal({
+       tension: 10
+     }),
+     axisY: {
+       showGrid: true,
+       offset: 40
+     },
+     axisX: {
+       showGrid: false,
+
+     },
+     showPoint: true,
+     height: '300px'
+   };
 
 
+   var chart = new Chartist.Line('#mpChart', chartData, chartOptions);
 
+   md.startAnimationForLineChart(chart);
+
+       });
+     </script>
 {% endblock %}
