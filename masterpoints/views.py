@@ -35,6 +35,7 @@ def masterpoints_detail(request,system_number):
     chart_red={}
     chart_gold={}
 
+# build chart labels
     rolling_date = datetime.today() + relativedelta(years=-1) # go back a year then move forward
 
     for i in range(13):
@@ -43,8 +44,10 @@ def masterpoints_detail(request,system_number):
         labels_key.append("%s-%s" % (year, month))
         labels.append(rolling_date.strftime("%b"))
         rolling_date = rolling_date + relativedelta(months=+1)
+        chart_gold["%s-%s" % (year, month)]=decimal.Decimal(0.0)
 
     print(labels)
+    print(labels_key)
 
 # loop through the details and augment the data to pass to the template
 # we are just adding running total data for the table of details
@@ -61,10 +64,8 @@ def masterpoints_detail(request,system_number):
         if d.mp_colour == "Y":
             gold = gold - d.mps
             last_line_gold = d.mps
-            if d.posting_date in chart_gold:
-                chart_gold[d.posting_date]=chart_gold[d.posting_date]+d.mps
-            else:
-                chart_gold[d.posting_date]=d.mps
+            chart_gold[d.posting_date]=chart_gold[d.posting_date]+d.mps
+
 
         elif d.mp_colour == "R":
             red = red - d.mps
@@ -76,9 +77,9 @@ def masterpoints_detail(request,system_number):
 # build chart data
     print(chart_gold)
 
-# fill in the gaps
-    # for l in labels_key:
-    #     if
+# fill in the chart data
+    for l in reversed(labels_key):
+        print(l)
 
 # update bottom line
     total = green + red + gold - last_line_gold - last_line_red - last_line_green
