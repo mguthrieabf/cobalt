@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from datetime import datetime, date
+from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from .models import MasterpointsCopy, MasterpointDetails
 
@@ -24,9 +25,9 @@ def masterpoints_detail(request,system_number):
     details = MasterpointDetails.objects.filter(system_number = system_number,
                 posting_date__gt="%s-%s" % (year, month)).order_by('-posting_date')
     counter = summary[0].total_MPs # we need to construct the balance to show
-    gold = summary[0].total_gold
-    red = summary[0].total_red
-    green = summary[0].total_green
+    gold = float(summary[0].total_gold)
+    red = float(summary[0].total_red)
+    green = float(summary[0].total_green)
 
 # build list for the fancy chart at the top while we loop through
     labels_key=[]
@@ -44,10 +45,10 @@ def masterpoints_detail(request,system_number):
         labels_key.append("%s-%s" % (year, month))
         labels.append(rolling_date.strftime("%b"))
         rolling_date = rolling_date + relativedelta(months=+1)
-        chart_gold["%s-%s" % (year, month)]=decimal.Decimal(0.0)
+        chart_gold["%s-%s" % (year, month)]=0.0
+        chart_red["%s-%s" % (year, month)]=0.0
+        chart_green["%s-%s" % (year, month)]=0.0
 
-    print(labels)
-    print(labels_key)
 
 # loop through the details and augment the data to pass to the template
 # we are just adding running total data for the table of details
@@ -62,43 +63,59 @@ def masterpoints_detail(request,system_number):
 
         d.running_total = counter
         if d.mp_colour == "Y":
-            gold = gold - d.mps
-            last_line_gold = d.mps
-            chart_gold[d.posting_date]=chart_gold[d.posting_date]+d.mps
-
-
+            gold = gold - float(d.mps)
+            last_line_gold = float(d.mps)
+            chart_gold[d.posting_date]=chart_gold[d.posting_date]+float(d.mps)
         elif d.mp_colour == "R":
-            red = red - d.mps
-            last_line_red = d.mps
+            red = red - float(d.mps)
+            last_line_red = float(d.mps)
+            chart_red[d.posting_date]=chart_red[d.posting_date]+float(d.mps)
         elif d.mp_colour == "G":
-            green = green - d.mps
-            last_line_green = d.mps
-
-# build chart data
-    print(chart_gold)
+            green = green - float(d.mps)
+            last_line_green = float(d.mps)
+            chart_green[d.posting_date]=chart_green[d.posting_date]+float(d.mps)
 
 # fill in the chart data
+    running_gold = gold
+    gold_series = []
     for l in reversed(labels_key):
-        print(l)
+        running_gold = running_gold - chart_gold[l]
+        gold_series.append(float("%.2f" % running_gold))
+    gold_series.reverse()
+
+    running_red = red
+    red_series = []
+    for l in reversed(labels_key):
+        running_gold = running_red - chart_red[l]
+        red_series.append(float("%.2f" % running_red))
+    red_series.reverse()
+
+    running_green = green
+    green_series = []
+    for l in reversed(labels_key):
+        running_green = running_green - chart_green[l]
+        green_series.append(float('%.2f' % running_green))
+    green_series.reverse()
+
+
+    chart = {'labels': labels,
+             'gold': gold_series,
+             'red': red_series,
+             'green': green_series
+            }
 
 # update bottom line
-    total = green + red + gold - last_line_gold - last_line_red - last_line_green
-    green = green - last_line_green
-    red = red - last_line_red
-    gold = gold - last_line_gold
+    total = "%.2f" % (green + red + gold - last_line_gold - last_line_red - last_line_green)
+    green = "%.2f" % (green - last_line_green)
+    red = "%.2f" % (red - last_line_red)
+    gold = "%.2f" % (gold - last_line_gold)
 
     bottom = {'gold': gold, 'red': red, 'green': green, 'total': total}
 
-# generate the chart data for the top of the page
-#    for d in details:
-
-
     return render(request, 'masterpoints/details.html', {'details' : details,
                                                          'summary': summary[0],
+                                                         'chart': chart,
                                                          'bottom': bottom})
-
-
-
 
 def abf_lookup(request):
     if request.method == "GET":
