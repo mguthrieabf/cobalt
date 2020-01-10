@@ -9,8 +9,9 @@ from .models import MasterpointsCopy, MasterpointDetails
 
 @login_required(login_url='/accounts/login/')
 def home(request):
-    number = MasterpointsCopy.objects.count()
-    return render(request, 'masterpoints/home.html', {'number' : number})
+    summary = MasterpointsCopy.objects.count()
+    detail = MasterpointDetails.objects.count()
+    return render(request, 'masterpoints/home.html', {'summary' : summary, 'detail' : detail})
 
 @login_required(login_url='/accounts/login/')
 def masterpoints_detail(request,system_number):
@@ -86,7 +87,7 @@ def masterpoints_detail(request,system_number):
     running_red = red
     red_series = []
     for l in reversed(labels_key):
-        running_gold = running_red - chart_red[l]
+        running_red = running_red - chart_red[l]
         red_series.append(float("%.2f" % running_red))
     red_series.reverse()
 

@@ -1,0 +1,14 @@
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-start.sql -o data/OUT-start.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-end.sql -o data/OUT-end.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-4000.sql -o data/OUT-4000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-10000.sql -o data/OUT-10000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-50000.sql -o data/OUT-50000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-100000.sql -o data/OUT-100000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-150000.sql -o data/OUT-150000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-200000.sql -o data/OUT-200000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-400000.sql -o data/OUT-400000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-500000.sql -o data/OUT-500000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-600000.sql -o data/OUT-600000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-700000.sql -o data/OUT-700000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-800000.sql -o data/OUT-800000.tsv
+mssql-cli -S "tcp:202.146.210.45,2433" -d abfmpc_db -U abfmpc_website -P Br1dge1440 --mssqlclirc mssqlclirc.cfg -i cmds/mp_detail.sql-900000.sql -o data/OUT-900000.tsv

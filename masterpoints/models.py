@@ -30,7 +30,7 @@ class MasterpointsCopy(models.Model):
 
 
 class MasterpointDetails(models.Model):
-    system_number = models.IntegerField("ABF Number")
+    system_number = models.IntegerField("ABF Number", db_index=True)
     mps = models.DecimalField("Masterpoints", max_digits=10, decimal_places=2)
     posting_month = models.IntegerField("Posting Month")
     posting_year = models.IntegerField("Posting Year")

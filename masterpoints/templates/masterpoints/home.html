@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
-<h1>Masterpoints {{ number }}</h1>
+<h1>Masterpoints</h1>
+
+<h2>Summary: {{ summary|intcomma }} rows</h2>
+
+<h2>Detail: {{ detail|intcomma }} rows</h2>
 
 
 

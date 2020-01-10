@@ -1,0 +1,1 @@
+SELECT ABFNumber, mps, postingmonth, postingyear, MPColour, EventDescription, EventCode FROM dbo.viewPlayerTrans where ABFNumber >= 280000 and ABFNumber< 300000; where ABFNumber < 5000 and ABFNumber > 6000;

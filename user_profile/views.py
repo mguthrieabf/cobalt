@@ -7,12 +7,6 @@ from accounts.forms import UserUpdateForm
 def home(request):
     if request.method == 'POST':
         form = UserUpdateForm(data=request.POST, instance=request.user)
-        # if form.is_valid():
-        #     print("later")
-        # else:
-        #     print("Not valid")
-        #     print(form.is_valid())
-        #     print(form.errors)
         u=request.user
         u.save()
         msg="Profile Updated"
