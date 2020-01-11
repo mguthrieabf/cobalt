@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<table class="table table-hover">
+    <thead class="text-info">
+      <th>First Name
+      <th>Last Name
+      <th>ABF number
+      <th>Home Club
+    </thead>
+    <tbody>
+{% for m in matches %}
+
+      <tr>
+        <td>{{ m.given_name }}
+        <td>{{ m.surname }}
+        <td><a href="view/{{ m.abf_number }}"> {{ m.abf_number }} </a>
+      </tr>
+
+{% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

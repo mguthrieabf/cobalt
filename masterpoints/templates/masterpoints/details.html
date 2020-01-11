@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
     <div class="container-fluid">
@@ -6,10 +7,11 @@
            <div class="card">
              <div class="card-header card-header-primary">
                <h4 class="card-title">
-                 <h1>{{ request.user.first_name }} {{ request.user.last_name }} - {{ summary.rank }}
+                 <h1>{{ summary.given_name }} {{ summary.surname }} - {{ summary.rank }}
+                   ({% if summary.active %}Active{% else %}Inactive{% endif %})
 
                  </h1>
-                 <h3>ABF Number: {{ request.user.abf_number }}</h3>
+                 <h3>ABF Number: {{ summary.abf_number }}</h3>
              </div>
              <div class="container w-100">
                <div class="row d-flex flex-wrap">
@@ -25,16 +27,16 @@
                        <table class="table table-hover">
                          <tbody>
                            <tr>
-                             <td style="color: orange;  font-weight: bold;">Gold<td style="text-align: right">{{ summary.total_gold }}
+                             <td style="color: orange;  font-weight: bold;">Gold<td style="text-align: right">{{ summary.total_gold|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: red; font-weight: bold;">Red<td style="text-align: right">{{ summary.total_red }}
+                             <td style="color: red; font-weight: bold;">Red<td style="text-align: right">{{ summary.total_red|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: green; font-weight: bold;">Green<td style="text-align: right">{{ summary.total_green }}
+                             <td style="color: green; font-weight: bold;">Green<td style="text-align: right">{{ summary.total_green|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: black; font-weight: bold;">Total<td style="text-align: right; font-weight: bold;">{{ summary.total_MPs }}
+                             <td style="color: black; font-weight: bold;">Total<td style="text-align: right; font-weight: bold;">{{ summary.total_MPs|floatformat:2|intcomma }}
                            </tr>
                          </tbody>
                        </table>
@@ -66,31 +68,28 @@
 
                      <div class="card-body table-responsive">
 
-                       <form>
+                       <form method="POST" action="../../masterpoints_search">
+                         {% csrf_token %}
                          <div class="row">
                            <div class="col-md-12">
                              <div class="form-group">
                                <label class="bmd-label-floating">ABF Number</label>
-                               <input type="text" class="form-control" value="">
+                               <input name="system_number" id="id_system_number" type="text" class="form-control" value="">
                              </div>
                            </div>
                            <div class="col-md-12">
                              <div class="form-group">
                                <label class="bmd-label-floating">Last Name</label>
-                               <input type="text" class="form-control" value="">
+                               <input name="last_name" id="id_last_name" type="text" class="form-control" value="">
                              </div>
                            </div>
                            <div class="col-md-12">
                              <div class="form-group">
                                <label class="bmd-label-floating">First Name</label>
-                               <input type="text" class="form-control" value="">
+                               <input name="first_name" id="id_first_name" type="text" class="form-control" value="">
                              </div>
                            </div>
                          </div>
-
-
-
-
                          <button type="submit" class="btn btn-primary">Search</button>
                          <div class="clearfix"></div>
                        </form>
@@ -126,10 +125,10 @@
 
                <td>
                <td><b>Closing Total<b>
-               <td class="text-right" style="color: orange;">{{ summary.total_gold }}
-               <td class="text-right" style="color: red;">{{ summary.total_red }}
-               <td class="text-right" style="color: green;">{{ summary.total_green }}
-               <td class="text-right"><b>{{ summary.total_MPs }}</b>
+               <td class="text-right" style="color: orange;">{{ summary.total_gold|floatformat:2|intcomma }}
+               <td class="text-right" style="color: red;">{{ summary.total_red|floatformat:2|intcomma }}
+               <td class="text-right" style="color: green;">{{ summary.total_green|floatformat:2|intcomma }}
+               <td class="text-right"><b>{{ summary.total_MPs|floatformat:2|intcomma }}</b>
              </tr>
 
                {% for row in details %}
@@ -149,17 +148,17 @@
                    {% if row.mp_colour == "G" %}
                      {{ row.mps }}
                    {% endif %}
-                 <td class="text-right">{{ row.running_total }}
+                 <td class="text-right">{{ row.running_total|floatformat:2|intcomma }}
              </tr>
              {% endfor %}
 
             <tr>
               <td>
               <td><b>Opening Balance</b>
-                <td class="text-right" style="color: orange;"><b>{{ bottom.gold }}</b>
-                <td class="text-right" style="color: red;"><b>{{ bottom.red }}</b>
-                <td class="text-right" style="color: green;"><b>{{ bottom.green }}</b>
-                <td class="text-right"><b>{{ bottom.total }}</b>
+                <td class="text-right" style="color: orange;"><b>{{ bottom.gold|floatformat:2|intcomma }}</b>
+                <td class="text-right" style="color: red;"><b>{{ bottom.red|floatformat:2|intcomma }}</b>
+                <td class="text-right" style="color: green;"><b>{{ bottom.green|floatformat:2|intcomma }}</b>
+                <td class="text-right"><b>{{ bottom.total|floatformat:2|intcomma }}</b>
             </tr>
 
            </tbody>

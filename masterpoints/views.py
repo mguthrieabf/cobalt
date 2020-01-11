@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import datetime, date
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
+from accounts.models import User
 from .models import MasterpointsCopy, MasterpointDetails
 
 @login_required(login_url='/accounts/login/')
@@ -14,8 +15,8 @@ def home(request):
     return render(request, 'masterpoints/home.html', {'summary' : summary, 'detail' : detail})
 
 @login_required(login_url='/accounts/login/')
-def masterpoints_detail(request,system_number):
-    summary = MasterpointsCopy.objects.filter(abf_number = system_number)
+def masterpoints_detail(request, system_number):
+    summary = get_object_or_404(MasterpointsCopy, abf_number = system_number)
 
 # Get last year in YYYY-MM format
     dt = date.today()
@@ -24,11 +25,11 @@ def masterpoints_detail(request,system_number):
     month = dt.strftime("%m")
 
     details = MasterpointDetails.objects.filter(system_number = system_number,
-                posting_date__gt="%s-%s" % (year, month)).order_by('-posting_date')
-    counter = summary[0].total_MPs # we need to construct the balance to show
-    gold = float(summary[0].total_gold)
-    red = float(summary[0].total_red)
-    green = float(summary[0].total_green)
+                posting_date__gte="%s-%s" % (year, month)).order_by('-posting_date')
+    counter = summary.total_MPs # we need to construct the balance to show
+    gold = float(summary.total_gold)
+    red = float(summary.total_red)
+    green = float(summary.total_green)
 
 # build list for the fancy chart at the top while we loop through
     labels_key=[]
@@ -77,21 +78,21 @@ def masterpoints_detail(request,system_number):
             chart_green[d.posting_date]=chart_green[d.posting_date]+float(d.mps)
 
 # fill in the chart data
-    running_gold = gold
+    running_gold = float(summary.total_gold)
     gold_series = []
     for l in reversed(labels_key):
         running_gold = running_gold - chart_gold[l]
         gold_series.append(float("%.2f" % running_gold))
     gold_series.reverse()
 
-    running_red = red
+    running_red = float(summary.total_red)
     red_series = []
     for l in reversed(labels_key):
         running_red = running_red - chart_red[l]
         red_series.append(float("%.2f" % running_red))
     red_series.reverse()
 
-    running_green = green
+    running_green = float(summary.total_green)
     green_series = []
     for l in reversed(labels_key):
         running_green = running_green - chart_green[l]
@@ -113,10 +114,35 @@ def masterpoints_detail(request,system_number):
 
     bottom = {'gold': gold, 'red': red, 'green': green, 'total': total}
 
-    return render(request, 'masterpoints/details.html', {'details' : details,
-                                                         'summary': summary[0],
+    return render(request, 'masterpoints/details.html', {'details': details,
+                                                         'summary': summary,
                                                          'chart': chart,
                                                          'bottom': bottom})
+
+@login_required(login_url='/accounts/login/')
+def masterpoints_search(request):
+    if request.method == 'POST':
+        system_number = request.POST['system_number']
+        last_name = request.POST['last_name']
+        first_name = request.POST['first_name']
+        if system_number:
+            return redirect("view/%s/" % system_number)
+        else:
+            if not first_name: # last name only
+                matches = MasterpointsCopy.objects.filter(surname__icontains = last_name)
+            elif not last_name: # first name only
+                matches = MasterpointsCopy.objects.filter(given_name__iexact = first_name)
+            else: # first and last names
+                matches = MasterpointsCopy.objects.filter(given_name__iexact = first_name, surname__icontains = last_name)
+            if len(matches)==1:
+                system_number=matches[0].abf_number
+                return redirect("view/%s/" % system_number)
+            else:
+                return render(request,
+                    'masterpoints/masterpoints_search_results.html',
+                    {'matches' : matches})
+    else:
+        return redirect("view/%s/" % request.user.abf_number)
 
 def abf_lookup(request):
     if request.method == "GET":
