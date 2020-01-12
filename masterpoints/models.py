@@ -28,7 +28,6 @@ class MasterpointsCopy(models.Model):
     def __str__(self):
         return("%s %s (ABF no: %s) Club: %s" % (self.given_name, self.surname, self.abf_number, self.home_club))
 
-
 class MasterpointDetails(models.Model):
     system_number = models.IntegerField("ABF Number", db_index=True)
     mps = models.DecimalField("Masterpoints", max_digits=10, decimal_places=2)
@@ -39,3 +38,13 @@ class MasterpointDetails(models.Model):
     mp_colour = models.TextField(max_length=1)
     event_description = models.TextField(max_length=50)
     event_code = models.TextField(max_length=10)
+
+    def __str__(self):
+        return("%s" % (self.system_number))
+
+class MasterpointsClubs(models.Model):
+    club_number = models.IntegerField("Club Number", db_index=True)
+    club_name = models.TextField("Club Name", max_length=100)
+
+    def __str__(self):
+        return("%s (%s)" % (self.club_name, self.club_number))

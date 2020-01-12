@@ -6,7 +6,7 @@ from datetime import datetime, date
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from accounts.models import User
-from .models import MasterpointsCopy, MasterpointDetails
+from .models import MasterpointsCopy, MasterpointDetails, MasterpointsClubs
 
 @login_required(login_url='/accounts/login/')
 def home(request):
@@ -17,7 +17,8 @@ def home(request):
 @login_required(login_url='/accounts/login/')
 def masterpoints_detail(request, system_number):
     summary = get_object_or_404(MasterpointsCopy, abf_number = system_number)
-
+    club_string = summary.home_club.replace("-","")
+    club = get_object_or_404(MasterpointsClubs, club_number = int(club_string))
 # Get last year in YYYY-MM format
     dt = date.today()
     dt = dt.replace(year=dt.year-1)
@@ -26,6 +27,7 @@ def masterpoints_detail(request, system_number):
 
     details = MasterpointDetails.objects.filter(system_number = system_number,
                 posting_date__gte="%s-%s" % (year, month)).order_by('-posting_date')
+
     counter = summary.total_MPs # we need to construct the balance to show
     gold = float(summary.total_gold)
     red = float(summary.total_red)
@@ -116,6 +118,7 @@ def masterpoints_detail(request, system_number):
 
     return render(request, 'masterpoints/details.html', {'details': details,
                                                          'summary': summary,
+                                                         'club': club,
                                                          'chart': chart,
                                                          'bottom': bottom})
 
@@ -138,6 +141,7 @@ def masterpoints_search(request):
                 system_number=matches[0].abf_number
                 return redirect("view/%s/" % system_number)
             else:
+                # clubs = MasterpointsClubs.objects.filter(club_number = )
                 return render(request,
                     'masterpoints/masterpoints_search_results.html',
                     {'matches' : matches})

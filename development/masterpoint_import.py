@@ -45,5 +45,4 @@ for row in data:
     post.year_start_rank_seq = row[21]
     post.last_promotion_date = row[22]
 
-    if post.active==True:
-        post.save()
+    post.save()

@@ -25,8 +25,6 @@
         </a>
       </div>
       <div class="sidebar-wrapper">
-
-
         <ul class="nav">
           <li class="nav-item
           {% if request.path|slice:":10" == "/dashboard" %}active{% endif %}
@@ -84,10 +82,8 @@
         </ul>
       </div>
     </div>
-
     <div class="main-panel">
       <!-- Navbar -->
-
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
@@ -150,18 +146,14 @@
               </li>
             </ul>
           </div>
-        </div>
+          </div>
       </nav>
-  <div class="content">
+    <div class="content" style="margin-top:20px;">
 
-    {% block content %}
-    {% endblock %}
+      {% block content %}
+      {% endblock %}
 
-
-
-
-
-  </div>
+    </div>
       <footer class="footer">
         <div class="container-fluid">
           <nav class="float-left">
@@ -234,8 +226,8 @@
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/static/assets/js/material-dashboard.js?v=2.1.1" type="text/javascript"></script>
   <!-- Material Dashboard DEMO methods, don't include it in your project! -->
-  <script src="/static/assets/demo/demo.js"></script>
-  <script src="/static/assets/demo/mydate.js"></script>
+  <!-- <script src="/static/assets/demo/demo.js"></script>
+  <script src="/static/assets/demo/mydate.js"></script> -->
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
