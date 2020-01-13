@@ -5,15 +5,17 @@ from django.utils import timezone
 from .models import Post, Comment1, Comment2
 from .forms import PostForm
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def home(request):
     return render(request, 'forums/home.html')
 
+@login_required(login_url='/accounts/login/')
 def post_list(request):
     posts=Post.objects.all()
 #    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     return render(request, 'forums/post_list.html', {'posts' : posts})
 
+@login_required(login_url='/accounts/login/')
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments1 = Comment1.objects.filter(post = post)
@@ -25,7 +27,8 @@ def post_detail(request, pk):
     return render(request, 'forums/post_detail.html', {'post': post,
                                                        'comments1' : comments1,
                                                        'comments2' : comments2 })
-
+                                                       
+@login_required(login_url='/accounts/login/')
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)

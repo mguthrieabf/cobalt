@@ -9,9 +9,11 @@
                <h4 class="card-title">
                  <h1>{{ summary.given_name }} {{ summary.surname }}
                  </h1>
-                 <h2>{{ summary.rank }}</h2>
-                 <h3>ABF Number: {{ summary.abf_number }}</h3>
-                 <h3>{% if summary.active %}Plays at {{club.club_name}}{% else %}}Used to play at {{club.club_name}}{% endif %}</h3>
+                 <h2>{{ summary.abf_number }} - {{ summary.rank }}</h2>
+                 <h3><i>{% if summary.active %}Home club is {{club.club_name}}{% else %}}Used to play at {{club.club_name}}{% endif %}</i></h3>
+
+            <!-- <img class="img" src="/media/{{ request.user.pic }}" /> -->
+
              </div>
              <div class="container w-100">
                <div class="row d-flex flex-wrap">
