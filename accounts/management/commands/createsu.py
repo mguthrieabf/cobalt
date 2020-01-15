@@ -11,3 +11,5 @@ class Command(BaseCommand):
                                  password='F1shcake',
                                  abf_number=99)
             self.stdout.write(self.style.SUCCESS('Successfully created new super user'))
+        else:
+            self.stdout.write(self.style.SUCCESS('Super user already exists'))
