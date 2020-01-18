@@ -13,6 +13,8 @@ from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
 
+from forums.models import Post
+
 
 def register(request):
     if request.method == 'POST':
@@ -39,8 +41,10 @@ def register(request):
                 return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
+    postlist = Post.objects.filter()
     context = {
         'user_form': form,
+        'posts': postlist
     }
     return render(request, 'accounts/register.html', context)
 
