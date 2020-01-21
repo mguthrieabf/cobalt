@@ -13,9 +13,6 @@ from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
 
-from notifications.models import TestIt
-
-
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -41,12 +38,8 @@ def register(request):
                 return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
-    notif = TestIt(msg="Hello")
-    notif.save()
-    postlist = TestIt.objects.all()[0]
     context = {
         'user_form': form,
-        'posts': postlist
     }
     return render(request, 'accounts/register.html', context)
 
