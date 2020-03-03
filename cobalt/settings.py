@@ -13,7 +13,8 @@ SECRET_KEY = 'ci8v_@0l*@1@*ufho0kt4+wu6d7b(r!0-4k9p2c^a!rki%23dr'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cobalt-dev.ap-southeast-2.elasticbeanstalk.com','127.0.0.1']
+# ALLOWED_HOSTS = ['cobalt-dev.ap-southeast-2.elasticbeanstalk.com','127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -83,17 +84,17 @@ DATABASES = {
     },
 }
 
-if 'RDS_HOSTNAME' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
-        }
-    }
+# if 'RDS_HOSTNAME' in os.environ:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#             'NAME': os.environ['RDS_DB_NAME'],
+#             'USER': os.environ['RDS_USERNAME'],
+#             'PASSWORD': os.environ['RDS_PASSWORD'],
+#             'HOST': os.environ['RDS_HOSTNAME'],
+#             'PORT': os.environ['RDS_PORT'],
+#         }
+#     }
 
     # 'abfmpc_db' : {
     #     'ENGINE': 'sql_server.pyodbc',

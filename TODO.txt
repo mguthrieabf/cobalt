@@ -1,6 +1,0 @@
-Add logging throughout-use database for major events
-Security and groups - link to Django security
-API research
-Extend notifications to all apps not just events
-Masterpoints
-Add incoming events to the notifications app
