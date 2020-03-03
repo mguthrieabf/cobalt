@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 import random
-
+from django.db import connection
 
 class NotificationsConfig(AppConfig):
     name = 'notifications'
@@ -25,7 +25,13 @@ class Notifications():
                 "Hello.",
                 "How are you?",
              ]
-        return(random.choice(list))
+
+        cursor = connection.cursor()
+        cursor.execute('''SELECT * FROM pg_catalog.pg_tables''')
+        row = cursor.fetchone()
+        return(row)
+
+#        return(random.choice(list))
 
     def acknowledge_notification(self, id):
         pass
