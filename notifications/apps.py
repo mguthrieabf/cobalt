@@ -27,7 +27,7 @@ class Notifications():
              ]
 
         cursor = connection.cursor()
-        cursor.execute('''SELECT * FROM pg_catalog.pg_tables''')
+        cursor.execute('''SELECT version()''')
         row = cursor.fetchone()
         return(row)
 
