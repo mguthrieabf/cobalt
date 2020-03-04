@@ -1,6 +1,6 @@
 branch-defaults:
   master:
-    environment: cobalt-dev
+    environment: cobalt-test
     group_suffix: null
 environment-defaults:
   cobalt-dev:

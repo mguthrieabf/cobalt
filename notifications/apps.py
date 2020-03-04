@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 import random
 from django.db import connection
+from django.db import connections
 
 class NotificationsConfig(AppConfig):
     name = 'notifications'
@@ -29,6 +30,7 @@ class Notifications():
         cursor = connection.cursor()
         cursor.execute('''SELECT version()''')
         row = cursor.fetchone()
+
         return(row)
 
 #        return(random.choice(list))
