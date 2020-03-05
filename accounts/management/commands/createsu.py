@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        print("Running createsu")
+        print("Running createsu.")
         self.CreateDefaultTestUsers("admin", "a@b.com", "99", "Admin", "Admin")
     #    self.CreateDefaultTestUsers("Mark", "m@rkguthrie.com", "620246", "Mark", "Guthrie")
         self.CreateDefaultTestUsers("Julian", "julianrfoster@gmail.com", "518891", "Julian", "Foster")
