@@ -15,11 +15,13 @@
   <link href="/static/assets/css/material-dashboard.css?v=2.1.1" rel="stylesheet" />
 </head>
 <body class="">
-  <div class="wrapper ">
+  <div class="wrapper">
     <div class="sidebar" data-color="orange" data-background-color="white" data-image="/static/assets/img/abf_slider_1.jpg">
       <div class="logo text-center">
         <a href="/" class="simple-text logo-normal">
           {{ GLOBAL_TITLE }}
+          <br>
+          {{ request.META.HTTP_HOST }}
           <br>
           <img src="/static/assets/img/ABF_logo.gif">
         </a>
@@ -124,7 +126,6 @@
                   {% for id, msg in notifications.items %}
                        <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
-
 
                 </div>
                 {% endif %}

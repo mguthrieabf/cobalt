@@ -58,11 +58,11 @@
 /* Override Chartist colours */
 
 .ct-chart .ct-series.ct-series-a .ct-point {
-  stroke: green;
+  stroke: #76EE00;
 }
 
 .ct-chart .ct-series.ct-series-a .ct-line {
-  stroke: green;
+  stroke: #76EE00;
 }
 
 .ct-chart .ct-series.ct-series-b .ct-point {
