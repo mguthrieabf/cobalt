@@ -167,7 +167,7 @@ GLOBAL_TITLE="ABF Technology"
 GLOBAL_CONTACT="https://abf.com.au"
 GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
-GLOBAL_MPSERVER="127.0.0.1:8081"
+GLOBAL_MPSERVER="http://127.0.0.1:8081"
 
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']

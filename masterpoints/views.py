@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from accounts.models import User
 import requests
 import calendar
+from cobalt.settings import GLOBAL_MPSERVER
 
 @login_required(login_url='/accounts/login/')
 def masterpoints_detail(request, system_number=None):
@@ -15,17 +16,17 @@ def masterpoints_detail(request, system_number=None):
    if system_number == None:
        system_number = request.user.abf_number
 
-   summary = requests.get('http://127.0.0.1:8081/mps/%s' % system_number).json()[0]
+   summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
    club_string = summary['HomeClubID']
-   club = requests.get('http://127.0.0.1:8081/club/%s' % club_string).json()[0]['ClubName']
+   club = requests.get('%s/club/%s' % (GLOBAL_MPSERVER, club_string)).json()[0]['ClubName']
 # Get last year in YYYY-MM format
    dt = date.today()
    dt = dt.replace(year=dt.year-1)
    year = dt.strftime("%Y")
    month = dt.strftime("%-m")
 
-   details = requests.get('http://127.0.0.1:8081/mpdetail/%s/postingyear/%s/postingmonth/%s' %
-        (system_number, year, month)).json()
+   details = requests.get('%s/mpdetail/%s/postingyear/%s/postingmonth/%s' %
+        (GLOBAL_MPSERVER, system_number, year, month)).json()
    counter = summary['TotalMPs'] # we need to construct the balance to show
    gold = float(summary['TotalGold'])
    red = float(summary['TotalRed'])
@@ -170,7 +171,7 @@ def abf_lookup(request):
 def get_masterpoints(abf_number):
 
    try:
-       summary = requests.get('http://127.0.0.1:8081/mps/%s' % abf_number).json()[0]
+       summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
        points = summary["TotalMPs"]
        rank = summary["RankName"]
    except:
