@@ -19,7 +19,11 @@
     <div class="sidebar" data-color="orange" data-background-color="white" data-image="/static/assets/img/abf_slider_1.jpg">
       <div class="logo text-center">
         <a href="/" class="simple-text logo-normal">
-          {{ GLOBAL_TITLE }}
+          { if request.META_HTTP_HOST == GLOBAL_PRODUCTION }
+            {{ GLOBAL_TITLE }}
+          { else }
+            {{ request.META.HTTP_HOST }}
+          {% endif %}
           <br>
           <img src="/static/assets/img/ABF_logo.gif">
         </a>
