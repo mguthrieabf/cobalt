@@ -10,23 +10,42 @@ import requests
 import calendar
 from cobalt.settings import GLOBAL_MPSERVER
 
+#####
+#
+# This module is a little strange as it gets all of its data from
+# an external source, not from our database.
+#
+# We use requests to access a node.js web service which connects
+# to a SQL Server database. Confluence can tell you more
+#
+######
+
 @login_required(login_url='/accounts/login/')
 def masterpoints_detail(request, system_number=None):
 
    if system_number == None:
        system_number = request.user.abf_number
 
-   summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
+# Get summary data
+   qry = '%s/mps/%s' % (GLOBAL_MPSERVER, system_number)
+   summary = requests.get(qry).json()[0]
+
+# Get home club name
    club_string = summary['HomeClubID']
-   club = requests.get('%s/club/%s' % (GLOBAL_MPSERVER, club_string)).json()[0]['ClubName']
+   qry = '%s/club/%s' % (GLOBAL_MPSERVER, club_string)
+   club = requests.get(qry).json()[0]['ClubName']
+
 # Get last year in YYYY-MM format
    dt = date.today()
    dt = dt.replace(year=dt.year-1)
    year = dt.strftime("%Y")
    month = dt.strftime("%-m")
 
-   details = requests.get('%s/mpdetail/%s/postingyear/%s/postingmonth/%s' %
-        (GLOBAL_MPSERVER, system_number, year, month)).json()
+# Get the detail list of recent activity
+   qry = '%s/mpdetail/%s/postingyear/%s/postingmonth/%s' % \
+        (GLOBAL_MPSERVER, system_number, year, month)
+   details = requests.get(qry).json()
+
    counter = summary['TotalMPs'] # we need to construct the balance to show
    gold = float(summary['TotalGold'])
    red = float(summary['TotalRed'])
@@ -40,7 +59,8 @@ def masterpoints_detail(request, system_number=None):
    chart_gold={}
 
 # build chart labels
-   rolling_date = datetime.today() + relativedelta(years=-1) # go back a year then move forward
+    # go back a year then move forward
+   rolling_date = datetime.today() + relativedelta(years=-1)
 
    for i in range(13):
        year = rolling_date.strftime("%Y")
@@ -51,10 +71,6 @@ def masterpoints_detail(request, system_number=None):
        chart_gold["%s-%s" % (year, month)]=0.0
        chart_red["%s-%s" % (year, month)]=0.0
        chart_green["%s-%s" % (year, month)]=0.0
-
-   # last_line_green = 0
-   # last_line_red = 0
-   # last_line_gold = 0
 
 # loop through the details and augment the data to pass to the template
 # we are just adding running total data for the table of details
@@ -71,6 +87,7 @@ def masterpoints_detail(request, system_number=None):
        d["PostingDate"] = "%s-%s" % (d["PostingYear"], d["PostingMonth"])
        d["PostingDateDisplay"] = "%s-%s" % (calendar.month_abbr[d["PostingMonth"]], d["PostingYear"])
 
+# Its too slow to filter at the db so skip any month we don't want
        if not d["PostingDate"] in chart_gold:
            continue
 
@@ -175,7 +192,7 @@ def abf_lookup(request):
        return render(request, 'masterpoints/abf_lookup.html', {'result' : result})
 
 def get_masterpoints(abf_number):
-
+# Called from Dashboard
    try:
        summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
        points = summary["TotalMPs"]
