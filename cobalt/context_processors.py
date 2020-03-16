@@ -8,5 +8,5 @@ def global_settings(request):
             'GLOBAL_CONTACT': settings.GLOBAL_CONTACT,
             'GLOBAL_ABOUT': settings.GLOBAL_ABOUT,
             'GLOBAL_PRIVACY': settings.GLOBAL_PRIVACY,
-
+            'GLOBAL_MPSERVER': settings.GLOBAL_MPSERVER,
            }

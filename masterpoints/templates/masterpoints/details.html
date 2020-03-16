@@ -7,10 +7,10 @@
            <div class="card">
              <div class="card-header card-header-primary">
                <h4 class="card-title">
-                 <h1>{{ summary.given_name }} {{ summary.surname }}
+                 <h1>{{ summary.GivenNames }} {{ summary.Surname }}
                  </h1>
-                 <h2>{{ summary.abf_number }} - {{ summary.rank }}</h2>
-                 <h3><i>{% if summary.active %}Home club is {{club.club_name}}{% else %}}Used to play at {{club.club_name}}{% endif %}</i></h3>
+                 <h2>{{ summary.ABFNumber }} - {{ summary.RankName }}</h2>
+                 <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}}Used to play at {{club}}{% endif %}</i></h3>
 
             <!-- <img class="img" src="/media/{{ request.user.pic }}" /> -->
 
@@ -29,16 +29,16 @@
                        <table class="table table-hover">
                          <tbody>
                            <tr>
-                             <td style="color: orange;  font-weight: bold;">Gold<td style="text-align: right">{{ summary.total_gold|floatformat:2|intcomma }}
+                             <td style="color: orange;  font-weight: bold;">Gold<td style="text-align: right">{{ summary.TotalGold|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: red; font-weight: bold;">Red<td style="text-align: right">{{ summary.total_red|floatformat:2|intcomma }}
+                             <td style="color: red; font-weight: bold;">Red<td style="text-align: right">{{ summary.TotalRed|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: green; font-weight: bold;">Green<td style="text-align: right">{{ summary.total_green|floatformat:2|intcomma }}
+                             <td style="color: green; font-weight: bold;">Green<td style="text-align: right">{{ summary.TotalGreen|floatformat:2|intcomma }}
                            </tr>
                            <tr>
-                             <td style="color: black; font-weight: bold;">Total<td style="text-align: right; font-weight: bold;">{{ summary.total_MPs|floatformat:2|intcomma }}
+                             <td style="color: black; font-weight: bold;">Total<td style="text-align: right; font-weight: bold;">{{ summary.TotalMPs|floatformat:2|intcomma }}
                            </tr>
                          </tbody>
                        </table>
@@ -127,27 +127,27 @@
 
                <td>
                <td><b>Closing Total<b>
-               <td class="text-right" style="color: orange;">{{ summary.total_gold|floatformat:2|intcomma }}
-               <td class="text-right" style="color: red;">{{ summary.total_red|floatformat:2|intcomma }}
-               <td class="text-right" style="color: green;">{{ summary.total_green|floatformat:2|intcomma }}
-               <td class="text-right"><b>{{ summary.total_MPs|floatformat:2|intcomma }}</b>
+               <td class="text-right" style="color: orange;">{{ summary.TotalGold|floatformat:2|intcomma }}
+               <td class="text-right" style="color: red;">{{ summary.TotalRed|floatformat:2|intcomma }}
+               <td class="text-right" style="color: green;">{{ summary.TotalGreen|floatformat:2|intcomma }}
+               <td class="text-right"><b>{{ summary.TotalMPs|floatformat:2|intcomma }}</b>
              </tr>
 
                {% for row in details %}
 
                <tr>
-                 <td>{{ row.posting_date_display }}
-                 <td>{{ row.event_description }}
+                 <td>{{ row.PostingDateDisplay }}
+                 <td>{{ row.EventDescription }}
                  <td class="text-right" style="color: orange;">
-                   {% if row.mp_colour == "Y" %}
+                   {% if row.MPColour == "Y" %}
                      {{ row.mps }}
                    {% endif %}
                  <td class="text-right" style="color: red;">
-                   {% if row.mp_colour == "R" %}
+                   {% if row.MPColour == "R" %}
                      {{ row.mps }}
                    {% endif %}
                  <td class="text-right" style="color: green;">
-                   {% if row.mp_colour == "G" %}
+                   {% if row.MPColour == "G" %}
                      {{ row.mps }}
                    {% endif %}
                  <td class="text-right">{{ row.running_total|floatformat:2|intcomma }}
