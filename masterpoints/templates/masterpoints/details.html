@@ -10,7 +10,7 @@
                  <h1>{{ summary.GivenNames }} {{ summary.Surname }}
                  </h1>
                  <h2>{{ summary.ABFNumber }} - {{ summary.RankName }}</h2>
-                 <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}}Used to play at {{club}}{% endif %}</i></h3>
+                 <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
 
             <!-- <img class="img" src="/media/{{ request.user.pic }}" /> -->
 
@@ -70,7 +70,7 @@
 
                      <div class="card-body table-responsive">
 
-                       <form method="POST" action="../../masterpoints_search">
+                       <form method="POST" action="/masterpoints/masterpoints_search">
                          {% csrf_token %}
                          <div class="row">
                            <div class="col-md-12">
@@ -92,10 +92,10 @@
                              </div>
                            </div>
                          </div>
-                         <button type="submit" class="btn btn-primary">Search</button>
+                         <button type="submit" class="btn btn-primary center-text">Search</button>
                          <div class="clearfix"></div>
                        </form>
-
+                      <a href="http://abfmasterpoints.com.au">MasterPoints Centre</a>
                    </div>
                    </div>
                </div>

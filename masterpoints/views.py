@@ -30,9 +30,14 @@ def masterpoints_detail(request, system_number=None):
    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, system_number)
    summary = requests.get(qry).json()[0]
 
+# Set active to a boolean
+   if summary["IsActive"]=="Y":
+       summary["IsActive"]=True
+   else:
+       summary["IsActive"]=False
+
 # Get home club name
-   club_string = summary['HomeClubID']
-   qry = '%s/club/%s' % (GLOBAL_MPSERVER, club_string)
+   qry = '%s/club/%s' % (GLOBAL_MPSERVER, summary['HomeClubID'])
    club = requests.get(qry).json()[0]['ClubName']
 
 # Get last year in YYYY-MM format
@@ -71,6 +76,10 @@ def masterpoints_detail(request, system_number=None):
        chart_gold["%s-%s" % (year, month)]=0.0
        chart_red["%s-%s" % (year, month)]=0.0
        chart_green["%s-%s" % (year, month)]=0.0
+
+   last_line_green = 0
+   last_line_red = 0
+   last_line_gold = 0
 
 # loop through the details and augment the data to pass to the template
 # we are just adding running total data for the table of details
@@ -157,16 +166,15 @@ def masterpoints_search(request):
            return redirect("view/%s/" % system_number)
        else:
            if not first_name: # last name only
-               matches = MasterpointsCopy.objects.filter(surname__icontains = last_name)
+               matches = requests.get('%s/lastname_search/%s' % (GLOBAL_MPSERVER, last_name)).json()
            elif not last_name: # first name only
-               matches = MasterpointsCopy.objects.filter(given_name__iexact = first_name)
+               matches = requests.get('%s/firstname_search/%s' % (GLOBAL_MPSERVER, first_name)).json()
            else: # first and last names
-               matches = MasterpointsCopy.objects.filter(given_name__iexact = first_name, surname__icontains = last_name)
+               matches = requests.get('%s/firstlastname_search/%s/%s' % (GLOBAL_MPSERVER, first_name, last_name)).json()
            if len(matches)==1:
                system_number=matches[0].abf_number
                return redirect("view/%s/" % system_number)
            else:
-               # clubs = MasterpointsClubs.objects.filter(club_number = )
                return render(request,
                    'masterpoints/masterpoints_search_results.html',
                    {'matches' : matches})
