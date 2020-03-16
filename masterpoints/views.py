@@ -159,13 +159,19 @@ def masterpoints_search(request):
 def abf_lookup(request):
    if request.method == "GET":
        abf_number = request.GET['abf_number']
-       member = MasterpointsCopy.objects.filter(abf_number = abf_number)
+       member=None
+       if abf_number.isdigit():
+           try:
+               member = requests.get('%s/id/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
+           except:
+               member=None
+       result = "Invalid or inactive number"
        if member:
-           given_name = member[0].given_name
-           surname = member[0].surname
-           result = "%s %s" % (given_name, surname)
-       else:
-           result = "Invalid or inactive number"
+           if member["IsActive"]=="Y":
+               given_name = member["GivenNames"]
+               surname = member["Surname"]
+               result = "%s %s" % (given_name, surname)
+
        return render(request, 'masterpoints/abf_lookup.html', {'result' : result})
 
 def get_masterpoints(abf_number):
