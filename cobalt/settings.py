@@ -152,6 +152,7 @@ GLOBAL_TITLE="ABF Technology"
 GLOBAL_CONTACT="https://abf.com.au"
 GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
+GLOBAL_PRODUCTION="abftech.com.au"
 GLOBAL_MPSERVER="http://127.0.0.1:8081"
 
 if 'GLOBAL_MPSERVER' in os.environ:
