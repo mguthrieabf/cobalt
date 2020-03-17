@@ -13,8 +13,7 @@ SECRET_KEY = 'ci8v_@0l*@1@*ufho0kt4+wu6d7b(r!0-4k9p2c^a!rki%23dr'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['cobalt-dev.ap-southeast-2.elasticbeanstalk.com','127.0.0.1']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['cobalt-dev.ap-southeast-2.elasticbeanstalk.com','127.0.0.1']
 
 # Application definition
 
@@ -71,12 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cobalt.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-# DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
-# DATABASE_APPS_MAPPING = {'masterpoints': 'abfmpc_db'}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -95,20 +88,6 @@ if 'RDS_HOSTNAME' in os.environ:
             'PORT': os.environ['RDS_PORT'],
         }
     }
-
-    # 'abfmpc_db' : {
-    #     'ENGINE': 'sql_server.pyodbc',
-    #     'NAME': 'adfmpc_db',
-    #     'HOST': 'tcp:202.146.210.45,2433',
-    #     'USER': 'xxx',
-    #     'PASSWORD': 'xxx',
-    #
-    #     'OPTIONS': {
-    #         'driver': 'ODBC Driver 13 for SQL Server',
-    #     }
-    # }
-
-
 
 AUTH_USER_MODEL="accounts.User"
 
@@ -139,6 +118,12 @@ EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'donotreply@drunkguthrie.com'
 
 
+if 'EMAIL_HOST' in os.environ:
+    EMAIL_HOST = os.environ['EMAIL_HOST']
+    EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+    EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+    DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -167,11 +152,6 @@ GLOBAL_TITLE="ABF Technology"
 GLOBAL_CONTACT="https://abf.com.au"
 GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
-GLOBAL_PRODUCTION="abftech.com.au"
-GLOBAL_MPSERVER="http://127.0.0.1:8081"
-
-if 'GLOBAL_MPSERVER' in os.environ:
-    GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
 
 try:
     from .local_settings import *
