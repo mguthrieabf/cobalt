@@ -12,6 +12,7 @@ from django.contrib.auth import login, authenticate
 from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
+from cobalt.settings import DEFAULT_FROM_EMAIL
 
 def register(request):
     if request.method == 'POST':
@@ -34,7 +35,7 @@ def register(request):
                     'token':account_activation_token.make_token(user),
                 })
                 to_email = form.cleaned_data.get('email')
-                send_mail(mail_subject, message, 'test@drunkguthrie.com', [to_email], fail_silently=False)
+                send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
                 return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
