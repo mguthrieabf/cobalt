@@ -16,6 +16,6 @@ def get_balance(system_number):
         last_top_up = "Last top up %s ($%s)" % (top_date,
                                                member[0].last_top_up_amount)
     except:
-        balance = "Set up Now"
+        balance = "Set up Now!"
         last_top_up = "Never"
     return({'balance' : balance, 'last_top_up': last_top_up})
