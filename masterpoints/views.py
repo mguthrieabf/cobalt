@@ -44,7 +44,7 @@ def masterpoints_detail(request, system_number=None):
    dt = date.today()
    dt = dt.replace(year=dt.year-1)
    year = dt.strftime("%Y")
-   month = dt.strftime("%-m")
+   month = dt.strftime("%m")
 
 # Get the detail list of recent activity
    qry = '%s/mpdetail/%s/postingyear/%s/postingmonth/%s' % \
@@ -69,7 +69,7 @@ def masterpoints_detail(request, system_number=None):
 
    for i in range(13):
        year = rolling_date.strftime("%Y")
-       month = rolling_date.strftime("%-m")
+       month = rolling_date.strftime("%m")
        labels_key.append("%s-%s" % (year, month))
        labels.append(rolling_date.strftime("%b"))
        rolling_date = rolling_date + relativedelta(months=+1)
