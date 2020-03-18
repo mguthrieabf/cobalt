@@ -56,7 +56,7 @@ def masterpoints_detail(request, system_number=None):
    red = float(summary['TotalRed'])
    green = float(summary['TotalGreen'])
 
-# build list for the fancy chart at the top while we loop through
+# build list for the fancy chart at the top while we loop through.
    labels_key=[]
    labels=[]
    chart_green={}
