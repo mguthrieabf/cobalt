@@ -158,6 +158,12 @@ GLOBAL_MPSERVER="http://127.0.0.1:8081"
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
 
+STRIPE_SECRET_KEY="sk_test_tbD1kQf7S7aBrWdpaAkdK60e"
+STRIPE_PUBLISHABLE_KEY="pk_test_vx2RPX6BXeETHa3MJycvArkx"
+if 'STRIPE_SECRET_KEY' in os.environ:
+    STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
+    STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
+
 try:
     from .local_settings import *
 except ImportError:
