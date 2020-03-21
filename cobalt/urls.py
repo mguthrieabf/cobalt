@@ -21,7 +21,7 @@ urlpatterns = [
     path('support', include('support.urls')),
     path('profile', include('user_profile.urls')),
     path('settings', include('user_settings.urls')),
-    path('health/', include('health_check.urls')),
+    # path('health/', include('health_check.urls')),
 ]
     # path('logout', 'django.contrib.auth.views.logout', {'next_page': '/accounts/login'}),
 
