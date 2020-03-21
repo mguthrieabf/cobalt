@@ -13,7 +13,7 @@ SECRET_KEY = 'ci8v_@0l*@1@*ufho0kt4+wu6d7b(r!0-4k9p2c^a!rki%23dr'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cobalt-dev.ap-southeast-2.elasticbeanstalk.com','cobalt-test.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com','test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
+ALLOWED_HOSTS = ['cobalt-uat.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com','cobalt-test.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com','test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
 
 # Application definition
 
