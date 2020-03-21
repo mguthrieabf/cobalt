@@ -6,3 +6,4 @@ requests==2.20.1
 stripe==2.43.0
 Pillow==6.2.1
 psycopg2
+django-health-check
