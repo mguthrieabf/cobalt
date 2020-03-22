@@ -34,8 +34,7 @@ def create_payment_intent(request):
 # When a user is going to pay with a credit card we tell stripe and stripe gets ready for it
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(data["amount"])
-        trans_amount = int(float(data["amount"]) * 100.0)
+        trans_amount = int(float(data["amount"]) * 100.0) # pay in cents
         stripe.api_key = STRIPE_SECRET_KEY
         intent = stripe.PaymentIntent.create(
                 amount=trans_amount,
