@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Balance
+from .models import Balance, Transaction
 from .forms import OneOffPayment, Checkout
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -41,6 +41,24 @@ def create_payment_intent(request):
                 metadata={'integration_check': 'accept_a_payment'}
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
+
+@login_required(login_url='/accounts/login/')
+def test_payment(request):
+    if request.method == 'POST':
+        form = OneOffPayment(request.POST)
+        if form.is_valid():
+            print("Valid form")
+            trans = Transaction()
+            trans.description = form.cleaned_data['description']
+            trans.amount = form.cleaned_data['amount']
+            trans.member = request.user
+            trans.save()
+            return render(request, 'payments/checkout.html', {'trans': trans})
+    else:
+        form = OneOffPayment()
+
+    return render(request, 'payments/test_payment.html', {'form': form})
+
 
 #@login_required(login_url='/accounts/login/')
 def checkout(request):

@@ -1,9 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Payments</h1>
+
+<div class="card col-5">
+  <div class="card-header card-header-warning">
+    <h4 class="card-title">Payments</h4>
+  </div>
 
 
+  <div class="card-body" style="text-align: center">
+    <div>
+      <a href="./test-payment"><button class="text-left btn btn-primary btn-round" style="width: 270px;">
+        <i class="material-icons">attach_money</i>&nbsp;Make One Off Test Payment
+      </button>
+      </a>
+
+      <a href="./mp-score.html"><button class="text-left btn btn-info btn-round" style="width: 270px">
+        <i class="material-icons">credit_card</i>&nbsp;Set up Auto Top Up
+      </button>
+      </a>
+
+      <a href="./mp-score.html"><button class="text-left btn btn-success btn-round" style="width: 270px">
+        <i class="material-icons">add_circle</i>&nbsp;Transaction against account
+      </button>
+      </a>
+
+      <a href="./mp-score.html"><button class="text-left btn btn-danger btn-round" style="width: 270px">
+        <i class="material-icons">assignment</i>&nbsp;View Statement
+      </button>
+      </a>
+
+    </div>
+  </div>
+</div>
 
 
 {% endblock %}

@@ -5,9 +5,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-#    path('', dashboard.views.home, name='home'),
-#    path('dashboard/', dashboard.views.home, name='dashboard'),
-#    path('results/', results.views.home, name='results'),
     path('', include('dashboard.urls')),
     path('dashboard', include('dashboard.urls')),
     path('results', include('results.urls')),
@@ -21,7 +18,4 @@ urlpatterns = [
     path('support', include('support.urls')),
     path('profile', include('user_profile.urls')),
     path('settings', include('user_settings.urls')),
-    
-    # path('logout', 'django.contrib.auth.views.logout', {'next_page': '/accounts/login'}),
-
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
