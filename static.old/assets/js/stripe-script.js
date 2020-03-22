@@ -1,6 +1,8 @@
 // A reference to Stripe.js
 var stripe;
 
+alert("me");
+
 var orderData = {
   items: [{ id: "photo-subscription" }],
   currency: "usd"

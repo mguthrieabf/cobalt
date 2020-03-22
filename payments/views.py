@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Balance, Transaction
@@ -32,13 +34,13 @@ def create_payment_intent(request):
 # When a user is going to pay with a credit card we tell stripe and stripe gets ready for it
     if request.method == 'POST':
         data = json.loads(request.body)
+        print(data["amount"])
+        trans_amount = int(float(data["amount"]) * 100.0)
         stripe.api_key = STRIPE_SECRET_KEY
         intent = stripe.PaymentIntent.create(
-                # amount=data["amount"],
-                # currency=data["currency"],
-                amount=2345,
+                amount=trans_amount,
                 currency='aud',
-                metadata={'integration_check': 'accept_a_payment'}
+                metadata={'cobalt_pay_id': data["id"]}
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
@@ -47,7 +49,6 @@ def test_payment(request):
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
         if form.is_valid():
-            print("Valid form")
             trans = Transaction()
             trans.description = form.cleaned_data['description']
             trans.amount = form.cleaned_data['amount']
@@ -59,6 +60,43 @@ def test_payment(request):
 
     return render(request, 'payments/test_payment.html', {'form': form})
 
+
+
+
+#@require_http_methods(["GET", "POST"])
+@require_POST
+@csrf_exempt
+def stripe_webhook(request):
+  payload = request.body
+  event = None
+
+  try:
+    event = stripe.Event.construct_from(
+      json.loads(payload), stripe.api_key
+    )
+  except ValueError as e:
+    # Invalid payload
+    print("Invalid payload")
+    return HttpResponse(status=400)
+
+  # Handle the event
+  if event.type == 'payment_intent.succeeded':
+    payment_intent = event.data.object # contains a stripe.PaymentIntent
+    # Then define and call a method to handle the successful payment intent.
+    # handle_payment_intent_succeeded(payment_intent)
+    print(payment_intent)
+  elif event.type == 'payment_method.attached':
+    payment_method = event.data.object # contains a stripe.PaymentMethod
+    # Then define and call a method to handle the successful attachment of a PaymentMethod.
+    # handle_payment_method_attached(payment_method)
+  # ... handle other event types
+    print(payment_method)
+  else:
+    # Unexpected event type
+    print("Unexpected event")
+    return HttpResponse(status=400)
+
+  return HttpResponse(status=200)
 
 #@login_required(login_url='/accounts/login/')
 def checkout(request):

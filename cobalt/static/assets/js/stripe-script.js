@@ -2,8 +2,9 @@
 var stripe;
 
 var orderData = {
-  items: [{ id: "photo-subscription" }],
-  currency: "usd"
+  "id": document.getElementById('transID').value,
+  "amount": document.getElementById('transAmount').value,
+  "description": document.getElementById('transDescription').value,
 };
 
 // Disable the button until we have Stripe set up on the page
