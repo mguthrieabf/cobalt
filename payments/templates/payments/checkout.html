@@ -13,8 +13,12 @@
 
 <h1>Payments</h1>
 
-{{ trans.amount }}
-{{ trans.description }}
+<div class="text-left">
+<p>You are: {{ user.first_name }} {{ user.last_name }} (ABF Number: {{ user.abf_number }})</p>
+<p>This payment is for {{ trans.member.first_name}} {{ trans.member.last_name }} (ABF Number: {{ trans.member.abf_number }})</p>
+<p>Description: {{ trans.description }}</p>
+<p>Amount: {{ trans.amount }}</p>
+</div>
 
 <div class="sr-root">
   <div class="sr-main">
