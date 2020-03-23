@@ -18,9 +18,11 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=8, decimal_places=2)
 
     TRANSACTION_STATUS = [
-        ('IN', 'Intent'),
-        ('OK', 'Received'),
-        ('CA', 'Cancelled'),
+        ('ST', 'Started - payment identified'),
+        ('IN', 'Intent - received intent from Stripe'),
+        ('OK', 'Okay - payment completed successfully'),
+        ('CA', 'Cancelled - payment cancelled'),
+        ('FA', 'Failed - payment failed'),
     ]
 
     status = models.CharField(
