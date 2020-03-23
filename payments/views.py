@@ -18,6 +18,9 @@ def home(request):
 
 # @login_required(login_url='/accounts/login/')
 def get_balance(system_number):
+#######################################
+# called by dashboard to show basics  #
+#######################################
     try:
         member = Balance.objects.filter(system_number = system_number)
         balance = member[0].balance
@@ -31,7 +34,11 @@ def get_balance(system_number):
 
 #@login_required(login_url='/accounts/login/')
 def create_payment_intent(request):
-# When a user is going to pay with a credit card we tell stripe and stripe gets ready for it
+######################################################
+# When a user is going to pay with a credit card we  #
+# tell stripe and stripe gets ready for it           #
+# Called from the stripe code in Javascript          #
+######################################################
     if request.method == 'POST':
         data = json.loads(request.body)
         trans_amount = int(float(data["amount"]) * 100.0) # pay in cents
@@ -45,6 +52,9 @@ def create_payment_intent(request):
 
 @login_required(login_url='/accounts/login/')
 def test_payment(request):
+###################################################
+# view for simple payments                        #
+###################################################
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
         if form.is_valid():
@@ -59,13 +69,12 @@ def test_payment(request):
 
     return render(request, 'payments/test_payment.html', {'form': form})
 
-
-
-
-#@require_http_methods(["GET", "POST"])
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):
+############################################
+# callback from Stripe                     #
+############################################
   payload = request.body
   event = None
 
@@ -78,12 +87,41 @@ def stripe_webhook(request):
     print("Invalid payload")
     return HttpResponse(status=400)
 
-  # Handle the event
   if event.type == 'payment_intent.succeeded':
-    payment_intent = event.data.object # contains a stripe.PaymentIntent
-    # Then define and call a method to handle the successful payment intent.
-    # handle_payment_intent_succeeded(payment_intent)
-    print(payment_intent)
+
+# get data from payload
+
+    payment_intent  = event.data.object
+
+    pi_reference    = payment_intent.id
+    pi_method       = payment_intent.payment_method
+    pi_amount       = payment_intent.amount
+    pi_currency     = payment_intent.currency
+    pi_payment_id   = payment_intent.metadata.cobalt_pay_id
+    pi_receipt_url  = payment_intent.charges.data[0].receipt_url
+    pi_brand        = payment_intent.charges.data[0].payment_method_details.card.brand
+    pi_country      = payment_intent.charges.data[0].payment_method_details.card.country
+    pi_exp_month    = payment_intent.charges.data[0].payment_method_details.card.exp_month
+    pi_exp_year     = payment_intent.charges.data[0].payment_method_details.card.exp_year
+    pi_last4        = payment_intent.charges.data[0].payment_method_details.card.last4
+
+# Update transaction
+
+    tran = Transaction.objects.get(pk=pi_payment_id)
+
+    tran.stripe_reference = pi_reference
+    tran.stripe_method = pi_method
+    tran.stripe_currency = pi_currency
+    tran.stripe_receipt_url = pi_receipt_url
+    tran.stripe_brand = pi_brand
+    tran.stripe_country = pi_country
+    tran.stripe_exp_month = pi_exp_month
+    tran.stripe_exp_year = pi_exp_year
+    tran.stripe_last4 = pi_last4
+    tran.last_change_date = timezone.now()
+    tran.status = "Complete"
+    tran.save()
+
   elif event.type == 'payment_method.attached':
     payment_method = event.data.object # contains a stripe.PaymentMethod
     # Then define and call a method to handle the successful attachment of a PaymentMethod.
@@ -92,7 +130,7 @@ def stripe_webhook(request):
     print(payment_method)
   else:
     # Unexpected event type
-    print("Unexpected event")
+    print("Unexpected event found - " + event.type)
     return HttpResponse(status=400)
 
   return HttpResponse(status=200)
@@ -100,17 +138,3 @@ def stripe_webhook(request):
 #@login_required(login_url='/accounts/login/')
 def checkout(request):
     return render(request, 'payments/checkout.html')
-
-# @login_required(login_url='/accounts/login/')
-# def test_oneoff_payment(request):
-#
-#     if request.method == 'POST':
-#         form = OneOffPayment(request.POST)
-#         if form.is_valid():
-#             checkout=Checkout()
-#             checkout.amount = form.cleaned_data.get("amount")
-#             return render(request, 'payments/checkout.html', {'form': checkout})
-#     else:
-#         form = OneOffPayment()
-#
-#     return render(request, 'payments/oneoffpayment.html', {'form': form})

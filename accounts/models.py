@@ -12,4 +12,4 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['abf_number', 'email'] # tells createsuperuser to ask for them
 
     def __str__(self):
-        return self.username
+        return "%s - %s %s" % (self.abf_number, self.first_name, self.last_name)
