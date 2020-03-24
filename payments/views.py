@@ -117,7 +117,7 @@ def stripe_webhook(request):
     # Update transaction
 
         try:
-            tran = Transaction.objects.get(pk=99999)
+            tran = Transaction.objects.get(pk=pi_payment_id)
 
             tran.stripe_reference = pi_reference
             tran.stripe_method = pi_method

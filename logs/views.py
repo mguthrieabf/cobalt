@@ -26,4 +26,14 @@ def home(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
+# Add styles to rows
+    # print(type(events))
+    # new_events=[]
+    # for event in events:
+    #     if event["severity"] == "INFO":
+    #         event["css"]="bg-primary text-white"
+    #     else:
+    #         event["css"]=""
+    #     new_events.append(event)
+
     return render(request, 'logs/event_list.html', { 'events': events })
