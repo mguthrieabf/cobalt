@@ -1,6 +1,7 @@
 from .models import Log
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
+from django.contrib.auth.decorators import user_passes_test
 
 def log_event(user, severity, source, sub_source, message):
 
@@ -12,6 +13,7 @@ def log_event(user, severity, source, sub_source, message):
     l.message = message
     l.save()
 
+@user_passes_test(lambda u: u.is_superuser)
 def home(request):
     events_list = Log.objects.all().order_by('-event_date')
     page = request.GET.get('page', 1)

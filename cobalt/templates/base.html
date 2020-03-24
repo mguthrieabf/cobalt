@@ -79,6 +79,16 @@
             </a>
           </li>
           <hr>
+
+          {% if request.user.is_superuser %}
+            <li class="nav-item {% if request.path|slice:":5" == "/logs" %}active{% endif %} ">
+              <a class="nav-link" href="/logs">
+                <i class="material-icons">build</i>
+                <p>Logs</p>
+              </a>
+            </li>
+          {% endif %}
+
           <li class="nav-item {% if request.path|slice:":8" == "/support" %}active{% endif %} ">
             <a class="nav-link" href="/support">
               <i class="material-icons">language</i>
