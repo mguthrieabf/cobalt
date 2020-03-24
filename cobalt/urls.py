@@ -15,6 +15,7 @@ urlpatterns = [
     path('forums', include('forums.urls')),
     path('masterpoints/', include('masterpoints.urls')),
     path('payments/', include('payments.urls')),
+    path('logs/', include('logs.urls')),
     path('support', include('support.urls')),
     path('profile', include('user_profile.urls')),
     path('settings', include('user_settings.urls')),

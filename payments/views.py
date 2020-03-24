@@ -8,6 +8,8 @@ from .models import Balance, Transaction
 from .forms import OneOffPayment, Checkout
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
+from logs.views import log_event
 import stripe
 import json
 from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
@@ -55,6 +57,9 @@ def test_payment(request):
 ###################################################
 # view for simple payments                        #
 ###################################################
+    log_event("%s %s" % (request.user.first_name, request.user.last_name), "INFO",
+              "Payments", "test_payment", "User went to test payment screen")
+
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
         if form.is_valid():
@@ -75,65 +80,79 @@ def stripe_webhook(request):
 ############################################
 # callback from Stripe                     #
 ############################################
-  payload = request.body
-  event = None
+    payload = request.body
+    event = None
 
-  try:
-    event = stripe.Event.construct_from(
-      json.loads(payload), stripe.api_key
-    )
-  except ValueError as e:
-    # Invalid payload
-    print("Invalid payload")
-    return HttpResponse(status=400)
+    try:
+        event = stripe.Event.construct_from(
+          json.loads(payload), stripe.api_key
+        )
+    except ValueError as e:
+        # Invalid payload
+        log_event("Stripe API", "HIGH", "Payments", "stripe_webhook", "Invalid Payload in message from Stripe")
 
-  if event.type == 'payment_intent.succeeded':
+        print("Invalid payload")
+        return HttpResponse(status=400)
 
-# get data from payload
+    if event.type == 'payment_intent.succeeded':
 
-    payment_intent  = event.data.object
+    # get data from payload
 
-    pi_reference    = payment_intent.id
-    pi_method       = payment_intent.payment_method
-    pi_amount       = payment_intent.amount
-    pi_currency     = payment_intent.currency
-    pi_payment_id   = payment_intent.metadata.cobalt_pay_id
-    pi_receipt_url  = payment_intent.charges.data[0].receipt_url
-    pi_brand        = payment_intent.charges.data[0].payment_method_details.card.brand
-    pi_country      = payment_intent.charges.data[0].payment_method_details.card.country
-    pi_exp_month    = payment_intent.charges.data[0].payment_method_details.card.exp_month
-    pi_exp_year     = payment_intent.charges.data[0].payment_method_details.card.exp_year
-    pi_last4        = payment_intent.charges.data[0].payment_method_details.card.last4
+        payment_intent  = event.data.object
 
-# Update transaction
+        pi_reference    = payment_intent.id
+        pi_method       = payment_intent.payment_method
+        pi_amount       = payment_intent.amount
+        pi_currency     = payment_intent.currency
+        pi_payment_id   = payment_intent.metadata.cobalt_pay_id
+        pi_receipt_url  = payment_intent.charges.data[0].receipt_url
+        pi_brand        = payment_intent.charges.data[0].payment_method_details.card.brand
+        pi_country      = payment_intent.charges.data[0].payment_method_details.card.country
+        pi_exp_month    = payment_intent.charges.data[0].payment_method_details.card.exp_month
+        pi_exp_year     = payment_intent.charges.data[0].payment_method_details.card.exp_year
+        pi_last4        = payment_intent.charges.data[0].payment_method_details.card.last4
 
-    tran = Transaction.objects.get(pk=pi_payment_id)
+        log_event("Stripe API", "INFO", "Payments", "stripe_webhook", "Received payment_intent.succeeded. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
 
-    tran.stripe_reference = pi_reference
-    tran.stripe_method = pi_method
-    tran.stripe_currency = pi_currency
-    tran.stripe_receipt_url = pi_receipt_url
-    tran.stripe_brand = pi_brand
-    tran.stripe_country = pi_country
-    tran.stripe_exp_month = pi_exp_month
-    tran.stripe_exp_year = pi_exp_year
-    tran.stripe_last4 = pi_last4
-    tran.last_change_date = timezone.now()
-    tran.status = "Complete"
-    tran.save()
+    # Update transaction
 
-  elif event.type == 'payment_method.attached':
-    payment_method = event.data.object # contains a stripe.PaymentMethod
-    # Then define and call a method to handle the successful attachment of a PaymentMethod.
-    # handle_payment_method_attached(payment_method)
-  # ... handle other event types
-    print(payment_method)
-  else:
-    # Unexpected event type
-    print("Unexpected event found - " + event.type)
-    return HttpResponse(status=400)
+        try:
+            tran = Transaction.objects.get(pk=99999)
 
-  return HttpResponse(status=200)
+            tran.stripe_reference = pi_reference
+            tran.stripe_method = pi_method
+            tran.stripe_currency = pi_currency
+            tran.stripe_receipt_url = pi_receipt_url
+            tran.stripe_brand = pi_brand
+            tran.stripe_country = pi_country
+            tran.stripe_exp_month = pi_exp_month
+            tran.stripe_exp_year = pi_exp_year
+            tran.stripe_last4 = pi_last4
+            tran.last_change_date = timezone.now()
+            tran.status = "Complete"
+            tran.save()
+
+            log_event("Stripe API", "INFO", "Payments", "stripe_webhook",
+                "Successfully updated transaction table. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
+
+        except ObjectDoesNotExist:
+            print("NOT FOUND!!!!")
+            log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
+                "Unable to load transaction. Check Transaction table. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
+
+    elif event.type == 'payment_method.attached':
+        payment_method = event.data.object # contains a stripe.PaymentMethod
+        # Then define and call a method to handle the successful attachment of a PaymentMethod.
+        # handle_payment_method_attached(payment_method)
+      # ... handle other event types
+        print(payment_method)
+    else:
+        # Unexpected event type
+        log_event("Stripe API", "HIGH", "Payments", "stripe_webhook", "Unexpected event received from Stripe - " + event.type)
+        print("Unexpected event found - " + event.type)
+        return HttpResponse(status=400)
+
+    return HttpResponse(status=200)
 
 #@login_required(login_url='/accounts/login/')
 def checkout(request):
