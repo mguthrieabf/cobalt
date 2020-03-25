@@ -25,9 +25,9 @@ class Transaction(models.Model):
     ]
 
     member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
-    description = models.CharField(max_length=100)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
-    status = models.CharField(max_length=9, choices=TRANSACTION_STATUS, default='Initiated')
+    description = models.CharField("Description", max_length=100)
+    amount = models.DecimalField("Amount", max_digits=8, decimal_places=2)
+    status = models.CharField("Status", max_length=9, choices=TRANSACTION_STATUS, default='Initiated')
     stripe_reference = models.CharField("Stripe Payment Intent", null=True, max_length=40)
     stripe_method = models.CharField("Stripe Payment Method", null=True, max_length=40)
     stripe_currency = models.CharField("Card Native Currency", null=True, max_length=3)
@@ -39,10 +39,23 @@ class Transaction(models.Model):
     stripe_last4 = models.CharField("Card Last 4 Digits", null=True, max_length=4)
     route_code = models.CharField("Internal routing code for callback", null=True, max_length=4)
     route_payload = models.CharField("Payload to return to callback", null=True, max_length=40)
-    created_date = models.DateTimeField(default=timezone.now)
-    last_change_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField("Creation Date", default=timezone.now)
+    last_change_date = models.DateTimeField("Last Update Date", default=timezone.now)
 
 
     def __str__(self):
         return "%s(%s %s) - %s" % (self.member.abf_number, self.member.first_name,
                                   self.member.last_name, self.stripe_reference)
+
+class Account(models.Model):
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
+    created_date = models.DateTimeField("Create Date", default=timezone.now)
+    amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
+    balance = models.DecimalField("Balance after transaction", max_digits=12, decimal_places=2)
+    description = models.CharField("Transaction description", null=True, max_length=80)
+    counterparty = models.CharField("Counterparty", null=True, max_length=80)
+
+    def __str__(self):
+        return "%s - %s %s %s" % (self.member.abf_number, self.member.first_name,
+                                  self.member.last_name, self.id)

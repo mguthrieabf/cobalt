@@ -4,11 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Balance, Transaction
+from .models import Balance, Transaction, Account
 from .forms import OneOffPayment, Checkout
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from logs.views import log_event
 import stripe
 import json
@@ -186,6 +187,29 @@ def stripe_webhook(request):
             log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
                 "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
+
+        balance = Balance.objects.filter(system_number = tran.member.abf_number)[0]
+        balance.balance += tran.amount
+        balance.save()
+
+        log_event("%s %s" % (tran.member.first_name, tran.member.last_name), "INFO", "Payments", "stripe_webhook",
+            "Successfully updated balance table after Stripe payment of $%s" % (tran.amount))
+
+        act = Account()
+        act.member = tran.member
+        act.amount = tran.amount
+        act.counterparty = "Stripe"
+        act.transaction = tran
+        act.balance = balance.balance
+        act.description = "Payment from card ending in %s Exp %s/%s" % (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100)
+
+        act.save()
+
+        log_event("%s %s" % (act.member.first_name, act.member.last_name), "INFO", "Payments", "stripe_webhook",
+            "Successfully updated account table after Stripe payment of $%s" % (act.amount))
+
+
+
     elif event.type == 'payment_method.attached':
         payment_method = event.data.object # contains a stripe.PaymentMethod
         # Then define and call a method to handle the successful attachment of a PaymentMethod.
@@ -199,3 +223,18 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
 
     return HttpResponse(status=200)
+
+
+def statement(request):
+    events_list = Account.objects.filter(member=request.user).order_by('-created_date')
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(events_list, 10)
+    try:
+        events = paginator.page(page)
+    except PageNotAnInteger:
+        events = paginator.page(1)
+    except EmptyPage:
+        events = paginator.page(paginator.num_pages)
+
+    return render(request, 'payments/statement.html', { 'events': events })
