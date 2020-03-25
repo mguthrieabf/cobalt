@@ -192,7 +192,8 @@ def stripe_webhook(request):
         except:
             balance = Balance()
             balance.balance=0
-            
+            balance.last_top_up=0
+            balance.system_number = tran.member.abf_number
         balance.balance += tran.amount
         balance.save()
 
