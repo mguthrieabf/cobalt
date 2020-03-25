@@ -30,7 +30,7 @@
               {% if event.severity == "INFO" %}bg-light{% endif %}
               {% if event.severity == "WARN" %}bg-info{% endif %}
               {% if event.severity == "ERROR" %}bg-warning{% endif %}
-              {% if event.severity == "HIGH" %}bg-danger text-warning{% endif %}
+              {% if event.severity == "HIGH" %}bg-danger text-blue{% endif %}
               {% if event.severity == "CRITICAL" %}bg-dark text-white font-weight-bold{% endif %}
 
               ">{{ event.severity }}</td>

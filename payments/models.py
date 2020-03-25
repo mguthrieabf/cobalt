@@ -12,9 +12,6 @@ class Balance(models.Model):
         return "%s" % self.system_number
 
 class Transaction(models.Model):
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
-    description = models.CharField(max_length=100)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
 
     TRANSACTION_STATUS = [
     # This means we have asked a customer for money
@@ -27,22 +24,21 @@ class Transaction(models.Model):
         ('Failed', 'Failed - payment failed'),
     ]
 
-    status = models.CharField(
-        max_length=9,
-        choices=TRANSACTION_STATUS,
-        default='Initiated',
-    )
-
-    stripe_reference    = models.CharField("Stripe Payment Intent", null=True, max_length=40)
-    stripe_method       = models.CharField("Stripe Payment Method", null=True, max_length=40)
-    stripe_currency     = models.CharField("Card Native Currency", null=True, max_length=3)
-    stripe_receipt_url  = models.CharField("Receipt URL", null=True, max_length=200)
-    stripe_brand        = models.CharField("Card brand", null=True, max_length=10)
-    stripe_country      = models.CharField("Card Country", null=True, max_length=5)
-    stripe_exp_month    = models.IntegerField("Card Expiry Month", null=True)
-    stripe_exp_year     = models.IntegerField("Card Expiry Year", null=True)
-    stripe_last4        = models.CharField("Card Last 4 Digits", null=True, max_length=4)
-
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    description = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    status = models.CharField(max_length=9, choices=TRANSACTION_STATUS, default='Initiated')
+    stripe_reference = models.CharField("Stripe Payment Intent", null=True, max_length=40)
+    stripe_method = models.CharField("Stripe Payment Method", null=True, max_length=40)
+    stripe_currency = models.CharField("Card Native Currency", null=True, max_length=3)
+    stripe_receipt_url = models.CharField("Receipt URL", null=True, max_length=200)
+    stripe_brand = models.CharField("Card brand", null=True, max_length=10)
+    stripe_country = models.CharField("Card Country", null=True, max_length=5)
+    stripe_exp_month = models.IntegerField("Card Expiry Month", null=True)
+    stripe_exp_year = models.IntegerField("Card Expiry Year", null=True)
+    stripe_last4 = models.CharField("Card Last 4 Digits", null=True, max_length=4)
+    route_code = models.CharField("Internal routing code for callback", null=True, max_length=4)
+    route_payload = models.CharField("Payload to return to callback", null=True, max_length=40)
     created_date = models.DateTimeField(default=timezone.now)
     last_change_date = models.DateTimeField(default=timezone.now)
 

@@ -121,7 +121,7 @@ EMAIL_HOST_USER = 'test@drunkguthrie.com'
 EMAIL_HOST_PASSWORD = 'F1shcake'
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'donotreply@drunkguthrie.com'
-
+SUPPORT_EMAIL=['m@rkguthrie.com']
 
 if 'EMAIL_HOST' in os.environ:
     EMAIL_HOST = os.environ['EMAIL_HOST']

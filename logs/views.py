@@ -2,6 +2,8 @@ from .models import Log
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
+from django.core.mail import send_mail
+from cobalt.settings import DEFAULT_FROM_EMAIL, SUPPORT_EMAIL
 
 def log_event(user, severity, source, sub_source, message):
 
@@ -12,6 +14,12 @@ def log_event(user, severity, source, sub_source, message):
     l.sub_source = sub_source
     l.message = message
     l.save()
+
+    if severity=="CRITICAL":
+        mail_subject = "%s - %s" % (severity, source)
+        message = "Severity: %s\nSource:%s\nSub-Source:%s\nUser:%s\nMessage:%s" % (severity,
+            source, sub_source, user, message)
+        send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, SUPPORT_EMAIL, fail_silently=False)
 
 @user_passes_test(lambda u: u.is_superuser)
 def home(request):
@@ -25,15 +33,5 @@ def home(request):
         events = paginator.page(1)
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
-
-# Add styles to rows
-    # print(type(events))
-    # new_events=[]
-    # for event in events:
-    #     if event["severity"] == "INFO":
-    #         event["css"]="bg-primary text-white"
-    #     else:
-    #         event["css"]=""
-    #     new_events.append(event)
 
     return render(request, 'logs/event_list.html', { 'events': events })

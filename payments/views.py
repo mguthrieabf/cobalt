@@ -16,13 +16,13 @@ from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 
 @login_required(login_url='/accounts/login/')
 def home(request):
+    """ Default page """
     return render(request, 'payments/home.html')
 
 # @login_required(login_url='/accounts/login/')
 def get_balance(system_number):
-#######################################
-# called by dashboard to show basics  #
-#######################################
+    """ called by dashboard to show basic information """
+
     try:
         member = Balance.objects.filter(system_number = system_number)
         balance = member[0].balance
@@ -36,11 +36,28 @@ def get_balance(system_number):
 
 #@login_required(login_url='/accounts/login/')
 def create_payment_intent(request):
-######################################################
-# When a user is going to pay with a credit card we  #
-# tell stripe and stripe gets ready for it           #
-# Called from the stripe code in Javascript          #
-######################################################
+    """ Called from the checkout webpage.
+
+When a user is going to pay with a credit card we
+tell stripe and stripe gets ready for it.
+
+This functions expects a json payload:
+
+  "id": This is the Transaction in our table that we are handling
+  "amount": The amount in dollars
+  "description": The description on the transaction
+  "route_code":  What to notify about the outcome of this Transaction
+  "route_payload": What to pass on when we are done
+
+Payments only knows how to pay things, not why. Some other part of the
+system needs to be informed once we are done. The route_code tells us
+what to call. There are only ever going to be a small number of things
+to call so we hard code them.
+
+This function returns our public key and the client secret that we
+get back from Stripe
+"""
+
     if request.method == 'POST':
         data = json.loads(request.body)
         trans_amount = int(float(data["amount"]) * 100.0) # pay in cents
@@ -51,6 +68,10 @@ def create_payment_intent(request):
                 metadata={'cobalt_pay_id': data["id"]}
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
+
+def test_callback(status, payload):
+    log_event("Callback" , "DEBUG",
+                  "Payments", "test_callback", "Received callback from payment: %s %s" % (status, payload) )
 
 @login_required(login_url='/accounts/login/')
 def test_payment(request):
@@ -63,16 +84,32 @@ def test_payment(request):
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
         if form.is_valid():
-            trans = Transaction()
-            trans.description = form.cleaned_data['description']
-            trans.amount = form.cleaned_data['amount']
-            trans.member = request.user
-            trans.save()
-            return render(request, 'payments/checkout.html', {'trans': trans})
+            description = form.cleaned_data['description']
+            amount = form.cleaned_data['amount']
+            member = request.user
+            route_code = form.cleaned_data['route_code']
+            route_payload = form.cleaned_data['route_payload']
+            return payment_api(request, description, amount, member, route_code, route_payload)
     else:
         form = OneOffPayment()
 
     return render(request, 'payments/test_payment.html', {'form': form})
+
+def payment_api(request, description, amount, member, route_code, route_payload):
+    """ API for one off payments from other parts of the application
+
+The route_code provides a callback and the route_payload is the string
+to return.
+
+"""
+    trans = Transaction()
+    trans.description = description
+    trans.amount = amount
+    trans.member = member
+    trans.route_code = route_code
+    trans.route_payload = route_payload
+    trans.save()
+    return render(request, 'payments/checkout.html', {'trans': trans})
 
 @require_POST
 @csrf_exempt
@@ -133,12 +170,21 @@ def stripe_webhook(request):
             tran.save()
 
             log_event("Stripe API", "INFO", "Payments", "stripe_webhook",
-                "Successfully updated transaction table. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
+                "Successfully updated transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
+
+            # make Callback
+
+            if tran.route_code == "MAN":
+                test_callback("Success", tran.route_payload)
+            else:
+                log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
+                    "Unable to make callback. Invalid route_code: %s" % tran.route_code)
+
 
         except ObjectDoesNotExist:
             print("NOT FOUND!!!!")
             log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
-                "Unable to load transaction. Check Transaction table. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
+                "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
     elif event.type == 'payment_method.attached':
         payment_method = event.data.object # contains a stripe.PaymentMethod
@@ -153,7 +199,3 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
 
     return HttpResponse(status=200)
-
-#@login_required(login_url='/accounts/login/')
-def checkout(request):
-    return render(request, 'payments/checkout.html')
