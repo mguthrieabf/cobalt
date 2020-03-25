@@ -33,6 +33,9 @@
            <div class="card">
              <div class="card-header card-header-primary">
                <h3 class="card-title text-center font-weight-bold">{{ GLOBAL_ORG }} Technology</h3>
+               <div class=" text-center">
+                 <h4><i class="material-icons">how_to_reg</i></h4>
+              </div>
                <h4 class="text-center">Sign Up. Its free for members!</h4>
              </div>
              <div class="card-body">
@@ -47,7 +50,6 @@
 									 <span id="system_number_error"></span>
 									 <input type="text" name="abf_number" id="id_abf_number" class="form-control input-sm" placeholder="ABF Number">
 								 </div>
-
 								 <div class="row">
 									 <div class="col-xs-6 col-sm-6 col-md-6">
 										 <div class="form-group">
@@ -62,32 +64,23 @@
 										 </div>
 									 </div>
 								 </div>
-
 								 <div class="form-group">
 									 {{ user_form.email.errors }}
 									 <input type="email" name="email" id="id_email" class="form-control input-sm" placeholder="Email Address">
 								 </div>
-
 								 <div class="form-group">
 									 {{ user_form.username.errors }}
 									 <input type="text" name="username" id="id_username" class="form-control input-sm" placeholder="Choose a Username">
 								 </div>
-
 								 <div class="form-group">
 									 {{ user_form.password1.errors }}
 									 <input type="password" name="password1" id="id_password1" class="form-control input-sm" placeholder="Password">
 								 </div>
-
-
 								 <div class="form-group">
 									 {{ user_form.password2.errors }}
 									 <input type="password" name="password2" id="id_password2" class="form-control input-sm" placeholder="Confirm Password">
 								 </div>
-
-
-
 								 <input type="submit" value="Register" class="btn btn-block bg-info">
-
 							 </form>
                 <span class="center-block">
   							<a href="/dashboard"><div class="text-center">Already registered? Sign In.</div></a>
