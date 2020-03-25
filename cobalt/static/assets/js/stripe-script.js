@@ -4,8 +4,7 @@ var stripe;
 var orderData = {
   "id": document.getElementById('transID').value,
   "amount": document.getElementById('transAmount').value,
-  "description": document.getElementById('transDescription').value,
-  "route_code":  document.getElementById('transRouteCode').value,
+  "description": document.getElementById('transDescription').value
 };
 
 // Disable the button until we have Stripe set up on the page
