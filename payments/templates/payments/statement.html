@@ -6,27 +6,27 @@
 <div class="col-lg-11 col-md-12">
   <div class="card">
     <div class="card-header card-header-success">
-      <h4 class="card-title">Statement</h4>
+      <h4 class="card-title">Statement for {{ user.first_name }} {{ user.last_name}} ({{ user.abf_number }})</h4>
     </div>
     <div class="card-body table-responsive">
       <table class="table table-hover">
         <thead class="text-info">
           <tr>
-            <th>Time Stamp</th>
-            <th>Counterparty</th>
+            <th>Date</th>
+            <th>Reason</th>
             <th>Description</th>
-            <th>Amount</th>
-            <th>Balance</th>
+            <th class="text-right">Amount ($)</th>
+            <th class="text-right">Balance ($)</th>
           </tr>
         </thead>
         <tbody>
           {% for event in events %}
             <tr>
-              <td>{{ event.created_date }}</td>
+              <td>{{ event.created_date|date:"d M Y" }}</td>
               <td>{{ event.counterparty }}</td>
               <td>{{ event.description }}</td>
-              <td>{{ event.amount }}</td>
-              <td>{{ event.balance }}</td>
+              <td class="text-right">{{ event.amount }}</td>
+              <td class="text-right">{{ event.balance }}</td>
 
             </tr>
           {% endfor %}
@@ -56,6 +56,7 @@
     {% endif %}
 
   </div>
+</div>
 </div>
 
 {% endblock %}

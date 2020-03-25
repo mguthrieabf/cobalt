@@ -16,7 +16,7 @@
   <style>
     .bg {
   height: 100%;
-  background-image: url("/static/assets/img/backgrounds/bg1.jpg");
+  background-image: url("/static/assets/img/backgrounds/bg4.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -32,8 +32,8 @@
          <div clas="row justify-content-center">
            <div class="card">
              <div class="card-header card-header-warning">
-               <h3 class="card-title">{{ GLOBAL_ORG }} Technology</h3>
-               <h4>Login</h4>
+               <h3 class="card-title text-center">{{ GLOBAL_ORG }} Technology</h3>
+               <h4 class="text-center">Come on in</h4>
              </div>
              <div class="card-body">
       	    		<form role="form" method="post">
@@ -58,10 +58,13 @@
       	    			<input type="submit" value="Login" class="btn btn-block">
 
       	    		</form>
-                <span class="center-block">
-                  <a href="/accounts/password_reset">Reset password.</a>
-                  &nbsp;
-                  <a href="/accounts/register">Signup.</a>
+                <span class="center-block d-flex justify-content-between">
+                  <div>
+                    <a href="/accounts/register">Signup</a>
+                </div>
+                <div>
+                  <a href="/accounts/password_reset">Reset password</a>
+                </div>
                 </span>
           		</div>
        		  </div>

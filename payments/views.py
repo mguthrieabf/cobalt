@@ -115,9 +115,7 @@ to return.
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):
-############################################
-# callback from Stripe                     #
-############################################
+    """ Callback from Stipe webhook """
     payload = request.body
     event = None
 
@@ -192,9 +190,9 @@ def stripe_webhook(request):
         except:
             balance = Balance()
             balance.balance=0
-            balance.last_top_up=0
             balance.system_number = tran.member.abf_number
         balance.balance += tran.amount
+        balance.last_top_up_amount = tran.amount
         balance.save()
 
         log_event("%s %s" % (tran.member.first_name, tran.member.last_name), "INFO", "Payments", "stripe_webhook",
@@ -203,7 +201,7 @@ def stripe_webhook(request):
         act = Account()
         act.member = tran.member
         act.amount = tran.amount
-        act.counterparty = "Stripe"
+        act.counterparty = "CC Payment"
         act.transaction = tran
         act.balance = balance.balance
         act.description = "Payment from card ending in %s Exp %s/%s" % (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100)
@@ -242,4 +240,4 @@ def statement(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
-    return render(request, 'payments/statement.html', { 'events': events })
+    return render(request, 'payments/statement.html', { 'events': events, "user": request.user })
