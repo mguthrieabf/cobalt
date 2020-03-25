@@ -187,8 +187,12 @@ def stripe_webhook(request):
             log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
                 "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
-
-        balance = Balance.objects.filter(system_number = tran.member.abf_number)[0]
+        try:
+            balance = Balance.objects.filter(system_number = tran.member.abf_number)[0]
+        except:
+            balance = Balance()
+            balance.balance=0
+            
         balance.balance += tran.amount
         balance.save()
 
