@@ -23,7 +23,7 @@
         <tbody>
           {% for event in events %}
             <tr>
-              <td>{{ event.event_date }}</td>
+              <td>{{ event.event_date|timesince }} ago</td>
               <td class="
 
               {% if event.severity == "DEBUG" %}bg-white{% endif %}

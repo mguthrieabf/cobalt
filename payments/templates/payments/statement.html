@@ -3,10 +3,21 @@
 {% block content %}
 
 
+<div class="card-header card-header-primary">
+  <h4 class="card-title">
+
+
+    <h3></h3>
+
+
 <div class="col-lg-11 col-md-12">
   <div class="card">
-    <div class="card-header card-header-success">
-      <h4 class="card-title">Statement for {{ user.first_name }} {{ user.last_name}} ({{ user.abf_number }})</h4>
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">
+        <h1>Statement - {{ user.first_name }} {{ user.last_name}}</h1>
+        <h2>{{ summary.ABFNumber }} - {{ summary.RankName }}</h2>
+        <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
+      </h4>
     </div>
     <div class="card-body table-responsive">
       <table class="table table-hover">

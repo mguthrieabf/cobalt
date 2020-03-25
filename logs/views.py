@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import send_mail
 from cobalt.settings import DEFAULT_FROM_EMAIL, SUPPORT_EMAIL
+from datetime import datetime
 
 def log_event(user, severity, source, sub_source, message):
 
@@ -17,12 +18,13 @@ def log_event(user, severity, source, sub_source, message):
 
     if severity=="CRITICAL":
         mail_subject = "%s - %s" % (severity, source)
-        message = "Severity: %s\nSource:%s\nSub-Source:%s\nUser:%s\nMessage:%s" % (severity,
+        message = "Severity: %s\nSource: %s\nSub-Source: %s\nUser: %s\nMessage: %s" % (severity,
             source, sub_source, user, message)
         send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, SUPPORT_EMAIL, fail_silently=False)
 
 @user_passes_test(lambda u: u.is_superuser)
 def home(request):
+
     events_list = Log.objects.all().order_by('-event_date')
     page = request.GET.get('page', 1)
 

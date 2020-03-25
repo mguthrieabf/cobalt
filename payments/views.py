@@ -11,9 +11,10 @@ from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from logs.views import log_event
+import requests
 import stripe
 import json
-from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
+from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, GLOBAL_MPSERVER
 
 @login_required(login_url='/accounts/login/')
 def home(request):
@@ -204,7 +205,7 @@ def stripe_webhook(request):
         act.counterparty = "CC Payment"
         act.transaction = tran
         act.balance = balance.balance
-        act.description = "Payment from card ending in %s Exp %s/%s" % (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100)
+        act.description = "Payment from card **** **** ***** %s Exp %s/%s" % (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100)
 
         act.save()
 
@@ -229,6 +230,21 @@ def stripe_webhook(request):
 
 
 def statement(request):
+
+# Get summary data
+    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, request.user.abf_number)
+    summary = requests.get(qry).json()[0]
+
+    # Set active to a boolean
+    if summary["IsActive"]=="Y":
+        summary["IsActive"]=True
+    else:
+        summary["IsActive"]=False
+
+    # Get home club name
+    qry = '%s/club/%s' % (GLOBAL_MPSERVER, summary['HomeClubID'])
+    club = requests.get(qry).json()[0]['ClubName']
+
     events_list = Account.objects.filter(member=request.user).order_by('-created_date')
     page = request.GET.get('page', 1)
 
@@ -240,4 +256,4 @@ def statement(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
-    return render(request, 'payments/statement.html', { 'events': events, "user": request.user })
+    return render(request, 'payments/statement.html', { 'events': events, "user": request.user, "summary": summary, "club": club})
