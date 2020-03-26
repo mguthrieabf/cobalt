@@ -27165,7 +27165,7 @@ be a descendant of the grid when it is being dragged.
 .ct-chart .ct-series-a .ct-slice-pie,
 .ct-chart .ct-series-a .ct-slice-donut-solid,
 .ct-chart .ct-series-a .ct-area {
-  stroke: #00bcd4;
+  stroke: #00FF00;
 }
 
 .ct-chart .ct-series-b .ct-point,
