@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Balance, Transaction, Account
-from .forms import OneOffPayment, Checkout
+from .forms import OneOffPayment, TestTransaction
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -21,7 +21,6 @@ def home(request):
     """ Default page """
     return render(request, 'payments/home.html')
 
-# @login_required(login_url='/accounts/login/')
 def get_balance(member):
     """ called by dashboard to show basic information """
 
@@ -116,6 +115,37 @@ def test_payment(request):
         form = OneOffPayment()
 
     return render(request, 'payments/test_payment.html', {'form': form})
+
+@login_required(login_url='/accounts/login/')
+def test_transaction(request):
+    """ Temporary way to make a change to ABF $ account """
+
+    msg=""
+
+    log_event("%s %s" % (request.user.first_name, request.user.last_name), "INFO",
+              "Payments", "test_transaction", "User went to test transaction screen")
+
+    if request.method == 'POST':
+        form = TestTransaction(request.POST)
+        if form.is_valid():
+            details = {
+                'member': form.cleaned_data['payer'],
+                'amount': form.cleaned_data['amount'],
+                'counterparty': form.cleaned_data['counterparty'],
+                'transaction': None,
+                'description': form.cleaned_data['description'],
+                'log_msg': "Manual Payments Update: $%s %s" %
+                    (form.cleaned_data['amount'], form.cleaned_data['description']),
+                'source': "Payments",
+                'sub_source': "test_transaction"
+            }
+            update_account(details)
+            msg = "Update applied"
+
+    else:
+        form = TestTransaction()
+
+    return render(request, 'payments/test_transaction.html', {'form': form, 'msg': msg})
 
 def payment_api(request, description, amount, member, route_code, route_payload):
     """ API for one off payments from other parts of the application

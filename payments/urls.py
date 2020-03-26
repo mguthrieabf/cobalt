@@ -7,4 +7,5 @@ urlpatterns = [
     path('stripe-webhook', views.stripe_webhook, name='stripe_webhook'),
     path('create-payment-intent', views.create_payment_intent, name='paymentintent'),
     path('statement', views.statement, name='statement'),
+    path('test-transaction', views.test_transaction, name='test_transaction'),
 ]

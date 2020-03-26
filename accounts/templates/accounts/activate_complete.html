@@ -25,19 +25,22 @@
 </style>
 </head>
 <body>
+
 <div class="bg" id="bg">
   <div class="wrapper">
      <div class="container">
-       <div class="card">
-        <div class="card-body">
-          <h1>Congratulations!</h1>
-          <h2>Hi {{ user.first_name }}, your account is active.</h2>
-          <h4>You can login using your email address, {{ GLOBAL_ORG }} number or username({{ user.username }}).</h4>
-          <h3> We will take you to complete your profile in <span id="time">20 seconds</span>.
-          <h3><a href="/profile">Click here to go there now</a></h3>       </div>
-     </div>
-
-    </div>
+       <div class="row">
+         <div class="card">
+           <div class="card-body">
+             <h1>Congratulations!</h1>
+             <h2>Hi {{ user.first_name }}, your account is active.</h2>
+             <h4>You can login using your email address, {{ GLOBAL_ORG }} number or username({{ user.username }}).</h4>
+             <h3> We will take you to complete your profile in <span id="time">20 seconds</span>.
+             <h3><a href="/profile">Click here to go there now</a></h3>
+           </div>
+        </div>
+     	</div>
+   </div>
   </div>
   <footer class="footer fixed-bottom">
     <div class="container-fluid">
@@ -75,7 +78,6 @@
   <script src="/static/assets/js/core/jquery.min.js"></script>
   <script src="/static/assets/js/core/popper.min.js"></script>
   <script src="/static/assets/js/core/bootstrap-material-design.min.js"></script>
-  <script src="/static/assets/js/core/jquery.min.js"></script>
   <script>
     $('document').ready(function(){
       var time=20;
@@ -89,6 +91,7 @@
 
     });
   </script>
+
 </body>
 
 </html>
