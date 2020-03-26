@@ -10,5 +10,5 @@ from accounts.models import User
 def home(request):
     system_number = request.user.abf_number
     mp = get_masterpoints(system_number)
-    payments = get_balance(system_number)
+    payments = get_balance(request.user)
     return render(request, 'dashboard/home.html', {'mp': mp, 'payments': payments})

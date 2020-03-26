@@ -1,68 +1,64 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block content %}
 
-
-<div class="card-header card-header-primary">
-  <h4 class="card-title">
-  <div class="col-lg-11 col-md-12">
-    <div class="card">
-      <div class="card-header card-header-primary">
-        <h4 class="card-title">
-          <h1>Statement - {{ user.first_name }} {{ user.last_name}}</h1>
-          <h2>{{ summary.ABFNumber }} - {{ summary.RankName }}</h2>
-          <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
-        </h4>
-      </div>
-      <div class="card-body table-responsive">
-        <table class="table table-hover">
-          <thead class="text-info">
+<div class="col-lg-11 col-md-12">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h1>Statement - {{ user.first_name }} {{ user.last_name}}</h1>
+      <h2>{{ summary.ABFNumber }} - {{ summary.RankName }}</h2>
+      <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-hover">
+        <thead class="text-info">
+          <tr>
+            <th>Date</th>
+            <th>Reason</th>
+            <th>Description</th>
+            <th class="text-right">Amount ($)</th>
+            <th class="text-right">Balance ($)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in events %}
             <tr>
-              <th>Date</th>
-              <th>Reason</th>
-              <th>Description</th>
-              <th class="text-right">Amount ($)</th>
-              <th class="text-right">Balance ($)</th>
+              <td>{{ event.created_date|date:"d M Y" }}</td>
+              <td>{{ event.counterparty }}</td>
+              <td>{{ event.description }}</td>
+              <td class="text-right">{{ event.amount|floatformat:2|intcomma }}</td>
+              <td class="text-right">{{ event.balance|floatformat:2|intcomma }}</td>
+
             </tr>
-          </thead>
-          <tbody>
-            {% for event in events %}
-              <tr>
-                <td>{{ event.created_date|date:"d M Y" }}</td>
-                <td>{{ event.counterparty }}</td>
-                <td>{{ event.description }}</td>
-                <td class="text-right">{{ event.amount }}</td>
-                <td class="text-right">{{ event.balance }}</td>
-
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-      {% if events.has_other_pages %}
-        <ul class="pagination">
-          {% if events.has_previous %}
-            <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
-          {% else %}
-            <li class="disabled"><span>&laquo;&nbsp;</span></li>
-          {% endif %}
-          {% for i in events.paginator.page_range %}
-            {% if events.number == i %}
-              <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
-            {% else %}
-              <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
-            {% endif %}
           {% endfor %}
-          {% if events.has_next %}
-            <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
-          {% else %}
-            <li class="disabled"><span>&raquo;</span></li>
-          {% endif %}
-        </ul>
-      {% endif %}
+        </tbody>
+      </table>
 
-      </div>
+    {% if events.has_other_pages %}
+      <ul class="pagination">
+        {% if events.has_previous %}
+          <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;&nbsp;</span></li>
+        {% endif %}
+        {% for i in events.paginator.page_range %}
+          {% if events.number == i %}
+            <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if events.has_next %}
+          <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
     </div>
   </div>
 </div>
+
 {% endblock %}

@@ -22,15 +22,15 @@ def home(request):
     return render(request, 'payments/home.html')
 
 # @login_required(login_url='/accounts/login/')
-def get_balance(system_number):
+def get_balance(member):
     """ called by dashboard to show basic information """
 
     try:
-        member = Balance.objects.filter(system_number = system_number)
-        balance = member[0].balance
-        top_date = member[0].last_top_up_date.strftime('%d %b %Y at %-I:%M %p')
+        balance_inst = Balance.objects.filter(member=member)[0]
+        balance = balance_inst.balance
+        top_date = balance_inst.last_top_up_date.strftime('%d %b %Y at %-I:%M %p')
         last_top_up = "Last top up %s ($%s)" % (top_date,
-                                               member[0].last_top_up_amount)
+                                               balance_inst.last_top_up_amount)
     except:
         balance = "Set up Now!"
         last_top_up = "Never"
@@ -71,9 +71,29 @@ get back from Stripe
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
-def test_callback(status, payload):
+def test_callback(status, payload, tran):
+    """ Eventually I will be moved to another module. I am only here for testing purposes
+
+    I also shouldn't have the 3rd parameter. I only get status and the payload that I provided
+    when I made the call to payments to get money from a member. I am responsible for my own
+    actions, but for testing I get the transaction passed so I can reverse it.
+
+    """
     log_event("Callback" , "DEBUG",
                   "Payments", "test_callback", "Received callback from payment: %s %s" % (status, payload) )
+    if status=="Success":
+        details = {
+            'member': tran.member,
+            'amount': -tran.amount,
+            'counterparty': "SFOB",
+            'transaction': tran,
+            'description': "Summer Festival Of Bridge - Swiss Pairs entry",
+            'log_msg': "$%s payment for SFOB" % tran.amount,
+            'source': "Events",
+            'sub_source': "fictional_event_entry_module"
+        }
+
+        update_account(details)
 
 @login_required(login_url='/accounts/login/')
 def test_payment(request):
@@ -175,7 +195,7 @@ def stripe_webhook(request):
             # make Callback
 
             if tran.route_code == "MAN":
-                test_callback("Success", tran.route_payload)
+                test_callback("Success", tran.route_payload, tran)
             else:
                 log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
                     "Unable to make callback. Invalid route_code: %s" % tran.route_code)
@@ -186,40 +206,20 @@ def stripe_webhook(request):
             log_event("Stripe API", "CRITICAL", "Payments", "stripe_webhook",
                 "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
-        try:
-            balance = Balance.objects.filter(system_number = tran.member.abf_number)[0]
-        except:
-            balance = Balance()
-            balance.balance=0
-            balance.system_number = tran.member.abf_number
-        balance.balance += tran.amount
-        balance.last_top_up_amount = tran.amount
-        balance.save()
+        details = {
+            'member': tran.member,
+            'amount': tran.amount,
+            'counterparty': "CC Payment",
+            'transaction': tran,
+            'description': "Payment from card **** **** ***** %s Exp %s/%s" %
+                (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100),
+            'log_msg': "$%s Payment from Stripe Transaction=%s" % (tran.amount, tran.id),
+            'source': "Payments",
+            'sub_source': "stripe_webhook"
+        }
 
-        log_event("%s %s" % (tran.member.first_name, tran.member.last_name), "INFO", "Payments", "stripe_webhook",
-            "Successfully updated balance table after Stripe payment of $%s" % (tran.amount))
+        update_account(details)
 
-        act = Account()
-        act.member = tran.member
-        act.amount = tran.amount
-        act.counterparty = "CC Payment"
-        act.transaction = tran
-        act.balance = balance.balance
-        act.description = "Payment from card **** **** ***** %s Exp %s/%s" % (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100)
-
-        act.save()
-
-        log_event("%s %s" % (act.member.first_name, act.member.last_name), "INFO", "Payments", "stripe_webhook",
-            "Successfully updated account table after Stripe payment of $%s" % (act.amount))
-
-
-
-    elif event.type == 'payment_method.attached':
-        payment_method = event.data.object # contains a stripe.PaymentMethod
-        # Then define and call a method to handle the successful attachment of a PaymentMethod.
-        # handle_payment_method_attached(payment_method)
-      # ... handle other event types
-        print(payment_method)
     else:
         # Unexpected event type
         log_event("Stripe API", "HIGH", "Payments", "stripe_webhook", "Unexpected event received from Stripe - " + event.type)
@@ -228,7 +228,37 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
+def update_account(details):
+    """ method to update a customer account """
+    try:
+        balance = Balance.objects.filter(member = details['member'])[0]
+    except:
+        balance = Balance()
+        balance.balance=0
+        balance.member = details['member']
+    balance.balance += details['amount']
+    balance.last_top_up_amount = details['amount']
+    balance.save()
 
+    log_event("%s %s" % (details['member'].first_name, details['member'].last_name), "INFO",
+        details['source'], details['sub_source'], details['log_msg'] + " Updated balance table")
+
+# Create new waccount entry
+    act = Account()
+    act.member = details['member']
+    act.amount = details['amount']
+    act.counterparty = details['counterparty']
+    act.transaction = details['transaction']
+    act.balance = balance.balance
+    act.description = details['description']
+
+    act.save()
+
+    log_event("%s %s" % (details['member'].first_name, details['member'].last_name), "INFO",
+        details['source'], details['sub_source'], details['log_msg'] + " Updated account table")
+
+
+@login_required(login_url='/accounts/login/')
 def statement(request):
 
 # Get summary data
@@ -248,7 +278,7 @@ def statement(request):
     events_list = Account.objects.filter(member=request.user).order_by('-created_date')
     page = request.GET.get('page', 1)
 
-    paginator = Paginator(events_list, 10)
+    paginator = Paginator(events_list, 30)
     try:
         events = paginator.page(page)
     except PageNotAnInteger:
