@@ -6,10 +6,24 @@ from django.core.mail import send_mail
 from cobalt.settings import DEFAULT_FROM_EMAIL, SUPPORT_EMAIL
 from datetime import datetime
 
-def log_event(user, severity, source, sub_source, message):
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+def log_event(request, user, severity, source, sub_source, message):
+
+    if request:
+        ip = get_client_ip(request)
+    else:
+        ip = None
 
     l = Log()
     l.user = user
+    l.ip=ip
     l.severity = severity
     l.source = source
     l.sub_source = sub_source

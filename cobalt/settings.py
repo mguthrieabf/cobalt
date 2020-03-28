@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'support.apps.SupportConfig',
     'accounts.apps.AccountsConfig',
     'dashboard.apps.DashboardConfig',
-    'user_settings.apps.UserSettingsConfig',
     'user_profile.apps.UserProfileConfig',
     'results.apps.ResultsConfig',
     'logs.apps.LogsConfig',
@@ -95,6 +94,7 @@ if 'RDS_HOSTNAME' in os.environ:
     }
 
 AUTH_USER_MODEL="accounts.User"
+AUTHENTICATION_BACKENDS = ['accounts.backend.CobaltBackend']
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

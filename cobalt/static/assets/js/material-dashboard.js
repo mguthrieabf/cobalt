@@ -314,7 +314,7 @@ md = {
     });
 
     $('.datepicker').datetimepicker({
-      format: 'MM/DD/YYYY',
+      format: 'DD/MM/YYYY',
       icons: {
         time: "fa fa-clock-o",
         date: "fa fa-calendar",
@@ -326,7 +326,10 @@ md = {
         clear: 'fa fa-trash',
         close: 'fa fa-remove'
       }
-    });
+    }).on('change', function(e){
+        alert("hello");
+      });
+
 
     $('.timepicker').datetimepicker({
       //          format: 'H:mm',    // use this format if you want the 24hours timepicker

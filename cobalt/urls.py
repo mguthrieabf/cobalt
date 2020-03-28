@@ -18,5 +18,4 @@ urlpatterns = [
     path('logs/', include('logs.urls')),
     path('support', include('support.urls')),
     path('profile', include('user_profile.urls')),
-    path('settings', include('user_settings.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,18 +3,31 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from accounts.forms import UserUpdateForm
 
+
 @login_required
 def home(request):
+    msg=""
     if request.method == 'POST':
         form = UserUpdateForm(data=request.POST, instance=request.user)
-        u=request.user
-        u.save()
-        msg="Profile Updated"
+        if form.is_valid():
+            msg="Profile Updated"
+            print(form)
+            form.save()
+        else:
+            print(form.errors)
     else:
-        msg=""
 
-    user=request.user
-    form = UserUpdateForm(instance=user)
+# Fix DOB format for browser - expects DD/MM/YYYY
+        print(request.user.dob)
+        request.user.dob=request.user.dob.strftime("%d/%m/%Y")
+        print(request.user.dob)
+
+        form = UserUpdateForm(instance=request.user)
+
+# fix date format for dob
+#    print(form['dob'])
+#    form['dob']="03/05/1967"
+
     context = {
         'form': form,
         'msg': msg,

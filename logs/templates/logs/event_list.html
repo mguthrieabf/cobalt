@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<div class="col-lg-11 col-md-12">
+<div class="col-md-12">
   <div class="card">
     <div class="card-header card-header-warning">
       <h4 class="card-title">Logs</h4>
@@ -13,6 +13,7 @@
         <thead class="text-info">
           <tr>
             <th>Time Stamp</th>
+            <th>IP</th>
             <th>Severity</th>
             <th>User</th>
             <th>Source</th>
@@ -24,6 +25,7 @@
           {% for event in events %}
             <tr>
               <td>{{ event.event_date|timesince }} ago</td>
+              <td>{{ event.ip }}</td>
               <td class="
 
               {% if event.severity == "DEBUG" %}bg-white{% endif %}
