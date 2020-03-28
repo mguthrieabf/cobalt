@@ -18,9 +18,8 @@ def home(request):
     else:
 
 # Fix DOB format for browser - expects DD/MM/YYYY
-        print(request.user.dob)
-        request.user.dob=request.user.dob.strftime("%d/%m/%Y")
-        print(request.user.dob)
+        if request.user.dob:
+            request.user.dob=request.user.dob.strftime("%d/%m/%Y")
 
         form = UserUpdateForm(instance=request.user)
 
