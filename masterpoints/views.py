@@ -204,7 +204,7 @@ def get_masterpoints(abf_number):
    try:
        summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
        points = summary["TotalMPs"]
-       rank = summary["RankName"]
+       rank = summary["RankName"] + " Master"
    except:
        points = "Not found"
        rank = "Not found"
