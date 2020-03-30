@@ -98,7 +98,7 @@ def test_payment(request):
 ###################################################
 # view for simple payments                        #
 ###################################################
-    log_event(request, "%s %s" % (request.user.first_name, request.user.last_name), "INFO",
+    log_event(request, request.user.full_name, "INFO",
               "Payments", "test_payment", "User went to test payment screen")
 
     if request.method == 'POST':
@@ -121,7 +121,7 @@ def test_transaction(request):
 
     msg=""
 
-    log_event(request, "%s %s" % (request.user.first_name, request.user.last_name), "INFO",
+    log_event(request, request.user.full_name, "INFO",
               "Payments", "test_transaction", "User went to test transaction screen")
 
     if request.method == 'POST':
@@ -269,7 +269,7 @@ def update_account(details):
     balance.last_top_up_amount = details['amount']
     balance.save()
 
-    log_event(None, "%s %s" % (details['member'].first_name, details['member'].last_name), "INFO",
+    log_event(None, details['member'].full_name, "INFO",
         details['source'], details['sub_source'], details['log_msg'] + " Updated balance table")
 
 # Create new waccount entry
@@ -283,7 +283,7 @@ def update_account(details):
 
     act.save()
 
-    log_event(None, "%s %s" % (details['member'].first_name, details['member'].last_name), "INFO",
+    log_event(None, details['member'].full_name, "INFO",
         details['source'], details['sub_source'], details['log_msg'] + " Updated account table")
 
 

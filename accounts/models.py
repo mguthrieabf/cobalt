@@ -13,4 +13,9 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['abf_number', 'email'] # tells createsuperuser to ask for them
 
     def __str__(self):
-        return "%s - %s %s" % (self.abf_number, self.first_name, self.last_name)
+        return "%s - %s" % (self.abf_number, self.full_name)
+
+    @property
+    def full_name(self):
+        "Returns the person's full name."
+        return '%s %s' % (self.first_name, self.last_name)

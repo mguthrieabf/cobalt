@@ -14,7 +14,7 @@ but probably morphs into the single top up screen.</p>
     </div>
     <div class="card-body" style="text-align: center">
       <div class="text-left">
-        You are: {{ user.first_name }} {{ user.last_name }} (ABF Number: {{ user.abf_number }})
+        You are: {{ user.full_name }} (ABF Number: {{ user.abf_number }})
       </div>
       <form action="test-payment" method="post">
           {% csrf_token %}

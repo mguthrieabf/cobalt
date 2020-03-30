@@ -4,27 +4,70 @@
 
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
-    {{ post.title }}
+    <h3>{{ post.title }}</h3>
+    <h4>By {{ post.author.full_name }}</h4>
+    <div class="card-title d-flex justify-content-between">
+          <div>
+                {{ post.created_date }}
+          </div>
+          <div>
+            Forum: {{ post.forum.title }}
+          </div>
+     </div>
   </div>
   <div class="card-body">
-    <p class="card-title text-right">Posted by {{ post.author }} on {{ post.created_date }}</p>
     <p class="card-text">{{ post.text|linebreaksbr }}</p>
-    <a href="#0" class="btn btn-primary">Reply</a>
     <span class="float-right">
-      <a href="#"> 10 <i class="material-icons">comment</i>
-      <a href="#"> 2 <i class="material-icons">thumb_up</i>
+      <a href="#"> {{ total_comments }} <i class="material-icons">comment</i>
+      <a href="#"> {{ post_likes.count }} <i class="material-icons">thumb_up</i>
     </span>
-
   </div>
 </div>
-{% for c1 in comments1 %}
-<h4> {{ c1.user  }} </h4>
-{{ c1.text|linebreaksbr }}
 
-{{ comments2 }}
+<h4>Comments</h4>
+
+{% for c1 in comments1 %}
+<div class="card">
+  <div class="card-body">
+
+    <div class="card-title d-flex justify-content-between">
+          <div>
+             {{ c1.author.full_name }}
+          </div>
+          <div>
+             {{ c1.created_date }}
+          </div>
+     </div>
+    <p class="card-text">{{ c1.text|linebreaksbr }}</p>
+    <span class="float-right">
+      <a href="#"> TBA <i class="material-icons">thumb_up</i>
+    </span>
+  </div>
+</div>
+
+<div class="col-8">
+
+  {% for c2 in c1.c2 %}
+  <div class="card">
+    <div class="card-body bg-light">
+      <div class="card-title d-flex justify-content-between">
+            <div>
+               {{ c2.author.full_name }}
+            </div>
+            <div>
+               {{ c2.created_date }}
+            </div>
+       </div>
+    <p class="card-text">{{ c2.text|linebreaksbr }}</p>
+    </div>
+  </div>
+  {% endfor %}
+  <a href="#0" class="btn btn-primary">Reply to Thread</a>
+</div>
 
 {% endfor %}
 
+<a href="#0" class="btn btn-primary">Reply To Post</a>
 
 
 {% endblock %}

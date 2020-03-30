@@ -12,7 +12,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('calendar', include('calendar_app.urls')),
     path('events', include('events.urls')),
-    path('forums', include('forums.urls')),
+    path('forums/', include('forums.urls')),
     path('masterpoints/', include('masterpoints.urls')),
     path('payments/', include('payments.urls')),
     path('logs/', include('logs.urls')),

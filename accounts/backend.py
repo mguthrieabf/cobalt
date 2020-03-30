@@ -35,6 +35,6 @@ class CobaltBackend(ModelBackend):
             return None
 
         if user.check_password(password):
-            log_event(request, "%s %s" % (user.first_name, user.last_name) , "INFO",
+            log_event(request, user.full_name , "INFO",
                         "Accounts", "Login", "Logged in using %s" % con_type)
             return user
