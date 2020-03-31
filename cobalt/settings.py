@@ -193,6 +193,10 @@ SUMMERNOTE_CONFIG = {
         # Use proper language setting automatically (default)
         'lang': None,
 
+  
+
+
+
     },
 
     # Need authentication while uploading attachments.
