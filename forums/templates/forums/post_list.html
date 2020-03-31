@@ -13,7 +13,7 @@
     </div>
     <div class="card-body">
       <p class="card-title text-right">Posted by {{ post.author }} on {{ post.created_date }}</p>
-      <p class="card-text">{{ post.text|linebreaksbr }}</p>
+      <p class="card-text">{{ post.text|safe }}</p>
       <a href="#0" class="btn btn-primary">Reply</a>
       <span class="float-right">
         <a href="{% url 'post_detail' pk=post.pk %}"> 10 <i class="material-icons">comment</i>

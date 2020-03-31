@@ -5,11 +5,18 @@
 <div class="content container">
   <div class="row">
       <div class="col-md-8">
-        <h2>New post</h2>
+        <div class="card">
+          <div class="card-header card-header-success">
+            <div class="card-title">
+              <h2>New Post by {{ request.user.full_name }}</h2>
+            </div>
+          </div>
+          <div class="card-body">
         <form method="POST" class="post-form">{% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="save btn btn-default">Save</button>
         </form>
+        </div>
       </div>
   </div>
 </div>

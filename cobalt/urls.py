@@ -18,4 +18,5 @@ urlpatterns = [
     path('logs/', include('logs.urls')),
     path('support', include('support.urls')),
     path('profile', include('user_profile.urls')),
+    path('summernote/', include('django_summernote.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
