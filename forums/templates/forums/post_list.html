@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<button class="btn btn-success" onclick="{% url 'post_new' %}">Create New Post</button>
+<button class="btn btn-success" onclick="location.reload();location.href='./post/new'">Create New Post</button>
 <a href="{% url 'post_new' %}" class="top-menu">New</a>
 
 {% for post in posts %}
