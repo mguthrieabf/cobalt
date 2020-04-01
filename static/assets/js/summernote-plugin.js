@@ -10,6 +10,8 @@
     factory(window.jQuery);
   }
 }(function($) {
+
+
   $.extend($.summernote.plugins, {
     'specialchars': function(context) {
       var self = this;
@@ -36,31 +38,8 @@
 
       // special characters data set
       var specialCharDataSet = [
-        '&quot;', '&amp;', '&lt;', '&gt;', '&iexcl;', '&cent;',
-        '&pound;', '&curren;', '&yen;', '&brvbar;', '&sect;',
-        '&uml;', '&copy;', '&ordf;', '&laquo;', '&not;',
-        '&reg;', '&macr;', '&deg;', '&plusmn;', '&sup2;',
-        '&sup3;', '&acute;', '&micro;', '&para;', '&middot;',
-        '&cedil;', '&sup1;', '&ordm;', '&raquo;', '&frac14;',
-        '&frac12;', '&frac34;', '&iquest;', '&times;', '&divide;',
-        '&fnof;', '&circ;', '&tilde;', '&ndash;', '&mdash;',
-        '&lsquo;', '&rsquo;', '&sbquo;', '&ldquo;', '&rdquo;',
-        '&bdquo;', '&dagger;', '&Dagger;', '&bull;', '&hellip;',
-        '&permil;', '&prime;', '&Prime;', '&lsaquo;', '&rsaquo;',
-        '&oline;', '&frasl;', '&euro;', '&image;', '&weierp;',
-        '&real;', '&trade;', '&alefsym;', '&larr;', '&uarr;',
-        '&rarr;', '&darr;', '&harr;', '&crarr;', '&lArr;',
-        '&uArr;', '&rArr;', '&dArr;', '&hArr;', '&forall;',
-        '&part;', '&exist;', '&empty;', '&nabla;', '&isin;',
-        '&notin;', '&ni;', '&prod;', '&sum;', '&minus;',
-        '&lowast;', '&radic;', '&prop;', '&infin;', '&ang;',
-        '&and;', '&or;', '&cap;', '&cup;', '&int;',
-        '&there4;', '&sim;', '&cong;', '&asymp;', '&ne;',
-        '&equiv;', '&le;', '&ge;', '&sub;', '&sup;',
-        '&nsub;', '&sube;', '&supe;', '&oplus;', '&otimes;',
-        '&perp;', '&sdot;', '&lceil;', '&rceil;', '&lfloor;',
-        '&rfloor;', '&loz;', '&spades;', '&clubs;', '&hearts;',
-        '&diams;',
+        '&spades;', '&clubs;', '<span style="color:red">&hearts;</span>',
+        '<span style="color:red">&diams;</span>',
       ];
 
       context.memo('button.specialchars', function() {
@@ -130,8 +109,24 @@
         this.showSpecialCharDialog(text).then(function(selectChar) {
           context.invoke('editor.restoreRange');
 
+          selectChar2 = unescape(encodeURIComponent("&spade;"));
+
           // build node
           var $node = $('<span></span>').html(selectChar)[0];
+
+          console.log("selectChar");
+          console.log(selectChar);
+          console.log(typeof selectChar);
+
+
+          console.log("selectChar2");
+          console.log(selectChar2);
+          console.log(typeof selectChar2);
+
+
+          console.log("node");
+          console.log($node);
+          console.log(typeof $node);
 
           if ($node) {
             // insert video node
@@ -239,6 +234,11 @@
               return;
             }
 
+            alert("selectedNode");
+            alert($selectedNode.find('button').attr('data-value'));
+
+            alert("decodeURI");
+            alert(decodeURIComponent($selectedNode.find('button').attr('data-value')));
             deferred.resolve(decodeURIComponent($selectedNode.find('button').attr('data-value')));
             $specialCharDialog.modal('hide');
           }

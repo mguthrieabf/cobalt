@@ -13,7 +13,7 @@ SECRET_KEY = 'ci8v_@0l*@1@*ufho0kt4+wu6d7b(r!0-4k9p2c^a!rki%23dr'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cobalt-uat.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com','cobalt-test.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com','test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
+ALLOWED_HOSTS = ['test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
 
 # Application definition
 
@@ -164,86 +164,43 @@ GLOBAL_MPSERVER="http://127.0.0.1:8081"
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
 
+# Stripe is our payment gateway
+
 STRIPE_SECRET_KEY="sk_test_tbD1kQf7S7aBrWdpaAkdK60e"
 STRIPE_PUBLISHABLE_KEY="pk_test_vx2RPX6BXeETHa3MJycvArkx"
 if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
 
+# django-summernote provides the rich text entry fields
+
 SUMMERNOTE_THEME = 'bs4'
 
 SUMMERNOTE_CONFIG = {
-    # Using SummernoteWidget - iframe mode, default
-#    'iframe': True,
-
-    # Or, you can set it as False to use SummernoteInplaceWidget by default - no iframe mode
-    # In this case, you have to load Bootstrap/jQuery stuff by manually.
-    # Use this when you're already using Bootstraip/jQuery based themes.
     'iframe': False,
-
-    # You can put custom Summernote settings
     'summernote': {
-        # As an example, using Summernote Air-mode
         'airMode': False,
-
-        # Change editor size
         'width': '100%',
-        'height': '480',
-
-        # Use proper language setting automatically (default)
+        'height': '600',
         'lang': None,
-
-  
-
-
-
+        'spellCheck': True,
+        'toolbar': [
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'clear']],
+        ['fontname', ['fontname']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'hr']],
+        ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs']],
+        ['view', ['fullscreen', 'codeview']],
+        ['help', ['help']]
+      ],
     },
-
-    # Need authentication while uploading attachments.
     'attachment_require_authentication': True,
-
-    # Set `upload_to` function for attachments.
-#    'attachment_upload_to': my_custom_upload_to_func(),
-
-    # Set custom storage class for attachments.
-#    'attachment_storage_class': 'my.custom.storage.class.name',
-
-    # You can disable attachment feature.
     'disable_attachment': False,
-
-    # Set `True` to return attachment paths in absolute URIs.
     'attachment_absolute_uri': False,
-
-    # You can add custom css/js for SummernoteWidget.
-    'css': (
-    ),
-    'js': (
-    ),
-
-    # You can also add custom css/js for SummernoteInplaceWidget.
-    # !!! Be sure to put {{ form.media }} in template before initiate summernote.
-    'css_for_inplace': (
-    ),
-    'js_for_inplace': (
-    ),
-
-    # Codemirror as codeview
-    # If any codemirror settings are defined, it will include codemirror files automatically.
-    'css': (
-        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/theme/monokai.min.css',
-    ),
-
-    # Lazy initialize
-    # If you want to initialize summernote at the bottom of page, set this as True
-    # and call `initSummernote()` on your page.
-    'lazy': True,
-
-    # To use external plugins,
-    # Include them within `css` and `js`.
-    # 'js': {
-    #     '/some_static_folder/summernote-ext-print.js',
-    #     '//somewhere_in_internet/summernote-plugin-name.js',
-    # },
 }
 
 try:
