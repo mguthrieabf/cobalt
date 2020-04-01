@@ -11,8 +11,8 @@ def home(request):
 
 @login_required(login_url='/accounts/login/')
 def post_list(request):
-    posts=Post.objects.all()
-#    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+#    posts=Post.objects.all()
+    posts = Post.objects.all().order_by('-created_date')
     return render(request, 'forums/post_list.html', {'posts' : posts})
 
 @login_required(login_url='/accounts/login/')

@@ -20,7 +20,9 @@ class AbstractForum(models.Model):
 class Post(AbstractForum):
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    summary = models.TextField()
     text = models.TextField()
+
 
     def __str__(self):
         return self.title
