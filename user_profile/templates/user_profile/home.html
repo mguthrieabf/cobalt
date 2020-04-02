@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
 
 
@@ -91,7 +91,10 @@
    </div>
 </div>
 
-<script src="/static/assets/js/core/jquery.min.js"></script>
+{% endblock %}
+{% block footer %}
+<script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
   $(document).ready(function() {
     // initialise Datetimepicker and Sliders

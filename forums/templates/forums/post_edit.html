@@ -1,15 +1,8 @@
-{% extends 'base-post.html' %}
-
+{% extends 'base.html' %}
+{% load static %}
 {% block header %}
 
-<script
-  src="https://code.jquery.com/jquery-3.4.1.min.js"
-  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-  crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <style> /* remove bug from summernote height in codeview mode */
   .note-codable { min-height: 600px !important; }
@@ -22,13 +15,19 @@
 
 {% block content %}
 
-{{ form.media }}
+<!-- Instead of using {{ form.media }} we hardcode the static files here
+     so we can control the version that we use. Django-summertone comes with
+     an older version of summertone that has some bugs especially relating
+     to how it shakes when it is slowly scrolled. We point to a newer
+     version of summertone and it fixes the problem. -->
 
-
-<script src="/static/assets/js/summernote-plugin-spades.js"></script>
-<script src="/static/assets/js/summernote-plugin-hearts.js"></script>
-<script src="/static/assets/js/summernote-plugin-diamonds.js"></script>
-<script src="/static/assets/js/summernote-plugin-clubs.js"></script>
+<link href="{% static "forums/summernote/summernote-bs4.css" %}" type="text/css" media="all" rel="stylesheet">
+<link href="{% static "forums/summernote/django_summernote.css" %}" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="{% static "forums/summernote/jquery.ui.widget.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.iframe-transport.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.fileupload.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/summernote-bs4.min.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/ResizeSensor.js" %}"></script>
 
 <div class="content container">
   <div class="row">
@@ -48,6 +47,11 @@
       </div>
   </div>
 </div>
+
+<script src="{% static "forums/assets/js/summernote-plugin-spades.js" %}"></script>
+<script src="{% static "forums/assets/js/summernote-plugin-hearts.js" %}"></script>
+<script src="{% static "forums/assets/js/summernote-plugin-diamonds.js" %}"></script>
+<script src="{% static "forums/assets/js/summernote-plugin-clubs.js" %}"></script>
 
 <script>
 $('.summernote').summernote({ followingToolbar: false });

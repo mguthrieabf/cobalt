@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block content %}
+
+<img src="{% static "forums/example.png" %}" alt="My image">
 
 <button class="btn btn-success" onclick="location.reload();location.href='./post/new'">Create New Post</button>
 

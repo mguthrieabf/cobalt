@@ -139,10 +139,14 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'cobalt/static/')
-]
+# app specific static lives in app_name/static/app_name
+# general static lives in STATICFILES_DIRS
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'cobalt/static/')]
+
+# This is where collectstatic will put the static files it finds
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# External reference point to find static
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
