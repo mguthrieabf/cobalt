@@ -1,12 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'base-post.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block header %}
 
+<script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
+<script src="{% static "assets/js/core/popper.min.js" %}"></script>
+
+  <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+  <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 
   <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
-
-  <script src="{% static "assets/js/bootstrap.4.0.0.min.js" %}"></script>
-
+  <!-- <script src="{% static "assets/js/bootstrap.4.0.0.min.js" %}"></script> -->
 
 <style> /* remove bug from summernote height in codeview mode */
   .note-codable { min-height: 600px !important; }
@@ -44,8 +48,17 @@
           </div>
           <div class="card-body">
         <form method="POST" class="post-form">{% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="save btn btn-default">Save</button>
+          {{ form.forum|as_crispy_field }}
+          {{ form.title|as_crispy_field }}
+          {{ form.summary|as_crispy_field }}
+          {{ form.text|as_crispy_field }}
+
+
+
+
+
+
+            <button type="submit" class="save btn btn-default">Publish</button>
         </form>
         </div>
       </div>
@@ -57,7 +70,4 @@
 <script src="{% static "forums/assets/js/summernote-plugin-diamonds.js" %}"></script>
 <script src="{% static "forums/assets/js/summernote-plugin-clubs.js" %}"></script>
 
-<script>
-$('.summernote').summernote({ followingToolbar: false });
-</script>
 {% endblock %}

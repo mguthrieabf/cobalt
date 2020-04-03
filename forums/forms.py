@@ -3,8 +3,10 @@ from .models import Post
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 class PostForm(forms.ModelForm):
-    summary = forms.CharField(widget=SummernoteInplaceWidget(attrs={'summernote': {
-            'placeholder': '<br><br>Short description. Keep it punchy.'}}))
+    summary = forms.CharField(widget=SummernoteInplaceWidget(attrs={
+    'summernote': {
+            'placeholder': '<br><br>Short description. Keep it punchy.',
+             'height': 200}}))
     text = forms.CharField(widget=SummernoteInplaceWidget(attrs={'summernote': {
             'placeholder': '<br><br>Start typing...'}}))
 

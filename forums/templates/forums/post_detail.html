@@ -24,8 +24,11 @@
   </div>
 </div>
 
+{% if total_comments == 0 %}
+  <h4>Be the first to comment</h4>
+{% else %}
 <h4>Comments</h4>
-
+{% endif %}
 {% for c1 in comments1 %}
 <div class="card">
   <div class="card-body">

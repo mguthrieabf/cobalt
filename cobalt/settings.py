@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_summernote',
+    'crispy_forms',
     # 'health_check',
     # 'health_check.db',
     # 'health_check.cache',
@@ -151,7 +152,7 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL="/dashboard"
 LOGOUT_REDIRECT_URL="/accounts/login"
@@ -194,7 +195,6 @@ SUMMERNOTE_CONFIG = {
         ['fontname', ['fontname']],
         ['color', ['color']],
         ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
         ['table', ['table']],
         ['insert', ['link', 'picture', 'hr']],
         ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs']],
