@@ -18,7 +18,6 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.SUCCESS('%s user already exists - ok' % newuser))
 
-
     def handle(self, *args, **options):
         print("Running createsu.")
         self.CreateDefaultTestUsers("admin", "a@b.com", "99", "Admin", "Admin")

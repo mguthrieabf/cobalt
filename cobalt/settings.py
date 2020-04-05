@@ -191,7 +191,7 @@ SUMMERNOTE_CONFIG = {
         'spellCheck': True,
         'toolbar': [
         ['style', ['style']],
-        ['font', ['bold', 'italic', 'underline', 'clear']],
+        ['font', ['bold', 'italic', 'underline']],
         ['fontname', ['fontname']],
         ['color', ['color']],
         ['para', ['ul', 'ol', 'paragraph']],
