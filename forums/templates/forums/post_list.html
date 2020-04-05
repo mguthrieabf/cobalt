@@ -13,7 +13,7 @@
       <div class="container">
         <div class="row">
       <div class="col-2">
-            <a href="/accounts/public-profile/{{ post.author.id }}">
+        <a href="{% url 'public_profile' pk=post.author.pk %}">
               <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
               <h4>{{ post.author.full_name }}</h4>
             </a>

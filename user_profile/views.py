@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from accounts.forms import UserUpdateForm
-
+from accounts.models import User
 
 @login_required
 def home(request):
@@ -23,12 +23,13 @@ def home(request):
 
         form = UserUpdateForm(instance=request.user)
 
-# fix date format for dob
-#    print(form['dob'])
-#    form['dob']="03/05/1967"
-
     context = {
         'form': form,
         'msg': msg,
     }
     return render(request, 'user_profile/home.html', context)
+
+@login_required
+def public_profile(request, pk):
+    profile = get_object_or_404(User, pk=pk)
+    return render(request, 'user_profile/public_profile.html', {'profile': profile})
