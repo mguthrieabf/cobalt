@@ -8,33 +8,59 @@
 
 {% for post in posts %}
 
-  <div class="card card-nav-tabs">
-    <div class="card-header card-header-success">
-      <a href="{% url 'post_detail' pk=post.pk %}">
-        <h3>{{ post.title }}</h3>
-        <h5>{{ post.author.full_name }}</h5>
-      </a>
-    </div>
+  <div class="card">
     <div class="card-body">
-      <div class="card-title d-flex justify-content-between">
-            <div>
-                  {{ post.created_date }}
-            </div>
-            <div>
-              Forum: {{ post.forum.title }}
-            </div>
-       </div>
-
-      <p class="card-text">{{ post.summary|safe }}</p>
-      <span class="float-right">
-        <a href="{% url 'post_detail' pk=post.pk %}"> 10 <i class="material-icons">comment</i>
-        <a href="#"> 2 <i class="material-icons">thumb_up</i>
-      </span>
+      <div class="container">
+        <div class="row">
+      <div class="col-2">
+            <a href="/accounts/public-profile/{{ post.author.id }}">
+              <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+              <h4>{{ post.author.full_name }}</h4>
+            </a>
+      </div>
+      <div class="col-10">
+        <a href="{% url 'post_detail' pk=post.pk %}">
+          <h3>{{ post.title|safe }}</h3>
+        </a>
+        <div class="card-title d-flex justify-content-between">
+              <div>
+                    {{ post.created_date }}
+              </div>
+              <div>
+                Forum: {{ post.forum.title }}
+              </div>
+         </div>
+        </div>
+          <span class="float-right">
+            <a href="{% url 'post_detail' pk=post.pk %}">{{ post.post_comments }}<i class="material-icons">comment</i>
+            <a href="#"> {{ post.post_likes }} <i class="material-icons">thumb_up</i>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
-
-  <br>
-
 {% endfor %}
+
+{% if posts.has_other_pages %}
+  <ul class="pagination">
+    {% if posts.has_previous %}
+      <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;&nbsp;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if events.number == i %}
+        <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
+      {% else %}
+        <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+      <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+{% endif %}
 
 {% endblock %}

@@ -35,6 +35,7 @@ class Comment1(AbstractForum):
         return "%s - comment by %s" % (self.post.title, self.author.full_name)
 
 class Comment2(AbstractForum):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment1 = models.ForeignKey(Comment1, on_delete=models.CASCADE)
     text = models.TextField()
 

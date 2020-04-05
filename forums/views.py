@@ -3,20 +3,51 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2
-from .forms import PostForm
-
-@login_required(login_url='/accounts/login/')
-def home(request):
-    return render(request, 'forums/home.html')
+from .forms import PostForm, CommentForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/accounts/login/')
 def post_list(request):
-#    posts=Post.objects.all()
-    posts = Post.objects.all().order_by('-created_date')
-    return render(request, 'forums/post_list.html', {'posts' : posts})
+    posts_list = Post.objects.all().order_by('-created_date')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(posts_list, 10)
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
+    # for post in posts:
+    #     post_likes = LikePost.objects.filter(post = post)
+    #     comments1 = Comment1.objects.filter(post = post)
+    #
+    #     total_comments = 0
+    #     for c1 in comments1:
+    #         total_comments += 1
+    #         c1.c2 = Comment2.objects.filter(comment1 = c1)
+    #         total_comments += len(c1.c2)
+
+    posts_new=[]
+    for p in posts:
+        p.post_likes = LikePost.objects.filter(post = p).count()
+        p.post_comments = Comment1.objects.filter(post = p).count()
+        p.post_comments += Comment2.objects.filter(post = p).count()
+        posts_new.append(p)
+
+    return render(request, 'forums/post_list.html', {'posts' : posts_new})
 
 @login_required(login_url='/accounts/login/')
 def post_detail(request, pk):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+        else:
+            print(form.errors)
+    form = CommentForm()
     post = get_object_or_404(Post, pk=pk)
     post_likes = LikePost.objects.filter(post = post)
     comments1 = Comment1.objects.filter(post = post)
@@ -29,7 +60,8 @@ def post_detail(request, pk):
         total_comments += len(c1.c2)
         comments1_new.append(c1)
 
-    return render(request, 'forums/post_detail.html', {'post': post,
+    return render(request, 'forums/post_detail.html', {'form': form,
+                                                       'post': post,
                                                        'comments1' : comments1_new,
                                                        'post_likes' : post_likes,
                                                        'total_comments' : total_comments})

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
 <div class="card card-nav-tabs">
@@ -65,12 +65,15 @@
     </div>
   </div>
   {% endfor %}
-  <a href="#0" class="btn btn-primary">Reply to Thread</a>
+  <h4>Reply to Thread</h4>
 </div>
 
 {% endfor %}
 
-<a href="#0" class="btn btn-primary">Reply To Post</a>
-
+<form method="POST" class="post-form">{% csrf_token %}
+  <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+  {{ form.text|as_crispy_field }}
+    <button type="submit" class="save btn btn-default">Reply to Post</button>
+</form>
 
 {% endblock %}

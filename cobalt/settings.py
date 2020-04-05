@@ -197,7 +197,7 @@ SUMMERNOTE_CONFIG = {
         ['para', ['ul', 'ol', 'paragraph']],
         ['table', ['table']],
         ['insert', ['link', 'picture', 'hr']],
-        ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs']],
+        ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs', 'specialcharshand']],
         ['view', ['fullscreen', 'codeview']],
         ['help', ['help']]
       ],
