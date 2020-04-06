@@ -16,7 +16,6 @@
   <style>
     .bg {
   height: 100%;
-  background-image: url("/static/assets/img/backgrounds/bg4.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -116,19 +115,9 @@
   <script type="text/javascript">
       $(document).ready(function() {
 
-        function changeBg() {
-            pic = Math.floor(Math.random() * 10) + 1;
-            $('#bg').css('background-image', 'url(/static/assets/img/backgrounds/bg' + pic +'.jpg');
-            $('#bg').fadeIn(100);
-        }
-
-        function changeBackgroundSmoothly() {
-            $('#bg').fadeOut(100, changeBg);
-        }
-
-        setInterval(changeBackgroundSmoothly,15000);
-
-
+        pic = Math.floor(Math.random() * 10) + 1;
+        $('#bg').css('background-image', 'url(/static/assets/img/backgrounds/bg' + pic +'.jpg');
+        $('#bg').fadeIn(100);
 
       });
   </script>

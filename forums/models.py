@@ -22,7 +22,7 @@ class Post(AbstractForum):
     title = models.CharField(max_length=200)
     summary = models.TextField()
     text = models.TextField()
-
+    comments_allowed = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title

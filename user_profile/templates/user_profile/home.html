@@ -14,7 +14,7 @@
            <p class="card-category">Basic details</p>
          </div>
          <div class="card-body">
-           <form method="post" action="/profile">
+           <form method="post" action="/profile/">
              <input type="hidden" id="id_username" name="username" value="{{ form.username.value }}">
              {% csrf_token %}
              <div class="row">
@@ -51,13 +51,21 @@
                    <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form.last_name.value }}">
                  </div>
                </div>
-             <div class="col-md-6">
-               <div class="form-group">
-                 <label class="bmd-label-static" style="font-size:11px">Date of Birth</label>
-                 <input type="text" name="dob" id="id_dob" class="form-control datepicker" value="{{ form.dob.value }}">
+              </div>
+              <div class="row">
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="bmd-label-static" style="font-size:11px">Date of Birth</label>
+                   <input type="text" name="dob" id="id_dob" class="form-control datepicker" value="{{ form.dob.value }}">
+                 </div>
+               </div>
+               <div class="col-md-6">
+                 <div class="form-group">
+                   <label class="bmd-label-floating">BBO Username</label>
+                   <input type="text" name="bbo_name" id="id_bbo_name" class="form-control" value="{{ form.bbo_name.value|default_if_none:'' }}">
+                 </div>
                </div>
              </div>
-           </div>
 
              <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
              <div class="clearfix"></div>
@@ -66,20 +74,29 @@
        </div>
      </div>
      <div class="col-md-4">
+       <form method="post" action="update-blurb" enctype="multipart/form-data">
+         {% csrf_token %}
 
        <div class="card card-profile">
          <div class="card-avatar">
-           <a href="#pablo">
              <img class="img" src="/media/{{ form.pic.value }}" />
-           </a>
          </div>
          <div class="card-body">
-           <h6 class="card-category text-gray">{{ form.headline.value }}</h6>
-           <h4 class="card-title">{{ form.first_name.value }} {{ form.last_name.value }}</h4>
+           <span>
+               <span >Change image</span>
+              <input type="file" name="pic" accept="image/*" id="id_pic">
+           </span>
+
            <p class="card-description">
-             {{ form.about.value }}
+             <label class="bmd-label-floating">Short Description of You</label>
+             <textarea rows=3 name="headline" id="id_headline" class="form-control">{{ blurbform.headline.value }}</textarea>
            </p>
-           <a href="#pablo" class="btn btn-primary btn-round">Edit</a>
+           <p class="card-description">
+             <label class="bmd-label-floating">About You</label>
+             <textarea rows=8 name="about" id="id_about" class="form-control">{{ blurbform.about.value }}</textarea>
+           </p>
+           <button type="submit" class="btn btn-primary">Update</button>
+         </form>
          </div>
        </div>
      </div>

@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
 
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
     <h1>{{ post.title }}</h1>
-    <h2>{{ post.author.full_name }}</h2>
+    <a href="{% url 'public_profile' pk=post.author.pk %}">
+          <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+          <h4>{{ post.author.full_name }}</h4>
+        </a>
     <div class="card-title d-flex justify-content-between">
           <div>
                 {{ post.created_date }}
@@ -35,7 +37,10 @@
 
     <div class="card-title d-flex justify-content-between">
           <div>
-             {{ c1.author.full_name }}
+            <a href="{% url 'public_profile' pk=c1.author.pk %}">
+                <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
+                <h4>{{ c1.author.full_name }}</h4>
+            </a>
           </div>
           <div>
              {{ c1.created_date }}
@@ -43,7 +48,7 @@
      </div>
     <p class="card-text">{{ c1.text|linebreaksbr }}</p>
     <span class="float-right">
-      <a href="#"> TBA <i class="material-icons">thumb_up</i>
+      <a href="#"> {{ c1.c1_likes}} <i class="material-icons">thumb_up</i>
     </span>
   </div>
 </div>
@@ -62,18 +67,27 @@
             </div>
        </div>
     <p class="card-text">{{ c2.text|linebreaksbr }}</p>
+    <span class="float-right">
+      <a href="#"> {{ c2.c2_likes}} <i class="material-icons">thumb_up</i>
+    </span>
     </div>
   </div>
   {% endfor %}
   <h4>Reply to Thread</h4>
+  <form method="POST" class="post-form">{% csrf_token %}
+    <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+    <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
+    {{ form2.text }}
+      <button type="submit" name="submit-c2" class="save btn btn-default">Reply to Thread</button>
+  </form>
 </div>
 
 {% endfor %}
 
 <form method="POST" class="post-form">{% csrf_token %}
   <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
-  {{ form.text|as_crispy_field }}
-    <button type="submit" class="save btn btn-default">Reply to Post</button>
+  {{ form.text }}
+    <button type="submit" name="submit-c1" class="save btn btn-default">Reply to Post</button>
 </form>
 
 {% endblock %}

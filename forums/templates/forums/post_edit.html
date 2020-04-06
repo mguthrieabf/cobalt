@@ -13,14 +13,14 @@
 
   <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
-{% endblock %}
+
 <style> /* remove bug from summernote height in codeview mode */
   .note-codable { min-height: 600px !important; }
   .note-editable {
   line-height: 1.0;
 }
 </style>
-
+{% endblock %}
 {% block content %}
 
 <!-- Instead of using {{ form.media }} we hardcode the static files here
@@ -47,14 +47,39 @@
             </div>
           </div>
           <div class="card-body">
-        <form method="POST" class="post-form">{% csrf_token %}
-          {{ form.forum|as_crispy_field }}
-          {{ form.title|as_crispy_field }}
+
+            <form method="POST" class="post-form">
+              {% csrf_token %}
+
+              <div class="form-group row">
+                <label for="id_forum" class="col-sm-2">Forum</label>
+                <div class="col-sm-10">
+                  {{ form.forum|as_crispy_field }}
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="id_title" class="col-sm-2">Title</label>
+                <div class="col-sm-10">
+                  {{ form.title|as_crispy_field }}
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="id_comments_allowed" class="col-sm-2">Comment Status</label>
+                <div class="col-sm-10">
+                  {{ form.comments_allowed|as_crispy_field }}
+                </div>
+              </div>
+
           {{ form.summary|as_crispy_field }}
           {{ form.text|as_crispy_field }}
 
-            <button type="submit" class="save btn btn-default">Publish</button>
-        </form>
+            <div class="form-group row">
+              <button type="submit" class="save btn btn-default">Publish</button>
+            </div>
+            </form>
+          </div>
         </div>
       </div>
   </div>

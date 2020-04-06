@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2
-from .forms import PostForm, CommentForm
+from .forms import PostForm, CommentForm, Comment2Form
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/accounts/login/')
@@ -18,19 +18,8 @@ def post_list(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
-    # for post in posts:
-    #     post_likes = LikePost.objects.filter(post = post)
-    #     comments1 = Comment1.objects.filter(post = post)
-    #
-    #     total_comments = 0
-    #     for c1 in comments1:
-    #         total_comments += 1
-    #         c1.c2 = Comment2.objects.filter(comment1 = c1)
-    #         total_comments += len(c1.c2)
-
     posts_new=[]
     for p in posts:
-        p.post_likes = LikePost.objects.filter(post = p).count()
         p.post_comments = Comment1.objects.filter(post = p).count()
         p.post_comments += Comment2.objects.filter(post = p).count()
         posts_new.append(p)
@@ -40,7 +29,11 @@ def post_list(request):
 @login_required(login_url='/accounts/login/')
 def post_detail(request, pk):
     if request.method == "POST":
-        form = CommentForm(request.POST)
+# identify which form submitted this - comments1 or comments2
+        if 'submit-c1' in request.POST:
+            form = CommentForm(request.POST)
+        elif 'submit-c2' in request.POST:
+            form = Comment2Form(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -48,6 +41,7 @@ def post_detail(request, pk):
         else:
             print(form.errors)
     form = CommentForm()
+    form2 = Comment2Form()
     post = get_object_or_404(Post, pk=pk)
     post_likes = LikePost.objects.filter(post = post)
     comments1 = Comment1.objects.filter(post = post)
@@ -55,12 +49,22 @@ def post_detail(request, pk):
     total_comments = 0
     comments1_new = [] # comments1 is immutable - make a copy
     for c1 in comments1:
+# add related c2 objects to c1
+        c2 = Comment2.objects.filter(comment1 = c1)
+        c2_new = []
+        for i in c2:
+            i.c2_likes = LikeComment2.objects.filter(comment2 = i).count()
+            c2_new.append(i)
+        c1.c2 = c2_new
+# number of comments
         total_comments += 1
-        c1.c2 = Comment2.objects.filter(comment1 = c1)
         total_comments += len(c1.c2)
+# number of likes
+        c1.c1_likes = LikeComment1.objects.filter(comment1 = c1).count()
         comments1_new.append(c1)
 
     return render(request, 'forums/post_detail.html', {'form': form,
+                                                       'form2': form2,
                                                        'post': post,
                                                        'comments1' : comments1_new,
                                                        'post_likes' : post_likes,
@@ -70,6 +74,7 @@ def post_detail(request, pk):
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
+        form.helper.form_show_labels = False
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user

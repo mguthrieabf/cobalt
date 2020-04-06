@@ -74,6 +74,8 @@ TEMPLATES = [
     },
 ]
 
+CRISPY_TEMPLATE_PACKc= 'bootstrap4'
+
 WSGI_APPLICATION = 'cobalt.wsgi.application'
 
 DATABASES = {
