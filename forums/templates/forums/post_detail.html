@@ -1,13 +1,46 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block headerjs %}
+
+
+<!-- The js libraries are a problem for Summernote so we override thwm here -->
+
+<script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
+<script src="{% static "assets/js/core/popper.min.js" %}"></script>
+
+  <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+  <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
+
+  <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+
+{% endblock %}
 {% block content %}
+
+<!-- Instead of using {{ form.media }} we hardcode the static files here
+     so we can control the version that we use. Django-summertone comes with
+     an older version of summertone that has some bugs especially relating
+     to how it shakes when it is slowly scrolled. We point to a newer
+     version of summertone and it fixes the problem. -->
+
+<link href="{% static "forums/summernote/summernote-bs4.css" %}" type="text/css" media="all" rel="stylesheet">
+<link href="{% static "forums/summernote/django_summernote.css" %}" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="{% static "forums/summernote/jquery.ui.widget.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.iframe-transport.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.fileupload.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/summernote-bs4.min.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/ResizeSensor.js" %}"></script>
+
+
+<!-- Post -->
 
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
     <h1>{{ post.title }}</h1>
-    <a href="{% url 'public_profile' pk=post.author.pk %}">
+      <a href="{% url 'public_profile' pk=post.author.pk %}">
           <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
           <h4>{{ post.author.full_name }}</h4>
-        </a>
+      </a>
     <div class="card-title d-flex justify-content-between">
           <div>
                 {{ post.created_date }}
@@ -20,11 +53,13 @@
   <div class="card-body">
     <p class="card-text">{{ post.text|safe }}</p>
     <span class="float-right">
-      <a href="#"> {{ total_comments }} <i class="material-icons">comment</i>
-      <a href="#"> {{ post_likes.count }} <i class="material-icons">thumb_up</i>
+      {{ total_comments }} <i class="material-icons">comment</i>
+      {{ post_likes.count }} <i class="material-icons">thumb_up</i>
     </span>
   </div>
 </div>
+
+<!-- End post -->
 
 {% if total_comments == 0 %}
   <h4>Be the first to comment</h4>
@@ -32,26 +67,37 @@
 <h4>Comments</h4>
 {% endif %}
 {% for c1 in comments1 %}
-<div class="card">
+
+<!-- Comment1  -->
+
+<div class="card card-nav-tabs">
   <div class="card-body">
+      <a href="{% url 'public_profile' pk=c1.author.pk %}">
+          <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
+          <h4>{{ c1.author.full_name }}</h4>
+      </a>
+      <span class="float-right">
+        {{ c1.c2|length }} <i class="material-icons">comment</i>
+        {{ c1.c1_likes }} <i class="material-icons">thumb_up</i>
+      </span>
 
     <div class="card-title d-flex justify-content-between">
           <div>
-            <a href="{% url 'public_profile' pk=c1.author.pk %}">
-                <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
-                <h4>{{ c1.author.full_name }}</h4>
-            </a>
-          </div>
-          <div>
-             {{ c1.created_date }}
+                {{ c1.created_date }}
           </div>
      </div>
-    <p class="card-text">{{ c1.text|linebreaksbr }}</p>
-    <span class="float-right">
-      <a href="#"> {{ c1.c1_likes}} <i class="material-icons">thumb_up</i>
-    </span>
+
+    <p class="card-text">{{ c1.text|safe }}</p>
   </div>
 </div>
+
+
+
+
+
+<!-- end Comment 1 -->
+
+<!-- Comment 2 -->
 
 <div class="col-8">
 
@@ -83,6 +129,10 @@
 </div>
 
 {% endfor %}
+
+ <!-- End Comment 2 -->
+
+<!-- Reply -->
 
 <form method="POST" class="post-form">{% csrf_token %}
   <input type="hidden" id="id_post" name="post" value="{{ post.id }}">

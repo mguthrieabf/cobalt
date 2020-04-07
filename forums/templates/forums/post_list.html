@@ -14,11 +14,13 @@
         <div class="row">
       <div class="col-2">
         <a href="{% url 'public_profile' pk=post.author.pk %}">
-              <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
-              <h4>{{ post.author.full_name }}</h4>
+              <img width="100px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+              <br><br><p>{{ post.author.full_name }}</p>
             </a>
       </div>
       <div class="col-10">
+
+
         <a href="{% url 'post_detail' pk=post.pk %}">
           <h3>{{ post.title|safe }}</h3>
         </a>

@@ -4,6 +4,7 @@ from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        # Hide the crispy labels
         super(PostForm, self).__init__(*args, **kwargs)
         self.fields['forum'].label = False
         self.fields['title'].label = False
@@ -23,6 +24,9 @@ class PostForm(forms.ModelForm):
         fields = ('forum', 'title', 'comments_allowed', 'summary', 'text', )
 
 class CommentForm(forms.ModelForm):
+
+    text = forms.CharField(widget=SummernoteInplaceWidget(attrs={'summernote': {
+            'placeholder': '<br><br>Reply'}}))
 
     class Meta:
         model = Comment1
