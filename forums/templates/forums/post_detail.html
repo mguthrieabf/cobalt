@@ -8,11 +8,9 @@
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
-
-  <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
-  <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
-
-  <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+<link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+<script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
+<link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
 {% endblock %}
 {% block content %}
@@ -55,7 +53,9 @@
     <span class="float-right">
       {{ total_comments }} <i class="material-icons">comment</i>
       {{ post_likes.count }} <i class="material-icons">thumb_up</i>
+      <a href="#" id="tba">Like</a>
     </span>
+
   </div>
 </div>
 
@@ -74,7 +74,7 @@
   <div class="card-body">
       <a href="{% url 'public_profile' pk=c1.author.pk %}">
           <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
-          <h4>{{ c1.author.full_name }}</h4>
+          <h5>{{ c1.author.full_name }}</h5>
       </a>
       <span class="float-right">
         {{ c1.c2|length }} <i class="material-icons">comment</i>
@@ -91,10 +91,6 @@
   </div>
 </div>
 
-
-
-
-
 <!-- end Comment 1 -->
 
 <!-- Comment 2 -->
@@ -104,28 +100,32 @@
   {% for c2 in c1.c2 %}
   <div class="card">
     <div class="card-body bg-light">
-      <div class="card-title d-flex justify-content-between">
-            <div>
-               {{ c2.author.full_name }}
-            </div>
+      <a href="{% url 'public_profile' pk=c2.author.pk %}">
+          <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
+          <h5>{{ c2.author.full_name }}</h5>
+      </a>
+      <span class="float-right">
+        {{ c2.c2_likes }} <i class="material-icons">thumb_up</i>
+      </span>
+
             <div>
                {{ c2.created_date }}
             </div>
-       </div>
-    <p class="card-text">{{ c2.text|linebreaksbr }}</p>
-    <span class="float-right">
-      <a href="#"> {{ c2.c2_likes}} <i class="material-icons">thumb_up</i>
-    </span>
+    <p class="card-text">{{ c2.text|safe }}</p>
     </div>
   </div>
   {% endfor %}
-  <h4>Reply to Thread</h4>
-  <form method="POST" class="post-form">{% csrf_token %}
-    <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
-    <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
-    {{ form2.text }}
-      <button type="submit" name="submit-c2" class="save btn btn-default">Reply to Thread</button>
-  </form>
+  <a href="#cobalt-click-{{ c1.id }}"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
+  <div id="cobalt-thread-{{ c1.id }}" class="d-none">
+    <form method="POST" class="post-form">{% csrf_token %}
+      <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+      <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
+      {{ form2.text|as_crispy_field  }}
+      <div class="row">
+        <button type="submit" name="submit-c2" class="save btn btn-default">Publish</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% endfor %}
@@ -133,11 +133,32 @@
  <!-- End Comment 2 -->
 
 <!-- Reply -->
+<hr>
+<h4 id="cobalt-post-comment">{{ total_comments }} comment{{ total_comments|pluralize }} so far. Want to add yours?</h4>
 
 <form method="POST" class="post-form">{% csrf_token %}
   <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
-  {{ form.text }}
+  {{ form.text|as_crispy_field }}
     <button type="submit" name="submit-c1" class="save btn btn-default">Reply to Post</button>
 </form>
+
+<script>
+
+// reveal reply form if user clicks on Reply, hide it if they click again
+
+jQuery(document).ready(function() {
+  $(".cobalt-open-reply").on('click', function(event){
+
+// stop event spreading
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    var id = event.target.id.replace("cobalt-click", "cobalt-thread");
+    $('#' + id).toggleClass('d-block d-none');
+  });
+
+})
+
+</script>
 
 {% endblock %}

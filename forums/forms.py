@@ -11,7 +11,6 @@ class PostForm(forms.ModelForm):
         self.fields['summary'].label = False
         self.fields['text'].label = False
 
-
     summary = forms.CharField(widget=SummernoteInplaceWidget(attrs={
     'summernote': {
             'placeholder': '<br>Enter a short description. Keep it punchy, this goes on the front page. Use it to tempt your reader.',
@@ -24,15 +23,39 @@ class PostForm(forms.ModelForm):
         fields = ('forum', 'title', 'comments_allowed', 'summary', 'text', )
 
 class CommentForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        # Hide the crispy labels
+        super(CommentForm, self).__init__(*args, **kwargs)
+        self.fields['text'].label = False
 
-    text = forms.CharField(widget=SummernoteInplaceWidget(attrs={'summernote': {
-            'placeholder': '<br><br>Reply'}}))
+    # text = forms.CharField(widget=SummernoteInplaceWidget(attrs={
+    #     'summernote': {
+    #         'placeholder': '<br><br>Reply C1',
+    #         'toolbar': [
+    #     ['font', ['bold', 'italic', 'underline']],
+    #     ['color', ['color']],
+    #     ['insert', ['link', 'picture', 'hr']],
+    #     ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs', 'specialcharshand']]]}}))
 
     class Meta:
         model = Comment1
         fields = ('text', 'post',)
 
 class Comment2Form(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        # Hide the crispy labels
+        super(Comment2Form, self).__init__(*args, **kwargs)
+        self.fields['text'].label = False
+
+    #
+    # text = forms.CharField(widget=SummernoteInplaceWidget(attrs={
+    #     'summernote': {
+    #         'placeholder': '<br><br>Reply C2',
+    #         'toolbar': [
+    #     ['font', ['bold', 'italic', 'underline']],
+    #     ['color', ['color']],
+    #     ['insert', ['link', 'picture', 'hr']],
+    #     ['cards', ['specialcharsspades', 'specialcharshearts', 'specialcharsdiamonds', 'specialcharsclubs', 'specialcharshand']]]}}))
 
     class Meta:
         model = Comment2
