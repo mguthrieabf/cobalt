@@ -83,3 +83,17 @@ def post_new(request):
     else:
         form = PostForm()
     return render(request, 'forums/post_edit.html', {'form': form, 'request': request})
+
+@login_required(login_url='/accounts/login/')
+def like_post(request, pk):
+    if request.method == "POST":
+        already_liked = LikePost.objects.filter(post=pk, liker=request.user)
+        if not already_liked:
+            like=LikePost()
+            like.liker=request.user
+            like.post=Post.objects.get(pk=pk)
+            like.save()
+            return HttpResponse("ok")
+        else:
+            print("already liked")
+            return HttpResponse("already liked")

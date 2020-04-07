@@ -12,6 +12,15 @@
 <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
+<!-- Other libraries needed for this page -->
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+<style>
+.cobalt-textarea {
+  min-width: 100%;
+}
+</style>
 {% endblock %}
 {% block content %}
 
@@ -52,10 +61,9 @@
     <p class="card-text">{{ post.text|safe }}</p>
     <span class="float-right">
       {{ total_comments }} <i class="material-icons">comment</i>
-      {{ post_likes.count }} <i class="material-icons">thumb_up</i>
-      <a href="#" id="tba">Like</a>
+      <span id="cobalt_post_likes">{{ post_likes.count }}</span> <i class="material-icons">thumb_up</i>
+      <a href="javascript:void(0);" id="cobalt_like_post">Like</a>
     </span>
-
   </div>
 </div>
 
@@ -79,6 +87,7 @@
       <span class="float-right">
         {{ c1.c2|length }} <i class="material-icons">comment</i>
         {{ c1.c1_likes }} <i class="material-icons">thumb_up</i>
+        <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
       </span>
 
     <div class="card-title d-flex justify-content-between">
@@ -87,47 +96,49 @@
           </div>
      </div>
 
-    <p class="card-text">{{ c1.text|safe }}</p>
+    <p class="card-text">{{ c1.text|safe|linebreaks }}</p>
   </div>
 </div>
 
 <!-- end Comment 1 -->
 
 <!-- Comment 2 -->
+<div class="row">
+  <div class="col-1"></div>
+  <div class="col-11">
 
-<div class="col-8">
+    {% for c2 in c1.c2 %}
+    <div class="card">
+      <div class="card-body bg-light">
+        <a href="{% url 'public_profile' pk=c2.author.pk %}">
+            <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
+            <h5>{{ c2.author.full_name }}</h5>
+        </a>
+        <span class="float-right">
+          {{ c2.c2_likes }} <i class="material-icons">thumb_up</i>
+        </span>
 
-  {% for c2 in c1.c2 %}
-  <div class="card">
-    <div class="card-body bg-light">
-      <a href="{% url 'public_profile' pk=c2.author.pk %}">
-          <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
-          <h5>{{ c2.author.full_name }}</h5>
-      </a>
-      <span class="float-right">
-        {{ c2.c2_likes }} <i class="material-icons">thumb_up</i>
-      </span>
-
-            <div>
-               {{ c2.created_date }}
-            </div>
-    <p class="card-text">{{ c2.text|safe }}</p>
-    </div>
-  </div>
-  {% endfor %}
-  <a href="#cobalt-click-{{ c1.id }}"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
-  <div id="cobalt-thread-{{ c1.id }}" class="d-none">
-    <form method="POST" class="post-form">{% csrf_token %}
-      <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
-      <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
-      {{ form2.text|as_crispy_field  }}
-      <div class="row">
-        <button type="submit" name="submit-c2" class="save btn btn-default">Publish</button>
+              <div>
+                 {{ c2.created_date }}
+              </div>
+      <p class="card-text">{{ c2.text|safe|linebreaks }}</p>
       </div>
-    </form>
+    </div>
+    {% endfor %}
+
   </div>
 </div>
-
+<a href="javascript:void(0);"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
+<div id="cobalt-thread-{{ c1.id }}" class="d-none">
+  <form method="POST" class="post-form">{% csrf_token %}
+    <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+    <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
+    {{ form2.text|as_crispy_field  }}
+    <div class="row">
+      <button type="submit" name="submit-c2" class="save btn btn-default">Publish</button>
+    </div>
+  </form>
+</div>
 {% endfor %}
 
  <!-- End Comment 2 -->
@@ -153,9 +164,53 @@ jQuery(document).ready(function() {
     event.stopPropagation();
     event.stopImmediatePropagation();
 
+// Change the clicked on text
+    var textid = $("#" + event.target.id)
+    if (textid.text()=="Reply to this thread") {
+      textid.text("Close");
+    } else {
+      textid.text("Reply to this thread");
+    }
+
+// toggle visibility
     var id = event.target.id.replace("cobalt-click", "cobalt-thread");
     $('#' + id).toggleClass('d-block d-none');
   });
+
+  function likePost() {
+    $.ajax({
+           url: "/forums/post/like-post/{{ post.id }}/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              console.log(response);
+              if (response=="ok"){
+                var likecount=$("#cobalt_post_likes");
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+
+
+
+  jQuery('#cobalt_like_post').on('click', function(e) {
+     likePost();
+  });
+
+
+
 
 })
 

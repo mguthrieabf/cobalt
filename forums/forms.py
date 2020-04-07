@@ -27,6 +27,8 @@ class CommentForm(forms.ModelForm):
         # Hide the crispy labels
         super(CommentForm, self).__init__(*args, **kwargs)
         self.fields['text'].label = False
+        self.fields['text'].widget = forms.Textarea(attrs={'rows': 10, 'cols': 80, 'class': 'cobalt-textarea'})
+
 
     # text = forms.CharField(widget=SummernoteInplaceWidget(attrs={
     #     'summernote': {
@@ -46,6 +48,7 @@ class Comment2Form(forms.ModelForm):
         # Hide the crispy labels
         super(Comment2Form, self).__init__(*args, **kwargs)
         self.fields['text'].label = False
+        self.fields['text'].widget = forms.Textarea(attrs={'rows': 10, 'cols': 80, 'class': 'cobalt-textarea'})
 
     #
     # text = forms.CharField(widget=SummernoteInplaceWidget(attrs={
