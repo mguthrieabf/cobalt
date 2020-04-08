@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_summernote',
     'crispy_forms',
-    # 'health_check',
-    # 'health_check.db',
-    # 'health_check.cache',
-    # 'health_check.storage',
+     'health_check',
+     'health_check.db',
+     'health_check.cache',
+     'health_check.storage',
 ]
 
 MIDDLEWARE = [

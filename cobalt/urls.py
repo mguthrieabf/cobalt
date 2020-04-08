@@ -19,4 +19,7 @@ urlpatterns = [
     path('support', include('support.urls')),
     path('profile/', include('user_profile.urls')),
     path('summernote/', include('django_summernote.urls')),
+    path('health/', include('health_check.urls')),
+]
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
