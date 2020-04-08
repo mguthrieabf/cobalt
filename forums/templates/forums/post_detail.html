@@ -78,27 +78,31 @@
 
 <!-- Comment1  -->
 
-<div class="card card-nav-tabs">
+<div class="card card-nav-tabs mb-0">
   <div class="card-body">
-      <a href="{% url 'public_profile' pk=c1.author.pk %}">
-          <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
-          <h5>{{ c1.author.full_name }}</h5>
+    <div class=" justify-content-between">
+        <a href="{% url 'public_profile' pk=c1.author.pk %}">
+      <div>
+        <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
+        <h5>{{ c1.author.full_name }}</h5>
+      </div>
       </a>
-      <span class="float-right">
-        {{ c1.c2|length }} <i class="material-icons">comment</i>
-        <span id="cobalt_c1_likes_{{ c1.id }}">{{ c1.c1_likes }}</span> <i class="material-icons">thumb_up</i>
-        <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
-      </span>
-
-    <div class="card-title d-flex justify-content-between">
-          <div>
-                {{ c1.created_date }}
-          </div>
-     </div>
-
-    <p class="card-text">{{ c1.text|safe|linebreaks }}</p>
+      <div>
+        {{ c1.created_date }}
+      </div>
+    </div>
+    <div>
+      <br>
+      {{ c1.text|safe|linebreaks }}
+    </div>
+    <div class="float-right">
+      {{ c1.c2|length }} <i class="material-icons">comment</i>
+      <span id="cobalt_c1_likes_{{ c1.id }}">{{ c1.c1_likes }}</span> <i class="material-icons">thumb_up</i>
+      <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
+    </div>
   </div>
 </div>
+
 
 <!-- end Comment 1 -->
 
@@ -108,27 +112,36 @@
   <div class="col-11">
 
     {% for c2 in c1.c2 %}
-    <div class="card">
+
+    <div class="card card-nav-tabs">
       <div class="card-body bg-light">
-        <a href="{% url 'public_profile' pk=c2.author.pk %}">
+        <div class=" justify-content-between">
+            <a href="{% url 'public_profile' pk=c2.author.pk %}">
+          <div>
             <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
             <h5>{{ c2.author.full_name }}</h5>
-        </a>
-        <span class="float-right">
+          </div>
+          </a>
+          <div>
+            {{ c2.created_date }}
+          </div>
+        </div>
+        <div>
+          <br>
+          {{ c2.text|safe|linebreaks }}
+        </div>
+        <div class="float-right">
           <span id="cobalt_c2_likes_{{ c2.id }}">{{ c2.c2_likes }}</span> <i class="material-icons">thumb_up</i>
           <a href="javascript:void(0);" class="cobalt_like_c2_class" id="cobalt_like_c2_{{ c2.id }}">Like</a>
-        </span>
-
-              <div>
-                 {{ c2.created_date }}
-              </div>
-      <p class="card-text">{{ c2.text|safe|linebreaks }}</p>
+        </div>
       </div>
     </div>
+
     {% endfor %}
 
   </div>
 </div>
+
 <a href="javascript:void(0);"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
 <div id="cobalt-thread-{{ c1.id }}" class="d-none">
   <form method="POST" class="post-form">{% csrf_token %}
