@@ -11,6 +11,7 @@ class PostForm(forms.ModelForm):
         self.fields['summary'].label = False
         self.fields['text'].label = False
 
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'cobalt-min-width-100'}))
     summary = forms.CharField(widget=SummernoteInplaceWidget(attrs={
     'summernote': {
             'placeholder': '<br>Enter a short description. Keep it punchy, this goes on the front page. Use it to tempt your reader.',
@@ -27,7 +28,7 @@ class CommentForm(forms.ModelForm):
         # Hide the crispy labels
         super(CommentForm, self).__init__(*args, **kwargs)
         self.fields['text'].label = False
-        self.fields['text'].widget = forms.Textarea(attrs={'rows': 10, 'cols': 80, 'class': 'cobalt-textarea'})
+        self.fields['text'].widget = forms.Textarea(attrs={'rows': 10, 'cols': 80, 'class': 'cobalt-min-width-100'})
 
 
     # text = forms.CharField(widget=SummernoteInplaceWidget(attrs={

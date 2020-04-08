@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import timezone
 from datetime import datetime, date
 from decimal import Decimal
@@ -28,7 +28,11 @@ def masterpoints_detail(request, system_number=None):
 
 # Get summary data
    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, system_number)
-   summary = requests.get(qry).json()[0]
+   r = requests.get(qry).json()
+   if len(r)==0:
+       print("nothing")
+       raise Http404("No entry found for %s" % system_number)
+   summary=r[0]
 
 # Set active to a boolean
    if summary["IsActive"]=="Y":
@@ -172,7 +176,8 @@ def masterpoints_search(request):
            else: # first and last names
                matches = requests.get('%s/firstlastname_search/%s/%s' % (GLOBAL_MPSERVER, first_name, last_name)).json()
            if len(matches)==1:
-               system_number=matches[0].abf_number
+               print(matches)
+               system_number=matches[0]['ABFNumber']
                return redirect("view/%s/" % system_number)
            else:
                return render(request,

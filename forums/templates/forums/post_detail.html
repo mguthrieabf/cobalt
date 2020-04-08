@@ -17,7 +17,7 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
 <style>
-.cobalt-textarea {
+.cobalt-min-width-100 {
   min-width: 100%;
 }
 </style>
@@ -86,7 +86,7 @@
       </a>
       <span class="float-right">
         {{ c1.c2|length }} <i class="material-icons">comment</i>
-        {{ c1.c1_likes }} <i class="material-icons">thumb_up</i>
+        <span id="cobalt_c1_likes_{{ c1.id }}">{{ c1.c1_likes }}</span> <i class="material-icons">thumb_up</i>
         <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
       </span>
 
@@ -115,7 +115,8 @@
             <h5>{{ c2.author.full_name }}</h5>
         </a>
         <span class="float-right">
-          {{ c2.c2_likes }} <i class="material-icons">thumb_up</i>
+          <span id="cobalt_c2_likes_{{ c2.id }}">{{ c2.c2_likes }}</span> <i class="material-icons">thumb_up</i>
+          <a href="javascript:void(0);" class="cobalt_like_c2_class" id="cobalt_like_c2_{{ c2.id }}">Like</a>
         </span>
 
               <div>
@@ -202,12 +203,101 @@ jQuery(document).ready(function() {
        });
   }
 
+  function likeC1(e) {
+    var id = event.target.id.replace("cobalt_like_c1_","");
 
+    $.ajax({
+           url: "/forums/post/like-comment1/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c1_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
 
+  function likeC1(e) {
+    var id = event.target.id.replace("cobalt_like_c1_","");
+
+    $.ajax({
+           url: "/forums/post/like-comment1/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c1_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+  function likeC2(e) {
+    var id = event.target.id.replace("cobalt_like_c2_","");
+
+    $.ajax({
+           url: "/forums/post/like-comment2/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c2_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
 
   jQuery('#cobalt_like_post').on('click', function(e) {
-     likePost();
+    likePost();
   });
+
+  jQuery('.cobalt_like_c1_class').on('click', function(e) {
+    // stop event spreading
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    likeC1(e);
+  });
+
+    jQuery('.cobalt_like_c2_class').on('click', function(e) {
+      // stop event spreading
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      likeC2(e);
+    });
 
 
 
