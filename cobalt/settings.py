@@ -17,9 +17,13 @@ ALLOWED_HOSTS = ['test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
 
 # For AWS we also need to add the local IP address as this is used by the health checks
 # We do this dynamically
-local_ip = os.popen("hostname -I")
-ALLOWED_HOSTS.append(local_ip.strip())
-
+#local_ip = os.popen("ipconfig getifaddr en1").read()
+try:
+    local_ip = os.popen("hostname -I").read()
+    ALLOWED_HOSTS.append(local_ip.strip())
+except:
+    pass
+    
 # Application definition
 
 INSTALLED_APPS = [
