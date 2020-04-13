@@ -23,7 +23,7 @@ try:
     ALLOWED_HOSTS.append(local_ip.strip())
 except:
     pass
-    
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -162,7 +162,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+if 'FILE_SYSTEM_ID' in os.environ:   # AWS EFS for media
+    MEDIA_ROOT = '/cobalt-media'
 MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL="/dashboard"
