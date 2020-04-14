@@ -19,7 +19,7 @@ ALLOWED_HOSTS = ['test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1']
 # We do this dynamically
 #local_ip = os.popen("ipconfig getifaddr en1").read()
 try:
-    local_ip = os.popen("hostname -I").read()
+    local_ip = os.popen("hostname -I 2>/dev/null").read()
     ALLOWED_HOSTS.append(local_ip.strip())
 except:
     pass
