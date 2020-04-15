@@ -19,6 +19,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 
 def register(request):
     if request.method == 'POST':
+        # request is immutable so copy it and add in username
         request.POST = request.POST.copy()
         request.POST['username'] = request.POST['abf_number']
         form = UserRegisterForm(request.POST)
