@@ -13,9 +13,9 @@ class CobaltBackend(ModelBackend):
         con_type = "Unknown"
 
         try:
-            user = UserModel.objects.get(email=username)
+            user = UserModel.objects.filter(email=username)[0]
             con_type = "email"
-        except UserModel.DoesNotExist:
+        except IndexError:
             try:
                 user = UserModel.objects.get(username=username)
                 con_type = "username"
