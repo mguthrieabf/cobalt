@@ -11,15 +11,19 @@
                  <h1>{{ summary.GivenNames }} {{ summary.Surname }}
                  </h1>
                  <h2>{{ summary.ABFNumber }} - {{ summary.RankName }} Master</h2>
-                 <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
+                   <div>
+                     <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
+                   </div>
+                   <div>
+                      This includes provisional masterpoints, visit <a href="http://www.abfmasterpoints.com.au/myawards.asp?search=name&nomenu=n"><span style="color: white;"><u>The MasterPoints Centre</u></span></a> for official figures.
+                 </div>
 
             <!-- <img class="img" src="/media/{{ request.user.pic }}" /> -->
 
              </div>
              <div class="container w-100">
                <div class="row d-flex flex-wrap">
-
-                 <div class="col-sm-3" >
+                 <div class="col">
                    <div class="card">
                      <div class="card-header card-header-info">
                        <h4 class="card-title">
@@ -47,7 +51,7 @@
                    </div>
                  </div>
 
-                 <div class="col-sm-6">
+                 <div class="col-6" style="min-width: 500px;">
                    <div class="card">
                      <div class="card-header card-header-icon card-header-warning">
                        <div class="card-icon">
@@ -62,7 +66,7 @@
                    </div>
                  </div>
 
-                 <div class="col-sm-3">
+                 <div class="col">
                    <div class="card">
                      <div class="card-header card-header-success">
                        <h4 class="card-title">
@@ -93,10 +97,11 @@
                              </div>
                            </div>
                          </div>
-                         <button type="submit" class="btn btn-primary center-text">Search</button>
+                         <div class="d-flex justify-content-center">
+                           <button type="submit" class="btn btn-primary center-text">Search</button>
+                         </div>
                          <div class="clearfix"></div>
                        </form>
-                      <a href="http://abfmasterpoints.com.au">MasterPoints Centre</a>
                    </div>
                    </div>
                </div>

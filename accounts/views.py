@@ -37,10 +37,8 @@ def register(request):
             return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
-    context = {
-        'user_form': form,
-    }
-    return render(request, 'accounts/register.html', context)
+
+    return render(request, 'accounts/register.html', {'user_form': form})
 
 def activate(request, uidb64, token):
     try:
