@@ -30,11 +30,21 @@ class CobaltBackend(ModelBackend):
                     user = None
 
         if user==None:
-            log_event(request, "Login" , "WARN",
-                        "Accounts", "Login", "Login failed - unknown userid")
+            log_event(request = request,
+                      user = "Login",
+                      severity = "WARN",
+                      source = "Accounts",
+                      sub_source = "Login",
+                      message = "Login failed - unknown userid")
+
             return None
 
         if user.check_password(password):
-            log_event(request, user.full_name , "INFO",
-                        "Accounts", "Login", "Logged in using %s" % con_type)
+            log_event(request = request,
+                      user = user.full_name,
+                      severity = "INFO",
+                      source = "Accounts",
+                      sub_source = "Login",
+                      message = "Logged in using %s" % con_type)
+                      
             return user
