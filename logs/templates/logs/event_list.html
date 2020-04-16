@@ -24,7 +24,7 @@
         <tbody>
           {% for event in events %}
             <tr>
-              <td>{{ event.event_date|timesince }} ago</td>
+              <td title="{{ event.event_date }}">{{ event.event_date|timesince }} ago</td>
               <td>{{ event.ip }}</td>
               <td class="
 

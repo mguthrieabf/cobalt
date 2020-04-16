@@ -14,7 +14,7 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-def log_event(request, user, severity, source, sub_source, message):
+def log_event(user, severity, source, sub_source, message, request=None):
 
     if request:
         ip = get_client_ip(request)

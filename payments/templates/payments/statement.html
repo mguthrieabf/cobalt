@@ -16,9 +16,11 @@
         <thead class="text-info">
           <tr>
             <th>Date</th>
+            <th>Reference</th>
             <th>Reason</th>
             <th>Description</th>
-            <th class="text-right">Amount ($)</th>
+            <th class="text-right">In ($)</th>
+            <th class="text-right">Out ($)</th>
             <th class="text-right">Balance ($)</th>
           </tr>
         </thead>
@@ -26,9 +28,16 @@
           {% for event in events %}
             <tr>
               <td>{{ event.created_date|date:"d M Y" }}</td>
+              <td>{{ event.reference_no }}</td>
               <td>{{ event.counterparty }}</td>
               <td>{{ event.description }}</td>
-              <td class="text-right">{{ event.amount|floatformat:2|intcomma }}</td>
+              {% if event.amount >= 0 %}
+                <td class="text-right">{{ event.amount|floatformat:2|intcomma }}</td>
+                <td></td>
+              {% else %}
+                <td></td>
+                <td class="text-right">{{ event.amount|floatformat:2|intcomma|slice:"1:" }}</td>
+              {% endif %}
               <td class="text-right">{{ event.balance|floatformat:2|intcomma }}</td>
 
             </tr>

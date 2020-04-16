@@ -77,8 +77,12 @@ def test_callback(status, payload, tran):
     actions, but for testing I get the transaction passed so I can reverse it.
 
     """
-    log_event(None, "Callback" , "DEBUG",
-                  "Payments", "test_callback", "Received callback from payment: %s %s" % (status, payload) )
+    log_event(user = "Callback",
+              severity = "DEBUG",
+              source = "Payments",
+              sub_source = "test_callback",
+              message = "Received callback from payment: %s %s" % (status, payload))
+
     if status=="Success":
         details = {
             'member': tran.member,
@@ -98,8 +102,12 @@ def test_payment(request):
 ###################################################
 # view for simple payments                        #
 ###################################################
-    log_event(request, request.user.full_name, "INFO",
-              "Payments", "test_payment", "User went to test payment screen")
+    log_event(request = request,
+              user = request.user.full_name,
+              severity = "INFO",
+              source = "Payments",
+              sub_source = "test_payment",
+              message = "User went to test payment screen")
 
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
@@ -121,8 +129,12 @@ def test_transaction(request):
 
     msg=""
 
-    log_event(request, request.user.full_name, "INFO",
-              "Payments", "test_transaction", "User went to test transaction screen")
+    log_event(request = request,
+              user = request.user.full_name,
+              severity = "INFO",
+              source = "Payments",
+              sub_source = "test_payment",
+              message = "User went to test transaction screen")
 
     if request.method == 'POST':
         form = TestTransaction(request.POST)
@@ -175,15 +187,17 @@ def stripe_webhook(request):
         )
     except ValueError as e:
         # Invalid payload
-        log_event(None, "Stripe API", "HIGH", "Payments", "stripe_webhook", "Invalid Payload in message from Stripe")
+        log_event(user = "Stripe API",
+              severity = "HIGH",
+              source = "Payments",
+              sub_source = "stripe_webhook",
+              message = "Invalid Payload in message from Stripe")
 
         print("Invalid payload")
         return HttpResponse(status=400)
 
     if event.type == 'payment_intent.succeeded':
-
     # get data from payload
-
         payment_intent  = event.data.object
 
         pi_reference    = payment_intent.id
@@ -198,8 +212,11 @@ def stripe_webhook(request):
         pi_exp_year     = payment_intent.charges.data[0].payment_method_details.card.exp_year
         pi_last4        = payment_intent.charges.data[0].payment_method_details.card.last4
 
-        log_event(None, "Stripe API", "INFO", "Payments", "stripe_webhook", "Received payment_intent.succeeded. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
-
+        log_event(user = "Stripe API",
+                  severity = "INFO",
+                  source = "Payments",
+                  sub_source = "stripe_webhook",
+                  message = "Received payment_intent.succeeded. Our id=%s - Their id=%s" % (pi_payment_id, pi_reference))
     # Update transaction
 
         try:
@@ -218,22 +235,18 @@ def stripe_webhook(request):
             tran.status = "Complete"
             tran.save()
 
-            log_event(None, "Stripe API", "INFO", "Payments", "stripe_webhook",
-                "Successfully updated transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
-
-            # make Callback
-
-            if tran.route_code == "MAN":
-                test_callback("Success", tran.route_payload, tran)
-            else:
-                log_event(None, "Stripe API", "CRITICAL", "Payments", "stripe_webhook",
-                    "Unable to make callback. Invalid route_code: %s" % tran.route_code)
-
+            log_event(user = "Stripe API",
+                      severity = "INFO",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Successfully updated transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
         except ObjectDoesNotExist:
-            print("NOT FOUND!!!!")
-            log_event(None, "Stripe API", "CRITICAL", "Payments", "stripe_webhook",
-                "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
+            log_event(user = "Stripe API",
+                      severity = "CRITICAL",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
         details = {
             'member': tran.member,
@@ -249,9 +262,29 @@ def stripe_webhook(request):
 
         update_account(details)
 
+        # make Callback
+        if tran.route_code == "MAN":
+            test_callback("Success", tran.route_payload, tran)
+            log_event(user = "Stripe API",
+                      severity = "INFO",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Callback made to: %s" % tran.route_code)
+        else:
+            log_event(user = "Stripe API",
+                      severity = "INFO",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Unable to make callback. Invalid route_code: %s" % tran.route_code)
+
     else:
         # Unexpected event type
-        log_event(None, "Stripe API", "HIGH", "Payments", "stripe_webhook", "Unexpected event received from Stripe - " + event.type)
+        log_event(user = "Stripe API",
+                  severity = "HIGH",
+                  source = "Payments",
+                  sub_source = "stripe_webhook",
+                  message = "Unexpected event received from Stripe - " + event.type)
+
         print("Unexpected event found - " + event.type)
         return HttpResponse(status=400)
 
@@ -269,10 +302,14 @@ def update_account(details):
     balance.last_top_up_amount = details['amount']
     balance.save()
 
-    log_event(None, details['member'].full_name, "INFO",
-        details['source'], details['sub_source'], details['log_msg'] + " Updated balance table")
+    log_event(user = details['member'].full_name,
+              severity = "INFO",
+              source = details['source'],
+              sub_source = details['sub_source'],
+              message = details['log_msg'] + " Updated balance table")
 
-# Create new waccount entry
+
+# Create new account entry
     act = Account()
     act.member = details['member']
     act.amount = details['amount']
@@ -283,8 +320,11 @@ def update_account(details):
 
     act.save()
 
-    log_event(None, details['member'].full_name, "INFO",
-        details['source'], details['sub_source'], details['log_msg'] + " Updated account table")
+    log_event(user = details['member'].full_name,
+              severity = "INFO",
+              source = details['source'],
+              sub_source = details['sub_source'],
+              message = details['log_msg'] + " Updated account table")
 
 
 @login_required(login_url='/accounts/login/')

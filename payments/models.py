@@ -1,15 +1,18 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+import secrets
 
 class Balance(models.Model):
     member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     balance = models.DecimalField("Current Balance", blank=True, null=True, max_digits=10, decimal_places=2)
     last_top_up_date = models.DateTimeField("Last Top Up Date", auto_now_add=True, blank=True)
     last_top_up_amount = models.DecimalField("Last Top Up Amount", blank=True, null=True, max_digits=10, decimal_places=2)
-    # 
-    # def __str__(self):
-    #     return "%s" % self.member.abf_number
+
+    def __str__(self):
+        return "%s(%s) = $%s" % (self.member.full_name,
+                                self.member.abf_number,
+                                self.balance)
 
 class Transaction(models.Model):
 
@@ -55,6 +58,13 @@ class Account(models.Model):
     balance = models.DecimalField("Balance after transaction", max_digits=12, decimal_places=2)
     description = models.CharField("Transaction description", null=True, max_length=80)
     counterparty = models.CharField("Counterparty", null=True, max_length=80)
+    reference_no = models.CharField("Reference No", max_length=14)
+
+    def save(self, *args, **kwargs):
+        ref = secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2)
+        ref = ref.upper()
+        self.reference_no = ref
+        super(Account, self).save(*args, **kwargs)
 
     def __str__(self):
         return "%s - %s %s %s" % (self.member.abf_number, self.member.first_name,
