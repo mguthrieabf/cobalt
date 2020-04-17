@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from accounts.forms import UserUpdateForm, BlurbUpdateForm
 from accounts.models import User
+import ipinfo
 
 @login_required
 def home(request):
@@ -16,6 +17,10 @@ def home(request):
         else:
             print(form.errors)
     else:
+        access_token='70691e3380c3b2'
+        handler = ipinfo.getHandler(access_token)
+        ip_address = '60.241.52.174'
+        ip_details = handler.getDetails(ip_address)
 
 # Fix DOB format for browser - expects DD/MM/YYYY
         if request.user.dob:
@@ -28,6 +33,7 @@ def home(request):
         'form': form,
         'blurbform': blurbform,
         'msg': msg,
+        'ip_details': ip_details,
     }
     return render(request, 'user_profile/home.html', context)
 
