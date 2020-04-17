@@ -11,6 +11,7 @@ class User(AbstractUser):
     dob = models.DateField(blank="True", null=True)
     bbo_name = models.TextField("BBO Username", blank="True", null=True, max_length=20)
 
+
     REQUIRED_FIELDS = ['abf_number', 'email'] # tells createsuperuser to ask for them
 
     def __str__(self):

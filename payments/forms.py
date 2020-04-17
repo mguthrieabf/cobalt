@@ -1,5 +1,5 @@
 from django import forms
-from accounts.models import User 
+from accounts.models import User
 
 class OneOffPayment(forms.Form):
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
@@ -7,10 +7,8 @@ class OneOffPayment(forms.Form):
     route_code = forms.CharField(label="Internal routing code for callback", max_length=4)
     route_payload = forms.CharField(label="Payload to return to callback", max_length=40)
 
-# class Checkout(forms.Form):
-#     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
-#     currency = forms.CharField(label='Currency', max_length=3)
-
+class AutoTopUp(forms.Form):
+    auto_amount = forms.IntegerField(label='Auto Top Up Amount')
 
 class TestTransaction(forms.Form):
     payer = forms.ModelChoiceField(queryset=User.objects.all())

@@ -69,3 +69,11 @@ class Account(models.Model):
     def __str__(self):
         return "%s - %s %s %s" % (self.member.abf_number, self.member.first_name,
                                   self.member.last_name, self.id)
+
+class AutoTopUp(models.Model):
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    auto_amount = models.IntegerField("Auto Top Up Amount", null=True)
+    stripe_customer_id = models.CharField("Stripe Customer Id", null=True, max_length=25)
+
+    def __str__(self):
+        return "%s (Stripe Customer id: %s)" % (self.member, self.stripe_customer_id) 

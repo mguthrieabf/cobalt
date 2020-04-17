@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Balance, Transaction, Account
+from .models import Balance, Transaction, Account, AutoTopUp
 from .forms import OneOffPayment, TestTransaction
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -68,6 +68,27 @@ get back from Stripe
                 metadata={'cobalt_pay_id': data["id"]}
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
+
+#@login_required(login_url='/accounts/login/')
+def create_payment_superintent(request):
+    """ Called from the auto top up webpage.
+
+
+COMMENT LATER
+
+
+"""
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        stripe.api_key = STRIPE_SECRET_KEY
+        customer_id=AutoTopUp.objects.filter(member = request.user)[0].stripe_customer_id
+        intent = stripe.SetupIntent.create(
+                customer = customer_id,
+                metadata = {'cobalt_member_id': request.user.id}
+                )
+        return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
+
+
 
 def test_callback(status, payload, tran):
     """ Eventually I will be moved to another module. I am only here for testing purposes
@@ -356,3 +377,24 @@ def statement(request):
         events = paginator.page(paginator.num_pages)
 
     return render(request, 'payments/statement.html', { 'events': events, "user": request.user, "summary": summary, "club": club})
+
+@login_required(login_url='/accounts/login/')
+def setup_autotopup(request):
+
+# Already a customer?
+    autotopup = AutoTopUp.objects.filter(member=request.user)
+    if autotopup:                           # record exists
+        print("auto top up record found")
+        if autotopup[0].stripe_customer_id:    # cust_id exists
+            print("Found autotopup with stripe details")
+
+            # need to fix logic - if autotopup & a.stripe_c_id
+    else:
+        stripe.api_key = STRIPE_SECRET_KEY
+        customer = stripe.Customer.create()
+        auto=AutoTopUp()
+        auto.member = request.user
+        auto.stripe_customer_id = customer.id
+        auto.save()
+
+    return render(request, 'payments/autotopup.html', {})
