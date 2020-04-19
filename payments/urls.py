@@ -9,5 +9,6 @@ urlpatterns = [
     path('create-payment-superintent', views.create_payment_superintent, name='paymentsuperintent'),
     path('statement', views.statement, name='statement'),
     path('test-transaction', views.test_transaction, name='test_transaction'),
+    path('test-autotopup', views.test_autotopup, name='test_autotopup'),
     path('setup-autotopup', views.setup_autotopup, name='setup_autotopup'),
 ]

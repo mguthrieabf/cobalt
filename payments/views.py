@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Balance, Transaction, Account, AutoTopUp
-from .forms import OneOffPayment, TestTransaction
+from .forms import OneOffPayment, TestTransaction, TestAutoTopUp
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -86,6 +86,7 @@ COMMENT LATER
                 customer = customer_id,
                 metadata = {'cobalt_member_id': request.user.id}
                 )
+        print(intent)
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 
@@ -105,18 +106,15 @@ def test_callback(status, payload, tran):
               message = "Received callback from payment: %s %s" % (status, payload))
 
     if status=="Success":
-        details = {
-            'member': tran.member,
-            'amount': -tran.amount,
-            'counterparty': "SFOB",
-            'transaction': tran,
-            'description': "Summer Festival Of Bridge - Swiss Pairs entry",
-            'log_msg': "$%s payment for SFOB" % tran.amount,
-            'source': "Events",
-            'sub_source': "fictional_event_entry_module"
-        }
-
-        update_account(details)
+        update_account(member=tran.member,
+                       amount=-tran.amount,
+                       counterparty="SFOB",
+                       transaction=tran,
+                       description="Summer Festival of Bridge - Swiss Pairs entry",
+                       log_msg="$%s payment for SFOB" % tran.amount,
+                       source="Events",
+                       sub_source="fictional_event_entry_module"
+                       )
 
 @login_required(login_url='/accounts/login/')
 def test_payment(request):
@@ -145,6 +143,78 @@ def test_payment(request):
     return render(request, 'payments/test_payment.html', {'form': form})
 
 @login_required(login_url='/accounts/login/')
+def test_autotopup(request):
+###################################################
+# view for auto top up payments                   #
+###################################################
+    msg=""
+    log_event(request = request,
+              user = request.user.full_name,
+              severity = "INFO",
+              source = "Payments",
+              sub_source = "test_autotopup",
+              message = "User went to auto payment screen")
+
+    if request.method == 'POST':
+        form = TestAutoTopUp(request.POST)
+        if form.is_valid():
+
+            description = form.cleaned_data['description']
+            amount = form.cleaned_data['amount']
+            member = form.cleaned_data['payer']
+
+            print("###########")
+            print("Desc: " + description)
+            print("Amount: %s" % amount)
+            print("Member: %s" % member)
+
+            autotopup = get_object_or_404(AutoTopUp, member=member)
+
+            stripe.api_key = STRIPE_SECRET_KEY
+
+# Get payment method id for this customer from Stripe
+            paylist = stripe.PaymentMethod.list(
+              customer=autotopup.stripe_customer_id,
+              type="card",
+            )
+            pay_method_id = paylist.data[0].id
+
+# try payment
+            try:
+              rc=stripe.PaymentIntent.create(
+                amount=amount * 100,
+                currency='aud',
+                customer=autotopup.stripe_customer_id,
+                payment_method=pay_method_id,
+                off_session=True,
+                confirm=True,
+              )
+              print(rc)
+              update_account(member=member,
+                             amount=amount,
+                             counterparty="Auto Top Up",
+                             description="Auto Top Up",
+                             log_msg="$%s Auto Top Up" % amount,
+                             source="Payments",
+                             sub_source="auto_top_up"
+                             )
+              msg="Top Up Successful"
+            except stripe.error.CardError as e:
+              err = e.error
+              # Error code will be authentication_required if authentication is needed
+              print("Code is: %s" % err.code)
+              payment_intent_id = err.payment_intent['id']
+              payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+#            return payment_api(request, description, amount, member, route_code, route_payload)
+    else:
+        form = TestAutoTopUp()
+
+    return render(request, 'payments/test_autotopup.html', {'form': form, 'msg': msg})
+
+
+
+@login_required(login_url='/accounts/login/')
 def test_transaction(request):
     """ Temporary way to make a change to ABF $ account """
 
@@ -160,18 +230,15 @@ def test_transaction(request):
     if request.method == 'POST':
         form = TestTransaction(request.POST)
         if form.is_valid():
-            details = {
-                'member': form.cleaned_data['payer'],
-                'amount': form.cleaned_data['amount'],
-                'counterparty': form.cleaned_data['counterparty'],
-                'transaction': None,
-                'description': form.cleaned_data['description'],
-                'log_msg': "Manual Payments Update: $%s %s" %
-                    (form.cleaned_data['amount'], form.cleaned_data['description']),
-                'source': "Payments",
-                'sub_source': "test_transaction"
-            }
-            update_account(details)
+            update_account(member=form.cleaned_data['payer'],
+                           amount=-form.cleaned_data['amount'],
+                           counterparty=form.cleaned_data['counterparty'],
+                           description=form.cleaned_data['description'],
+                           log_msg="Manual Payments Update: $%s %s" %
+                               (form.cleaned_data['amount'], form.cleaned_data['description']),
+                           source="Payments",
+                           sub_source="test_transaction"
+                           )
             msg = "Update applied"
 
     else:
@@ -179,7 +246,7 @@ def test_transaction(request):
 
     return render(request, 'payments/test_transaction.html', {'form': form, 'msg': msg})
 
-def payment_api(request, description, amount, member, route_code, route_payload):
+def payment_api(request, description, amount, member, route_code=None, route_payload=None):
     """ API for one off payments from other parts of the application
 
 The route_code provides a callback and the route_payload is the string
@@ -269,19 +336,16 @@ def stripe_webhook(request):
                       sub_source = "stripe_webhook",
                       message = "Unable to load transaction. Check Transaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
-        details = {
-            'member': tran.member,
-            'amount': tran.amount,
-            'counterparty': "CC Payment",
-            'transaction': tran,
-            'description': "Payment from card **** **** ***** %s Exp %s/%s" %
-                (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100),
-            'log_msg': "$%s Payment from Stripe Transaction=%s" % (tran.amount, tran.id),
-            'source': "Payments",
-            'sub_source': "stripe_webhook"
-        }
-
-        update_account(details)
+        update_account(member=tran.member,
+                       amount=tran.amount,
+                       counterparty="CC Payment",
+                       transaction=tran,
+                       description="Payment from card **** **** ***** %s Exp %s/%s" %
+                           (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100),
+                       log_msg="$%s Payment from Stripe Transaction=%s" % (tran.amount, tran.id),
+                       source="Payments",
+                       sub_source="stripe_webhook"
+                       )
 
         # make Callback
         if tran.route_code == "MAN":
@@ -311,42 +375,40 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
-def update_account(details):
+def update_account(member, amount, counterparty, description, log_msg, source, sub_source, transaction=None):
     """ method to update a customer account """
     try:
-        balance = Balance.objects.filter(member = details['member'])[0]
+        balance = Balance.objects.filter(member = member)[0]
     except:
         balance = Balance()
         balance.balance=0
-        balance.member = details['member']
-    balance.balance += details['amount']
-    balance.last_top_up_amount = details['amount']
+        balance.member = member
+    balance.balance += amount
+    balance.last_top_up_amount = amount
     balance.save()
 
-    log_event(user = details['member'].full_name,
+    log_event(user = member.full_name,
               severity = "INFO",
-              source = details['source'],
-              sub_source = details['sub_source'],
-              message = details['log_msg'] + " Updated balance table")
-
+              source = source,
+              sub_source = sub_source,
+              message = log_msg + " Updated balance table")
 
 # Create new account entry
     act = Account()
-    act.member = details['member']
-    act.amount = details['amount']
-    act.counterparty = details['counterparty']
-    act.transaction = details['transaction']
+    act.member = member
+    act.amount = amount
+    act.counterparty = counterparty
+    act.transaction = transaction
     act.balance = balance.balance
-    act.description = details['description']
+    act.description = description
 
     act.save()
 
-    log_event(user = details['member'].full_name,
+    log_event(user = member.full_name,
               severity = "INFO",
-              source = details['source'],
-              sub_source = details['sub_source'],
-              message = details['log_msg'] + " Updated account table")
-
+              source = source,
+              sub_source = sub_source,
+              message = log_msg + " Updated account table")
 
 @login_required(login_url='/accounts/login/')
 def statement(request):

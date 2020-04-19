@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block header %}
-<script src="/static/assets/js/core/jquery.min.js"></script>
-<link rel="stylesheet" href="/static/assets/css/normalize.css" />
-<link rel="stylesheet" href="/static/assets/css/stripe-global.css" />
+<link href="{% static "payments/css/normalize.css" %}" rel="stylesheet" />
+<link href="{% static "payments/css/stripe-global.css" %}" rel="stylesheet" />
+
+<!-- Must load Stripe js from their server to be PCI compliant -->
 <script src="https://js.stripe.com/v3/"></script>
-<script src="/static/assets/js/stripe-script.js" defer></script>
+<script type="text/javascript" src="{% static "payments/js/stripe-script.js" %}" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 {% endblock %}
 
 {% block content %}
-
-
 
 <div align="center">
   <div class="sr-main">

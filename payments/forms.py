@@ -15,3 +15,8 @@ class TestTransaction(forms.Form):
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
     description = forms.CharField(label='Description', max_length=100)
     counterparty = forms.CharField(label='Counterparty', max_length=80)
+
+class TestAutoTopUp(forms.Form):
+    payer = forms.ModelChoiceField(queryset=User.objects.all())
+    amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
+    description = forms.CharField(label='Description', max_length=100)

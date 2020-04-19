@@ -4,6 +4,10 @@
 
 <h2>This screen will change later</h2>
 <p>It is here primarly for testing purposes.</p>
+<p>Payments doesn't really work as a standalone module so we need
+to have some pretend external connection to it for testing. Statements,
+Transfers and setting up Auto Top Up will remain as part of Payments,
+but the other 3 will not.</p>
 <br>
 <br>
 
@@ -26,8 +30,18 @@
         </button>
         </a>
 
+        <a href="./test-autotopup"><button class="text-left btn btn-warning btn-round" style="width: 270px">
+          <i class="material-icons">check_circle</i>&nbsp;Test Auto Top Up
+        </button>
+        </a>
+
         <a href="./test-transaction"><button class="text-left btn btn-success btn-round" style="width: 270px">
           <i class="material-icons">add_circle</i>&nbsp;Transaction against account
+        </button>
+        </a>
+
+        <a href="./payments-transfer"><button class="text-left btn btn-dark btn-round" style="width: 270px">
+          <i class="material-icons">people_alt</i>&nbsp;Transfer to another Member
         </button>
         </a>
 
