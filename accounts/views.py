@@ -16,16 +16,19 @@ from cobalt.settings import DEFAULT_FROM_EMAIL
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.http import JsonResponse
+
 
 def register(request):
     if request.method == 'POST':
         # request is immutable so copy it and add in username
-        request.POST = request.POST.copy()
-        request.POST['username'] = request.POST['abf_number']
+        # request.POST = request.POST.copy()
+        # request.POST['username'] = request.POST['abf_number']
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False   # not active until email confirmed
+            user.abf_number = user.username
             user.save()
             current_site = get_current_site(request)
             mail_subject = 'Activate your account.'
@@ -41,6 +44,8 @@ def register(request):
     else:
         form = UserRegisterForm()
 
+    print(form.errors)
+
     return render(request, 'accounts/register.html', {'user_form': form})
 
 def activate(request, uidb64, token):
@@ -52,7 +57,7 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        #login(request, user)
+        login(request, user)
         return render(request, 'accounts/activate_complete.html', { 'user' : user})
     else:
         return HttpResponse('Activation link is invalid!')
@@ -60,7 +65,7 @@ def activate(request, uidb64, token):
 def loggedout(request):
     return render(request, 'accounts/loggedout.html')
 
-
+@login_required(login_url='/accounts/login/')
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
@@ -76,3 +81,38 @@ def change_password(request):
     return render(request, 'accounts/change_password.html', {
         'form': form
     })
+
+@login_required(login_url='/accounts/login/')
+def search(request):
+
+    if request.method == "GET":
+
+        if 'lastname' in request.GET:
+            search_last_name = request.GET.get("lastname")
+        else:
+            search_last_name = None
+
+        if 'firstname' in request.GET:
+            search_first_name = request.GET.get("firstname")
+        else:
+            search_first_name = None
+
+        if search_first_name and search_last_name:
+            members = User.objects.filter(first_name__istartswith=search_first_name, last_name__istartswith=search_last_name)
+        elif search_last_name:
+            members = User.objects.filter(last_name__istartswith=search_last_name)
+        else:
+            members = User.objects.filter(first_name__istartswith=search_first_name)
+
+        if request.is_ajax:
+
+            html = render_to_string(
+                template_name="accounts/search-results.html",
+                context={"members": members}
+            )
+
+            data_dict = {"data": html}
+
+            return JsonResponse(data=data_dict, safe=False)
+
+    return render(request, "accounts/search-results.html", context={'members': members})

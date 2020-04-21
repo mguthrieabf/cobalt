@@ -11,4 +11,6 @@ urlpatterns = [
     path('test-transaction', views.test_transaction, name='test_transaction'),
     path('test-autotopup', views.test_autotopup, name='test_autotopup'),
     path('setup-autotopup', views.setup_autotopup, name='setup_autotopup'),
+    path('member-transfer', views.member_transfer, name='member_transfer'),
+    path('mp-score', views.mp_score, name='mp_score'),
 ]

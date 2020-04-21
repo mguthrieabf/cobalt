@@ -1,0 +1,10 @@
+{% if members %}
+  <ul>
+  {% for member in members %}
+    <li>{{ member.pk }}</li>
+    <li>{{ member.abf_number }}</li>
+    <li>{{ member.full_name }}</li>
+
+  {% endfor %}
+  </ul>
+{% endif %}

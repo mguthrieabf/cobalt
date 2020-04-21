@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Balance, Transaction, Account, AutoTopUp
-from .forms import OneOffPayment, TestTransaction, TestAutoTopUp
+from .forms import OneOffPayment, TestTransaction, TestAutoTopUp, MemberTransfer
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,11 +16,17 @@ import stripe
 import json
 from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, GLOBAL_MPSERVER
 
+####################
+# Home             #
+####################
 @login_required(login_url='/accounts/login/')
 def home(request):
     """ Default page """
     return render(request, 'payments/home.html')
 
+####################
+# get_balance      #
+####################
 def get_balance(member):
     """ called by dashboard to show basic information """
 
@@ -34,6 +40,9 @@ def get_balance(member):
         last_top_up = "Never"
     return({'balance' : balance, 'last_top_up': last_top_up})
 
+#########################
+# create_payment_intent #
+#########################
 #@login_required(login_url='/accounts/login/')
 def create_payment_intent(request):
     """ Called from the checkout webpage.
@@ -69,14 +78,16 @@ get back from Stripe
                 )
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
+####################################
+# create_payment_superintent       #
+####################################
 #@login_required(login_url='/accounts/login/')
 def create_payment_superintent(request):
     """ Called from the auto top up webpage.
 
-
-COMMENT LATER
-
-
+This is very similar to the one off payment. It lets Stripe
+know to expect a credit card and provides a token to confirm
+which one it is.
 """
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -90,7 +101,9 @@ COMMENT LATER
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 
-
+######################
+# test_callback      #
+######################
 def test_callback(status, payload, tran):
     """ Eventually I will be moved to another module. I am only here for testing purposes
 
@@ -117,10 +130,12 @@ def test_callback(status, payload, tran):
                        )
 
 @login_required(login_url='/accounts/login/')
+#################################
+# test_payment                  #
+#################################
 def test_payment(request):
-###################################################
-# view for simple payments                        #
-###################################################
+    """view for simple payments
+"""
     log_event(request = request,
               user = request.user.full_name,
               severity = "INFO",
@@ -142,11 +157,14 @@ def test_payment(request):
 
     return render(request, 'payments/test_payment.html', {'form': form})
 
+###########################
+# test_autotopup          #
+###########################
 @login_required(login_url='/accounts/login/')
 def test_autotopup(request):
-###################################################
-# view for auto top up payments                   #
-###################################################
+    """
+view for auto top up payments
+"""
     msg=""
     log_event(request = request,
               user = request.user.full_name,
@@ -212,8 +230,9 @@ def test_autotopup(request):
 
     return render(request, 'payments/test_autotopup.html', {'form': form, 'msg': msg})
 
-
-
+##########################
+# test_transaction       #
+##########################
 @login_required(login_url='/accounts/login/')
 def test_transaction(request):
     """ Temporary way to make a change to ABF $ account """
@@ -246,6 +265,9 @@ def test_transaction(request):
 
     return render(request, 'payments/test_transaction.html', {'form': form, 'msg': msg})
 
+#####################
+# payment_api       #
+#####################
 def payment_api(request, description, amount, member, route_code=None, route_payload=None):
     """ API for one off payments from other parts of the application
 
@@ -262,6 +284,9 @@ to return.
     trans.save()
     return render(request, 'payments/checkout.html', {'trans': trans})
 
+####################
+# stripe_webhook   #
+####################
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):
@@ -375,6 +400,9 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
+######################
+# update_account     #
+######################
 def update_account(member, amount, counterparty, description, log_msg, source, sub_source, transaction=None):
     """ method to update a customer account """
     try:
@@ -410,8 +438,13 @@ def update_account(member, amount, counterparty, description, log_msg, source, s
               sub_source = sub_source,
               message = log_msg + " Updated account table")
 
+#####################
+# statement         #
+#####################
 @login_required(login_url='/accounts/login/')
 def statement(request):
+    """ Member statement view
+    """
 
 # Get summary data
     qry = '%s/mps/%s' % (GLOBAL_MPSERVER, request.user.abf_number)
@@ -440,8 +473,13 @@ def statement(request):
 
     return render(request, 'payments/statement.html', { 'events': events, "user": request.user, "summary": summary, "club": club})
 
+#######################
+# setup_autotopup     #
+#######################
 @login_required(login_url='/accounts/login/')
 def setup_autotopup(request):
+    """ view to sign up to auto top up
+    """
 
 # Already a customer?
     autotopup = AutoTopUp.objects.filter(member=request.user)
@@ -460,3 +498,65 @@ def setup_autotopup(request):
         auto.save()
 
     return render(request, 'payments/autotopup.html', {})
+
+
+#######################
+# member_transfer     #
+#######################
+@login_required(login_url='/accounts/login/')
+def member_transfer(request):
+    """ view to transfer $ to another member
+    """
+
+    msg=""
+
+    if request.method == 'POST':
+        form = MemberTransfer(request.POST)
+        if form.is_valid():
+            # Money in
+            update_account(member=form.cleaned_data['transfer_to'],
+                           amount=form.cleaned_data['amount'],
+                           counterparty="Transfer from: %s (%s)" % (request.user.full_name, request.user.abf_number),
+                           description=form.cleaned_data['description'],
+                           log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.abf_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].abf_number,
+                                form.cleaned_data['amount']),
+                           source="Payments",
+                           sub_source="member_transfer"
+                           )
+            # Money out
+            update_account(member=request.user,
+                           amount=-form.cleaned_data['amount'],
+                           counterparty="Transfer to: %s (%s)" % (form.cleaned_data['transfer_to'].full_name, form.cleaned_data['transfer_to'].abf_number),
+                           description=form.cleaned_data['description'],
+                           log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.abf_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].abf_number,
+                                form.cleaned_data['amount']),
+                           source="Payments",
+                           sub_source="member_transfer"
+                           )
+
+            msg = "Transaction Successful"
+        else:
+            print(form.errors)
+
+    else:
+        form = MemberTransfer()
+
+    try:
+        balance_inst = Balance.objects.filter(member=request.user)[0]
+        balance = balance_inst.balance
+    except IndexError:
+        balance = "Nil"
+
+
+    return render(request, 'payments/member_transfer.html', {'form': form,
+                                                             'msg': msg,
+                                                             'balance': balance})
+
+def mp_score(request):
+    return render(request, 'payments/mp_score.html')

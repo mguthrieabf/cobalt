@@ -46,8 +46,8 @@
 												 {% endfor %}
 								 {% endif %}
 								 <div class="form-group">
-									 <span id="system_number_error"></span>
-									 <input type="text" name="abf_number" id="id_abf_number" class="form-control input-sm" placeholder="ABF Number" value="{{ user_form.abf_number.value|default_if_none:'' }}">
+									 <span id="username_error"></span>
+									 <input type="text" name="username" id="id_username" class="form-control input-sm" placeholder="ABF Number" value="{{ user_form.username.value|default_if_none:'' }}">
 								 </div>
 								 <div class="row">
 									 <div class="col-xs-6 col-sm-6 col-md-6">
@@ -128,20 +128,20 @@
 
 		function getPlayerName() {
 
-		    var abf = document.getElementById('id_abf_number')
+		    var username = document.getElementById('id_username')
 		    var fname = document.getElementById('id_first_name')
 		    var lname = document.getElementById('id_last_name')
-		    var err = document.getElementById('system_number_error')
+		    var err = document.getElementById('username_error')
 
 		    err.innerHTML="";
 
-		    var trimmed_abf = abf.value.replace(/^\s+|\s+$/g, '');
+		    var trimmed_username = username.value.replace(/^\s+|\s+$/g, '');
 
-		    if (trimmed_abf == '') {
+		    if (trimmed_username == '') {
 		        return;
 		    }
 
-		    var strURL = "/masterpoints/abf_lookup?abf_number=" + trimmed_abf;
+		    var strURL = "/masterpoints/abf_lookup?abf_number=" + trimmed_username;
 
 		    jQuery.ajax({
 		        url: strURL,
@@ -155,7 +155,7 @@
 		            }
 		            var n = txt.search("Invalid");
 		            if (n>=0) {
-		               abf.focus();
+		               username.focus();
 		              // abf.value="";
 		               err.innerHTML=txt;
 		            }
@@ -163,7 +163,7 @@
 		    });
 		}
 
-		jQuery('#id_abf_number').on('change', function(e) {
+		jQuery('#id_username').on('change', function(e) {
 		   getPlayerName();
 		});
 

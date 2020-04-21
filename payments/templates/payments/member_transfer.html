@@ -1,0 +1,130 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header text-center card-primary">
+    <h3 class="card-title">
+      ABF Dollar Transfer
+    </h3>
+    <h5 class="card-description">Transfer to another member</h5>
+    <h5 class="card-description">Your Balance: ${{ balance }}</h5>
+  </div>
+  <div class="card-body">
+    <form action="member-transfer" method="post">
+{% csrf_token %}
+      <h5 class="info-text">Find Member</h5>
+      <div class="form-group">
+        <label for="abf_number" class="bmd-label-floating">ABF Number</label>
+        <input type="number" class="form-control" id="id_abf_number" name="abf_number" value="">
+      </div>
+
+      <div class="form-group">
+        <label for="lastname" class="bmd-label-floating">Last Name</label>
+        <input type="text" class="form-control" id="id_lastname" name="lastname" value="">
+      </div>
+
+      <div class="form-group">
+        <label for="" class="bmd-label-floating">First Name</label>
+        <input type="text" class="form-control" id="id_firstname" name="firstname" value="">
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+                        <div class="row">
+                           <div class="col-xs-6 col-sm-6 col-md-6">
+                             <div class="form-group">
+                               <tr>
+                                 {{ user_form.transfer_to.errors }}
+                                 <th>
+                                   <label for="id_transfer_to">Transfer to:</label>
+                                 </th>
+                                 <td>
+                                   {{ form.transfer_to }}
+                                 </td>
+                               </tr>
+
+                               <tr>
+                                 <th>
+                                   <label for="id_amount">Amount:</label>
+                                 </th>
+                                 <td>
+                                   <input type="number" name="amount" step="0.01" required id="id_amount">
+                                 </td>
+                               </tr>
+                               <tr>
+                                 <th>
+                                   <label for="id_description">Description:</label>
+                                 </th>
+                                 <td>
+                                   <input type="text" name="description" maxlength="200" required id="id_description">
+                                 </td>
+                               </tr>
+                             </div>
+                           </div>
+                         </div>
+
+                			   <input type="submit" value="Transfer" class="btn btn-block">
+
+
+
+
+
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+{% endblock %}
+
+{% block footer %}
+<script>
+
+const user_input = $("#user-input")
+const search_icon = $('#search-icon')
+const artists_div = $('#replaceable-content')
+const endpoint = '/artists/'
+const delay_by_in_ms = 700
+let scheduled_function = false
+
+let ajax_call = function (endpoint, request_parameters) {
+    $.getJSON(endpoint, request_parameters)
+        .done(response => {
+            // fade out the artists_div, then:
+            artists_div.fadeTo('slow', 0).promise().then(() => {
+                // replace the HTML contents
+                artists_div.html(response['html_from_view'])
+                // fade-in the div with new contents
+                artists_div.fadeTo('slow', 1)
+                // stop animating search icon
+                search_icon.removeClass('blink')
+            })
+        })
+}
+
+
+user_input.on('keyup', function () {
+
+    const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+    }
+
+    // start animating the search icon with the CSS class
+    search_icon.addClass('blink')
+
+    // if scheduled_function is NOT false, cancel the execution of the function
+    if (scheduled_function) {
+        clearTimeout(scheduled_function)
+    }
+
+    // setTimeout returns the ID of the function to be executed
+    scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+})
+
+</script>
+
+{% endblock %}

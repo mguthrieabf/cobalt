@@ -78,15 +78,30 @@
        <form method="post" action="update-blurb" enctype="multipart/form-data">
          {% csrf_token %}
 
+
+
+
+
        <div class="card card-profile">
          <div class="card-avatar">
-             <img class="img" src="/media/{{ form.pic.value }}" />
-         </div>
+              <img class="img" src="/media/{{ form.pic.value }}" />
+          </div>
          <div class="card-body">
-           <span>
-               <span >Change image</span>
-              <input type="file" name="pic" accept="image/*" id="id_pic">
-           </span>
+
+
+           <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+               <div class="fileinput-preview fileinput-exists thumbnail img-circle img-raised"></div>
+               <div>
+               <span class="btn btn-raised btn-round btn-rose btn-file">
+                   <span class="fileinput-new">Change Photo</span>
+            <span class="fileinput-exists">Change</span>
+            <input type="file" name="pic" accept="image/*" id="id_pic"/></span>
+                   <br />
+                   <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
+               </div>
+           </div>
+
+
 
            <p class="card-description">
              <label class="bmd-label-floating">Short Description of You</label>
@@ -120,6 +135,19 @@
     if ($('.slider').length != 0) {
        md.initSliders();
     }
+
+        // 
+        // function readURL(input) {
+        //   if (input.files && input.files[0]) {
+        //     var reader = new FileReader();
+        //
+        //     reader.onload = function(e) {
+        //       $('#wizardPicturePreview').attr('src', e.target.result).fadeIn('slow');
+        //     }
+        //     reader.readAsDataURL(input.files[0]);
+        //   }
+        // }
+
 
   // $('#fixme').removeClass('is-empty');
 

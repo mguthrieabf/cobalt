@@ -5,7 +5,8 @@ Thanks for signing up to the ABF technology site.
 
 Please click on this link to confirm your registration:
 
-http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+http://{{ domain }}/accounts/activate/{{ uid }}/{{ token }}
+
 {% endautoescape %}
 
 The ABF Technology Team.

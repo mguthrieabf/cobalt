@@ -18,17 +18,17 @@ def home(request):
         else:
             print(form.errors)
     else:
-        access_token='70691e3380c3b2'
-        handler = ipinfo.getHandler(access_token)
-        ip_address = get_client_ip(request)
-        ip_details = handler.getDetails(ip_address)
-
 # Fix DOB format for browser - expects DD/MM/YYYY
         if request.user.dob:
             request.user.dob=request.user.dob.strftime("%d/%m/%Y")
 
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
+
+    access_token='70691e3380c3b2'
+    handler = ipinfo.getHandler(access_token)
+    ip_address = get_client_ip(request)
+    ip_details = handler.getDetails(ip_address)
 
     context = {
         'form': form,

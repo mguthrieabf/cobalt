@@ -8,7 +8,7 @@ urlpatterns = [
     path('', include('dashboard.urls')),
     path('dashboard', include('dashboard.urls')),
     path('results', include('results.urls')),
-    path('accounts', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('calendar', include('calendar_app.urls')),
     path('events', include('events.urls')),
