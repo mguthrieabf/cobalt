@@ -2,6 +2,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div  class="container">
+  <div class="row justify-content-center">
+    <div class="card col-11 col-md-6">
+      <div class="card-header card-header-primary">
+        <h3 class="card-title">ABF Dollar Transfer</h3>
+        <h5>Transfer funds online to another member</h5>
+      </div>
+      <h3>{{ msg }}</h3>
+      <div class="card-body">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="card col-11 col-md-7">
+              <div class="card-header card-header-warning">
+                <h4>Member Lookup</h4>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label for="abf_number" class="bmd-label-floating">ABF Number</label>
+                  <input type="number" class="form-control" id="id_abf_number" name="abf_number" value="">
+                </div>
+                <div class="form-group">
+                  <label for="lastname" class="bmd-label-floating">Last Name</label>
+                  <input type="text" class="form-control" id="id_lastname" name="lastname" value="">
+                </div>
+
+                <div class="form-group">
+                  <label for="" class="bmd-label-floating">First Name</label>
+                  <input type="text" class="form-control" id="id_firstname" name="firstname" value="">
+                </div>
+
+                <button class="btn btn-danger">Lookup</button>
+
+              </div>
+            </div>
+          </div>
+          <form action="member-transfer" method="post">
+          {% csrf_token %}
+
+            <div class="row">
+              {{ user_form.transfer_to.errors }}
+              <div class="form-group">
+                <label for="id_transer_to" class="bmd-label-floating">Member</label>
+                {{ form.transfer_to }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="form-group">
+                <label for="id_amount" class="bmd-label-floating">Amount $</label>
+                <input type="number" class="form-control" name="amount" step="0.01" required id="id_amount" value="">
+              </div>
+            </div>
+            <div class="row">
+              <div class="w-100"></div>
+              <div class="form-group">
+                <label for="id_description" class="bmd-label-floating">Description (optional)</label>
+                <input type="text" class="form-control" name="description" maxlength="200" id="id_description">
+              </div>
+            </div>
+            <div class="row justify-content-center">
+             <input type="submit" value="Transfer" class="btn btn-block col-11 col-md-5">
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="card">
   <div class="card-header text-center card-primary">
     <h3 class="card-title">

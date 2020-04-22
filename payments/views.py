@@ -460,6 +460,13 @@ def statement(request):
     qry = '%s/club/%s' % (GLOBAL_MPSERVER, summary['HomeClubID'])
     club = requests.get(qry).json()[0]['ClubName']
 
+    # get balance
+    try:
+        balance_inst = Balance.objects.filter(member=request.user)[0]
+        balance = balance_inst.balance
+    except IndexError:
+        balance = "Nil"
+
     events_list = Account.objects.filter(member=request.user).order_by('-created_date')
     page = request.GET.get('page', 1)
 
@@ -471,7 +478,11 @@ def statement(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
-    return render(request, 'payments/statement.html', { 'events': events, "user": request.user, "summary": summary, "club": club})
+    return render(request, 'payments/statement.html', { 'events': events,
+                                                        'user': request.user,
+                                                        'summary': summary,
+                                                        'club': club,
+                                                        'balance': balance})
 
 #######################
 # setup_autotopup     #
@@ -540,7 +551,10 @@ def member_transfer(request):
                            sub_source="member_transfer"
                            )
 
-            msg = "Transaction Successful"
+            msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
+                                     form.cleaned_data['transfer_to'].full_name,
+                                     form.cleaned_data['transfer_to'].abf_number)
+            return render(request, 'payments/member-transfer-successful.html', {"msg": msg})
         else:
             print(form.errors)
 
@@ -555,8 +569,4 @@ def member_transfer(request):
 
 
     return render(request, 'payments/member_transfer.html', {'form': form,
-                                                             'msg': msg,
                                                              'balance': balance})
-
-def mp_score(request):
-    return render(request, 'payments/mp_score.html')

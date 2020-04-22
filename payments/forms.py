@@ -24,4 +24,4 @@ class TestAutoTopUp(forms.Form):
 class MemberTransfer(forms.Form):
     transfer_to = forms.ModelChoiceField(queryset=User.objects.all())
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
-    description = forms.CharField(label='Description', max_length=100)
+    description = forms.CharField(label='Description', required=False, max_length=100)
