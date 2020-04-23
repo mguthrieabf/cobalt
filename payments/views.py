@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
 from logs.views import log_event
 import requests
 import stripe
@@ -248,6 +249,7 @@ def test_transaction(request):
                            sub_source="test_transaction"
                            )
             msg = "Update applied"
+            messages.success(request, 'Success: %s - $%s' % (form.cleaned_data['payer'], form.cleaned_data['amount']))
 
     else:
         form = TestTransaction()

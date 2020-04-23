@@ -1,14 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.utils import timezone
-from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
@@ -22,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from .forms import UserUpdateForm, BlurbUpdateForm
 import ipinfo
-from logs.views import get_client_ip
+from logs.views import get_client_ip, log_event
 
 def register(request):
     if request.method == 'POST':
@@ -75,8 +73,22 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('change-password')
+            log_event(request = request,
+                      user = request.user.full_name,
+                      severity = "INFO",
+                      source = "Accounts",
+                      sub_source = "change_password",
+                      message = "Password change successful")
+            return render(request, 'accounts/change-password.html', {
+                    'form': form
+                })
         else:
+            log_event(request = request,
+                      user = request.user.full_name,
+                      severity = "WARN",
+                      source = "Accounts",
+                      sub_source = "change_password",
+                      message = "Password change failed")
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
@@ -107,8 +119,10 @@ def search(request):
             members = User.objects.filter(last_name__istartswith=search_last_name)
         else:
             members = User.objects.filter(first_name__istartswith=search_first_name)
+        print(members)
 
         if request.is_ajax:
+            print("ok")
             if members.count()>30:
                 msg="Too many results (%s)" % members.count()
                 members=None
@@ -121,21 +135,7 @@ def search(request):
 
             return JsonResponse(data=data_dict, safe=False)
 
-    return render(request, "accounts/search-results.html", context={'members': members})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render(request, "accounts/search-results.html", context={'members': members, 'msg': msg})
 
 @login_required
 def profile(request):
