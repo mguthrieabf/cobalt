@@ -136,12 +136,6 @@ def test_callback(status, payload, tran):
 def test_payment(request):
     """view for simple payments
 """
-    log_event(request = request,
-              user = request.user.full_name,
-              severity = "INFO",
-              source = "Payments",
-              sub_source = "test_payment",
-              message = "User went to test payment screen")
 
     if request.method == 'POST':
         form = OneOffPayment(request.POST)
@@ -180,11 +174,6 @@ view for auto top up payments
             description = form.cleaned_data['description']
             amount = form.cleaned_data['amount']
             member = form.cleaned_data['payer']
-
-            print("###########")
-            print("Desc: " + description)
-            print("Amount: %s" % amount)
-            print("Member: %s" % member)
 
             autotopup = get_object_or_404(AutoTopUp, member=member)
 

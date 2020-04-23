@@ -85,6 +85,8 @@ def change_password(request):
 @login_required(login_url='/accounts/login/')
 def search(request):
 
+    msg=""
+
     if request.method == "GET":
 
         if 'lastname' in request.GET:
@@ -105,10 +107,12 @@ def search(request):
             members = User.objects.filter(first_name__istartswith=search_first_name)
 
         if request.is_ajax:
-
+            if members.count()>30:
+                msg="Too many results (%s)" % members.count()
+                members=None
             html = render_to_string(
                 template_name="accounts/search-results.html",
-                context={"members": members}
+                context={"members": members, "msg": msg}
             )
 
             data_dict = {"data": html}

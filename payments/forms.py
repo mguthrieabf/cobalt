@@ -25,3 +25,9 @@ class MemberTransfer(forms.Form):
     transfer_to = forms.ModelChoiceField(queryset=User.objects.all())
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
     description = forms.CharField(label='Description', required=False, max_length=100)
+
+    def clean_amount(self):
+        amount = self.cleaned_data['amount']
+        if amount < 0:
+            raise forms.ValidationError("Nice try")
+        return amount

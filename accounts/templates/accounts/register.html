@@ -21,6 +21,12 @@
   background-size: cover;
 }
 
+   .form-error {
+     color: red;
+     font-weight: bold;
+     font-size: 18px;
+   }
+
 </style>
 </head>
 <body>
@@ -46,7 +52,8 @@
 												 {% endfor %}
 								 {% endif %}
 								 <div class="form-group">
-									 <span id="username_error"></span>
+									 <span id="username_error" class="form-error"></span>
+                   <span class="form-error" id="id_username_errors">{{ user_form.username.errors|striptags }}</span>
 									 <input type="text" name="username" id="id_username" class="form-control input-sm" placeholder="ABF Number" value="{{ user_form.username.value|default_if_none:'' }}">
 								 </div>
 								 <div class="row">
@@ -132,6 +139,7 @@
 		    var fname = document.getElementById('id_first_name')
 		    var lname = document.getElementById('id_last_name')
 		    var err = document.getElementById('username_error')
+        var username_err = document.getElementById('id_username_errors')
 
 		    err.innerHTML="";
 
@@ -156,8 +164,9 @@
 		            var n = txt.search("Invalid");
 		            if (n>=0) {
 		               username.focus();
-		              // abf.value="";
-		               err.innerHTML=txt;
+                   err.innerHTML=txt;
+                   username_err.innerHTML="";
+
 		            }
 		        }
 		    });
