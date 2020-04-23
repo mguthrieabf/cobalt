@@ -1,3 +1,9 @@
 Manual function to generate random users - required for testing manual
 payment searches.
 Search for user in Admin added (search by ABF Number or last name)
+Removed hardcoded references to ABF, now controlled as a system setting,
+with the exception of the MasterPoints interface which will change later.
+Put the default avatar into static and set up a copy step to media so we
+have it for all new installs.
+Fixed direct /static references. This could break things especially in
+registration but if it does it will be big and obvious.

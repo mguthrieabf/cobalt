@@ -10,7 +10,7 @@
      <div class="col-md-8">
        <div class="card">
          <div class="card-header card-header-warning">
-           <h4 class="card-title">Edit Profile for {{ user.full_name }} ({{ user.abf_number }})</h4>
+           <h4 class="card-title">Edit Profile for {{ user.full_name }} ({{ user.system_number }})</h4>
            <p class="card-category">Basic details</p>
            <p class="card-category">Location: {{ ip_details.city }}/{{ ip_details.region }}/{{ ip_details.country_name }}</p>
          </div>
@@ -21,8 +21,8 @@
              <div class="row">
                <div class="col-md-3">
                  <div class="form-group">
-                   <label class="bmd-label-floating">ABF Number</label>
-                   <input type="text" class="form-control" name="abf_number" id="id_abf_number" value="{{ form.abf_number.value }}" readonly>
+                   <label class="bmd-label-floating">{{ GLOBAL_ORG }} Number</label>
+                   <input type="text" class="form-control" name="system_number" id="id_system_number" value="{{ form.system_number.value }}" readonly>
                  </div>
                </div>
 
@@ -120,7 +120,7 @@
 
 
    <div class="form-group">
-     <button onclick="location.href='/accounts/change_password';" class="btn-success btn">Change Password</button>
+     <button onclick="location.href='/accounts/change-password';" class="btn-success btn">Change Password</button>
    </div>
 </div>
 
@@ -136,7 +136,7 @@
        md.initSliders();
     }
 
-        // 
+        //
         // function readURL(input) {
         //   if (input.files && input.files[0]) {
         //     var reader = new FileReader();

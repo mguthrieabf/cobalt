@@ -224,7 +224,7 @@ view for auto top up payments
 ##########################
 @login_required(login_url='/accounts/login/')
 def test_transaction(request):
-    """ Temporary way to make a change to ABF $ account """
+    """ Temporary way to make a change to  $ account """
 
     msg=""
 
@@ -436,7 +436,7 @@ def statement(request):
     """
 
 # Get summary data
-    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, request.user.abf_number)
+    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, request.user.system_number)
     summary = requests.get(qry).json()[0]
 
     # Set active to a boolean
@@ -516,12 +516,12 @@ def member_transfer(request):
             # Money in
             update_account(member=form.cleaned_data['transfer_to'],
                            amount=form.cleaned_data['amount'],
-                           counterparty="Transfer from: %s (%s)" % (request.user.full_name, request.user.abf_number),
+                           counterparty="Transfer from: %s (%s)" % (request.user.full_name, request.user.system_number),
                            description=form.cleaned_data['description'],
                            log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.abf_number,
+                               (request.user.full_name, request.user.system_number,
                                 form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].abf_number,
+                                form.cleaned_data['transfer_to'].system_number,
                                 form.cleaned_data['amount']),
                            source="Payments",
                            sub_source="member_transfer"
@@ -529,12 +529,12 @@ def member_transfer(request):
             # Money out
             update_account(member=request.user,
                            amount=-form.cleaned_data['amount'],
-                           counterparty="Transfer to: %s (%s)" % (form.cleaned_data['transfer_to'].full_name, form.cleaned_data['transfer_to'].abf_number),
+                           counterparty="Transfer to: %s (%s)" % (form.cleaned_data['transfer_to'].full_name, form.cleaned_data['transfer_to'].system_number),
                            description=form.cleaned_data['description'],
                            log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.abf_number,
+                               (request.user.full_name, request.user.system_number,
                                 form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].abf_number,
+                                form.cleaned_data['transfer_to'].system_number,
                                 form.cleaned_data['amount']),
                            source="Payments",
                            sub_source="member_transfer"
@@ -542,7 +542,7 @@ def member_transfer(request):
 
             msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
                                      form.cleaned_data['transfer_to'].full_name,
-                                     form.cleaned_data['transfer_to'].abf_number)
+                                     form.cleaned_data['transfer_to'].system_number)
             return render(request, 'payments/member-transfer-successful.html', {"msg": msg})
         else:
             print(form.errors)

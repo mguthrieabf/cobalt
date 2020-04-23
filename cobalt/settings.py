@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'support.apps.SupportConfig',
     'accounts.apps.AccountsConfig',
     'dashboard.apps.DashboardConfig',
-    'user_profile.apps.UserProfileConfig',
     'results.apps.ResultsConfig',
     'logs.apps.LogsConfig',
     'django.contrib.admin',
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     'health_check.cache',
     'health_check.storage',
     'widget_tweaks',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

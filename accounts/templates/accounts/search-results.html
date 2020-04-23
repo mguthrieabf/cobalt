@@ -6,7 +6,7 @@
     <div class="form-check form-check-radio">
         <label class="form-check-label">
             <input class="form-check-input" type="radio" name="transfer_to" id="id_transfer_to" value="{{ member.pk }}">
-            <a href="{% url 'public_profile' member.pk %}" target="_blank">{{ member.full_name }} ({{ member.abf_number }})</a>
+            <a href="{% url 'public_profile' member.pk %}" target="_blank">{{ member.full_name }} ({{ member.system_number }})</a>
             <span class="circle">
                 <span class="check"></span>
             </span>

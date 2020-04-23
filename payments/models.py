@@ -11,7 +11,7 @@ class Balance(models.Model):
 
     def __str__(self):
         return "%s(%s) = $%s" % (self.member.full_name,
-                                self.member.abf_number,
+                                self.member.system_number,
                                 self.balance)
 
 class Transaction(models.Model):
@@ -47,7 +47,7 @@ class Transaction(models.Model):
 
 
     def __str__(self):
-        return "%s(%s %s) - %s" % (self.member.abf_number, self.member.first_name,
+        return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
                                   self.member.last_name, self.stripe_reference)
 
 class Account(models.Model):
@@ -67,7 +67,7 @@ class Account(models.Model):
         super(Account, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "%s - %s %s %s" % (self.member.abf_number, self.member.first_name,
+        return "%s - %s %s %s" % (self.member.system_number, self.member.first_name,
                                   self.member.last_name, self.id)
 
 class AutoTopUp(models.Model):
@@ -76,4 +76,4 @@ class AutoTopUp(models.Model):
     stripe_customer_id = models.CharField("Stripe Customer Id", null=True, max_length=25)
 
     def __str__(self):
-        return "%s (Stripe Customer id: %s)" % (self.member, self.stripe_customer_id) 
+        return "%s (Stripe Customer id: %s)" % (self.member, self.stripe_customer_id)

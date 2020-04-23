@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from cobalt.settings import GLOBAL_ORG
 
 class User(AbstractUser):
     email = models.EmailField(unique=False)
-    abf_number = models.IntegerField("ABF Number", blank="True", unique=True)
+    system_number = models.IntegerField("%s Number" % GLOBAL_ORG, blank="True", unique=True)
     mobile = models.IntegerField("Mobile Number", blank="True", unique=True, null=True)
     headline = models.TextField("Headline", blank="True", null=True, default="Not filled in", max_length=100)
     about = models.TextField("About Me", blank="True", null=True, default="Not filled in", max_length=800)
@@ -12,10 +13,10 @@ class User(AbstractUser):
     bbo_name = models.TextField("BBO Username", blank="True", null=True, max_length=20)
 
 
-    REQUIRED_FIELDS = ['abf_number', 'email'] # tells createsuperuser to ask for them
+    REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 
     def __str__(self):
-        return "%s - %s" % (self.abf_number, self.full_name)
+        return "%s - %s" % (self.system_number, self.full_name)
 
     @property
     def full_name(self):

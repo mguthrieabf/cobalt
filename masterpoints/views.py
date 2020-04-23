@@ -24,7 +24,7 @@ from cobalt.settings import GLOBAL_MPSERVER
 def masterpoints_detail(request, system_number=None):
 
    if system_number == None:
-       system_number = request.user.abf_number
+       system_number = request.user.system_number
 
 # Get summary data
    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, system_number)
@@ -184,15 +184,15 @@ def masterpoints_search(request):
                    'masterpoints/masterpoints_search_results.html',
                    {'matches' : matches})
    else:
-       return redirect("view/%s/" % request.user.abf_number)
+       return redirect("view/%s/" % request.user.system_number)
 
-def abf_lookup(request):
+def system_number_lookup(request):
    if request.method == "GET":
-       abf_number = request.GET['abf_number']
+       system_number = request.GET['system_number']
        member=None
-       if abf_number.isdigit():
+       if system_number.isdigit():
            try:
-               member = requests.get('%s/id/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
+               member = requests.get('%s/id/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
            except:
                member=None
        result = "Invalid or inactive number"
@@ -202,12 +202,12 @@ def abf_lookup(request):
                surname = member["Surname"]
                result = "%s %s" % (given_name, surname)
 
-       return render(request, 'masterpoints/abf_lookup.html', {'result' : result})
+       return render(request, 'masterpoints/system-number-lookup.html', {'result' : result})
 
-def get_masterpoints(abf_number):
+def get_masterpoints(system_number):
 # Called from Dashboard
    try:
-       summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, abf_number)).json()[0]
+       summary = requests.get('%s/mps/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
        points = summary["TotalMPs"]
        rank = summary["RankName"] + " Master"
    except:

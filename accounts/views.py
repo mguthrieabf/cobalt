@@ -17,22 +17,24 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from .forms import UserUpdateForm, BlurbUpdateForm
+import ipinfo
+from logs.views import get_client_ip
 
 def register(request):
     if request.method == 'POST':
-        # request is immutable so copy it and add in username
-        # request.POST = request.POST.copy()
-        # request.POST['username'] = request.POST['abf_number']
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False   # not active until email confirmed
-            user.abf_number = user.username
+            user.system_number = user.username
             user.save()
             current_site = get_current_site(request)
             mail_subject = 'Activate your account.'
-            message = render_to_string('accounts/acc_active_email.html', {
+            message = render_to_string('accounts/acc-active-email.html', {
                 'user': user,
                 'domain': current_site.domain,
                 'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
@@ -40,7 +42,7 @@ def register(request):
             })
             to_email = form.cleaned_data.get('email')
             send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
-            return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
+            return render(request, 'accounts/register-complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
 
@@ -58,7 +60,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return render(request, 'accounts/activate_complete.html', { 'user' : user})
+        return render(request, 'accounts/activate-complete.html', { 'user' : user})
     else:
         return HttpResponse('Activation link is invalid!')
 
@@ -73,12 +75,12 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-            return redirect('change_password')
+            return redirect('change-password')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/change_password.html', {
+    return render(request, 'accounts/change-password.html', {
         'form': form
     })
 
@@ -120,3 +122,71 @@ def search(request):
             return JsonResponse(data=data_dict, safe=False)
 
     return render(request, "accounts/search-results.html", context={'members': members})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@login_required
+def profile(request):
+    msg=""
+    if request.method == 'POST':
+        form = UserUpdateForm(data=request.POST, instance=request.user)
+        if form.is_valid():
+            msg="Profile Updated"
+            print(form)
+            form.save()
+        else:
+            print(form.errors)
+    else:
+# Fix DOB format for browser - expects DD/MM/YYYY
+        if request.user.dob:
+            request.user.dob=request.user.dob.strftime("%d/%m/%Y")
+
+        form = UserUpdateForm(instance=request.user)
+    blurbform = BlurbUpdateForm(instance=request.user)
+
+    access_token='70691e3380c3b2'
+    handler = ipinfo.getHandler(access_token)
+    ip_address = get_client_ip(request)
+    ip_details = handler.getDetails(ip_address)
+
+    context = {
+        'form': form,
+        'blurbform': blurbform,
+        'msg': msg,
+        'ip_details': ip_details,
+    }
+    return render(request, 'accounts/profile.html', context)
+
+def blurb_form_upload(request):
+    if request.method == 'POST':
+        blurbform = BlurbUpdateForm(request.POST, request.FILES, instance=request.user)
+        if blurbform.is_valid():
+            blurbform.save()
+    else:
+        blurbform = BlurbUpdateForm(data=request.POST, instance=request.user)
+
+    form = UserUpdateForm(instance=request.user)
+    context = {
+        'form': form,
+        'blurbform': blurbform,
+        'msg': "Profile Updated",
+    }
+    return render(request, 'accounts/profile.html', context)
+
+
+@login_required
+def public_profile(request, pk):
+    profile = get_object_or_404(User, pk=pk)
+    return render(request, 'accounts/public_profile.html', {'profile': profile})

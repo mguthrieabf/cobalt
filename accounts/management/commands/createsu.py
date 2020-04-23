@@ -3,14 +3,14 @@ from accounts.models import User
 
 class Command(BaseCommand):
 
-    def CreateDefaultTestUsers(self, newuser, email, abf, first, last):
+    def CreateDefaultTestUsers(self, newuser, email, system_number, first, last):
         if not User.objects.filter(username=newuser).exists():
             user = User.objects.create_user(username=newuser,
                                  email=email,
                                  password='F1shcake',
                                  first_name=first,
                                  last_name=last,
-                                 abf_number=abf)
+                                 system_number=system_number)
             user.is_superuser=True
             user.is_staff=True
             user.save()

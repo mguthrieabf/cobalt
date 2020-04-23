@@ -5,7 +5,7 @@
 <p>This screen simulates other parts of the system talking to
   the payments part. This won't exist in the finished system like this,
 but probably morphs into the single top up screen.</p>
-<p>Your payment goes to the ABF who will pass it on to the requestor.</p>
+<p>Your payment goes to the {{ GLOBAL_ORG }} who will pass it on to the requestor.</p>
 <br><br>
 <div align="center">
   <div class="card col-4">
@@ -14,7 +14,7 @@ but probably morphs into the single top up screen.</p>
     </div>
     <div class="card-body" style="text-align: center">
       <div class="text-left">
-        You are: {{ user.full_name }} (ABF Number: {{ user.abf_number }})
+        You are: {{ user.full_name }} ({{ GLOBAL_ORG }} Number: {{ user.system_number }})
       </div>
       <form action="test-payment" method="post">
           {% csrf_token %}

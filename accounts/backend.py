@@ -2,13 +2,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from logs.views import log_event
 
-# This allows logins using either abf no, userid or email address
+# This allows logins using either system no, userid or email address
 
 class CobaltBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None):
         UserModel = get_user_model()
 
-# Try email address, then username, then abf_number
+# Try email address, then username, then system_number
 
         con_type = "Unknown"
 
@@ -22,8 +22,8 @@ class CobaltBackend(ModelBackend):
             except UserModel.DoesNotExist:
                 try:
                     if username.isdigit():
-                        user = UserModel.objects.get(abf_number=username)
-                        con_type = "ABF Number"
+                        user = UserModel.objects.get(system_number=username)
+                        con_type = "System Number"
                     else:
                         user = None
                 except UserModel.DoesNotExist:
@@ -46,5 +46,5 @@ class CobaltBackend(ModelBackend):
                       source = "Accounts",
                       sub_source = "Login",
                       message = "Logged in using %s" % con_type)
-                      
+
             return user
