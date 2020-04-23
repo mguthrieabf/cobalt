@@ -1,0 +1,3 @@
+Manual function to generate random users - required for testing manual
+payment searches.
+Search for user in Admin added (search by ABF Number or last name)
