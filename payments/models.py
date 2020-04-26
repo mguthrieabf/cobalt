@@ -1,10 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-import secrets
+import random
+import string
 
 class Balance(models.Model):
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     balance = models.DecimalField("Current Balance", blank=True, null=True, max_digits=10, decimal_places=2)
     last_top_up_date = models.DateTimeField("Last Top Up Date", auto_now_add=True, blank=True)
     last_top_up_amount = models.DecimalField("Last Top Up Amount", blank=True, null=True, max_digits=10, decimal_places=2)
@@ -14,7 +15,7 @@ class Balance(models.Model):
                                 self.member.system_number,
                                 self.balance)
 
-class Transaction(models.Model):
+class StripeTransaction(models.Model):
 
     TRANSACTION_STATUS = [
     # This means we have asked a customer for money
@@ -50,28 +51,42 @@ class Transaction(models.Model):
         return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
                                   self.member.last_name, self.stripe_reference)
 
-class Account(models.Model):
+class InternalTransaction(models.Model):
+    TRANSACTION_TYPE = [
+        ('Transfer Out', 'Money transfered out of account'),
+        ('Transfer In', 'Money transfered in to account'),
+        ('Auto Top Up', 'Automated CC top up'),
+        ('Congress Entry', 'Entry to a congress'),
+        ('CC Payment', 'Credit Card payment'),
+        ('Club Payment', 'Club game payment'),
+        ('Club Membership', 'Club membership payment'),
+        ('Miscellaneous', 'Miscellaneous payment'),
+    ]
+
     member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
-    transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
+    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
     created_date = models.DateTimeField("Create Date", default=timezone.now)
     amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
-    balance = models.DecimalField("Balance after transaction", max_digits=12, decimal_places=2)
-    description = models.CharField("Transaction description", null=True, max_length=80)
+    balance = models.DecimalField("Balance After Transaction", max_digits=12, decimal_places=2)
+    description = models.CharField("Transaction Description", null=True, max_length=80)
     counterparty = models.CharField("Counterparty", null=True, max_length=80)
     reference_no = models.CharField("Reference No", max_length=14)
+    type = models.CharField("Transaction Type", choices = TRANSACTION_TYPE, max_length=20)
 
     def save(self, *args, **kwargs):
-        ref = secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2)
-        ref = ref.upper()
-        self.reference_no = ref
-        super(Account, self).save(*args, **kwargs)
+        self.reference_no = "%s-%s-%s" % (
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)))
+        super(InternalTransaction, self).save(*args, **kwargs)
 
     def __str__(self):
         return "%s - %s %s %s" % (self.member.system_number, self.member.first_name,
                                   self.member.last_name, self.id)
 
-class AutoTopUp(models.Model):
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+class AutoTopUpConfig(models.Model):
+#    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, unique=True)
+    member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     auto_amount = models.IntegerField("Auto Top Up Amount", null=True)
     stripe_customer_id = models.CharField("Stripe Customer Id", null=True, max_length=25)
 

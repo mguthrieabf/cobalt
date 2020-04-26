@@ -7,7 +7,7 @@ class OneOffPayment(forms.Form):
     route_code = forms.CharField(label="Internal routing code for callback", max_length=4)
     route_payload = forms.CharField(label="Payload to return to callback", max_length=40)
 
-class AutoTopUp(forms.Form):
+class AutoTopUpConfig(forms.Form):
     auto_amount = forms.IntegerField(label='Auto Top Up Amount')
 
 class TestTransaction(forms.Form):

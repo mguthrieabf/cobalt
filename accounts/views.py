@@ -60,7 +60,7 @@ def activate(request, uidb64, token):
         login(request, user)
         return render(request, 'accounts/activate-complete.html', { 'user' : user})
     else:
-        return HttpResponse('Activation link is invalid!')
+        return HttpResponse('Activation link is invalid or already used!')
 
 def loggedout(request):
     return render(request, 'accounts/loggedout.html')

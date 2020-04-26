@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from masterpoints.views import get_masterpoints
-from payments.views import get_balance
+from payments.core import get_balance
 from accounts.models import User
 from forums.views import post_list_dashboard
 

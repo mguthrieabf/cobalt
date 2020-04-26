@@ -1,9 +1,11 @@
-Manual function to generate random users - required for testing manual
-payment searches.
-Search for user in Admin added (search by ABF Number or last name)
-Removed hardcoded references to ABF, now controlled as a system setting,
-with the exception of the MasterPoints interface which will change later.
-Put the default avatar into static and set up a copy step to media so we
-have it for all new installs.
-Fixed direct /static references. This could break things especially in
-registration but if it does it will be big and obvious.
+Refactored payments to split code out of views and into core.
+Set up Django messages in the base template. This makes it easy (and consistent)
+to report back to users. Customised the css to look better.
+Set up cobalt.css to centralise css code
+Payment statements updated. Screen is too busy now and we should make it
+only show minimal information and have a click option to show details.
+Renamed the tables in Payments to more sensible names - StripeTransaction,
+InternalTransaction, AutoTopUpConfig
+Search in Payments admin for stripe_reference and our own reference number
+Updated error handling for one off payments
+Updated error handling for auto payments set up

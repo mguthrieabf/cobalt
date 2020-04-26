@@ -1,8 +1,12 @@
-{% for message in messages %}
-  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    {{ message }}
-  </div>
-{% endfor %}
+<div class="d-flex justify-content-center">
+  {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible col-md-8 col-lg-6" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <br>
+      <br>
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>

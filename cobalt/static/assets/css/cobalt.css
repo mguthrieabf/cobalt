@@ -1,0 +1,22 @@
+// Used by the message framework to add headings
+
+.cobalt-message-debug:before {
+    font-size: 25px;
+    content: 'Debug';
+}
+.cobalt-message-info:before {
+    font-size: 25px;
+    content: 'Info';
+}
+.cobalt-message-success:before {
+    font-size: 25px;
+    content: 'Success';
+}
+.cobalt-message-warning:before {
+    font-size: 25px;
+    content: 'Warning';
+}
+.cobalt-message-error:before {
+    font-size: 25px;
+    content: 'Error';
+}

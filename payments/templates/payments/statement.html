@@ -4,13 +4,14 @@
 
 {% block content %}
 
-<div class="col-lg-11 col-md-12">
+<div class="">
   <div class="card">
     <div class="card-header card-header-primary">
       <h1>Statement - {{ user.full_name}}</h1>
       <h2>{{ summary.ABFNumber }} - {{ summary.RankName }} Master</h2>
       <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
       <h2>Balance: ${{ balance|intcomma }}</h2>
+      <button class="btn btn-secondary" onclick="location.href = '{% url 'setup_autotopup' %}';">{{ auto_button }}</button>
     </div>
     <div class="card-body table-responsive">
       <table class="table table-hover">
@@ -19,6 +20,7 @@
             <th>Date</th>
             <th>Reference</th>
             <th>Reason</th>
+            <th>Type</th>
             <th>Description</th>
             <th class="text-right">In($)</th>
             <th class="text-right">Out($)</th>
@@ -31,6 +33,7 @@
               <td>{{ event.created_date|date:"d M Y" }}</td>
               <td>{{ event.reference_no }}</td>
               <td>{{ event.counterparty }}</td>
+              <td>{{ event.type }}</td>
               <td>{{ event.description }}</td>
               {% if event.amount >= 0 %}
                 <td class="text-right">{{ event.amount|floatformat:2|intcomma }}</td>
