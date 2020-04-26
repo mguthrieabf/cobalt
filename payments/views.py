@@ -62,7 +62,7 @@ view for auto top up payments
             autotopup = AutoTopUpConfig.objects.filter(member=member).first()
 
             if not autotopup:
-                messages.error(request, "Auto Top Up, not set up for this user.")
+                messages.error(request, "Auto Top Up, not set up for this user.", extra_tags='cobalt-message-error')
 
                 log_event(request = request,
                           user = request.user.full_name,
@@ -83,7 +83,7 @@ view for auto top up payments
                 )
                 pay_method_id = paylist.data[0].id
             except InvalidRequestError:
-                messages.error(request, "Oops. Problem with payment.")
+                messages.error(request, "Oops. Problem with payment.", extra_tags='cobalt-message-error')
 
                 log_event(request = request,
                           user = request.user.full_name,
@@ -115,7 +115,7 @@ view for auto top up payments
                              type = "Auto Top Up"
                              )
 
-                messages.success(request, 'Success!: Auto top up successful. $%s' % form.cleaned_data['amount'])
+                messages.success(request, 'Success!: Auto top up successful. $%s' % form.cleaned_data['amount'], extra_tags='cobalt-message-success')
                 form = TestAutoTopUp()
 
             except stripe.error.CardError as e:
@@ -128,7 +128,7 @@ view for auto top up payments
                           sub_source = "test_autotopup",
                           message = "Error from stripe - see logs")
 
-                messages.error(request, 'Error!: Stripe error code: %s' % err.code)
+                messages.error(request, 'Error!: Stripe error code: %s' % err.code, extra_tags='cobalt-message-error')
 
                 print("Code is: %s" % err.code)
                 payment_intent_id = err.payment_intent['id']
@@ -300,7 +300,7 @@ def member_transfer(request):
             msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
                                      form.cleaned_data['transfer_to'].full_name,
                                      form.cleaned_data['transfer_to'].system_number)
-            return render(request, 'payments/member-transfer-successful.html', {"msg": msg})
+            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
         else:
             print(form.errors)
 

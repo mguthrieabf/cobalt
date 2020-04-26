@@ -32,7 +32,7 @@ def register(request):
             user.save()
             current_site = get_current_site(request)
             mail_subject = 'Activate your account.'
-            message = render_to_string('accounts/acc-active-email.html', {
+            message = render_to_string('accounts/acc_active_email.html', {
                 'user': user,
                 'domain': current_site.domain,
                 'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
@@ -40,7 +40,7 @@ def register(request):
             })
             to_email = form.cleaned_data.get('email')
             send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
-            return render(request, 'accounts/register-complete.html', {'email_address' : to_email})
+            return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()
 
@@ -58,7 +58,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return render(request, 'accounts/activate-complete.html', { 'user' : user})
+        return render(request, 'accounts/activate_complete.html', { 'user' : user})
     else:
         return HttpResponse('Activation link is invalid or already used!')
 
@@ -72,14 +72,14 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
+            messages.success(request, 'Your password was successfully updated!', extra_tags='cobalt-message-success')
             log_event(request = request,
                       user = request.user.full_name,
                       severity = "INFO",
                       source = "Accounts",
                       sub_source = "change_password",
                       message = "Password change successful")
-            return render(request, 'accounts/change-password.html', {
+            return render(request, 'accounts/change_password.html', {
                     'form': form
                 })
         else:
@@ -89,10 +89,10 @@ def change_password(request):
                       source = "Accounts",
                       sub_source = "change_password",
                       message = "Password change failed")
-            messages.error(request, 'Please correct the error below.')
+            messages.error(request, 'Please correct the error below.', extra_tags='cobalt-message-error')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/change-password.html', {
+    return render(request, 'accounts/change_password.html', {
         'form': form
     })
 
@@ -127,7 +127,7 @@ def search(request):
                 msg="Too many results (%s)" % members.count()
                 members=None
             html = render_to_string(
-                template_name="accounts/search-results.html",
+                template_name="accounts/search_results.html",
                 context={"members": members, "msg": msg}
             )
 
@@ -135,7 +135,7 @@ def search(request):
 
             return JsonResponse(data=data_dict, safe=False)
 
-    return render(request, "accounts/search-results.html", context={'members': members, 'msg': msg})
+    return render(request, "accounts/search_results.html", context={'members': members, 'msg': msg})
 
 @login_required
 def profile(request):
