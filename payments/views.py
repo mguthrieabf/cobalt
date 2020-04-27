@@ -11,6 +11,9 @@ from logs.views import log_event
 import requests
 import stripe
 import json
+import csv
+from datetime import datetime
+from easy_pdf.rendering import render_to_pdf_response
 from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, GLOBAL_MPSERVER
 
 ####################
@@ -174,12 +177,12 @@ def test_transaction(request):
 
     return render(request, 'payments/test_transaction.html', {'form': form})
 
-#####################
-# statement         #
-#####################
+####################
+# statement_common #
+####################
 @login_required(login_url='/accounts/login/')
-def statement(request):
-    """ Member statement view
+def statement_common(request):
+    """ Member statement view - common part across online, pdf and csv
     """
 
 # Get summary data
@@ -211,6 +214,18 @@ def statement(request):
         auto_button = "Add Auto Top Up"
 
     events_list = InternalTransaction.objects.filter(member=request.user).order_by('-created_date')
+
+    return(summary, club, balance, auto_button, events_list)
+
+#####################
+# statement         #
+#####################
+@login_required(login_url='/accounts/login/')
+def statement(request):
+    """ Member statement view
+    """
+    (summary, club, balance, auto_button, events_list) = statement_common(request)
+
     page = request.GET.get('page', 1)
 
     paginator = Paginator(events_list, 30)
@@ -228,6 +243,45 @@ def statement(request):
                                                         'balance': balance,
                                                         'auto_button': auto_button})
 
+#####################
+# statement_csv     #
+#####################
+@login_required(login_url='/accounts/login/')
+def statement_csv(request):
+    """ Member statement view - csv download
+    """
+    (summary, club, balance, auto_button, events_list) = statement_common(request)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="statement.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([request.user.full_name, request.user.system_number])
+    writer.writerow(['Date', 'Reference', 'Reason', 'Type', 'Description', 'Amount', 'Balance'])
+
+    for row in events_list:
+        writer.writerow([row.created_date, row.reference_no, row.counterparty,
+                        row.type, row.description, row.amount, row.balance])
+
+    return response
+
+#####################
+# statement_pdf     #
+#####################
+@login_required(login_url='/accounts/login/')
+def statement_pdf(request):
+    """ Member statement view - pdf download
+    """
+    (summary, club, balance, auto_button, events_list) = statement_common(request)
+
+    today = datetime.today().strftime('%-m %B %Y')
+
+    return render_to_pdf_response(request, 'payments/statement_pdf.html', { 'events': events_list,
+                                                        'user': request.user,
+                                                        'summary': summary,
+                                                        'club': club,
+                                                        'balance': balance,
+                                                        'today': today})
 #######################
 # setup_autotopup     #
 #######################

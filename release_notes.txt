@@ -9,3 +9,4 @@ InternalTransaction, AutoTopUpConfig
 Search in Payments admin for stripe_reference and our own reference number
 Updated error handling for one off payments
 Updated error handling for auto payments set up
+Added basic pdf and csv download options to statements

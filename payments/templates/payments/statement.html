@@ -11,7 +11,15 @@
       <h2>{{ summary.ABFNumber }} - {{ summary.RankName }} Master</h2>
       <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
       <h2>Balance: ${{ balance|intcomma }}</h2>
-      <button class="btn btn-secondary" onclick="location.href = '{% url 'setup_autotopup' %}';">{{ auto_button }}</button>
+      <div class="float-left">
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'setup_autotopup' %}';">{{ auto_button }}</button>
+      </div>
+      <div class="float-right">
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'statement_csv' %}';">Export CSV</button>
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'statement_pdf' %}';">Export PDF</button>
+
+      </div>
+      <div class="clearfix"></div>
     </div>
     <div class="card-body table-responsive">
       <table class="table table-hover">
