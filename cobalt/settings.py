@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'dashboard.apps.DashboardConfig',
     'results.apps.ResultsConfig',
+    'clubs.apps.ClubsConfig',
     'logs.apps.LogsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
