@@ -1,3 +1,12 @@
+// form errors
+
+.cobalt-form-error {
+  color: red;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+
 // Used by the message framework to add headings
 
 .cobalt-message-debug:before {

@@ -38,7 +38,7 @@
              <h2>Hi {{ user.first_name }}, your account is active.</h2>
              <h4>You can login using your email address or {{ GLOBAL_ORG }} number({{ user.username }}).</h4>
              <h3> We will take you to complete your profile in <span id="time">20 seconds</span>.
-             <h3><a href="/profile">Click here to go there now</a></h3>
+             <h3><a href="{% url "user_profile" %}">Click here to go there now</a></h3>
            </div>
         </div>
      	</div>
@@ -87,7 +87,7 @@
         document.getElementById("time").innerHTML = time + " seconds";
         time--;
         if (time == 0) {
-          window.location.href = "/profile";
+          window.location.href = "href="{% url "user_profile" %}";
         }
       }, 1000);
 

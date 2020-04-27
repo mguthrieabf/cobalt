@@ -15,6 +15,7 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+  <link href="{% static "assets/css/cobalt.css" %}" rel="stylesheet" />
   <style>
     .bg {
   height: 100%;
@@ -22,13 +23,11 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
-
-   .form-error {
-     color: red;
-     font-weight: bold;
-     font-size: 18px;
-   }
-
+.cobalt-form-error {
+  color: red;
+  font-weight: bold;
+  font-size: 18px;
+}
 </style>
 </head>
 <body>
@@ -54,40 +53,41 @@
 												 {% endfor %}
 								 {% endif %}
 								 <div class="form-group">
-									 <span id="username_error" class="form-error"></span>
-                   <span class="form-error" id="id_username_errors">{{ user_form.username.errors|striptags }}</span>
+									 <span id="username_error" class="cobalt-form-error"></span>
+                   <span class="cobalt-form-error" id="id_username_errors">{{ user_form.username.errors|striptags }}</span>
 									 <input type="text" name="username" id="id_username" class="form-control input-sm" placeholder="{{ GLOBAL_ORG }}" Number" value="{{ user_form.username.value|default_if_none:'' }}">
 								 </div>
 								 <div class="row">
 									 <div class="col-xs-6 col-sm-6 col-md-6">
 										 <div class="form-group">
-											 {{ user_form.first_name.errors }}
+                       <span class="cobalt-form-error" id="id_first_name_errors">{{ user_form.first_name.errors|striptags }}</span>
 											 <input type="text" name="first_name" id="id_first_name" class="form-control input-sm" placeholder="First Name" value="{{ user_form.first_name.value|default_if_none:'' }}">
 										 </div>
 									 </div>
 									 <div class="col-xs-6 col-sm-6 col-md-6">
 										 <div class="form-group">
-										 {{ user_form.last_name.errors }}
+                     <span class="cobalt-form-error" id="id_last_name_errors">{{ user_form.last_name.errors|striptags }}</span>
 											 <input type="text" name="last_name" id="id_last_name" class="form-control input-sm" placeholder="Last Name" value="{{ user_form.last_name.value|default_if_none:'' }}">
 										 </div>
 									 </div>
 								 </div>
 								 <div class="form-group">
-									 {{ user_form.email.errors }}
+                   <span class="cobalt-form-error" id="id_email_errors">{{ user_form.email.errors|striptags }}</span>
+
 									 <input type="email" name="email" id="id_email" class="form-control input-sm" placeholder="Email Address" value="{{ user_form.email.value|default_if_none:'' }}">
 								 </div>
 								 <div class="form-group">
-									 {{ user_form.password1.errors }}
+                   <span class="cobalt-form-error" id="id_password1_errors">{{ user_form.password1.errors|striptags }}</span>
 									 <input type="password" name="password1" id="id_password1" class="form-control input-sm" placeholder="Password">
 								 </div>
 								 <div class="form-group">
-									 {{ user_form.password2.errors }}
+                   <span class="cobalt-form-error" id="id_password2_errors">{{ user_form.password2.errors|striptags }}</span>
 									 <input type="password" name="password2" id="id_password2" class="form-control input-sm" placeholder="Confirm Password">
 								 </div>
 								 <input type="submit" value="Register" class="btn btn-block bg-info">
 							 </form>
                 <span class="center-block">
-  							<a href="/dashboard"><div class="text-center">Already registered? Sign In.</div></a>
+  							<a href="{% url "dashboard" %}"><div class="text-center">Already registered? Sign In.</div></a>
                 </span>
           		</div>
        		  </div>
