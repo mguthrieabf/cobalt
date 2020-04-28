@@ -8,15 +8,21 @@ class Organisation(models.Model):
         ('National', 'National Body'),
         ('Other', 'Other')
     ]
-    org_id = models.CharField(max_length=4)
+    org_id = models.CharField(max_length=4, unique=True)
     name = models.CharField(max_length=50)
     type = models.CharField(choices=ORG_TYPE, max_length=8, null=True)
-    address1 = models.CharField(max_length=30, null=True)
-    address2 = models.CharField(max_length=30, null=True)
-    address3 = models.CharField(max_length=30, null=True)
+    address1 = models.CharField(max_length=100, null=True)
+    address2 = models.CharField(max_length=100, null=True)
+    suburb = models.CharField(max_length=50, null=True)
     state = models.CharField(max_length=3, null=True)
-    postcode = models.CharField(max_length=6, null=True)
+    postcode = models.CharField(max_length=10, null=True)
+
+    def __str__(self):
+        return self.name
 
 class MemberOrganisation(models.Model):
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.member.full_name}, member of {self.organisation.name}"

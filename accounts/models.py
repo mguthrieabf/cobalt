@@ -10,7 +10,8 @@ class User(AbstractUser):
     about = models.TextField("About Me", blank="True", null=True, default="Not filled in", max_length=800)
     pic = models.ImageField(upload_to = 'pic_folder/', default = 'pic_folder/default-avatar.png')
     dob = models.DateField(blank="True", null=True)
-    bbo_name = models.TextField("BBO Username", blank="True", null=True, max_length=20)
+    bbo_name = models.CharField("BBO Username", blank="True", null=True, max_length=20)
+
 
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 

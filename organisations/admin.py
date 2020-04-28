@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import Organisation, MemberOrganisation
 
-# Register your models here.
+class OrganisationAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+admin.site.register(Organisation, OrganisationAdmin)
+admin.site.register(MemberOrganisation)
