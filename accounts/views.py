@@ -21,6 +21,7 @@ from django.http import HttpResponse
 from .forms import UserUpdateForm, BlurbUpdateForm
 import ipinfo
 from logs.views import get_client_ip, log_event
+from django.conf import settings
 
 def register(request):
     if request.method == 'POST':
@@ -35,6 +36,7 @@ def register(request):
             message = render_to_string('accounts/acc_active_email.html', {
                 'user': user,
                 'domain': current_site.domain,
+                'org': settings.GLOBAL_ORG,
                 'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
                 'token':account_activation_token.make_token(user),
             })

@@ -56,7 +56,7 @@
                <div class="col-md-6">
                  <div class="form-group">
                    <label class="bmd-label-static" style="font-size:11px">Date of Birth</label>
-                   <input type="text" name="dob" id="id_dob" class="form-control datepicker" value="{{ form.dob.value }}">
+                   <input type="text" name="dob" id="id_dob" class="form-control datepicker" value="{{ form.dob.value|default_if_none:'' }}">
                  </div>
                </div>
                <div class="col-md-6">

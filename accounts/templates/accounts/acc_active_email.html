@@ -1,7 +1,7 @@
 {% autoescape off %}
 Hi {{ user.first_name }},
 
-Thanks for signing up to the {{ GLOBAL_ORG }} technology site.
+Thanks for signing up to the {{ org }} technology site.
 
 Please click on this link to confirm your registration:
 
@@ -9,4 +9,4 @@ http://{{ domain }}/accounts/activate/{{ uid }}/{{ token }}
 
 {% endautoescape %}
 
-The {{ GLOBAL_ORG }} Technology Team.
+The {{ org }} Technology Team.
