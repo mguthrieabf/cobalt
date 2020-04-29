@@ -27,7 +27,7 @@
           <tr>
             <th>Date</th>
             <th>Reference</th>
-            <th>Reason</th>
+            <th>Counterparty</th>
             <th>Type</th>
             <th>Description</th>
             <th class="text-right">In($)</th>
@@ -40,7 +40,7 @@
             <tr>
               <td>{{ event.created_date|date:"d M Y" }}</td>
               <td>{{ event.reference_no }}</td>
-              <td>{{ event.counterparty }}</td>
+              <td>{{ event.other_member|default_if_none:"" }}{{ event.organisation|default_if_none:"" }}</td>
               <td>{{ event.type }}</td>
               <td>{{ event.description }}</td>
               {% if event.amount >= 0 %}

@@ -1,0 +1,3 @@
+Major changes to the models for payments
+Added Organisations
+Finished member transfer

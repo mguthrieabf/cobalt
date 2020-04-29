@@ -22,6 +22,7 @@ from .forms import UserUpdateForm, BlurbUpdateForm
 import ipinfo
 from logs.views import get_client_ip, log_event
 from django.conf import settings
+from organisations.models import MemberOrganisation
 
 def register(request):
     if request.method == 'POST':
@@ -99,7 +100,22 @@ def change_password(request):
     })
 
 @login_required(login_url='/accounts/login/')
-def search(request):
+def member_detail_ajax(request):
+        if request.method == "GET":
+            if 'member_id' in request.GET:
+                member_id = request.GET.get("member_id")
+                member = get_object_or_404(User, pk=member_id)
+                clubs = MemberOrganisation.objects.filter(member = member)
+                if request.is_ajax:
+                    html = render_to_string(
+                        template_name="accounts/member_ajax.html",
+                        context={"member": member, 'clubs': clubs}
+                    )
+                    data_dict = {"data": html}
+                    return JsonResponse(data=data_dict, safe=False)
+
+@login_required(login_url='/accounts/login/')
+def search_ajax(request):
 
     msg=""
 

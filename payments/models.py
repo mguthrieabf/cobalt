@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 import random
 import string
+from organisations.models import Organisation
 
 class Balance(models.Model):
     member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -51,7 +52,10 @@ class StripeTransaction(models.Model):
         return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
                                   self.member.last_name, self.stripe_reference)
 
-class InternalTransaction(models.Model):
+
+
+
+class AbstractTransaction(models.Model):
     TRANSACTION_TYPE = [
         ('Transfer Out', 'Money transfered out of account'),
         ('Transfer In', 'Money transfered in to account'),
@@ -63,22 +67,64 @@ class InternalTransaction(models.Model):
         ('Miscellaneous', 'Miscellaneous payment'),
     ]
 
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
-    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
     created_date = models.DateTimeField("Create Date", default=timezone.now)
     amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
     balance = models.DecimalField("Balance After Transaction", max_digits=12, decimal_places=2)
     description = models.CharField("Transaction Description", null=True, max_length=80)
-    counterparty = models.CharField("Counterparty", null=True, max_length=80)
     reference_no = models.CharField("Reference No", max_length=14)
     type = models.CharField("Transaction Type", choices = TRANSACTION_TYPE, max_length=20)
 
+    class Meta:
+        abstract = True
+
+class MemberTransaction(AbstractTransaction):
+# This is the primary member whose account is being interacted with
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="primary_member")
+
+# Each record with have one of the following 3 things
+# This is linked to a stripe transaction, so from our point of view this is money in
+    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
+# It is linked to another member, so internal transfer to or from this member
+# This will not have a stripe_transaction or an organisation set
+    other_member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="other_member")
+# It is linked to an organisation so usually a payment to a club or congress for entry fees or subscriptions.
+# Could also be a payment from the organisation for a refund for example.
+# Can have a stripe_transaction as well
+    organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL)
+
     def save(self, *args, **kwargs):
-        self.reference_no = "%s-%s-%s" % (
+        if not self.reference_no:
+            self.reference_no = "%s-%s-%s" % (
                             ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
                             ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
                             ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)))
-        super(InternalTransaction, self).save(*args, **kwargs)
+        super(MemberTransaction, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "%s - %s %s %s" % (self.member.system_number, self.member.first_name,
+                                  self.member.last_name, self.id)
+
+class OrganisationTransaction(AbstractTransaction):
+    PAYMENT_STATUSES = [
+    ('Paid', 'Paid'),
+    ('Unpaid', 'Unpaid')
+    ]
+    organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL, related_name="primary_org")
+# Organisation can have one and only one of the 3 following things
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
+    other_organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL, related_name="secondary_org")
+    payment_status = models.CharField("Payment Status", choices = PAYMENT_STATUSES, max_length=6, default="Unpaid")
+    payment_date = models.DateTimeField("Payment Date", null=True)
+    payment_reference = models.CharField("Payment Reference", max_length=10, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.reference_no:
+            self.reference_no = "%s-%s-%s" % (
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),
+                            ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)))
+        super(OrganisationTransaction, self).save(*args, **kwargs)
 
     def __str__(self):
         return "%s - %s %s %s" % (self.member.system_number, self.member.first_name,

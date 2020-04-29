@@ -5,8 +5,8 @@
 
     <div class="form-check form-check-radio">
         <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="transfer_to" id="id_transfer_to" value="{{ member.pk }}">
-            <a href="{% url 'public_profile' member.pk %}" target="_blank">{{ member.full_name }} ({{ member.system_number }})</a>
+            <input class="form-check-input cobalt-names" type="radio" name="transfer_to" id="id_transfer_to_{{ member.pk }}" value="{{ member.pk }}">
+            {{ member.full_name }} ({{ member.system_number }})
             <span class="circle">
                 <span class="check"></span>
             </span>

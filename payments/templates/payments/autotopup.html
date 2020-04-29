@@ -11,28 +11,41 @@
 {% endblock %}
 
 {% block content %}
-
-<div align="center">
-  <div class="sr-main">
-    <h3 align="center">Card Details</h3>
-    <form id="payment-form" class="sr-payment-form">
-      <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
-      <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
-      <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
-      <div class="sr-combo-inputs-row">
-        <div class="sr-input sr-card-element" id="card-element"></div>
+<div class="container">
+  <div class="justify-content-center d-flex">
+    <div class="row">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h1>Auto Top Up - {{ user.full_name}}</h1>
+        </div>
+        <div class="card-body">
+          <h5>{{ warn }}</h5>
+          <div align="center">
+            <div class="sr-main">
+              <h3 align="center">Card Details</h3>
+              <form id="payment-form" class="sr-payment-form">
+                <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
+                <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
+                <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
+                <div class="sr-combo-inputs-row">
+                  <div class="sr-input sr-card-element" id="card-element"></div>
+                </div>
+                <div class="sr-field-error" id="card-errors" role="alert"></div>
+                <button id="submit">
+                  <div class="spinner hidden" id="spinner"></div>
+                  <span id="button-text">Set Up</span><span id="order-amount"></span>
+                </button>
+              </form>
+              <div class="sr-result hidden">
+                <p>Payment completed<br /></p>
+                <pre>
+                  <code></code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="sr-field-error" id="card-errors" role="alert"></div>
-      <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Set Up</span><span id="order-amount"></span>
-      </button>
-    </form>
-    <div class="sr-result hidden">
-      <p>Payment completed<br /></p>
-      <pre>
-        <code></code>
-      </pre>
     </div>
   </div>
 </div>

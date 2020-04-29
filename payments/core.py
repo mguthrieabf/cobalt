@@ -4,7 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Balance, StripeTransaction, InternalTransaction, AutoTopUpConfig
+from .models import Balance, StripeTransaction, MemberTransaction, AutoTopUpConfig, OrganisationTransaction
+from organisations.models import Organisation
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from logs.views import log_event
@@ -171,14 +172,23 @@ def test_callback(status, payload, tran):
     if status=="Success":
         update_account(member = tran.member,
                        amount = -tran.amount,
-                       counterparty = "SFOB",
                        stripe_transaction = tran,
+                       organisation = Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
                        description = "Summer Festival of Bridge - Swiss Pairs entry",
                        log_msg = "$%s payment for SFOB" % tran.amount,
                        source = "Events",
                        sub_source = "fictional_event_entry_module",
                        type = "Congress Entry"
                        )
+
+        update_organisation(organisation=Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
+                            amount = tran.amount,
+                            description = "Summer Festival of Bridge - Swiss Pairs entry",
+                            log_msg = "$%s payment for SFOB" % tran.amount,
+                            source = "Events",
+                            sub_source = "fictional_event_entry_module",
+                            type = "Congress Entry",
+                            member=tran.member)
 
 #####################
 # payment_api       #
@@ -278,7 +288,6 @@ def stripe_webhook(request):
 
         update_account(member = tran.member,
                        amount = tran.amount,
-                       counterparty = "CC Payment",
                        stripe_transaction = tran,
                        description = "Payment from card **** **** ***** %s Exp %s/%s" %
                            (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100),
@@ -319,7 +328,9 @@ def stripe_webhook(request):
 ######################
 # update_account     #
 ######################
-def update_account(member, amount, counterparty, description, log_msg, source, sub_source, type, stripe_transaction=None):
+def update_account(member, amount, description, log_msg, source,
+                   sub_source, type, stripe_transaction=None,
+                   other_member=None, organisation=None):
     """ method to update a customer account """
     try:
         balance = Balance.objects.filter(member = member)[0]
@@ -337,12 +348,13 @@ def update_account(member, amount, counterparty, description, log_msg, source, s
               sub_source = sub_source,
               message = log_msg + " Updated balance table")
 
-# Create new InternalTransaction entry
-    act = InternalTransaction()
+# Create new MemberTransaction entry
+    act = MemberTransaction()
     act.member = member
     act.amount = amount
-    act.counterparty = counterparty
     act.stripe_transaction = stripe_transaction
+    act.other_member = other_member
+    act.organisation = organisation
     act.balance = balance.balance
     act.description = description
     act.type = type
@@ -353,4 +365,33 @@ def update_account(member, amount, counterparty, description, log_msg, source, s
               severity = "INFO",
               source = source,
               sub_source = sub_source,
-              message = log_msg + " Updated InternalTransaction table")
+              message = log_msg + " Updated MemberTransaction table")
+#########################
+# update_organisation   #
+#########################
+def update_organisation(organisation, amount, description, log_msg, source,
+                   sub_source, type, other_organisation=None,
+                   member=None):
+    """ method to update an organisations account """
+
+    try:
+        balance = OrganisationTransaction.objects.last().balance
+    except AttributeError:
+        balance = 0.0
+
+    act = OrganisationTransaction()
+    act.organisation = organisation
+    act.member = member
+    act.amount = amount
+    act.other_organisation = other_organisation
+    act.balance = balance
+    act.description = description
+    act.type = type
+
+    act.save()
+
+    log_event(user = member.full_name,
+              severity = "INFO",
+              source = source,
+              sub_source = sub_source,
+              message = log_msg + " Updated OrganisationTransaction table")

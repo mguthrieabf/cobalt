@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import Balance, StripeTransaction, InternalTransaction, AutoTopUpConfig
+from .models import Balance, StripeTransaction, MemberTransaction, AutoTopUpConfig
 from .forms import OneOffPayment, TestTransaction, TestAutoTopUp, MemberTransfer
 from .core import payment_api, update_account
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from logs.views import log_event
+from django.utils import timezone
 import requests
 import stripe
 import json
@@ -108,14 +109,50 @@ view for auto top up payments
                 confirm = True,
                 )
 
+                print(rc)
+
+# It worked so create a stripe record
+                payload  = rc.charges.data[0]
+
+                pi_reference    = payload.id
+                pi_method       = payload.payment_method
+                pi_amount       = payload.amount
+                pi_currency     = payload.currency
+                pi_receipt_url  = payload.receipt_url
+                pi_brand        = payload.payment_method_details.card.brand
+                pi_country      = payload.payment_method_details.card.country
+                pi_exp_month    = payload.payment_method_details.card.exp_month
+                pi_exp_year     = payload.payment_method_details.card.exp_year
+                pi_last4        = payload.payment_method_details.card.last4
+
+                stripe_tran = StripeTransaction()
+                stripe_tran.description = f"Auto top up for {member.full_name} ({member.system_number})"
+                stripe_tran.amount = amount
+                stripe_tran.member = member
+                stripe_tran.route_code = None
+                stripe_tran.route_payload = None
+                stripe_tran.stripe_reference = pi_reference
+                stripe_tran.stripe_method = pi_method
+                stripe_tran.stripe_currency = pi_currency
+                stripe_tran.stripe_receipt_url = pi_receipt_url
+                stripe_tran.stripe_brand = pi_brand
+                stripe_tran.stripe_country = pi_country
+                stripe_tran.stripe_exp_month = pi_exp_month
+                stripe_tran.stripe_exp_year = pi_exp_year
+                stripe_tran.stripe_last4 = pi_last4
+                stripe_tran.last_change_date = timezone.now()
+                stripe_tran.status = "Complete"
+                stripe_tran.save()
+
+# Update members account
                 update_account(member = member,
                              amount = amount,
-                             counterparty = "Auto Top Up",
                              description = "Auto Top Up",
                              log_msg = "$%s Auto Top Up" % amount,
                              source = "Payments",
                              sub_source = "auto_top_up",
-                             type = "Auto Top Up"
+                             type = "Auto Top Up",
+                             stripe_transaction = stripe_tran
                              )
 
                 messages.success(request, 'Success!: Auto top up successful. $%s' % form.cleaned_data['amount'], extra_tags='cobalt-message-success')
@@ -162,7 +199,7 @@ def test_transaction(request):
         if form.is_valid():
             update_account(member = form.cleaned_data['payer'],
                            amount = -form.cleaned_data['amount'],
-                           counterparty = form.cleaned_data['counterparty'],
+                           organisation = form.cleaned_data['counterparty'],
                            description = form.cleaned_data['description'],
                            log_msg = "Manual Payments Update: $%s %s" %
                                (form.cleaned_data['amount'], form.cleaned_data['description']),
@@ -213,7 +250,7 @@ def statement_common(request):
     else:
         auto_button = "Add Auto Top Up"
 
-    events_list = InternalTransaction.objects.filter(member=request.user).order_by('-created_date')
+    events_list = MemberTransaction.objects.filter(member=request.user).order_by('-created_date')
 
     return(summary, club, balance, auto_button, events_list)
 
@@ -257,10 +294,10 @@ def statement_csv(request):
 
     writer = csv.writer(response)
     writer.writerow([request.user.full_name, request.user.system_number])
-    writer.writerow(['Date', 'Reference', 'Reason', 'Type', 'Description', 'Amount', 'Balance'])
+    writer.writerow(['Date', 'Reference', 'Type', 'Description', 'Amount', 'Balance'])
 
     for row in events_list:
-        writer.writerow([row.created_date, row.reference_no, row.counterparty,
+        writer.writerow([row.created_date, row.reference_no,
                         row.type, row.description, row.amount, row.balance])
 
     return response
@@ -289,15 +326,25 @@ def statement_pdf(request):
 def setup_autotopup(request):
     """ view to sign up to auto top up
     """
-
+    stripe.api_key = STRIPE_SECRET_KEY
+    warn = ""
 # Already a customer?
-    autotopup = AutoTopUpConfig.objects.filter(member=request.user)
+    autotopup = AutoTopUpConfig.objects.filter(member=request.user).first()
     if autotopup:                           # record exists
         print("auto top up record found")
-        if autotopup[0].stripe_customer_id:    # cust_id exists
+        if autotopup.stripe_customer_id:    # cust_id exists
             print("Found autotopup with stripe details")
+            paylist = stripe.PaymentMethod.list(
+              customer=autotopup.stripe_customer_id,
+              type="card",
+            )
+            card = paylist.data[0].card
+            card_type = card.brand
+            card_exp_month = card.exp_month
+            card_exp_year = card.exp_year
+            card_last4 = card.last4
+            warn = f"This will override your {card_type} card ending in {card_last4} with expiry {card_exp_month}/{card_exp_year}"
 
-            # need to fix logic - if autotopup & a.stripe_c_id
     else:
         stripe.api_key = STRIPE_SECRET_KEY
         customer = stripe.Customer.create()
@@ -306,7 +353,7 @@ def setup_autotopup(request):
         auto.stripe_customer_id = customer.id
         auto.save()
 
-    return render(request, 'payments/autotopup.html', {})
+    return render(request, 'payments/autotopup.html', {'warn': warn})
 
 
 #######################
@@ -324,8 +371,8 @@ def member_transfer(request):
         if form.is_valid():
             # Money in
             update_account(member = form.cleaned_data['transfer_to'],
+                           other_member = request.user,
                            amount = form.cleaned_data['amount'],
-                           counterparty = "Transfer from: %s (%s)" % (request.user.full_name, request.user.system_number),
                            description = form.cleaned_data['description'],
                            log_msg = "Member Payment Received %s(%s) to %s(%s) $%s" %
                                (request.user.full_name, request.user.system_number,
@@ -338,8 +385,8 @@ def member_transfer(request):
                            )
             # Money out
             update_account(member = request.user,
+                           other_member = form.cleaned_data['transfer_to'],
                            amount = -form.cleaned_data['amount'],
-                           counterparty = "Transfer to: %s (%s)" % (form.cleaned_data['transfer_to'].full_name, form.cleaned_data['transfer_to'].system_number),
                            description = form.cleaned_data['description'],
                            log_msg = "Member Payment Sent %s(%s) to %s(%s) $%s" %
                                (request.user.full_name, request.user.system_number,

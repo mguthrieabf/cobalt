@@ -1,5 +1,6 @@
 from django import forms
 from accounts.models import User
+from organisations.models import Organisation
 
 class OneOffPayment(forms.Form):
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
@@ -14,7 +15,7 @@ class TestTransaction(forms.Form):
     payer = forms.ModelChoiceField(queryset=User.objects.all())
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
     description = forms.CharField(label='Description', max_length=100)
-    counterparty = forms.CharField(label='Counterparty', max_length=80)
+    counterparty = forms.ModelChoiceField(queryset=Organisation.objects.all())
 
 class TestAutoTopUp(forms.Form):
     payer = forms.ModelChoiceField(queryset=User.objects.all())
