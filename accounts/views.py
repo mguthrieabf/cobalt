@@ -23,6 +23,7 @@ import ipinfo
 from logs.views import get_client_ip, log_event
 from django.conf import settings
 from organisations.models import MemberOrganisation
+import cobalt.settings
 
 def register(request):
     if request.method == 'POST':
@@ -107,9 +108,10 @@ def member_detail_ajax(request):
                 member = get_object_or_404(User, pk=member_id)
                 clubs = MemberOrganisation.objects.filter(member = member)
                 if request.is_ajax:
+                    global_org = settings.GLOBAL_ORG
                     html = render_to_string(
                         template_name="accounts/member_ajax.html",
-                        context={"member": member, 'clubs': clubs}
+                        context={"member": member, 'clubs': clubs, 'global_org': global_org}
                     )
                     data_dict = {"data": html}
                     return JsonResponse(data=data_dict, safe=False)
