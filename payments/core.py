@@ -172,7 +172,7 @@ def test_callback(status, payload, tran):
     if status=="Success":
         update_account(member = tran.member,
                        amount = -tran.amount,
-                       stripe_transaction = tran,
+                       stripe_transaction = None,
                        organisation = Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
                        description = "Summer Festival of Bridge - Swiss Pairs entry",
                        log_msg = "$%s payment for SFOB" % tran.amount,
@@ -194,7 +194,7 @@ def test_callback(status, payload, tran):
 # payment_api       #
 #####################
 def payment_api(request, description, amount, member, route_code=None, route_payload=None):
-    """ API for one off payments from other parts of the application
+    """ API for payments from other parts of the application
 
 The route_code provides a callback and the route_payload is the string
 to return.
