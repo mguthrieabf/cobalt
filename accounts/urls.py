@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from django.http import HttpResponse
 
+app_name ='accounts'
+
 urlpatterns = [
     path('register', views.register, name='register'),
     path('loggedout', views.loggedout, name='loggedout'),

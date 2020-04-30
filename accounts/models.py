@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser
 from cobalt.settings import GLOBAL_ORG
 
 class User(AbstractUser):
+    """
+    User class based upon AbstractUser.
+    """
     email = models.EmailField(unique=False)
     system_number = models.IntegerField("%s Number" % GLOBAL_ORG, blank="True", unique=True)
     mobile = models.IntegerField("Mobile Number", blank="True", unique=True, null=True)
@@ -11,7 +14,6 @@ class User(AbstractUser):
     pic = models.ImageField(upload_to = 'pic_folder/', default = 'pic_folder/default-avatar.png')
     dob = models.DateField(blank="True", null=True)
     bbo_name = models.CharField("BBO Username", blank="True", null=True, max_length=20)
-
 
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 

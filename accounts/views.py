@@ -69,7 +69,7 @@ def activate(request, uidb64, token):
 def loggedout(request):
     return render(request, 'accounts/loggedout.html')
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
@@ -100,7 +100,7 @@ def change_password(request):
         'form': form
     })
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def member_detail_ajax(request):
         if request.method == "GET":
             if 'member_id' in request.GET:
@@ -116,7 +116,7 @@ def member_detail_ajax(request):
                     data_dict = {"data": html}
                     return JsonResponse(data=data_dict, safe=False)
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def search_ajax(request):
 
     msg=""

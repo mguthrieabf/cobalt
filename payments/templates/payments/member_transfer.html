@@ -97,8 +97,8 @@
     const search_panel = $('#cobalt-search')
     const form_dets = $('#cobalt-after')
     const member_display = $('#cobalt-member')
-    const member_search = '{% url "member_search_ajax" %}'
-    const member_detail = '{% url "member_detail_ajax" %}'
+    const member_search = '{% url "accounts:member_search_ajax" %}'
+    const member_detail = '{% url "accounts:member_detail_ajax" %}'
 
     $(".dynamic-search").on('keyup', function(event){
       event.stopPropagation();

@@ -151,7 +151,7 @@
 		        return;
 		    }
 
-		    var strURL = "/masterpoints/system_number_lookup?system_number=" + trimmed_username;
+		    var strURL = "{% url "masterpoints:system_number_lookup" %}?system_number=" + trimmed_username;
 
 		    jQuery.ajax({
 		        url: strURL,

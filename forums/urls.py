@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name ='forums'
+
 urlpatterns = [
     path('', views.post_list, name='forums'),
     path('post/<int:pk>/', views.post_detail, name='post_detail'),

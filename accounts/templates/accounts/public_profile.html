@@ -56,8 +56,17 @@
        </div>
      </div>
    </div>
-
-
+<h3>History</h3>
+    <div class="card">
+      <div class="card-body">
+    Posts: {{ profile.post_set.count }}
+    {% for post in profile.post_set.all %}
+    <p>
+    <a href="{% url "forums:post_detail" post.pk %}">{{ post.title }} - {{ post.created_date }}</a>
+      <br>
+    {% endfor %}
+    </p>
+      </div>
+    </div>
 </div>
-
 {% endblock %}
