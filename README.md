@@ -10,4 +10,4 @@ Initial development of Cobalt is funded by the [Australian Bridge Federation](ht
 
 ## License
 
-See the [LICENSE](LICENSE.md) file for license rights and limitations (GPL).
+See the [LICENSE](LICENSE) file for license rights and limitations (GPL).
