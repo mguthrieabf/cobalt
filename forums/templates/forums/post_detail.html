@@ -44,7 +44,7 @@
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
     <h1>{{ post.title }}</h1>
-      <a href="{% url 'public_profile' pk=post.author.pk %}">
+      <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
           <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
           <h4>{{ post.author.full_name }}</h4>
       </a>
@@ -81,7 +81,7 @@
 <div class="card card-nav-tabs mb-0">
   <div class="card-body">
     <div class=" justify-content-between">
-        <a href="{% url 'public_profile' pk=c1.author.pk %}">
+        <a href="{% url 'accounts:public_profile' pk=c1.author.pk %}">
       <div>
         <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
         <h5>{{ c1.author.full_name }}</h5>
@@ -116,7 +116,7 @@
     <div class="card card-nav-tabs">
       <div class="card-body bg-light">
         <div class=" justify-content-between">
-            <a href="{% url 'public_profile' pk=c2.author.pk %}">
+            <a href="{% url 'accounts:public_profile' pk=c2.author.pk %}">
           <div>
             <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
             <h5>{{ c2.author.full_name }}</h5>

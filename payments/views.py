@@ -14,23 +14,30 @@ import stripe
 import json
 import csv
 from datetime import datetime
+from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
 from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, GLOBAL_MPSERVER
 
 ####################
 # Home             #
 ####################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def home(request):
-    """ Default page """
+    """ Default page.
+    :view:`payments.test_payment`
+    """
     return render(request, 'payments/home.html')
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 #################################
 # test_payment                  #
 #################################
 def test_payment(request):
-    """view for simple payments
+    """This is a temporary view that can be used to test making a payment against
+       a members account. This simulates them entering an event or paying a subscription.
+       The form takes 4 inputs:
+
+       **Context**
 """
 
     if request.method == 'POST':
@@ -50,7 +57,7 @@ def test_payment(request):
 ###########################
 # test_autotopup          #
 ###########################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def test_autotopup(request):
     """
 view for auto top up payments
@@ -183,7 +190,7 @@ view for auto top up payments
 ##########################
 # test_transaction       #
 ##########################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def test_transaction(request):
     """ Temporary way to make a change to  $ account """
 
@@ -217,7 +224,7 @@ def test_transaction(request):
 ####################
 # statement_common #
 ####################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def statement_common(request):
     """ Member statement view - common part across online, pdf and csv
     """
@@ -257,7 +264,7 @@ def statement_common(request):
 #####################
 # statement         #
 #####################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def statement(request):
     """ Member statement view
     """
@@ -283,7 +290,7 @@ def statement(request):
 #####################
 # statement_csv     #
 #####################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def statement_csv(request):
     """ Member statement view - csv download
     """
@@ -305,7 +312,7 @@ def statement_csv(request):
 #####################
 # statement_pdf     #
 #####################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def statement_pdf(request):
     """ Member statement view - pdf download
     """
@@ -322,7 +329,7 @@ def statement_pdf(request):
 #######################
 # setup_autotopup     #
 #######################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def setup_autotopup(request):
     """ view to sign up to auto top up
     """
@@ -359,7 +366,7 @@ def setup_autotopup(request):
 #######################
 # member_transfer     #
 #######################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def member_transfer(request):
     """ view to transfer $ to another member
     """
@@ -369,34 +376,35 @@ def member_transfer(request):
     if request.method == 'POST':
         form = MemberTransfer(request.POST)
         if form.is_valid():
-            # Money in
-            update_account(member = form.cleaned_data['transfer_to'],
-                           other_member = request.user,
-                           amount = form.cleaned_data['amount'],
-                           description = form.cleaned_data['description'],
-                           log_msg = "Member Payment Received %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                           source = "Payments",
-                           sub_source = "member_transfer",
-                           type = "Transfer In"
-                           )
-            # Money out
-            update_account(member = request.user,
-                           other_member = form.cleaned_data['transfer_to'],
-                           amount = -form.cleaned_data['amount'],
-                           description = form.cleaned_data['description'],
-                           log_msg = "Member Payment Sent %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                           source = "Payments",
-                           sub_source = "member_transfer",
-                           type="Transfer Out"
-                           )
+            with transaction.atomic():
+                # Money in
+                update_account(member = form.cleaned_data['transfer_to'],
+                               other_member = request.user,
+                               amount = form.cleaned_data['amount'],
+                               description = form.cleaned_data['description'],
+                               log_msg = "Member Payment Received %s(%s) to %s(%s) $%s" %
+                                   (request.user.full_name, request.user.system_number,
+                                    form.cleaned_data['transfer_to'].full_name,
+                                    form.cleaned_data['transfer_to'].system_number,
+                                    form.cleaned_data['amount']),
+                               source = "Payments",
+                               sub_source = "member_transfer",
+                               type = "Transfer In"
+                               )
+                # Money out
+                update_account(member = request.user,
+                               other_member = form.cleaned_data['transfer_to'],
+                               amount = -form.cleaned_data['amount'],
+                               description = form.cleaned_data['description'],
+                               log_msg = "Member Payment Sent %s(%s) to %s(%s) $%s" %
+                                   (request.user.full_name, request.user.system_number,
+                                    form.cleaned_data['transfer_to'].full_name,
+                                    form.cleaned_data['transfer_to'].system_number,
+                                    form.cleaned_data['amount']),
+                               source = "Payments",
+                               sub_source = "member_transfer",
+                               type="Transfer Out"
+                               )
 
             msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
                                      form.cleaned_data['transfer_to'].full_name,

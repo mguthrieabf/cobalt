@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from notifications.apps import Notifications
 
-@login_required
+@login_required()
 def home(request):
     n = Notifications()
     notification_list = n.get_notifications_for_user(request.user)

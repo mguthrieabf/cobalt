@@ -20,7 +20,7 @@ from cobalt.settings import GLOBAL_MPSERVER
 #
 ######
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def masterpoints_detail(request, system_number=None):
 
    if system_number == None:
@@ -160,7 +160,7 @@ def masterpoints_detail(request, system_number=None):
                                                         'chart': chart,
                                                         'bottom': bottom})
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def masterpoints_search(request):
    if request.method == 'POST':
        system_number = request.POST['system_number']

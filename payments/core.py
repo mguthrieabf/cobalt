@@ -32,7 +32,7 @@ def get_balance(member):
 #########################
 # create_payment_intent #
 #########################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def create_payment_intent(request):
     """ Called from the checkout webpage.
 
@@ -114,7 +114,7 @@ get back from Stripe
 ####################################
 # create_payment_superintent       #
 ####################################
-@login_required(login_url='/accounts/login/')
+@login_required()
 def create_payment_superintent(request):
     """ Called from the auto top up webpage.
 

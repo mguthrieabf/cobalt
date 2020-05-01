@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
+{% load log %}
+
+
 
 {% block content %}
 
+{% get_admin_log 10 as admin_log %}
+<h3>Recent Admin Activity</h3>
+{% for adm in admin_log %}
+{{ adm.user }} {{ adm }}<br>
+{% endfor %}
 
 <div class="col-md-12">
   <div class="card">

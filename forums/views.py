@@ -6,7 +6,7 @@ from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeCommen
 from .forms import PostForm, CommentForm, Comment2Form
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def post_list(request):
     posts_list = Post.objects.all().order_by('-created_date')
     page = request.GET.get('page', 1)
@@ -26,7 +26,7 @@ def post_list(request):
 
     return render(request, 'forums/post_list.html', {'posts' : posts_new})
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def post_list_dashboard(request):
     posts = Post.objects.all().order_by('-created_date')[:20]
     posts_new=[]
@@ -37,7 +37,7 @@ def post_list_dashboard(request):
 
     return posts_new
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def post_detail(request, pk):
     if request.method == "POST":
 # identify which form submitted this - comments1 or comments2
@@ -81,7 +81,7 @@ def post_detail(request, pk):
                                                        'post_likes' : post_likes,
                                                        'total_comments' : total_comments})
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -95,7 +95,7 @@ def post_new(request):
         form = PostForm()
     return render(request, 'forums/post_edit.html', {'form': form, 'request': request})
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def like_post(request, pk):
     if request.method == "POST":
         already_liked = LikePost.objects.filter(post=pk, liker=request.user)
@@ -108,7 +108,7 @@ def like_post(request, pk):
         else:
             return HttpResponse("already liked")
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def like_comment1(request, pk):
     if request.method == "POST":
         already_liked = LikeComment1.objects.filter(comment1=pk, liker=request.user)
@@ -121,7 +121,7 @@ def like_comment1(request, pk):
         else:
             return HttpResponse("already liked")
 
-@login_required(login_url='/accounts/login/')
+@login_required()
 def like_comment2(request, pk):
     if request.method == "POST":
         already_liked = LikeComment2.objects.filter(comment2=pk, liker=request.user)
