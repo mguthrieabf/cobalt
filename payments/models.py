@@ -29,21 +29,21 @@ class StripeTransaction(models.Model):
         ('Failed', 'Failed - payment failed'),
     ]
 
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     description = models.CharField("Description", max_length=100)
     amount = models.DecimalField("Amount", max_digits=8, decimal_places=2)
     status = models.CharField("Status", max_length=9, choices=TRANSACTION_STATUS, default='Initiated')
-    stripe_reference = models.CharField("Stripe Payment Intent", null=True, max_length=40)
-    stripe_method = models.CharField("Stripe Payment Method", null=True, max_length=40)
-    stripe_currency = models.CharField("Card Native Currency", null=True, max_length=3)
-    stripe_receipt_url = models.CharField("Receipt URL", null=True, max_length=200)
-    stripe_brand = models.CharField("Card brand", null=True, max_length=10)
-    stripe_country = models.CharField("Card Country", null=True, max_length=5)
-    stripe_exp_month = models.IntegerField("Card Expiry Month", null=True)
-    stripe_exp_year = models.IntegerField("Card Expiry Year", null=True)
-    stripe_last4 = models.CharField("Card Last 4 Digits", null=True, max_length=4)
-    route_code = models.CharField("Internal routing code for callback", null=True, max_length=4)
-    route_payload = models.CharField("Payload to return to callback", null=True, max_length=40)
+    stripe_reference = models.CharField("Stripe Payment Intent", blank=True, null=True, max_length=40)
+    stripe_method = models.CharField("Stripe Payment Method", blank=True, null=True, max_length=40)
+    stripe_currency = models.CharField("Card Native Currency", blank=True, null=True, max_length=3)
+    stripe_receipt_url = models.CharField("Receipt URL", blank=True, null=True, max_length=200)
+    stripe_brand = models.CharField("Card brand", blank=True, null=True, max_length=10)
+    stripe_country = models.CharField("Card Country", blank=True, null=True, max_length=5)
+    stripe_exp_month = models.IntegerField("Card Expiry Month", blank=True, null=True)
+    stripe_exp_year = models.IntegerField("Card Expiry Year", blank=True, null=True)
+    stripe_last4 = models.CharField("Card Last 4 Digits", blank=True, null=True, max_length=4)
+    route_code = models.CharField("Internal routing code for callback", blank=True, null=True, max_length=4)
+    route_payload = models.CharField("Payload to return to callback", blank=True, null=True, max_length=40)
     created_date = models.DateTimeField("Creation Date", default=timezone.now)
     last_change_date = models.DateTimeField("Last Update Date", default=timezone.now)
 
@@ -70,7 +70,7 @@ class AbstractTransaction(models.Model):
     created_date = models.DateTimeField("Create Date", default=timezone.now)
     amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
     balance = models.DecimalField("Balance After Transaction", max_digits=12, decimal_places=2)
-    description = models.CharField("Transaction Description", null=True, max_length=80)
+    description = models.CharField("Transaction Description", blank=True, null=True, max_length=80)
     reference_no = models.CharField("Reference No", max_length=14)
     type = models.CharField("Transaction Type", choices = TRANSACTION_TYPE, max_length=20)
 
@@ -83,14 +83,14 @@ class MemberTransaction(AbstractTransaction):
 
 # Each record with have one of the following 3 things
 # This is linked to a stripe transaction, so from our point of view this is money in
-    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
+    stripe_transaction = models.ForeignKey(StripeTransaction, blank=True, null=True, on_delete=models.SET_NULL)
 # It is linked to another member, so internal transfer to or from this member
 # This will not have a stripe_transaction or an organisation set
-    other_member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="other_member")
+    other_member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL, related_name="other_member")
 # It is linked to an organisation so usually a payment to a club or congress for entry fees or subscriptions.
 # Could also be a payment from the organisation for a refund for example.
 # Can have a stripe_transaction as well
-    organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL)
+    organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
         if not self.reference_no:
@@ -109,14 +109,14 @@ class OrganisationTransaction(AbstractTransaction):
     ('Paid', 'Paid'),
     ('Unpaid', 'Unpaid')
     ]
-    organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL, related_name="primary_org")
+    organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL, related_name="primary_org")
 # Organisation can have one and only one of the 3 following things
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
-    stripe_transaction = models.ForeignKey(StripeTransaction, null=True, on_delete=models.SET_NULL)
-    other_organisation = models.ForeignKey(Organisation, null=True, on_delete=models.SET_NULL, related_name="secondary_org")
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    stripe_transaction = models.ForeignKey(StripeTransaction, blank=True, null=True, on_delete=models.SET_NULL)
+    other_organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL, related_name="secondary_org")
     payment_status = models.CharField("Payment Status", choices = PAYMENT_STATUSES, max_length=6, default="Unpaid")
-    payment_date = models.DateTimeField("Payment Date", null=True)
-    payment_reference = models.CharField("Payment Reference", max_length=10, null=True)
+    payment_date = models.DateTimeField("Payment Date", blank=True, null=True)
+    payment_reference = models.CharField("Payment Reference", max_length=10, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.reference_no:
@@ -131,10 +131,9 @@ class OrganisationTransaction(AbstractTransaction):
                                   self.member.last_name, self.id)
 
 class AutoTopUpConfig(models.Model):
-#    member = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, unique=True)
     member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    auto_amount = models.IntegerField("Auto Top Up Amount", null=True)
-    stripe_customer_id = models.CharField("Stripe Customer Id", null=True, max_length=25)
+    auto_amount = models.IntegerField("Auto Top Up Amount", blank=True, null=True)
+    stripe_customer_id = models.CharField("Stripe Customer Id", blank=True, null=True, max_length=25)
 
     def __str__(self):
         return "%s (Stripe Customer id: %s)" % (self.member, self.stripe_customer_id)
