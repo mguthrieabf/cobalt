@@ -14,3 +14,7 @@ db.sqlite3*
 !default-avatar.png
 /static
 /htmlcov
+/static
+.DS_Store
+/env.sh
+.coverage

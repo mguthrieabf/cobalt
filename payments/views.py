@@ -1,22 +1,25 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-from .models import Balance, StripeTransaction, MemberTransaction, AutoTopUpConfig
-from .forms import OneOffPayment, TestTransaction, TestAutoTopUp, MemberTransfer
-from .core import payment_api, update_account
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib import messages
-from logs.views import log_event
-from django.utils import timezone
 import requests
 import stripe
 import json
 import csv
+from .forms import (OneOffPayment, TestTransaction, TestAutoTopUp,
+                    MemberTransfer)
+from .core import payment_api, update_account
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from .models import (Balance, StripeTransaction, MemberTransaction,
+                     AutoTopUpConfig)
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
+from logs.views import log_event
+from django.utils import timezone
 from datetime import datetime
 from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
-from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, GLOBAL_MPSERVER
+from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
+                             GLOBAL_MPSERVER)
 
 ####################
 # Home             #
@@ -27,6 +30,7 @@ def home(request):
     :view:`payments.test_payment`
     """
     return render(request, 'payments/home.html')
+
 
 @login_required()
 #################################
@@ -73,14 +77,16 @@ view for auto top up payments
             autotopup = AutoTopUpConfig.objects.filter(member=member).first()
 
             if not autotopup:
-                messages.error(request, "Auto Top Up, not set up for this user.", extra_tags='cobalt-message-error')
+                messages.error(request,
+                               "Auto Top Up, not set up for this user.",
+                               extra_tags='cobalt-message-error')
 
-                log_event(request = request,
-                          user = request.user.full_name,
-                          severity = "WARN",
-                          source = "Payments",
-                          sub_source = "test_autotopup",
-                          message = "user not set up for auto top up %s" % member)
+                log_event(request=request,
+                          user=request.user.full_name,
+                          severity="WARN",
+                          source="Payments",
+                          sub_source="test_autotopup",
+                          message="user not set up for auto top up %s" % member)
 
                 return render(request, 'payments/test_autotopup.html', {'form': form})
 
@@ -94,46 +100,49 @@ view for auto top up payments
                 )
                 pay_method_id = paylist.data[0].id
             except InvalidRequestError:
-                messages.error(request, "Oops. Problem with payment.", extra_tags='cobalt-message-error')
+                messages.error(request,
+                               "Oops. Problem with payment.",
+                               extra_tags='cobalt-message-error')
 
-                log_event(request = request,
-                          user = request.user.full_name,
-                          severity = "WARN",
-                          source = "Payments",
-                          sub_source = "test_autotopup",
-                          message = "Error from stripe - see logs")
+                log_event(request=request,
+                          user=request.user.full_name,
+                          severity="WARN",
+                          source="Payments",
+                          sub_source="test_autotopup",
+                          message="Error from stripe - see logs")
 
                 return render(request, 'payments/test_autotopup.html', {'form': form})
 
 # try payment
             try:
-                rc=stripe.PaymentIntent.create(
-                amount = amount * 100,
-                currency = 'aud',
-                customer = autotopup.stripe_customer_id,
-                payment_method = pay_method_id,
-                off_session = True,
-                confirm = True,
+                rc = stripe.PaymentIntent.create(
+                        amount=amount * 100,
+                        currency='aud',
+                        customer=autotopup.stripe_customer_id,
+                        payment_method=pay_method_id,
+                        off_session=True,
+                        confirm=True,
                 )
 
                 print(rc)
 
 # It worked so create a stripe record
-                payload  = rc.charges.data[0]
+                payload = rc.charges.data[0]
 
-                pi_reference    = payload.id
-                pi_method       = payload.payment_method
-                pi_amount       = payload.amount
-                pi_currency     = payload.currency
-                pi_receipt_url  = payload.receipt_url
-                pi_brand        = payload.payment_method_details.card.brand
-                pi_country      = payload.payment_method_details.card.country
-                pi_exp_month    = payload.payment_method_details.card.exp_month
-                pi_exp_year     = payload.payment_method_details.card.exp_year
-                pi_last4        = payload.payment_method_details.card.last4
+                pi_reference = payload.id
+                pi_method = payload.payment_method
+                pi_amount = payload.amount
+                pi_currency = payload.currency
+                pi_receipt_url = payload.receipt_url
+                pi_brand = payload.payment_method_details.card.brand
+                pi_country = payload.payment_method_details.card.country
+                pi_exp_month = payload.payment_method_details.card.exp_month
+                pi_exp_year = payload.payment_method_details.card.exp_year
+                pi_last4 = payload.payment_method_details.card.last4
 
                 stripe_tran = StripeTransaction()
-                stripe_tran.description = f"Auto top up for {member.full_name} ({member.system_number})"
+                stripe_tran.description = f"Auto top up for \
+                                         {member.full_name} ({member.system_number})"
                 stripe_tran.amount = amount
                 stripe_tran.member = member
                 stripe_tran.route_code = None
@@ -152,30 +161,35 @@ view for auto top up payments
                 stripe_tran.save()
 
 # Update members account
-                update_account(member = member,
-                             amount = amount,
-                             description = "Auto Top Up",
-                             log_msg = "$%s Auto Top Up" % amount,
-                             source = "Payments",
-                             sub_source = "auto_top_up",
-                             type = "Auto Top Up",
-                             stripe_transaction = stripe_tran
-                             )
+                update_account(member=member,
+                               amount=amount,
+                               description="Auto Top Up",
+                               log_msg="$%s Auto Top Up" % amount,
+                               source="Payments",
+                               sub_source="auto_top_up",
+                               type="Auto Top Up",
+                               stripe_transaction=stripe_tran
+                               )
 
-                messages.success(request, 'Success!: Auto top up successful. $%s' % form.cleaned_data['amount'], extra_tags='cobalt-message-success')
+                messages.success(request,
+                                 'Success!: Auto top up successful. $%s' %
+                                 form.cleaned_data['amount'],
+                                 extra_tags='cobalt-message-success')
                 form = TestAutoTopUp()
 
             except stripe.error.CardError as e:
                 err = e.error
                 # Error code will be authentication_required if authentication is needed
-                log_event(request = request,
-                          user = request.user.full_name,
-                          severity = "WARN",
-                          source = "Payments",
-                          sub_source = "test_autotopup",
-                          message = "Error from stripe - see logs")
+                log_event(request=request,
+                          user=request.user.full_name,
+                          severity="WARN",
+                          source="Payments",
+                          sub_source="test_autotopup",
+                          message="Error from stripe - see logs")
 
-                messages.error(request, 'Error!: Stripe error code: %s' % err.code, extra_tags='cobalt-message-error')
+                messages.error(request,
+                               'Error!: Stripe error code: %s' % err.code,
+                               extra_tags='cobalt-message-error')
 
                 print("Code is: %s" % err.code)
                 payment_intent_id = err.payment_intent['id']
@@ -194,27 +208,31 @@ view for auto top up payments
 def test_transaction(request):
     """ Temporary way to make a change to  $ account """
 
-    log_event(request = request,
-              user = request.user.full_name,
-              severity = "INFO",
-              source = "Payments",
-              sub_source = "test_payment",
-              message = "User went to test transaction screen")
+    log_event(request=request,
+              user=request.user.full_name,
+              severity="INFO",
+              source="Payments",
+              sub_source="test_payment",
+              message="User went to test transaction screen")
 
     if request.method == 'POST':
         form = TestTransaction(request.POST)
         if form.is_valid():
-            update_account(member = form.cleaned_data['payer'],
-                           amount = -form.cleaned_data['amount'],
-                           organisation = form.cleaned_data['counterparty'],
-                           description = form.cleaned_data['description'],
-                           log_msg = "Manual Payments Update: $%s %s" %
-                               (form.cleaned_data['amount'], form.cleaned_data['description']),
-                           source = "Payments",
-                           sub_source = "test_transaction",
-                           type = "Miscellaneous"
+            update_account(member=form.cleaned_data['payer'],
+                           amount=-form.cleaned_data['amount'],
+                           organisation=form.cleaned_data['counterparty'],
+                           description=form.cleaned_data['description'],
+                           log_msg="Manual Payments Update: $%s %s" %
+                           (form.cleaned_data['amount'],
+                            form.cleaned_data['description']),
+                           source="Payments",
+                           sub_source="test_transaction",
+                           type="Miscellaneous"
                            )
-            messages.success(request, 'Transfer complete. %s - $%s' % (form.cleaned_data['payer'], form.cleaned_data['amount']), extra_tags='cobalt-message-success')
+            messages.success(request,
+                             'Transfer complete. %s - $%s' %
+                             (form.cleaned_data['payer'], form.cleaned_data['amount']),
+                             extra_tags='cobalt-message-success')
             form = TestTransaction()
     else:
         form = TestTransaction()
@@ -234,10 +252,10 @@ def statement_common(request):
     summary = requests.get(qry).json()[0]
 
     # Set active to a boolean
-    if summary["IsActive"]=="Y":
-        summary["IsActive"]=True
+    if summary["IsActive"] == "Y":
+        summary["IsActive"] = True
     else:
-        summary["IsActive"]=False
+        summary["IsActive"] = False
 
     # Get home club name
     qry = '%s/club/%s' % (GLOBAL_MPSERVER, summary['HomeClubID'])
@@ -251,7 +269,7 @@ def statement_common(request):
         balance = "Nil"
 
     # get auto top up
-    auto_top_up = AutoTopUpConfig.objects.filter(member = request.user)
+    auto_top_up = AutoTopUpConfig.objects.filter(member=request.user)
     if auto_top_up:
         auto_button = "Update Auto Top Up"
     else:
@@ -280,12 +298,12 @@ def statement(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
-    return render(request, 'payments/statement.html', { 'events': events,
-                                                        'user': request.user,
-                                                        'summary': summary,
-                                                        'club': club,
-                                                        'balance': balance,
-                                                        'auto_button': auto_button})
+    return render(request, 'payments/statement.html', {'events': events,
+                                                       'user': request.user,
+                                                       'summary': summary,
+                                                       'club': club,
+                                                       'balance': balance,
+                                                       'auto_button': auto_button})
 
 #####################
 # statement_csv     #
@@ -320,7 +338,8 @@ def statement_pdf(request):
 
     today = datetime.today().strftime('%-m %B %Y')
 
-    return render_to_pdf_response(request, 'payments/statement_pdf.html', { 'events': events_list,
+    return render_to_pdf_response(request, 'payments/statement_pdf.html', {
+                                                        'events': events_list,
                                                         'user': request.user,
                                                         'summary': summary,
                                                         'club': club,
@@ -345,17 +364,19 @@ def setup_autotopup(request):
               customer=autotopup.stripe_customer_id,
               type="card",
             )
+            # TODO This needs to handle invalid customer exception
             card = paylist.data[0].card
             card_type = card.brand
             card_exp_month = card.exp_month
             card_exp_year = card.exp_year
             card_last4 = card.last4
-            warn = f"This will override your {card_type} card ending in {card_last4} with expiry {card_exp_month}/{card_exp_year}"
+            warn = f"This will override your {card_type} card ending in {card_last4} \
+                    with expiry {card_exp_month}/{card_exp_year}"
 
     else:
         stripe.api_key = STRIPE_SECRET_KEY
         customer = stripe.Customer.create()
-        auto=AutoTopUpConfig()
+        auto = AutoTopUpConfig()
         auto.member = request.user
         auto.stripe_customer_id = customer.id
         auto.save()
@@ -371,38 +392,38 @@ def member_transfer(request):
     """ view to transfer $ to another member
     """
 
-    msg=""
+    msg = ""
 
     if request.method == 'POST':
         form = MemberTransfer(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 # Money in
-                update_account(member = form.cleaned_data['transfer_to'],
-                               other_member = request.user,
-                               amount = form.cleaned_data['amount'],
-                               description = form.cleaned_data['description'],
-                               log_msg = "Member Payment Received %s(%s) to %s(%s) $%s" %
-                                   (request.user.full_name, request.user.system_number,
-                                    form.cleaned_data['transfer_to'].full_name,
-                                    form.cleaned_data['transfer_to'].system_number,
-                                    form.cleaned_data['amount']),
-                               source = "Payments",
-                               sub_source = "member_transfer",
-                               type = "Transfer In"
+                update_account(member=form.cleaned_data['transfer_to'],
+                               other_member=request.user,
+                               amount=form.cleaned_data['amount'],
+                               description=form.cleaned_data['description'],
+                               log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.system_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].system_number,
+                                form.cleaned_data['amount']),
+                               source="Payments",
+                               sub_source="member_transfer",
+                               type="Transfer In"
                                )
                 # Money out
-                update_account(member = request.user,
-                               other_member = form.cleaned_data['transfer_to'],
-                               amount = -form.cleaned_data['amount'],
-                               description = form.cleaned_data['description'],
-                               log_msg = "Member Payment Sent %s(%s) to %s(%s) $%s" %
-                                   (request.user.full_name, request.user.system_number,
-                                    form.cleaned_data['transfer_to'].full_name,
-                                    form.cleaned_data['transfer_to'].system_number,
-                                    form.cleaned_data['amount']),
-                               source = "Payments",
-                               sub_source = "member_transfer",
+                update_account(member=request.user,
+                               other_member=form.cleaned_data['transfer_to'],
+                               amount=-form.cleaned_data['amount'],
+                               description=form.cleaned_data['description'],
+                               log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.system_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].system_number,
+                                form.cleaned_data['amount']),
+                               source="Payments",
+                               sub_source="member_transfer",
                                type="Transfer Out"
                                )
 
@@ -421,7 +442,6 @@ def member_transfer(request):
         balance = balance_inst.balance
     except IndexError:
         balance = "Nil"
-
 
     return render(request, 'payments/member_transfer.html', {'form': form,
                                                              'balance': balance})
