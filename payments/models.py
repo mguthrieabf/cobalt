@@ -42,8 +42,6 @@ class StripeTransaction(models.Model):
                                   self.member.last_name, self.stripe_reference)
 
 
-
-
 class AbstractTransaction(models.Model):
     TRANSACTION_TYPE = [
         ('Transfer Out', 'Money transfered out of account'),

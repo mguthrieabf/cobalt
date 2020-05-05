@@ -4,7 +4,7 @@ import json
 import csv
 from .forms import (OneOffPayment, TestTransaction, TestAutoTopUp,
                     MemberTransfer)
-from .core import payment_api, update_account
+from .core import payment_api, update_account, auto_topup_member
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -74,128 +74,15 @@ view for auto top up payments
             amount = form.cleaned_data['amount']
             member = form.cleaned_data['payer']
 
-            autotopup = AutoTopUpConfig.objects.filter(member=member).first()
+            (rc, msg) = auto_topup_member(member)
 
-            if not autotopup:
-                messages.error(request,
-                               "Auto Top Up, not set up for this user.",
+            if rc:
+                messages.success(request, msg,
+                               extra_tags='cobalt-message-success')
+            else:
+                messages.error(request, msg,
                                extra_tags='cobalt-message-error')
 
-                log_event(request=request,
-                          user=request.user.full_name,
-                          severity="WARN",
-                          source="Payments",
-                          sub_source="test_autotopup",
-                          message="user not set up for auto top up %s" % member)
-
-                return render(request, 'payments/test_autotopup.html', {'form': form})
-
-            stripe.api_key = STRIPE_SECRET_KEY
-
-# Get payment method id for this customer from Stripe
-            try:
-                paylist = stripe.PaymentMethod.list(
-                  customer=autotopup.stripe_customer_id,
-                  type="card",
-                )
-                pay_method_id = paylist.data[0].id
-            except InvalidRequestError:
-                messages.error(request,
-                               "Oops. Problem with payment.",
-                               extra_tags='cobalt-message-error')
-
-                log_event(request=request,
-                          user=request.user.full_name,
-                          severity="WARN",
-                          source="Payments",
-                          sub_source="test_autotopup",
-                          message="Error from stripe - see logs")
-
-                return render(request, 'payments/test_autotopup.html', {'form': form})
-
-# try payment
-            try:
-                rc = stripe.PaymentIntent.create(
-                        amount=amount * 100,
-                        currency='aud',
-                        customer=autotopup.stripe_customer_id,
-                        payment_method=pay_method_id,
-                        off_session=True,
-                        confirm=True,
-                )
-
-                print(rc)
-
-# It worked so create a stripe record
-                payload = rc.charges.data[0]
-
-                pi_reference = payload.id
-                pi_method = payload.payment_method
-                pi_amount = payload.amount
-                pi_currency = payload.currency
-                pi_receipt_url = payload.receipt_url
-                pi_brand = payload.payment_method_details.card.brand
-                pi_country = payload.payment_method_details.card.country
-                pi_exp_month = payload.payment_method_details.card.exp_month
-                pi_exp_year = payload.payment_method_details.card.exp_year
-                pi_last4 = payload.payment_method_details.card.last4
-
-                stripe_tran = StripeTransaction()
-                stripe_tran.description = f"Auto top up for \
-                                         {member.full_name} ({member.system_number})"
-                stripe_tran.amount = amount
-                stripe_tran.member = member
-                stripe_tran.route_code = None
-                stripe_tran.route_payload = None
-                stripe_tran.stripe_reference = pi_reference
-                stripe_tran.stripe_method = pi_method
-                stripe_tran.stripe_currency = pi_currency
-                stripe_tran.stripe_receipt_url = pi_receipt_url
-                stripe_tran.stripe_brand = pi_brand
-                stripe_tran.stripe_country = pi_country
-                stripe_tran.stripe_exp_month = pi_exp_month
-                stripe_tran.stripe_exp_year = pi_exp_year
-                stripe_tran.stripe_last4 = pi_last4
-                stripe_tran.last_change_date = timezone.now()
-                stripe_tran.status = "Complete"
-                stripe_tran.save()
-
-# Update members account
-                update_account(member=member,
-                               amount=amount,
-                               description="Auto Top Up",
-                               log_msg="$%s Auto Top Up" % amount,
-                               source="Payments",
-                               sub_source="auto_top_up",
-                               type="Auto Top Up",
-                               stripe_transaction=stripe_tran
-                               )
-
-                messages.success(request,
-                                 'Success!: Auto top up successful. $%s' %
-                                 form.cleaned_data['amount'],
-                                 extra_tags='cobalt-message-success')
-                form = TestAutoTopUp()
-
-            except stripe.error.CardError as e:
-                err = e.error
-                # Error code will be authentication_required if authentication is needed
-                log_event(request=request,
-                          user=request.user.full_name,
-                          severity="WARN",
-                          source="Payments",
-                          sub_source="test_autotopup",
-                          message="Error from stripe - see logs")
-
-                messages.error(request,
-                               'Error!: Stripe error code: %s' % err.code,
-                               extra_tags='cobalt-message-error')
-
-                print("Code is: %s" % err.code)
-                payment_intent_id = err.payment_intent['id']
-                payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
-
-#            return payment_api(request, description, amount, member, route_code, route_payload)
     else:
         form = TestAutoTopUp()
 
@@ -379,6 +266,7 @@ def setup_autotopup(request):
         auto = AutoTopUpConfig()
         auto.member = request.user
         auto.stripe_customer_id = customer.id
+        auto.auto_amount = 100.0
         auto.save()
 
     return render(request, 'payments/autotopup.html', {'warn': warn})

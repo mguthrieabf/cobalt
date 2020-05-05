@@ -10,9 +10,11 @@ from organisations.models import Organisation
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from logs.views import log_event
+from django.contrib import messages
 import stripe
 import json
-from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
+from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
+                            AUTO_TOP_UP_LOW_LIMIT)
 
 #######################
 # get_balance_detail  #
@@ -38,7 +40,7 @@ def get_balance(member):
     if last_tran:
         balance = last_tran.balance
     else:
-        balance = "Nil"
+        balance = 0.0
 
     return balance
 
@@ -182,31 +184,33 @@ def test_callback(status, payload, tran):
               sub_source = "test_callback",
               message = "Received callback from payment: %s %s" % (status, payload))
 
-    if status=="Success":
-        update_account(member = tran.member,
-                       amount = -tran.amount,
-                       stripe_transaction = None,
-                       organisation = Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
-                       description = "Summer Festival of Bridge - Swiss Pairs entry",
-                       log_msg = "$%s payment for SFOB" % tran.amount,
-                       source = "Events",
-                       sub_source = "fictional_event_entry_module",
-                       type = "Congress Entry"
-                       )
-
-        update_organisation(organisation=Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
-                            amount = tran.amount,
-                            description = "Summer Festival of Bridge - Swiss Pairs entry",
-                            log_msg = "$%s payment for SFOB" % tran.amount,
-                            source = "Events",
-                            sub_source = "fictional_event_entry_module",
-                            type = "Congress Entry",
-                            member=tran.member)
+#    if status=="Success":
+        # update_account(member = tran.member,
+        #                amount = -tran.amount,
+        #                stripe_transaction = None,
+        #                organisation = Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
+        #                description = "Summer Festival of Bridge - Swiss Pairs entry",
+        #                log_msg = "$%s payment for SFOB" % tran.amount,
+        #                source = "Events",
+        #                sub_source = "fictional_event_entry_module",
+        #                type = "Congress Entry"
+        #                )
+        #
+        # update_organisation(organisation=Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
+        #                     amount = tran.amount,
+        #                     description = "Summer Festival of Bridge - Swiss Pairs entry",
+        #                     log_msg = "$%s payment for SFOB" % tran.amount,
+        #                     source = "Events",
+        #                     sub_source = "fictional_event_entry_module",
+        #                     type = "Congress Entry",
+        #                     member=tran.member)
 
 #####################
 # payment_api       #
 #####################
-def payment_api(request, description, amount, member, route_code=None, route_payload=None):
+def payment_api(request, description, amount, member, route_code=None,
+               route_payload=None, organisation=None, other_member=None,
+               log_msg=None, type=None, url=None):
     """ API for payments from other parts of the application.
 
     There is a user on the end of this who needs to know what is happening,
@@ -225,15 +229,117 @@ def payment_api(request, description, amount, member, route_code=None, route_pay
     as there is no way to return control to the application after payments is
     done. Note: This would be possible if required.
 
+    amount is the amount to be deducted from the users account. A positive
+    amount is a charge, a negative amount is an incoming payment.
+
 """
-    trans = StripeTransaction()
-    trans.description = description
-    trans.amount = amount
-    trans.member = member
-    trans.route_code = route_code
-    trans.route_payload = route_payload
-    trans.save()
-    return render(request, 'payments/checkout.html', {'trans': trans})
+    balance = float(get_balance(member))
+    amount = float(amount)
+    auto_topup = AutoTopUpConfig.objects.filter(member=member).last()
+    print("balance: %s" % balance)
+
+    if not log_msg:
+        log_msg = description
+
+    if not type:
+        type = "Miscellaneous"
+
+    if not url:  # where to next
+        url = "dashboard"
+
+    if amount <= balance:  # sufficient funds
+
+        update_account(member=member,
+                       amount=-amount,
+                       organisation=organisation,
+                       description=description,
+                       log_msg=log_msg,
+                       source="Payments",
+                       sub_source="payments_api",
+                       type=type
+                       )
+
+# If we got an organisation then make their payment too
+        update_organisation(organisation=organisation,
+                            amount=amount,
+                            description=description,
+                            log_msg=log_msg,
+                            source="Payments",
+                            sub_source="payments_api",
+                            type=type,
+                            member=member)
+
+        messages.success(request, "Payment successful",
+                               extra_tags='cobalt-message-success')
+
+        callback_router(route_code=route_code, route_payload=route_payload, tran=None)
+        return redirect(url)
+
+# check for auto top up required - if user not set for auto topup then ignore
+
+        if auto_topup:
+            if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
+                (rc, msg) = auto_topup_member(member)
+                if rc:
+                    messages.success(request, msg,
+                                    extra_tags='cobalt-message-success')
+                else:
+                    messages.error(request, msg,
+                                    extra_tags='cobalt-message-error')
+
+    else: # insufficient funds
+        if auto_topup:
+
+# we put the balance after to AUTO_TOP_UP_LOW_LIMIT + auto_topup.auto_amount
+            topup_required = AUTO_TOP_UP_LOW_LIMIT + auto_topup.auto_amount - balance + amount
+
+            (rc, msg) = auto_topup_member(member, topup_required=topup_required)
+
+            if rc:
+                update_account(member=member,
+                               amount=-amount,
+                               organisation=organisation,
+                               description=description,
+                               log_msg=log_msg,
+                               source="Payments",
+                               sub_source="payments_api",
+                               type=type
+                               )
+
+        # If we got an organisation then make their payment too
+                update_organisation(organisation=organisation,
+                                    amount=amount,
+                                    description=description,
+                                    log_msg=log_msg,
+                                    source="Payments",
+                                    sub_source="payments_api",
+                                    type=type,
+                                    member=member)
+
+                messages.success(request, "Payment successful",
+                               extra_tags='cobalt-message-success')
+                messages.success(request, "Auto top up successful",
+                               extra_tags='cobalt-message-success')
+                callback_router(route_code=route_code, route_payload=route_payload, tran=None)
+                return redirect(url)
+
+
+            else: # auto top up failed
+                messages.error(request, msg,
+                              extra_tags='cobalt-message-error')
+                callback_router(route_code=route_code, route_payload=route_payload, tran=None, status="Failed")
+                return redirect(url)
+
+        else: # not set up for auto top up - manual payment
+
+            trans = StripeTransaction()
+            trans.description = description
+            trans.amount = amount
+            trans.member = member
+            trans.route_code = route_code
+            trans.route_payload = route_payload
+            trans.save()
+            return render(request, 'payments/checkout.html', {'trans': trans})
 
 ####################
 # stripe_webhook   #
@@ -324,19 +430,7 @@ def stripe_webhook(request):
                        )
 
         # make Callback
-        if tran.route_code == "MAN":
-            test_callback("Success", tran.route_payload, tran)
-            log_event(user = "Stripe API",
-                      severity = "INFO",
-                      source = "Payments",
-                      sub_source = "stripe_webhook",
-                      message = "Callback made to: %s" % tran.route_code)
-        else:
-            log_event(user = "Stripe API",
-                      severity = "INFO",
-                      source = "Payments",
-                      sub_source = "stripe_webhook",
-                      message = "Unable to make callback. Invalid route_code: %s" % tran.route_code)
+        callback_router(route_code, route_payload, tran)
 
     else:
         # Unexpected event type
@@ -351,6 +445,37 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
+#########################
+# callback_router       #
+#########################
+def callback_router(route_code=None, route_payload=None, tran=None, status="Success"):
+    """ Central function to handle callbacks.
+    Callbacks are an asynchronous way for us to let the calling application
+    know if a payment successed or not.
+
+    We could use a routing table for this but there will only ever be a small
+    number of callbacks in Cobalt so we are okay to hardcode it.
+
+    We should not get tran provided but do for early testing. This will be
+    removed later, but for now allows us to reverse the transaction for testing
+    """
+    if route_code:  # do nothing in no route_code passed
+
+        if route_code == "MAN":
+            test_callback(status, route_payload, tran)
+            log_event(user = "Stripe API",
+                      severity = "INFO",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Callback made to: %s" % route_code)
+        else:
+            log_event(user = "Stripe API",
+                      severity = "INFO",
+                      source = "Payments",
+                      sub_source = "stripe_webhook",
+                      message = "Unable to make callback. Invalid route_code: %s" % route_code)
+
+
 ######################
 # update_account     #
 ######################
@@ -361,7 +486,7 @@ def update_account(member, amount, description, log_msg, source,
 # Get old balance
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
-        balance = last_tran.balance + amount
+        balance = float(last_tran.balance) + amount
     else:
         balance = amount
 
@@ -413,3 +538,110 @@ def update_organisation(organisation, amount, description, log_msg, source,
               source = source,
               sub_source = sub_source,
               message = log_msg + " Updated OrganisationTransaction table")
+
+###########################
+# auto_topup_member       #
+###########################
+def auto_topup_member(member, topup_required=None):
+    """ process an auto top up. Optionally pass parameter with amount required
+    """
+
+    stripe.api_key = STRIPE_SECRET_KEY
+    autotopup = AutoTopUpConfig.objects.filter(member=member).first()
+
+    if not autotopup:
+        return(False, "Member not set up for Auto Top Up")
+
+    if topup_required:
+        amount = topup_required
+    else:
+        amount = autotopup.auto_amount
+
+# Get payment method id for this customer from Stripe
+    try:
+        paylist = stripe.PaymentMethod.list(
+          customer=autotopup.stripe_customer_id,
+          type="card",
+        )
+        pay_method_id = paylist.data[0].id
+    except InvalidRequestError:
+        log_event(user=member,
+                  severity="WARN",
+                  source="Payments",
+                  sub_source="auto_topup_member",
+                  message="Error from stripe - see logs")
+
+        return(False, "Error retreiving customer details from Stripe")
+
+# try payment
+    try:
+        rc = stripe.PaymentIntent.create(
+                amount=int(amount * 100),
+                currency='aud',
+                customer=autotopup.stripe_customer_id,
+                payment_method=pay_method_id,
+                off_session=True,
+                confirm=True,
+        )
+
+        print(rc)
+
+# It worked so create a stripe record
+        payload = rc.charges.data[0]
+
+        pi_reference = payload.id
+        pi_method = payload.payment_method
+        pi_currency = payload.currency
+        pi_receipt_url = payload.receipt_url
+        pi_brand = payload.payment_method_details.card.brand
+        pi_country = payload.payment_method_details.card.country
+        pi_exp_month = payload.payment_method_details.card.exp_month
+        pi_exp_year = payload.payment_method_details.card.exp_year
+        pi_last4 = payload.payment_method_details.card.last4
+
+        stripe_tran = StripeTransaction()
+        stripe_tran.description = f"Auto top up for \
+                                 {member.full_name} ({member.system_number})"
+        stripe_tran.amount = amount
+        stripe_tran.member = member
+        stripe_tran.route_code = None
+        stripe_tran.route_payload = None
+        stripe_tran.stripe_reference = pi_reference
+        stripe_tran.stripe_method = pi_method
+        stripe_tran.stripe_currency = pi_currency
+        stripe_tran.stripe_receipt_url = pi_receipt_url
+        stripe_tran.stripe_brand = pi_brand
+        stripe_tran.stripe_country = pi_country
+        stripe_tran.stripe_exp_month = pi_exp_month
+        stripe_tran.stripe_exp_year = pi_exp_year
+        stripe_tran.stripe_last4 = pi_last4
+        stripe_tran.last_change_date = timezone.now()
+        stripe_tran.status = "Complete"
+        stripe_tran.save()
+
+# Update members account
+        update_account(member=member,
+                       amount=amount,
+                       description="Auto Top Up",
+                       log_msg="$%s Auto Top Up" % amount,
+                       source="Payments",
+                       sub_source="auto_topup_member",
+                       type="Auto Top Up",
+                       stripe_transaction=stripe_tran
+                       )
+
+        return(True, "Auto top up successful")
+
+    except stripe.error.CardError as e:
+        err = e.error
+        # Error code will be authentication_required if authentication is needed
+        log_event(user=member.full_name,
+                  severity="WARN",
+                  source="Payments",
+                  sub_source="test_autotopup",
+                  message="Error from stripe - see logs")
+
+        print("Code is: %s" % err.code)
+        payment_intent_id = err.payment_intent['id']
+        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        return(False, "FIX LATER - MAYBE AUTH required from Stripe")

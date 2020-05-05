@@ -200,6 +200,8 @@ if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
 
+AUTO_TOP_UP_LOW_LIMIT = 20.0
+
 # django-summernote provides the rich text entry fields
 
 #SUMMERNOTE_THEME = 'bs4'
