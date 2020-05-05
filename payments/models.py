@@ -5,17 +5,6 @@ import random
 import string
 from organisations.models import Organisation
 
-class Balance(models.Model):
-    member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    balance = models.DecimalField("Current Balance", blank=True, null=True, max_digits=10, decimal_places=2)
-    last_top_up_date = models.DateTimeField("Last Top Up Date", auto_now_add=True, blank=True)
-    last_top_up_amount = models.DecimalField("Last Top Up Amount", blank=True, null=True, max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return "%s(%s) = $%s" % (self.member.full_name,
-                                self.member.system_number,
-                                self.balance)
-
 class StripeTransaction(models.Model):
 
     TRANSACTION_STATUS = [

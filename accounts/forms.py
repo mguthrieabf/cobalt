@@ -15,7 +15,7 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'system_number',
-                  'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name']
+                  'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name', 'autotopup_amount']
 
 class BlurbUpdateForm(forms.ModelForm):
 

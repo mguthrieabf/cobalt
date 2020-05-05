@@ -3,6 +3,16 @@
 
 {% load widget_tweaks %}
 
+{% block header %}
+<style>
+.cobalt-form-error {
+  color: red;
+  font-weight: bold;
+  font-size: 18px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div  class="container">
   <div class="row justify-content-center">
@@ -10,10 +20,11 @@
       <div class="card-header card-header-primary">
         <h3 class="card-title">{{ GLOBAL_ORG }} Dollar Transfer</h3>
         <h5>Transfer funds online to another member</h5>
+        <h5>Balance: ${{ balance }}</h5>
       </div>
-      <h3>{{ msg }}</h3>
       <div class="card-body">
         <div class="container">
+          <br>
           <div id="cobalt-search" class="row justify-content-center">
             <div class="card col-11 col-md-9">
               <div class="card-header card-header-warning">
@@ -45,16 +56,24 @@
             </div>
 
             <div id="cobalt-after" style="display: none;">
-
               <div class="row justify-content-center">
-                {{ form.amount.errors }}
+                 <span class="cobalt-form-error" id="id_amount_errors">{{ form.amount.errors|striptags }}</span>
+              </div>
+              <br>
+              <div class="row justify-content-center">
                 <div class="form-group">
                   <label for="id_amount" class="bmd-label-floating">Amount $</label>
                   {% render_field form.amount class+="form-control" %}
                 </div>
               </div>
               <div class="row justify-content-center">
+                 <span class="cobalt-form-error" id="id_description_errors">{{ form.description.errors|striptags }}</span>
+              </div>
+              <br>
+
+              <div class="row justify-content-center">
                 <div class="w-100"></div>
+                {{ form.description.errors }}
                 <div class="form-group">
                   <label for="id_description" class="bmd-label-floating">Description (optional)</label>
                   {% render_field form.description class+="form-control" %}
@@ -62,7 +81,7 @@
               </div>
 
             <div class="row justify-content-center">
-              <div id="cobalt-hidden-member"></div>
+              <div id="cobalt-hidden-member"><input type='hidden' id='id_transfer_to' name='transfer_to' value='{{ form.transfer_to.value }}'></div>
              <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-block col-11 col-md-5" disabled>
             </div>
           </div>
@@ -82,15 +101,6 @@
 // Dynamic search when input fields change
 
   jQuery(document).ready(function() {
-
-    $("#id_amount").on('keyup', function() {
-      if ($("#id_amount").val()>0){
-        $("#cobalt-button").prop('disabled', false);
-      } else {
-        $("#cobalt-button").prop('disabled', true);
-      }
-    });
-
     const lastname = $("#id_lastname")
     const firstname = $("#id_firstname")
     const search_results = $('#search-results')
@@ -100,6 +110,31 @@
     const member_search = '{% url "accounts:member_search_ajax" %}'
     const member_detail = '{% url "accounts:member_detail_ajax" %}'
 
+// first check if we have been given a transfer_to value - that means
+// that we have failed validation. Show the user the same form
+{% if form.transfer_to.value %}
+
+  $.getJSON(member_detail + "?member_id={{ form.transfer_to.value }}")
+    .done(response => {
+      search_panel.hide();
+      search_results.html("");
+    // show the member
+    member_display.html(response['data']);
+    // show amount, description and button
+    form_dets.show();
+  });
+{% endif %}
+
+// enable submit if we have a value
+    $("#id_amount").on('keyup', function() {
+      if ($("#id_amount").val()>0){
+        $("#cobalt-button").prop('disabled', false);
+      } else {
+        $("#cobalt-button").prop('disabled', true);
+      }
+    });
+
+// dynamic search
     $(".dynamic-search").on('keyup', function(event){
       event.stopPropagation();
       event.stopImmediatePropagation();

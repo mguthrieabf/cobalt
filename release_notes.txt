@@ -1,3 +1,5 @@
 added Django documentation support - now available in admin
 Added namespaces to most apps makes the documentation easier to read but also a good idea on a larger project
 Removed JS for year and replaced with template code
+Removed balance from payments
+check for insufficient funds on member transfer

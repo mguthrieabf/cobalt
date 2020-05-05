@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import (Balance, StripeTransaction, MemberTransaction,
+from .models import (StripeTransaction, MemberTransaction,
                      AutoTopUpConfig)
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
@@ -262,10 +262,10 @@ def statement_common(request):
     club = requests.get(qry).json()[0]['ClubName']
 
     # get balance
-    try:
-        balance_inst = Balance.objects.filter(member=request.user)[0]
-        balance = balance_inst.balance
-    except IndexError:
+    last_tran = MemberTransaction.objects.filter(member=request.user).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
         balance = "Nil"
 
     # get auto top up
@@ -395,7 +395,7 @@ def member_transfer(request):
     msg = ""
 
     if request.method == 'POST':
-        form = MemberTransfer(request.POST)
+        form = MemberTransfer(request.POST, user=request.user)
         if form.is_valid():
             with transaction.atomic():
                 # Money in
@@ -435,12 +435,13 @@ def member_transfer(request):
             print(form.errors)
 
     else:
-        form = MemberTransfer()
+        form = MemberTransfer(user=request.user)
 
-    try:
-        balance_inst = Balance.objects.filter(member=request.user)[0]
-        balance = balance_inst.balance
-    except IndexError:
+    # get balance
+    last_tran = MemberTransaction.objects.filter(member=request.user).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
         balance = "Nil"
 
     return render(request, 'payments/member_transfer.html', {'form': form,

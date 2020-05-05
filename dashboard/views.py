@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.utils import timezone
 from masterpoints.views import get_masterpoints
-from payments.core import get_balance
+from payments.core import get_balance_detail
 from accounts.models import User
 from forums.views import post_list_dashboard
 
@@ -11,7 +11,7 @@ from forums.views import post_list_dashboard
 def home(request):
     system_number = request.user.system_number
     mp = get_masterpoints(system_number)
-    payments = get_balance(request.user)
+    payments = get_balance_detail(request.user)
     posts = post_list_dashboard(request)
     return render(request, 'dashboard/home.html', {'mp': mp,
                                                    'payments': payments,

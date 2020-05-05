@@ -1,6 +1,7 @@
 from django import forms
 from accounts.models import User
 from organisations.models import Organisation
+from .models import MemberTransaction
 
 class OneOffPayment(forms.Form):
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
@@ -27,8 +28,20 @@ class MemberTransfer(forms.Form):
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
     description = forms.CharField(label='Description', required=False, max_length=100)
 
+# We need the logged in user to check the balance, add a parameter
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(MemberTransfer, self).__init__(*args, **kwargs)
+
     def clean_amount(self):
         amount = self.cleaned_data['amount']
         if amount < 0:
-            raise forms.ValidationError("Nice try")
+            raise forms.ValidationError("Negative amounts are not allowed")
+        print(self.user)
+        last_tran = MemberTransaction.objects.filter(member=self.user).last()
+        if last_tran:
+            if amount > last_tran.balance:
+                raise(forms.ValidationError("Insufficient funds"))
+        else:
+                raise(forms.ValidationError("Insufficient funds"))
         return amount

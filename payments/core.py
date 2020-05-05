@@ -4,7 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Balance, StripeTransaction, MemberTransaction, AutoTopUpConfig, OrganisationTransaction
+from .models import (StripeTransaction, MemberTransaction, AutoTopUpConfig,
+                    OrganisationTransaction)
 from organisations.models import Organisation
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,21 +14,33 @@ import stripe
 import json
 from cobalt.settings import STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 
-####################
-# get_balance      #
-####################
-def get_balance(member):
+#######################
+# get_balance_detail  #
+#######################
+def get_balance_detail(member):
     """ called by dashboard to show basic information """
 
-    try:
-        balance_inst = Balance.objects.filter(member=member)[0]
-        balance = balance_inst.balance
-        top_date = balance_inst.last_top_up_date.strftime('%d %b %Y at %-I:%M %p')
-        last_top_up = "Last transaction %s" % (top_date)
-    except:
-        balance = "Set up Now!"
-        last_top_up = "Never"
-    return({'balance' : balance, 'last_top_up': last_top_up})
+    last_tran = MemberTransaction.objects.filter(member=member).last()
+    if last_tran:
+        balance = "$%s" % last_tran.balance
+        last_top_up = "Last transaction %s" % last_tran.created_date.strftime('%d %b %Y at %-I:%M %p')
+        return({'balance' : balance, 'last_top_up': last_top_up})
+    else:
+        return({'balance' : "$0.00", 'last_top_up': "No History"})
+
+################
+# get_balance  #
+################
+def get_balance(member):
+    """ get members account balance """
+
+    last_tran = MemberTransaction.objects.filter(member=member).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        balance = "Nil"
+
+    return balance
 
 #########################
 # create_payment_intent #
@@ -194,10 +207,23 @@ def test_callback(status, payload, tran):
 # payment_api       #
 #####################
 def payment_api(request, description, amount, member, route_code=None, route_payload=None):
-    """ API for payments from other parts of the application
+    """ API for payments from other parts of the application.
 
-The route_code provides a callback and the route_payload is the string
-to return.
+    There is a user on the end of this who needs to know what is happening,
+    so we return a page that tells them. It could be:
+
+    1) A payment page for one off payments
+    2) A failed auto payment message
+    3) A success page from auto topup
+    4) A success page because they had enough funds in the account
+
+    The route_code provides a callback and the route_payload is the string
+    to return. For 3 and 4, the callback will be called before the page is
+    returned.
+
+    Payments should be the last step in the process for the calling application
+    as there is no way to return control to the application after payments is
+    done. Note: This would be possible if required.
 
 """
     trans = StripeTransaction()
@@ -332,21 +358,12 @@ def update_account(member, amount, description, log_msg, source,
                    sub_source, type, stripe_transaction=None,
                    other_member=None, organisation=None):
     """ method to update a customer account """
-    try:
-        balance = Balance.objects.filter(member = member)[0]
-    except:
-        balance = Balance()
-        balance.balance=0
-        balance.member = member
-    balance.balance += amount
-    balance.last_top_up_amount = amount
-    balance.save()
-
-    log_event(user = member.full_name,
-              severity = "INFO",
-              source = source,
-              sub_source = sub_source,
-              message = log_msg + " Updated balance table")
+# Get old balance
+    last_tran = MemberTransaction.objects.filter(member=member).last()
+    if last_tran:
+        balance = last_tran.balance + amount
+    else:
+        balance = amount
 
 # Create new MemberTransaction entry
     act = MemberTransaction()
@@ -355,7 +372,7 @@ def update_account(member, amount, description, log_msg, source,
     act.stripe_transaction = stripe_transaction
     act.other_member = other_member
     act.organisation = organisation
-    act.balance = balance.balance
+    act.balance = balance
     act.description = description
     act.type = type
 
@@ -374,9 +391,10 @@ def update_organisation(organisation, amount, description, log_msg, source,
                    member=None):
     """ method to update an organisations account """
 
-    try:
-        balance = OrganisationTransaction.objects.last().balance
-    except AttributeError:
+    last_tran = OrganisationTransaction.objects.last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
         balance = 0.0
 
     act = OrganisationTransaction()
