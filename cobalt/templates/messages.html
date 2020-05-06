@@ -1,6 +1,7 @@
-<div class="d-flex justify-content-center">
+<div class="container justify-content-center">
   {% for message in messages %}
-    <div class="alert {{ message.tags }} alert-dismissible col-md-8 col-lg-6" role="alert">
+  <div class="row">
+    <div class="alert {{ message.tags }} alert-dismissible col-12" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -8,5 +9,6 @@
       <br>
       {{ message }}
     </div>
+  </div>
   {% endfor %}
 </div>

@@ -16,7 +16,11 @@
       </div>
       <div class="card-footer">
         <div class="stats">
-          <i class="material-icons">date_range</i> {{ payments.last_top_up }}
+          <i class="material-icons">date_range</i>
+          {% if payments.last_top_up %}
+          Last event:
+          {% endif %}
+          {{ payments.last_top_up|default_if_none:"No History" }}
         </div>
       </div>
     </div>

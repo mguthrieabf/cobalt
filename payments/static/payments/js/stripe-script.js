@@ -105,9 +105,9 @@ var orderComplete = function(clientSecret) {
 //    document.querySelector("pre").textContent = paymentIntentJson;
 
     document.querySelector(".sr-result").classList.remove("hidden");
-    setTimeout(function() {
-      document.querySelector(".sr-result").classList.add("expand");
-    }, 200);
+    // setTimeout(function() {
+    //   document.querySelector(".sr-result").classList.add("expand");
+    // }, 200);
 
     changeLoadingState(false);
   });

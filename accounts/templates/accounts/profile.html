@@ -4,7 +4,9 @@
 
 
  <div class="container-fluid">
+   <h3>{{ msg }}</h3>
    <h2>{{ form.errors }}</h2>
+   <h2>{{ topupform.errors }}</h2>
    <div class="row">
      <div class="col-md-8">
        <div class="card">
@@ -64,7 +66,8 @@
              <div class="col-md-3">
                <div class="form-group">
                  <label class="bmd-label-floating">Auto Top Up Amount</label>
-                 <input type="number" name="autotopup_amount" id="id_autotopup_amount" class="form-control" value="{{ form.autotopup_amount.value|default_if_none:'' }}">
+                 <input type="hidden" id="id_member" name="member" value="{{ topupform.member.value }}">
+                 <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ topupform.auto_amount.value|default_if_none:'' }}">
                </div>
              </div>
            </div>

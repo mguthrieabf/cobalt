@@ -14,7 +14,6 @@ class User(AbstractUser):
     pic = models.ImageField(upload_to = 'pic_folder/', default = 'pic_folder/default-avatar.png')
     dob = models.DateField(blank="True", null=True)
     bbo_name = models.CharField("BBO Username", blank=True, null=True, max_length=20)
-    autotopup_amount = models.IntegerField("Auto Top Up Amount", blank=True, null=True)
 
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 

@@ -2,9 +2,8 @@ import requests
 import stripe
 import json
 import csv
-from .forms import (OneOffPayment, TestTransaction, TestAutoTopUp,
-                    MemberTransfer)
-from .core import payment_api, update_account, auto_topup_member
+from .forms import TestTransaction, MemberTransfer
+from .core import payment_api, update_account, auto_topup_member, get_balance
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -19,7 +18,7 @@ from datetime import datetime
 from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
 from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
-                             GLOBAL_MPSERVER)
+                             GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT)
 
 ####################
 # Home             #
@@ -39,92 +38,44 @@ def home(request):
 def test_payment(request):
     """This is a temporary view that can be used to test making a payment against
        a members account. This simulates them entering an event or paying a subscription.
-       The form takes 4 inputs:
-
-       **Context**
 """
-
-    if request.method == 'POST':
-        form = OneOffPayment(request.POST)
-        if form.is_valid():
-            description = form.cleaned_data['description']
-            amount = form.cleaned_data['amount']
-            member = request.user
-            route_code = form.cleaned_data['route_code']
-            route_payload = form.cleaned_data['route_payload']
-            return payment_api(request, description, amount, member, route_code, route_payload)
-    else:
-        form = OneOffPayment()
-
-    return render(request, 'payments/test_payment.html', {'form': form})
-
-###########################
-# test_autotopup          #
-###########################
-@login_required()
-def test_autotopup(request):
-    """
-view for auto top up payments
-"""
-    if request.method == 'POST':
-        form = TestAutoTopUp(request.POST)
-        if form.is_valid():
-
-            description = form.cleaned_data['description']
-            amount = form.cleaned_data['amount']
-            member = form.cleaned_data['payer']
-
-            (rc, msg) = auto_topup_member(member)
-
-            if rc:
-                messages.success(request, msg,
-                               extra_tags='cobalt-message-success')
-            else:
-                messages.error(request, msg,
-                               extra_tags='cobalt-message-error')
-
-    else:
-        form = TestAutoTopUp()
-
-    return render(request, 'payments/test_autotopup.html', {'form': form})
-
-##########################
-# test_transaction       #
-##########################
-@login_required()
-def test_transaction(request):
-    """ Temporary way to make a change to  $ account """
-
-    log_event(request=request,
-              user=request.user.full_name,
-              severity="INFO",
-              source="Payments",
-              sub_source="test_payment",
-              message="User went to test transaction screen")
 
     if request.method == 'POST':
         form = TestTransaction(request.POST)
         if form.is_valid():
-            update_account(member=form.cleaned_data['payer'],
-                           amount=-form.cleaned_data['amount'],
-                           organisation=form.cleaned_data['counterparty'],
-                           description=form.cleaned_data['description'],
-                           log_msg="Manual Payments Update: $%s %s" %
-                           (form.cleaned_data['amount'],
-                            form.cleaned_data['description']),
-                           source="Payments",
-                           sub_source="test_transaction",
-                           type="Miscellaneous"
-                           )
-            messages.success(request,
-                             'Transfer complete. %s - $%s' %
-                             (form.cleaned_data['payer'], form.cleaned_data['amount']),
-                             extra_tags='cobalt-message-success')
-            form = TestTransaction()
+            description = form.cleaned_data['description']
+            amount = form.cleaned_data['amount']
+            member = request.user
+            organisation = form.cleaned_data['organisation']
+            url = form.cleaned_data['url']
+            type = form.cleaned_data['type']
+
+            return payment_api(request=request,
+                              description=description,
+                              amount=amount,
+                              member=member,
+                              route_code="MAN",
+                              route_payload=None,
+                              organisation=organisation,
+                              log_msg=None,
+                              type=type,
+                              url=url)
     else:
         form = TestTransaction()
 
-    return render(request, 'payments/test_transaction.html', {'form': form})
+    autotopup = AutoTopUpConfig.objects.filter(member=request.user).last()
+
+    if autotopup:
+        auto_amount = autotopup.auto_amount
+    else:
+        auto_amount = None
+
+    balance=get_balance(request.user)
+
+    return render(request, 'payments/test_payment.html', {'form': form,
+                                                          'auto_amount' : auto_amount,
+                                                          'balance': balance,
+                                                          'lowbalance': AUTO_TOP_UP_LOW_LIMIT })
 
 ####################
 # statement_common #

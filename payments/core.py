@@ -25,10 +25,9 @@ def get_balance_detail(member):
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
         balance = "$%s" % last_tran.balance
-        last_top_up = "Last transaction %s" % last_tran.created_date.strftime('%d %b %Y at %-I:%M %p')
-        return({'balance' : balance, 'last_top_up': last_top_up})
+        return({'balance' : balance, 'last_top_up': last_tran.created_date})
     else:
-        return({'balance' : "$0.00", 'last_top_up': "No History"})
+        return({'balance' : "$0.00", 'last_top_up': None})
 
 ################
 # get_balance  #
@@ -38,7 +37,7 @@ def get_balance(member):
 
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
-        balance = last_tran.balance
+        balance = float(last_tran.balance)
     else:
         balance = 0.0
 
@@ -184,32 +183,11 @@ def test_callback(status, payload, tran):
               sub_source = "test_callback",
               message = "Received callback from payment: %s %s" % (status, payload))
 
-#    if status=="Success":
-        # update_account(member = tran.member,
-        #                amount = -tran.amount,
-        #                stripe_transaction = None,
-        #                organisation = Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
-        #                description = "Summer Festival of Bridge - Swiss Pairs entry",
-        #                log_msg = "$%s payment for SFOB" % tran.amount,
-        #                source = "Events",
-        #                sub_source = "fictional_event_entry_module",
-        #                type = "Congress Entry"
-        #                )
-        #
-        # update_organisation(organisation=Organisation.objects.filter(name = "North Shore Bridge Club Inc")[0],
-        #                     amount = tran.amount,
-        #                     description = "Summer Festival of Bridge - Swiss Pairs entry",
-        #                     log_msg = "$%s payment for SFOB" % tran.amount,
-        #                     source = "Events",
-        #                     sub_source = "fictional_event_entry_module",
-        #                     type = "Congress Entry",
-        #                     member=tran.member)
-
 #####################
 # payment_api       #
 #####################
 def payment_api(request, description, amount, member, route_code=None,
-               route_payload=None, organisation=None, other_member=None,
+               route_payload=None, organisation=None,
                log_msg=None, type=None, url=None):
     """ API for payments from other parts of the application.
 
@@ -236,7 +214,8 @@ def payment_api(request, description, amount, member, route_code=None,
     balance = float(get_balance(member))
     amount = float(amount)
     auto_topup = AutoTopUpConfig.objects.filter(member=member).last()
-    print("balance: %s" % balance)
+    print("DEBUG: balance: %s" % balance)
+    print("DEBUG: amount: %s" % amount)
 
     if not log_msg:
         log_msg = description
@@ -248,6 +227,8 @@ def payment_api(request, description, amount, member, route_code=None,
         url = "dashboard"
 
     if amount <= balance:  # sufficient funds
+
+        print("DEBUG: Sufficient funds")
 
         update_account(member=member,
                        amount=-amount,
@@ -269,11 +250,12 @@ def payment_api(request, description, amount, member, route_code=None,
                             type=type,
                             member=member)
 
-        messages.success(request, "Payment successful",
+        messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
                                extra_tags='cobalt-message-success')
 
+        print("DEBUG: calling callback")
         callback_router(route_code=route_code, route_payload=route_payload, tran=None)
-        return redirect(url)
+        print("DEBUG: return from callback")
 
 # check for auto top up required - if user not set for auto topup then ignore
 
@@ -287,11 +269,13 @@ def payment_api(request, description, amount, member, route_code=None,
                     messages.error(request, msg,
                                     extra_tags='cobalt-message-error')
 
+        return redirect(url)
+
     else: # insufficient funds
         if auto_topup:
 
-# we put the balance after to AUTO_TOP_UP_LOW_LIMIT + auto_topup.auto_amount
-            topup_required = AUTO_TOP_UP_LOW_LIMIT + auto_topup.auto_amount - balance + amount
+# The balance afterwards should be the auto amount the user has set
+            topup_required = auto_topup.auto_amount - balance + amount
 
             (rc, msg) = auto_topup_member(member, topup_required=topup_required)
 
@@ -316,9 +300,9 @@ def payment_api(request, description, amount, member, route_code=None,
                                     type=type,
                                     member=member)
 
-                messages.success(request, "Payment successful",
+                messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
                                extra_tags='cobalt-message-success')
-                messages.success(request, "Auto top up successful",
+                messages.success(request, msg,
                                extra_tags='cobalt-message-success')
                 callback_router(route_code=route_code, route_payload=route_payload, tran=None)
                 return redirect(url)
@@ -332,12 +316,16 @@ def payment_api(request, description, amount, member, route_code=None,
 
         else: # not set up for auto top up - manual payment
 
+# Create Stripe Transaction
             trans = StripeTransaction()
             trans.description = description
-            trans.amount = amount
+            trans.amount = amount - balance
             trans.member = member
             trans.route_code = route_code
             trans.route_payload = route_payload
+            trans.linked_amount = amount
+            trans.linked_organisation = organisation
+            trans.linked_transaction_type = type
             trans.save()
             return render(request, 'payments/checkout.html', {'trans': trans})
 
@@ -418,19 +406,40 @@ def stripe_webhook(request):
                       sub_source = "stripe_webhook",
                       message = "Unable to load stripe transaction. Check StripeTransaction table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
 
-        update_account(member = tran.member,
-                       amount = tran.amount,
-                       stripe_transaction = tran,
-                       description = "Payment from card **** **** ***** %s Exp %s/%s" %
+        update_account(member=tran.member,
+                       amount=tran.amount,
+                       stripe_transaction=tran,
+                       description="Payment from card **** **** ***** %s Exp %s/%s" %
                            (tran.stripe_last4, tran.stripe_exp_month, abs(tran.stripe_exp_year) % 100),
-                       log_msg = "$%s Payment from Stripe Transaction=%s" % (tran.amount, tran.id),
-                       source = "Payments",
-                       sub_source = "stripe_webhook",
-                       type = "CC Payment"
+                       log_msg="$%s Payment from Stripe Transaction=%s" % (tran.amount, tran.id),
+                       source="Payments",
+                       sub_source="stripe_webhook",
+                       type="CC Payment"
                        )
 
+# Money in from stripe so we can now process the original transaction
+        update_account(member=tran.member,
+                       amount=-tran.linked_amount,
+                       description=tran.description,
+                       source="Payments",
+                       sub_source="stripe_webhook",
+                       type=tran.linked_transaction_type,
+                       log_msg=tran.description,
+                       organisation=tran.linked_organisation
+                       )
+
+# If we got an organisation then make their payment too
+        update_organisation(organisation=tran.linked_organisation,
+                            amount=tran.linked_amount,
+                            description=tran.description,
+                            source="Payments",
+                            sub_source="stripe_webhook",
+                            type=tran.linked_transaction_type,
+                            log_msg=tran.description,
+                            member=tran.member)
+
         # make Callback
-        callback_router(route_code, route_payload, tran)
+        callback_router(tran.route_code, tran.route_payload, tran)
 
     else:
         # Unexpected event type
@@ -484,11 +493,7 @@ def update_account(member, amount, description, log_msg, source,
                    other_member=None, organisation=None):
     """ method to update a customer account """
 # Get old balance
-    last_tran = MemberTransaction.objects.filter(member=member).last()
-    if last_tran:
-        balance = float(last_tran.balance) + amount
-    else:
-        balance = amount
+    balance = get_balance(member) + float(amount)
 
 # Create new MemberTransaction entry
     act = MemberTransaction()
@@ -622,7 +627,7 @@ def auto_topup_member(member, topup_required=None):
 # Update members account
         update_account(member=member,
                        amount=amount,
-                       description="Auto Top Up",
+                       description=f"Auto Top Up with {pi_brand} card **** **** **** {pi_last4} Exp {pi_exp_month}/{pi_exp_year}",
                        log_msg="$%s Auto Top Up" % amount,
                        source="Payments",
                        sub_source="auto_topup_member",
@@ -630,7 +635,8 @@ def auto_topup_member(member, topup_required=None):
                        stripe_transaction=stripe_tran
                        )
 
-        return(True, "Auto top up successful")
+        return(True, f"Auto top up successful. ${amount:.2f} added to your account from \
+                      {pi_brand} card **** **** **** {pi_last4} Exp {pi_exp_month}/{pi_exp_year}")
 
     except stripe.error.CardError as e:
         err = e.error

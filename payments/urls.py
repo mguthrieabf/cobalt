@@ -13,8 +13,6 @@ urlpatterns = [
     path('statement', views.statement, name='statement'),
     path('statement-csv', views.statement_csv, name='statement_csv'),
     path('statement-pdf', views.statement_pdf, name='statement_pdf'),
-    path('test-transaction', views.test_transaction, name='test_transaction'),
-    path('test-autotopup', views.test_autotopup, name='test_autotopup'),
     path('setup-autotopup', views.setup_autotopup, name='setup_autotopup'),
     path('member-transfer', views.member_transfer, name='member_transfer'),
 ]

@@ -18,12 +18,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from .forms import UserUpdateForm, BlurbUpdateForm
+from .forms import UserUpdateForm, BlurbUpdateForm, AutoTopUpUpdateForm
 import ipinfo
 from logs.views import get_client_ip, log_event
 from django.conf import settings
 from organisations.models import MemberOrganisation
 import cobalt.settings
+from payments.models import AutoTopUpConfig
 
 def register(request):
     if request.method == 'POST':
@@ -162,18 +163,28 @@ def profile(request):
     msg=""
     if request.method == 'POST':
         form = UserUpdateForm(data=request.POST, instance=request.user)
-        if form.is_valid():
+        top = AutoTopUpConfig.objects.filter(member=request.user).last()
+        topupform = AutoTopUpUpdateForm(data=request.POST, instance=top)
+#        topupform = AutoTopUpUpdateForm(data=request.POST, instance=request.user)
+        if form.is_valid() and topupform.is_valid():
+            print("valid")
             msg="Profile Updated"
-            print(form)
             form.save()
+            print(topupform)
+            topupform.save()
+            print(msg)
         else:
+            print("invlaid")
             print(form.errors)
+            print(topupform.errors)
     else:
 # Fix DOB format for browser - expects DD/MM/YYYY
         if request.user.dob:
             request.user.dob=request.user.dob.strftime("%d/%m/%Y")
 
         form = UserUpdateForm(instance=request.user)
+        top = AutoTopUpConfig.objects.filter(member=request.user).last()
+        topupform = AutoTopUpUpdateForm(instance=top)
     blurbform = BlurbUpdateForm(instance=request.user)
 
     access_token='70691e3380c3b2'
@@ -184,6 +195,7 @@ def profile(request):
     context = {
         'form': form,
         'blurbform': blurbform,
+        'topupform': topupform,
         'msg': msg,
         'ip_details': ip_details,
     }

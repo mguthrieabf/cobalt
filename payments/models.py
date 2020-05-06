@@ -4,6 +4,7 @@ from django.utils import timezone
 import random
 import string
 from organisations.models import Organisation
+from django.core.validators import MaxValueValidator
 
 class StripeTransaction(models.Model):
 
@@ -35,7 +36,10 @@ class StripeTransaction(models.Model):
     route_payload = models.CharField("Payload to return to callback", blank=True, null=True, max_length=40)
     created_date = models.DateTimeField("Creation Date", default=timezone.now)
     last_change_date = models.DateTimeField("Last Update Date", default=timezone.now)
-
+    linked_organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL)
+    linked_transaction_type = models.CharField("Linked Transaction Type", blank=True, null=True, max_length=20)
+    # linked amount can be different to amount if the member had some money in their account already
+    linked_amount = models.DecimalField("Linked Amount", blank=True, null=True, max_digits=12, decimal_places=2)
 
     def __str__(self):
         return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
@@ -58,7 +62,7 @@ class AbstractTransaction(models.Model):
     amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
     balance = models.DecimalField("Balance After Transaction", max_digits=12, decimal_places=2)
     description = models.CharField("Transaction Description", blank=True, null=True, max_length=80)
-    reference_no = models.CharField("Reference No", max_length=14)
+    reference_no = models.CharField("Reference No", max_length=14, blank=True, null=True)
     type = models.CharField("Transaction Type", choices = TRANSACTION_TYPE, max_length=20)
 
     class Meta:
@@ -119,7 +123,7 @@ class OrganisationTransaction(AbstractTransaction):
 
 class AutoTopUpConfig(models.Model):
     member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    auto_amount = models.IntegerField("Auto Top Up Amount", blank=True, null=True)
+    auto_amount = models.PositiveIntegerField("Auto Top Up Amount", blank=True, null=True, validators=[MaxValueValidator(2000)])
     stripe_customer_id = models.CharField("Stripe Customer Id", blank=True, null=True, max_length=25)
 
     def __str__(self):
