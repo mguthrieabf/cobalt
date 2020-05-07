@@ -165,9 +165,7 @@ def profile(request):
         form = UserUpdateForm(data=request.POST, instance=request.user)
         top = AutoTopUpConfig.objects.filter(member=request.user).last()
         topupform = AutoTopUpUpdateForm(data=request.POST, instance=top)
-#        topupform = AutoTopUpUpdateForm(data=request.POST, instance=request.user)
         if form.is_valid() and topupform.is_valid():
-            print("valid")
             msg="Profile Updated"
             form.save()
             print(topupform)

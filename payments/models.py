@@ -96,18 +96,11 @@ class MemberTransaction(AbstractTransaction):
                                   self.member.last_name, self.id)
 
 class OrganisationTransaction(AbstractTransaction):
-    PAYMENT_STATUSES = [
-    ('Paid', 'Paid'),
-    ('Unpaid', 'Unpaid')
-    ]
     organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL, related_name="primary_org")
 # Organisation can have one and only one of the 3 following things
     member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
     stripe_transaction = models.ForeignKey(StripeTransaction, blank=True, null=True, on_delete=models.SET_NULL)
     other_organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL, related_name="secondary_org")
-    payment_status = models.CharField("Payment Status", choices = PAYMENT_STATUSES, max_length=6, default="Unpaid")
-    payment_date = models.DateTimeField("Payment Date", blank=True, null=True)
-    payment_reference = models.CharField("Payment Reference", max_length=10, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.reference_no:

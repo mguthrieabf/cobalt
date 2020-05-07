@@ -53,3 +53,22 @@ class LikeComment1(AbstractLike):
 
 class LikeComment2(AbstractLike):
     comment2 = models.ForeignKey(Comment2, on_delete=models.CASCADE)
+
+class UserForumRole(models.Model):
+    ROLE_TYPE = [
+        ('Poster', 'Poster - can create a new post'),
+        ('Responder', 'Responder - can reply to a post'),
+        ('Moderator', 'Moderator - can manage the forum'),
+    ]
+    RULE_TYPE = [
+        ('Allow', 'Allows a user to perform a role'),
+        ('Block', 'Blocks a user from performing a role')
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
+    role = models.CharField("User role in forum", choices = ROLE_TYPE, max_length=20)
+    rule = models.CharField("Type of Rule", choices = RULE_TYPE, max_length=5)
+
+    def get_forums_post_allowed(user):
+        ufr = UserForumRole.objects.filter(user=user).filter(role='Poster').filter(rule='Allow').values('forum')
+        return ufr
