@@ -13,15 +13,26 @@
 {% block content %}
 <div class="container">
   <div class="justify-content-center d-flex">
-    <div class="row">
+    <div class="row col-md-8">
       <div class="card">
         <div class="card-header card-header-primary">
           <h1>Auto Top Up - {{ user.full_name}}</h1>
         </div>
         <div class="card-body">
           <h5>{{ warn }}</h5>
+          <p>Thank you for chosing auto top up. When your balance falls below
+          $20.00 your account will automatically be topped up using the credit card details that you provide.
+          As long as your payment goes through, you don't need to do a thing.</p>
+          <p>You can cancel any time by going to your statement.</p>
+
           <div align="center">
             <div class="sr-main">
+              <form>
+               <div class="form-group">
+                 <label class="bmd-label-floating">Auto Top Up Amount</label>
+                 <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ user.auto_amount }}">
+               </div>
+              </form>
               <h3 align="center">Card Details</h3>
               <form id="payment-form" class="sr-payment-form">
                 <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
@@ -35,6 +46,8 @@
                   <div class="spinner hidden" id="spinner"></div>
                   <span id="button-text">Set Up</span><span id="order-amount"></span>
                 </button>
+
+
               </form>
               <div class="sr-result hidden">
                 <p>Payment completed<br /></p>
@@ -43,6 +56,8 @@
                 </pre>
               </div>
             </div>
+            <br>
+            <button class="btn btn-warning col-3" onclick="window.location.href='{% url "payments:payments" %}'">Cancel</button>
           </div>
         </div>
       </div>

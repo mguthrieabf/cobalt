@@ -111,13 +111,7 @@ class OrganisationTransaction(AbstractTransaction):
         super(OrganisationTransaction, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "%s - %s %s %s" % (self.member.system_number, self.member.first_name,
-                                  self.member.last_name, self.id)
-
-class AutoTopUpConfig(models.Model):
-    member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    auto_amount = models.PositiveIntegerField("Auto Top Up Amount", blank=True, null=True, validators=[MaxValueValidator(2000)])
-    stripe_customer_id = models.CharField("Stripe Customer Id", blank=True, null=True, max_length=25)
+        return f"{self.organisation.name} - {self.id}"
 
     def __str__(self):
         return "%s (Stripe Customer id: %s)" % (self.member, self.stripe_customer_id)

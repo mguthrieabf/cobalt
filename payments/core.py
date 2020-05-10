@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import (StripeTransaction, MemberTransaction, AutoTopUpConfig,
+from .models import (StripeTransaction, MemberTransaction,
                     OrganisationTransaction)
 from organisations.models import Organisation
 from django.http import JsonResponse
@@ -139,20 +139,27 @@ which one it is.
     if request.method == 'POST':
         data = json.loads(request.body)
 
-        try:
-            auto_top = AutoTopUpConfig.objects.get(member=request.user)
-        except ObjectDoesNotExist:
-            log_event(request = request,
-                  user = request.user.full_name,
-                  severity = "ERROR",
-                  source = "Payments",
-                  sub_source = "create_payment_superintent",
-                  message = "No AutoTopUpConfig for user: %s" % request.user)
-            return JsonResponse({'error': 'user not found'})
+        # if request.user.auto_amount == None:
+        #     log_event(request = request,
+        #           user = request.user.full_name,
+        #           severity = "ERROR",
+        #           source = "Payments",
+        #           sub_source = "create_payment_superintent",
+        #           message = "No auto_amount found for user: %s" % request.user)
+        #     return JsonResponse({'error': 'user not found'})
+        #
+        # if request.user.stripe_customer_id == None:
+        #     log_event(request = request,
+        #           user = request.user.full_name,
+        #           severity = "ERROR",
+        #           source = "Payments",
+        #           sub_source = "create_payment_superintent",
+        #           message = "No Stripe customer id found for user: %s" % request.user)
+        #     return JsonResponse({'error': 'user not found'})
 
         stripe.api_key = STRIPE_SECRET_KEY
         intent = stripe.SetupIntent.create(
-                customer = auto_top.stripe_customer_id,
+                customer = request.user.stripe_customer_id,
                 metadata = {'cobalt_member_id': request.user.id}
                 )
 
@@ -162,7 +169,7 @@ which one it is.
               source = "Payments",
               sub_source = "create_payment_superintent",
               message = "Intent created for: %s" % request.user)
-
+              
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 
@@ -213,7 +220,6 @@ def payment_api(request, description, amount, member, route_code=None,
 """
     balance = float(get_balance(member))
     amount = float(amount)
-    auto_topup = AutoTopUpConfig.objects.filter(member=member).last()
     print("DEBUG: balance: %s" % balance)
     print("DEBUG: amount: %s" % amount)
 
@@ -259,7 +265,7 @@ def payment_api(request, description, amount, member, route_code=None,
 
 # check for auto top up required - if user not set for auto topup then ignore
 
-        if auto_topup:
+        if member.auto_amount:
             if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
                 (rc, msg) = auto_topup_member(member)
                 if rc:
@@ -272,10 +278,10 @@ def payment_api(request, description, amount, member, route_code=None,
         return redirect(url)
 
     else: # insufficient funds
-        if auto_topup:
+        if member.auto_amount:
 
 # The balance afterwards should be the auto amount the user has set
-            topup_required = auto_topup.auto_amount - balance + amount
+            topup_required = member.auto_amount - balance + amount
 
             (rc, msg) = auto_topup_member(member, topup_required=topup_required)
 
@@ -552,20 +558,22 @@ def auto_topup_member(member, topup_required=None):
     """
 
     stripe.api_key = STRIPE_SECRET_KEY
-    autotopup = AutoTopUpConfig.objects.filter(member=member).first()
 
-    if not autotopup:
+    if not member.auto_amount:
         return(False, "Member not set up for Auto Top Up")
+
+    if not member.stripe_customer_id:
+        return(False, "No Stripe customer id found")
 
     if topup_required:
         amount = topup_required
     else:
-        amount = autotopup.auto_amount
+        amount = member.auto_amount
 
 # Get payment method id for this customer from Stripe
     try:
         paylist = stripe.PaymentMethod.list(
-          customer=autotopup.stripe_customer_id,
+          customer=member.stripe_customer_id,
           type="card",
         )
         pay_method_id = paylist.data[0].id
@@ -583,7 +591,7 @@ def auto_topup_member(member, topup_required=None):
         rc = stripe.PaymentIntent.create(
                 amount=int(amount * 100),
                 currency='aud',
-                customer=autotopup.stripe_customer_id,
+                customer=member.stripe_customer_id,
                 payment_method=pay_method_id,
                 off_session=True,
                 confirm=True,

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (StripeTransaction, MemberTransaction, AutoTopUpConfig,
+from .models import (StripeTransaction, MemberTransaction,
                     OrganisationTransaction)
 
 class MemberTransactionAdmin(admin.ModelAdmin):
@@ -14,4 +14,3 @@ class StripeTransactionAdmin(admin.ModelAdmin):
 admin.site.register(MemberTransaction, MemberTransactionAdmin)
 admin.site.register(OrganisationTransaction, OrganisationTransactionAdmin)
 admin.site.register(StripeTransaction, StripeTransactionAdmin)
-admin.site.register(AutoTopUpConfig)

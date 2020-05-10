@@ -8,8 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import (StripeTransaction, MemberTransaction,
-                     AutoTopUpConfig)
+from .models import StripeTransaction, MemberTransaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from logs.views import log_event
@@ -26,7 +25,6 @@ from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
 @login_required()
 def home(request):
     """ Default page.
-    :view:`payments.test_payment`
     """
     return render(request, 'payments/home.html')
 
@@ -63,10 +61,8 @@ def test_payment(request):
     else:
         form = TestTransaction()
 
-    autotopup = AutoTopUpConfig.objects.filter(member=request.user).last()
-
-    if autotopup:
-        auto_amount = autotopup.auto_amount
+    if request.user.auto_amount:
+        auto_amount = request.user.auto_amount
     else:
         auto_amount = None
 
@@ -107,8 +103,7 @@ def statement_common(request):
         balance = "Nil"
 
     # get auto top up
-    auto_top_up = AutoTopUpConfig.objects.filter(member=request.user)
-    if auto_top_up:
+    if request.user.auto_amount:
         auto_button = "Update Auto Top Up"
     else:
         auto_button = "Add Auto Top Up"
@@ -183,26 +178,75 @@ def statement_pdf(request):
                                                         'club': club,
                                                         'balance': balance,
                                                         'today': today})
+############################
+# Stripe_create_customer   #
+############################
+@login_required()
+def stripe_create_customer(request):
+    """ calls Stripe to register a customer
+    """
+    stripe.api_key = STRIPE_SECRET_KEY
+    customer = stripe.Customer.create()
+    request.user.stripe_customer_id = customer.id
+    request.user.auto_amount = 100.0   # make me a config setting
+    request.user.save()
+
 #######################
 # setup_autotopup     #
 #######################
 @login_required()
 def setup_autotopup(request):
-    """ view to sign up to auto top up
+    """ view to sign up to auto top up. Creates Stripe customer if not already defined.
+        Hands over to Stripe to process card.
     """
     stripe.api_key = STRIPE_SECRET_KEY
     warn = ""
+
 # Already a customer?
-    autotopup = AutoTopUpConfig.objects.filter(member=request.user).first()
-    if autotopup:                           # record exists
-        print("auto top up record found")
-        if autotopup.stripe_customer_id:    # cust_id exists
-            print("Found autotopup with stripe details")
+    if request.user.auto_amount and request.user.stripe_customer_id:   # record exists
+        try:
             paylist = stripe.PaymentMethod.list(
-              customer=autotopup.stripe_customer_id,
+              customer=request.user.stripe_customer_id,
               type="card",
             )
-            # TODO This needs to handle invalid customer exception
+        except stripe.error.InvalidRequestError as e:
+            log_event(user=request.user.full_name,
+                      severity="HIGH",
+                      source="Payments",
+                      sub_source="setup_autotopup",
+                      message="Stripe InvalidRequestError: %s" % e.error.message)
+            stripe_create_customer(request)
+            paylist=None
+
+        except stripe.error.RateLimitError as e:
+            log_event(user=request.user.full_name,
+                    severity="HIGH",
+                    source="Payments",
+                    sub_source="setup_autotopup",
+                    message="Stripe RateLimitError")
+
+        except stripe.error.AuthenticationError as e:
+            log_event(user=request.user.full_name,
+                    severity="CRITICAL",
+                    source="Payments",
+                    sub_source="setup_autotopup",
+                    message="Stripe AuthenticationError")
+
+        except stripe.error.APIConnectionError as e:
+            log_event(user=request.user.full_name,
+                    severity="HIGH",
+                    source="Payments",
+                    sub_source="setup_autotopup",
+                    message="Stripe APIConnectionError - likely network problems")
+
+        except stripe.error.StripeError as e:
+            log_event(user=request.user.full_name,
+                    severity="CRITICAL",
+                    source="Payments",
+                    sub_source="setup_autotopup",
+                    message="Stripe generic StripeError")
+
+        if paylist:  # if customer has a card associated
             card = paylist.data[0].card
             card_type = card.brand
             card_exp_month = card.exp_month
@@ -212,13 +256,7 @@ def setup_autotopup(request):
                     with expiry {card_exp_month}/{card_exp_year}"
 
     else:
-        stripe.api_key = STRIPE_SECRET_KEY
-        customer = stripe.Customer.create()
-        auto = AutoTopUpConfig()
-        auto.member = request.user
-        auto.stripe_customer_id = customer.id
-        auto.auto_amount = 100.0
-        auto.save()
+        stripe_create_customer(request)
 
     return render(request, 'payments/autotopup.html', {'warn': warn})
 

@@ -62,15 +62,16 @@
                  </div>
                </div>
             </div>
+            {% if form.auto_amount.value %}
             <div class="row">
              <div class="col-md-3">
                <div class="form-group">
                  <label class="bmd-label-floating">Auto Top Up Amount</label>
-                 <input type="hidden" id="id_member" name="member" value="{{ topupform.member.value }}">
-                 <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ topupform.auto_amount.value|default_if_none:'' }}">
+                 <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ form.auto_amount.value|default_if_none:'' }}">
                </div>
              </div>
            </div>
+           {% endif %}
 
              <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
              <div class="clearfix"></div>
