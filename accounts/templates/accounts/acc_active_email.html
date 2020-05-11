@@ -1,0 +1,12 @@
+{% autoescape off %}
+Hi {{ user.first_name }},
+
+Thanks for signing up to the {{ org }} technology site.
+
+Please click on this link to confirm your registration:
+
+http://{{ domain }}/accounts/activate/{{ uid }}/{{ token }}
+
+{% endautoescape %}
+
+The {{ org }} Technology Team.

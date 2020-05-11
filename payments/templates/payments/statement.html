@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+
+<div class="">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h1>Statement - {{ user.full_name}}</h1>
+      <h2>{{ summary.ABFNumber }} - {{ summary.RankName }} Master</h2>
+      <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
+      <h2>Balance: ${{ balance|intcomma }}</h2>
+      <div class="float-left">
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:setup_autotopup' %}';">{{ auto_button }}</button>
+      </div>
+      <div class="float-right">
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:statement_csv' %}';">Export CSV</button>
+        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:statement_pdf' %}';">Export PDF</button>
+
+      </div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-hover">
+        <thead class="text-info">
+          <tr>
+            <th>Date</th>
+            <th>Reference</th>
+            <th>Counterparty</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th class="text-right">In($)</th>
+            <th class="text-right">Out($)</th>
+            <th class="text-right">Balance($)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in events %}
+            <tr>
+              <td>{{ event.created_date|date:"d M Y" }}</td>
+              <td>{{ event.reference_no }}</td>
+              <td>{{ event.other_member|default_if_none:"" }}{{ event.organisation|default_if_none:"" }}</td>
+              <td>{{ event.type }}</td>
+              <td>{{ event.description }}</td>
+              {% if event.amount >= 0 %}
+                <td class="text-right">{{ event.amount|floatformat:2|intcomma }}</td>
+                <td></td>
+              {% else %}
+                <td></td>
+                <td class="text-right">{{ event.amount|floatformat:2|intcomma|slice:"1:" }}</td>
+              {% endif %}
+              <td class="text-right">{{ event.balance|floatformat:2|intcomma }}</td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% if events.has_other_pages %}
+      <ul class="pagination">
+        {% if events.has_previous %}
+          <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;&nbsp;</span></li>
+        {% endif %}
+        {% for i in events.paginator.page_range %}
+          {% if events.number == i %}
+            <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if events.has_next %}
+          <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

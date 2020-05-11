@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="row">
+
+  <div class="col-lg-4 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-header card-header-success card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">attach_money</i>
+        </div>
+        <p class="card-category">Account Balance</p>
+      <a href='#'>  <h3 class="card-title"> {{ payments.balance }}</h3></a>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">date_range</i>
+          {% if payments.last_top_up %}
+          Last event:
+          {% endif %}
+          {{ payments.last_top_up|default_if_none:"No History" }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-header card-header-warning card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">list_alt</i>
+        </div>
+        <p class="card-category">Booked Events</p>
+        <h3 class="card-title">0</h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">local_offer</i>
+            Events
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">call_made</i>
+        </div>
+        <p class="card-category">Masterpoints</p>
+        <h3 class="card-title"> <a href="./masterpoints/view/{{ request.user.system_number }}"><span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span></a> </h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">stars</i> {{ mp.rank }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+                    <div class="row">
+                      <div class="col-lg-6 col-md-12">
+                        <div class="card">
+                          <div class="card-header card-header-primary">
+                            <h4 class="card-title">Your Recent Results</h4>
+                          </div>
+
+                          <div class="card-body table-responsive">
+                            Coming Soon!
+                          </div>
+
+
+                        </div>
+                      </div>
+
+
+
+
+
+                      <div class="col-lg-6 col-md-12">
+                        <div class="card">
+                          <div class="card-header card-header-warning">
+                            <h4 class="card-title">Your Upcoming Events</h4>
+                          </div>
+
+
+                          <div class="card-body table-responsive">
+                            Coming Soon!
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+<!-- Forum posts -->
+
+{% for post in posts %}
+<div class="card card-nav-tabs">
+  <div class="card-body">
+    <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
+        <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+        <h5>{{ post.author.full_name }}</h5>
+    </a>
+    <a href="{% url 'forums:post_detail' pk=post.pk %}">
+    <h2>{{ post.title }}</h2>
+    </a>
+    {{ post.summary|safe }}
+    <span class="float-right">
+      {{ post.post_comments }} comment{{ post.post_comments|pluralize}}
+    </span>
+    <div class="card-title d-flex justify-content-between">
+      <div>
+        {{ post.created_date }}
+      </div>
+     </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

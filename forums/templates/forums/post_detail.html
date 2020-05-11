@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block headerjs %}
+
+
+<!-- The js libraries are a problem for Summernote so we override thwm here -->
+
+<script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
+<script src="{% static "assets/js/core/popper.min.js" %}"></script>
+<link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+<script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
+<link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+
+<!-- Other libraries needed for this page -->
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+<style>
+.cobalt-min-width-100 {
+  min-width: 100%;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- Instead of using {{ form.media }} we hardcode the static files here
+     so we can control the version that we use. Django-summertone comes with
+     an older version of summertone that has some bugs especially relating
+     to how it shakes when it is slowly scrolled. We point to a newer
+     version of summertone and it fixes the problem. -->
+
+<link href="{% static "forums/summernote/summernote-bs4.css" %}" type="text/css" media="all" rel="stylesheet">
+<link href="{% static "forums/summernote/django_summernote.css" %}" type="text/css" media="all" rel="stylesheet">
+<script type="text/javascript" src="{% static "forums/summernote/jquery.ui.widget.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.iframe-transport.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/jquery.fileupload.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/summernote-bs4.min.js" %}"></script>
+<script type="text/javascript" src="{% static "forums/summernote/ResizeSensor.js" %}"></script>
+
+
+<!-- Post -->
+
+<div class="card card-nav-tabs">
+  <div class="card-header card-header-warning">
+    <h1>{{ post.title }}</h1>
+      <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
+          <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+          <h4>{{ post.author.full_name }}</h4>
+      </a>
+    <div class="card-title d-flex justify-content-between">
+          <div>
+                {{ post.created_date }}
+          </div>
+          <div>
+            Forum: {{ post.forum.title }}
+          </div>
+     </div>
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{ post.text|safe }}</p>
+    <span class="float-right">
+      {{ total_comments }} <i class="material-icons">comment</i>
+      <span id="cobalt_post_likes">{{ post_likes.count }}</span> <i class="material-icons">thumb_up</i>
+      <a href="javascript:void(0);" id="cobalt_like_post">Like</a>
+    </span>
+  </div>
+</div>
+
+<!-- End post -->
+
+{% if total_comments == 0 %}
+  <h4>Be the first to comment</h4>
+{% else %}
+<h4>Comments</h4>
+{% endif %}
+{% for c1 in comments1 %}
+
+<!-- Comment1  -->
+
+<div class="card card-nav-tabs mb-0">
+  <div class="card-body">
+    <div class=" justify-content-between">
+        <a href="{% url 'accounts:public_profile' pk=c1.author.pk %}">
+      <div>
+        <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
+        <h5>{{ c1.author.full_name }}</h5>
+      </div>
+      </a>
+      <div>
+        {{ c1.created_date }}
+      </div>
+    </div>
+    <div>
+      <br>
+      {{ c1.text|safe|linebreaks }}
+    </div>
+    <div class="float-right">
+      {{ c1.c2|length }} <i class="material-icons">comment</i>
+      <span id="cobalt_c1_likes_{{ c1.id }}">{{ c1.c1_likes }}</span> <i class="material-icons">thumb_up</i>
+      <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- end Comment 1 -->
+
+<!-- Comment 2 -->
+<div class="row">
+  <div class="col-1"></div>
+  <div class="col-11">
+
+    {% for c2 in c1.c2 %}
+
+    <div class="card card-nav-tabs">
+      <div class="card-body bg-light">
+        <div class=" justify-content-between">
+            <a href="{% url 'accounts:public_profile' pk=c2.author.pk %}">
+          <div>
+            <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
+            <h5>{{ c2.author.full_name }}</h5>
+          </div>
+          </a>
+          <div>
+            {{ c2.created_date }}
+          </div>
+        </div>
+        <div>
+          <br>
+          {{ c2.text|safe|linebreaks }}
+        </div>
+        <div class="float-right">
+          <span id="cobalt_c2_likes_{{ c2.id }}">{{ c2.c2_likes }}</span> <i class="material-icons">thumb_up</i>
+          <a href="javascript:void(0);" class="cobalt_like_c2_class" id="cobalt_like_c2_{{ c2.id }}">Like</a>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+
+  </div>
+</div>
+
+<a href="javascript:void(0);"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
+<div id="cobalt-thread-{{ c1.id }}" class="d-none">
+  <form method="POST" class="post-form">{% csrf_token %}
+    <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+    <input type="hidden" id="id_comment1" name="comment1" value="{{ c1.id }}">
+    {{ form2.text|as_crispy_field  }}
+    <div class="row">
+      <button type="submit" name="submit-c2" class="save btn btn-default">Publish</button>
+    </div>
+  </form>
+</div>
+{% endfor %}
+
+ <!-- End Comment 2 -->
+
+<!-- Reply -->
+<hr>
+<h4 id="cobalt-post-comment">{{ total_comments }} comment{{ total_comments|pluralize }} so far. Want to add yours?</h4>
+
+<form method="POST" class="post-form">{% csrf_token %}
+  <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
+  {{ form.text|as_crispy_field }}
+    <button type="submit" name="submit-c1" class="save btn btn-default">Reply to Post</button>
+</form>
+
+<script>
+
+// reveal reply form if user clicks on Reply, hide it if they click again
+
+jQuery(document).ready(function() {
+  $(".cobalt-open-reply").on('click', function(event){
+
+// stop event spreading
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+// Change the clicked on text
+    var textid = $("#" + event.target.id)
+    if (textid.text()=="Reply to this thread") {
+      textid.text("Close");
+    } else {
+      textid.text("Reply to this thread");
+    }
+
+// toggle visibility
+    var id = event.target.id.replace("cobalt-click", "cobalt-thread");
+    $('#' + id).toggleClass('d-block d-none');
+  });
+
+  function likePost() {
+    $.ajax({
+           url: "/forums/post/like-post/{{ post.id }}/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              console.log(response);
+              if (response=="ok"){
+                var likecount=$("#cobalt_post_likes");
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+  function likeC1(e) {
+    var id = event.target.id.replace("cobalt_like_c1_","");
+
+    $.ajax({
+           url: "/forums/post/like-comment1/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c1_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+  function likeC1(e) {
+    var id = event.target.id.replace("cobalt_like_c1_","");
+
+    $.ajax({
+           url: "/forums/post/like-comment1/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c1_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+  function likeC2(e) {
+    var id = event.target.id.replace("cobalt_like_c2_","");
+
+    $.ajax({
+           url: "/forums/post/like-comment2/" + id + "/",
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+              if (response=="ok"){
+                var likecount=$("#cobalt_c2_likes_" + id);
+                var newcount = parseInt(likecount.text()) + 1;
+                likecount.text(newcount);
+                swal({ title:"Post Liked", html: "Success. Thank you for liking this.", type: "success", buttonsStyling: false, confirmButtonClass: "btn"});
+              } else {
+                swal({ title:"Post Already Liked", html: "You have already liked this post.", type: "error", buttonsStyling: false, confirmButtonClass: "btn"});
+              }
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
+  jQuery('#cobalt_like_post').on('click', function(e) {
+    likePost();
+  });
+
+  jQuery('.cobalt_like_c1_class').on('click', function(e) {
+    // stop event spreading
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    likeC1(e);
+  });
+
+    jQuery('.cobalt_like_c2_class').on('click', function(e) {
+      // stop event spreading
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      likeC2(e);
+    });
+
+
+
+
+})
+
+</script>
+
+{% endblock %}
