@@ -232,6 +232,13 @@ SUMMERNOTE_CONFIG = {
     'attachment_absolute_uri': False,
 }
 
+# Bring in Elastic Beanstalk config if present
+with open("/opt/elasticbeanstalk/deployment/env") as env:
+    lines=env.readlines()
+    for line in lines:
+        if not line.find("PATH"):
+            exec(line)
+
 try:
     from .local_settings import *
 except ImportError:
