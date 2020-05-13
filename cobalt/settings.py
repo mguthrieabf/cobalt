@@ -236,9 +236,10 @@ SUMMERNOTE_CONFIG = {
 with open("/opt/elasticbeanstalk/deployment/env") as env:
     lines=env.readlines()
     for line in lines:
-        if not line.find("PATH"):
+        if not line.find("PATH")>=0:
             parts=line.split("=")
-            exec(f"{parts[0]}='{parts[1]}'")
+            exec(f"{parts[0]}='{parts[1].strip()}'")
+
 
 try:
     from .local_settings import *
