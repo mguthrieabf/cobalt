@@ -237,7 +237,8 @@ with open("/opt/elasticbeanstalk/deployment/env") as env:
     lines=env.readlines()
     for line in lines:
         if not line.find("PATH"):
-            exec(line)
+            parts=line.split("=")
+            exec(f"{parts[0]}='{parts[1]}'")
 
 try:
     from .local_settings import *
