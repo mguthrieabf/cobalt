@@ -232,7 +232,7 @@ SUMMERNOTE_CONFIG = {
     'attachment_absolute_uri': False,
 }
 
-# Bring in Elastic Beanstalk config if present
+# Bring in Elastic Beanstalk config if present.
 #with open("/opt/elasticbeanstalk/deployment/env") as env:
 with open("/tmp/env") as env:
     lines=env.readlines()
