@@ -233,7 +233,8 @@ SUMMERNOTE_CONFIG = {
 }
 
 # Bring in Elastic Beanstalk config if present
-with open("/opt/elasticbeanstalk/deployment/env") as env:
+#with open("/opt/elasticbeanstalk/deployment/env") as env:
+with open("/tmp/env") as env:
     lines=env.readlines()
     for line in lines:
         if not line.find("PATH")>=0:
