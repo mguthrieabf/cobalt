@@ -3,3 +3,5 @@ AutoTopUpConfig moved to the User object
 Profile works now and only shows auto top up amount if registered
 Cancel button on Auto top up
 Auto top up amount now on form
+pylint --output-format=colorized payments/core.py
+read the docs
