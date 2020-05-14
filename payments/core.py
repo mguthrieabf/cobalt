@@ -1,3 +1,40 @@
+# -*- coding: utf-8 -*-
+"""Handles all activities associated with payments that do not talk to users.
+
+This module handles all of the functions that do not interact directly with
+a user. i.e. they do not generally accept a ``Request`` and return an
+``HttpResponse``.
+
+See also `Payments Views`_.
+
+Key Points:
+    - Payments is a service module, it is requested to do things on behalf of
+      another module and does not know why it is doing them.
+    - Payments are often not real time, for manual payments, the user will
+      be taken to another screen that interacts directly with Stripe, and for
+      automatic top up payments, the top up may fail and requuire user input.
+
+Section breaks are created by resuming unindented text. Section breaks
+are also implicitly created anytime a new section starts.
+
+Attributes:
+    module_level_variable1 (int): Module level variables may be documented in
+        either the ``Attributes`` section of the module docstring, or in an
+        inline docstring immediately following the variable.
+
+        Either form is acceptable, but the two should not be mixed. Choose
+        one convention to document module level variables and be consistent
+        with it.
+
+Todo:
+    * For module TODOs
+    * You have to also use ``sphinx.ext.todo`` extension
+
+.. _Payments Views:
+   #module-payments.views
+
+"""
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -21,7 +58,23 @@ from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
 # get_balance_detail  #
 #######################
 def get_balance_detail(member):
-    """ called by dashboard to show basic information """
+    """ called by dashboard to show basic information
+
+    `PEP 484`_ type annotations are supported. If attribute, parameter, and
+    return types are annotated according to `PEP 484`_, they do not need to be
+    included in the docstring:
+
+    Args:
+        param1 (int): The first parameter.
+        param2 (str): The second parameter.
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+
+    .. _PEP 484:
+        https://www.python.org/dev/peps/pep-0484/
+
+    """
 
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
@@ -45,10 +98,10 @@ def get_balance(member):
     return balance
 
 #########################
-# create_manual_payment_intent #
+# stripe_manual_payment_intent #
 #########################
 @login_required()
-def create_manual_payment_intent(request):
+def stripe_manual_payment_intent(request):
     """ Called from the checkout webpage.
 
 When a user is going to pay with a credit card we
@@ -80,7 +133,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_manual_payment_intent",
+                  sub_source = "stripe_manual_payment_intent",
                   message = "Invalid payload: %s" % data)
             return JsonResponse({'error': 'Invalid payload'})
 
@@ -92,7 +145,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_manual_payment_intent",
+                  sub_source = "stripe_manual_payment_intent",
                   message = "StripeTransaction id: %s not found" % payload_cobalt_pay_id)
             return JsonResponse({'error': 'Invalid payload'})
 
@@ -102,7 +155,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_manual_payment_intent",
+                  sub_source = "stripe_manual_payment_intent",
                   message = "StripeTransaction id: %s. Browser sent %s cents." %
                         (payload_cobalt_pay_id, payload_cents))
             return JsonResponse({'error': 'Invalid payload'})
@@ -117,7 +170,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "INFO",
                   source = "Payments",
-                  sub_source = "create_manual_payment_intent",
+                  sub_source = "stripe_manual_payment_intent",
                   message = "Created payment intent with Stripe. Cobalt_pay_id: %s" % payload_cobalt_pay_id)
 
 # Update Status
@@ -127,10 +180,10 @@ get back from Stripe
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 ####################################
-# create_auto_payment_intent       #
+# stripe_auto_payment_intent       #
 ####################################
 @login_required()
-def create_auto_payment_intent(request):
+def stripe_auto_payment_intent(request):
     """ Called from the auto top up webpage.
 
 This is very similar to the one off payment. It lets Stripe
@@ -150,7 +203,7 @@ which one it is.
               user = request.user.full_name,
               severity = "INFO",
               source = "Payments",
-              sub_source = "create_auto_payment_intent",
+              sub_source = "stripe_auto_payment_intent",
               message = "Intent created for: %s" % request.user)
 
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})

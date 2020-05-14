@@ -141,7 +141,44 @@
            <div itemprop="articleBody">
             
   <h1>Source code for payments.core</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Handles all activities associated with payments that do not talk to users.</span>
+
+<span class="sd">This module handles all of the functions that do not interact directly with</span>
+<span class="sd">a user. i.e. they do not generally accept a ``Request`` and return an</span>
+<span class="sd">``HttpResponse``.</span>
+
+<span class="sd">See also `Payments Views`_.</span>
+
+<span class="sd">Key Points:</span>
+<span class="sd">    - Payments is a service module, it is requested to do things on behalf of</span>
+<span class="sd">      another module and does not know why it is doing them.</span>
+<span class="sd">    - Payments are often not real time, for manual payments, the user will</span>
+<span class="sd">      be taken to another screen that interacts directly with Stripe, and for</span>
+<span class="sd">      automatic top up payments, the top up may fail and requuire user input.</span>
+
+<span class="sd">Section breaks are created by resuming unindented text. Section breaks</span>
+<span class="sd">are also implicitly created anytime a new section starts.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    module_level_variable1 (int): Module level variables may be documented in</span>
+<span class="sd">        either the ``Attributes`` section of the module docstring, or in an</span>
+<span class="sd">        inline docstring immediately following the variable.</span>
+
+<span class="sd">        Either form is acceptable, but the two should not be mixed. Choose</span>
+<span class="sd">        one convention to document module level variables and be consistent</span>
+<span class="sd">        with it.</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    * For module TODOs</span>
+<span class="sd">    * You have to also use ``sphinx.ext.todo`` extension</span>
+
+<span class="sd">.. _Payments Views:</span>
+<span class="sd">   #module-payments.views</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">django.views.decorators.csrf</span> <span class="kn">import</span> <span class="n">csrf_exempt</span>
 <span class="kn">from</span> <span class="nn">django.views.decorators.http</span> <span class="kn">import</span> <span class="n">require_POST</span>
@@ -164,7 +201,23 @@
 <span class="c1"># get_balance_detail  #</span>
 <span class="c1">#######################</span>
 <div class="viewcode-block" id="get_balance_detail"><a class="viewcode-back" href="../../payments.html#payments.core.get_balance_detail">[docs]</a><span class="k">def</span> <span class="nf">get_balance_detail</span><span class="p">(</span><span class="n">member</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; called by dashboard to show basic information &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; called by dashboard to show basic information</span>
+
+<span class="sd">    `PEP 484`_ type annotations are supported. If attribute, parameter, and</span>
+<span class="sd">    return types are annotated according to `PEP 484`_, they do not need to be</span>
+<span class="sd">    included in the docstring:</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        param1 (int): The first parameter.</span>
+<span class="sd">        param2 (str): The second parameter.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: The return value. True for success, False otherwise.</span>
+
+<span class="sd">    .. _PEP 484:</span>
+<span class="sd">        https://www.python.org/dev/peps/pep-0484/</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
@@ -188,10 +241,10 @@
     <span class="k">return</span> <span class="n">balance</span></div>
 
 <span class="c1">#########################</span>
-<span class="c1"># create_manual_payment_intent #</span>
+<span class="c1"># stripe_manual_payment_intent #</span>
 <span class="c1">#########################</span>
-<div class="viewcode-block" id="create_manual_payment_intent"><a class="viewcode-back" href="../../payments.html#payments.core.create_manual_payment_intent">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">create_manual_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="stripe_manual_payment_intent"><a class="viewcode-back" href="../../payments.html#payments.core.stripe_manual_payment_intent">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_manual_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called from the checkout webpage.</span>
 
 <span class="sd">When a user is going to pay with a credit card we</span>
@@ -223,7 +276,7 @@
                   <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                   <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
                   <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;create_manual_payment_intent&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;stripe_manual_payment_intent&quot;</span><span class="p">,</span>
                   <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Invalid payload: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Invalid payload&#39;</span><span class="p">})</span>
 
@@ -235,7 +288,7 @@
                   <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                   <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
                   <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;create_manual_payment_intent&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;stripe_manual_payment_intent&quot;</span><span class="p">,</span>
                   <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;StripeTransaction id: </span><span class="si">%s</span><span class="s2"> not found&quot;</span> <span class="o">%</span> <span class="n">payload_cobalt_pay_id</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Invalid payload&#39;</span><span class="p">})</span>
 
@@ -245,7 +298,7 @@
                   <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                   <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
                   <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;create_manual_payment_intent&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;stripe_manual_payment_intent&quot;</span><span class="p">,</span>
                   <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;StripeTransaction id: </span><span class="si">%s</span><span class="s2">. Browser sent </span><span class="si">%s</span><span class="s2"> cents.&quot;</span> <span class="o">%</span>
                         <span class="p">(</span><span class="n">payload_cobalt_pay_id</span><span class="p">,</span> <span class="n">payload_cents</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Invalid payload&#39;</span><span class="p">})</span>
@@ -260,7 +313,7 @@
                   <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                   <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
                   <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;create_manual_payment_intent&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;stripe_manual_payment_intent&quot;</span><span class="p">,</span>
                   <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Created payment intent with Stripe. Cobalt_pay_id: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">payload_cobalt_pay_id</span><span class="p">)</span>
 
 <span class="c1"># Update Status</span>
@@ -270,10 +323,10 @@
         <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;publishableKey&#39;</span><span class="p">:</span><span class="n">STRIPE_PUBLISHABLE_KEY</span><span class="p">,</span> <span class="s1">&#39;clientSecret&#39;</span><span class="p">:</span> <span class="n">intent</span><span class="o">.</span><span class="n">client_secret</span><span class="p">})</span></div>
 
 <span class="c1">####################################</span>
-<span class="c1"># create_auto_payment_intent       #</span>
+<span class="c1"># stripe_auto_payment_intent       #</span>
 <span class="c1">####################################</span>
-<div class="viewcode-block" id="create_auto_payment_intent"><a class="viewcode-back" href="../../payments.html#payments.core.create_auto_payment_intent">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">create_auto_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="stripe_auto_payment_intent"><a class="viewcode-back" href="../../payments.html#payments.core.stripe_auto_payment_intent">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_auto_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called from the auto top up webpage.</span>
 
 <span class="sd">This is very similar to the one off payment. It lets Stripe</span>
@@ -293,7 +346,7 @@
               <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
               <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
               <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-              <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;create_auto_payment_intent&quot;</span><span class="p">,</span>
+              <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;stripe_auto_payment_intent&quot;</span><span class="p">,</span>
               <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Intent created for: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;publishableKey&#39;</span><span class="p">:</span><span class="n">STRIPE_PUBLISHABLE_KEY</span><span class="p">,</span> <span class="s1">&#39;clientSecret&#39;</span><span class="p">:</span> <span class="n">intent</span><span class="o">.</span><span class="n">client_secret</span><span class="p">})</span></div>
@@ -302,7 +355,7 @@
 <span class="c1">######################</span>
 <span class="c1"># test_callback      #</span>
 <span class="c1">######################</span>
-<span class="k">def</span> <span class="nf">test_callback</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">):</span>
+<div class="viewcode-block" id="test_callback"><a class="viewcode-back" href="../../payments.html#payments.core.test_callback">[docs]</a><span class="k">def</span> <span class="nf">test_callback</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Eventually I will be moved to another module. I am only here for testing purposes</span>
 
 <span class="sd">    I also shouldn&#39;t have the 3rd parameter. I only get status and the payload that I provided</span>
@@ -314,7 +367,7 @@
               <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
               <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
               <span class="n">sub_source</span> <span class="o">=</span> <span class="s2">&quot;test_callback&quot;</span><span class="p">,</span>
-              <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Received callback from payment: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">payload</span><span class="p">))</span>
+              <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Received callback from payment: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">payload</span><span class="p">))</span></div>
 
 <span class="c1">#####################</span>
 <span class="c1"># payment_api       #</span>
