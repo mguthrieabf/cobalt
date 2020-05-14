@@ -1,0 +1,1848 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>forums package &mdash; Cobalt 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cobalt
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">forums package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-forums.admin">forums.admin module</a></li>
+<li><a class="reference internal" href="#module-forums.apps">forums.apps module</a></li>
+<li><a class="reference internal" href="#module-forums.forms">forums.forms module</a></li>
+<li><a class="reference internal" href="#module-forums.models">forums.models module</a></li>
+<li><a class="reference internal" href="#module-forums.tests">forums.tests module</a></li>
+<li><a class="reference internal" href="#module-forums.urls">forums.urls module</a></li>
+<li><a class="reference internal" href="#module-forums.views">forums.views module</a></li>
+<li><a class="reference internal" href="#module-forums">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cobalt</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>forums package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/forums.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="forums-package">
+<h1>forums package<a class="headerlink" href="#forums-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-forums.admin">
+<span id="forums-admin-module"></span><h2>forums.admin module<a class="headerlink" href="#module-forums.admin" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="forums.admin.PostAdmin">
+<em class="property">class </em><code class="sig-prename descclassname">forums.admin.</code><code class="sig-name descname">PostAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/admin.html#PostAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.admin.PostAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django_summernote.admin.SummernoteModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt id="forums.admin.PostAdmin.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.admin.PostAdmin.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.admin.PostAdmin.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.admin'</em><a class="headerlink" href="#forums.admin.PostAdmin.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.admin.PostAdmin.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#forums.admin.PostAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.admin.PostAdmin.summernote_fields">
+<code class="sig-name descname">summernote_fields</code><em class="property"> = ('text',)</em><a class="headerlink" href="#forums.admin.PostAdmin.summernote_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-forums.apps">
+<span id="forums-apps-module"></span><h2>forums.apps module<a class="headerlink" href="#module-forums.apps" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="forums.apps.ForumsConfig">
+<em class="property">class </em><code class="sig-prename descclassname">forums.apps.</code><code class="sig-name descname">ForumsConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_name</span></em>, <em class="sig-param"><span class="n">app_module</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/apps.html#ForumsConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.apps.ForumsConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<dl class="py attribute">
+<dt id="forums.apps.ForumsConfig.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.apps.ForumsConfig.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.apps.ForumsConfig.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.apps'</em><a class="headerlink" href="#forums.apps.ForumsConfig.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.apps.ForumsConfig.name">
+<code class="sig-name descname">name</code><em class="property"> = 'forums'</em><a class="headerlink" href="#forums.apps.ForumsConfig.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-forums.forms">
+<span id="forums-forms-module"></span><h2>forums.forms module<a class="headerlink" href="#module-forums.forms" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="forums.forms.Comment2Form">
+<em class="property">class </em><code class="sig-prename descclassname">forums.forms.</code><code class="sig-name descname">Comment2Form</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#Comment2Form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.Comment2Form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<dl class="py class">
+<dt id="forums.forms.Comment2Form.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/forums/forms.html#Comment2Form.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.Comment2Form.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'forums.forms', 'model': &lt;class 'forums.models.Comment2'&gt;, 'fields': ('text', 'post', 'comment1'), '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#forums.forms.Comment2Form.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.Comment2Form.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.Comment2Form.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#forums.forms.Comment2Form.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.fields">
+<code class="sig-name descname">fields</code><em class="property"> = ('text', 'post', 'comment1')</em><a class="headerlink" href="#forums.forms.Comment2Form.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.Meta.model">
+<code class="sig-name descname">model</code><a class="headerlink" href="#forums.forms.Comment2Form.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#forums.models.Comment2" title="forums.models.Comment2"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.Comment2</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.Comment2Form.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.Comment2Form.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#Comment2Form.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.Comment2Form.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.Comment2Form.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;django.forms.models.ModelFormOptions object&gt;</em><a class="headerlink" href="#forums.forms.Comment2Form._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'comment1': &lt;django.forms.models.ModelChoiceField object&gt;, 'post': &lt;django.forms.models.ModelChoiceField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.Comment2Form.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.Comment2Form.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {}</em><a class="headerlink" href="#forums.forms.Comment2Form.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.Comment2Form.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#forums.forms.Comment2Form.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.forms.CommentForm">
+<em class="property">class </em><code class="sig-prename descclassname">forums.forms.</code><code class="sig-name descname">CommentForm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#CommentForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.CommentForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<dl class="py class">
+<dt id="forums.forms.CommentForm.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/forums/forms.html#CommentForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.CommentForm.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'forums.forms', 'model': &lt;class 'forums.models.Comment1'&gt;, 'fields': ('text', 'post'), '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#forums.forms.CommentForm.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.CommentForm.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.CommentForm.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#forums.forms.CommentForm.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.fields">
+<code class="sig-name descname">fields</code><em class="property"> = ('text', 'post')</em><a class="headerlink" href="#forums.forms.CommentForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.Meta.model">
+<code class="sig-name descname">model</code><a class="headerlink" href="#forums.forms.CommentForm.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#forums.models.Comment1" title="forums.models.Comment1"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.Comment1</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.CommentForm.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.CommentForm.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#CommentForm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.CommentForm.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.CommentForm.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;django.forms.models.ModelFormOptions object&gt;</em><a class="headerlink" href="#forums.forms.CommentForm._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'post': &lt;django.forms.models.ModelChoiceField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.CommentForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.CommentForm.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {}</em><a class="headerlink" href="#forums.forms.CommentForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.CommentForm.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#forums.forms.CommentForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.forms.PostForm">
+<em class="property">class </em><code class="sig-prename descclassname">forums.forms.</code><code class="sig-name descname">PostForm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#PostForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.PostForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<dl class="py class">
+<dt id="forums.forms.PostForm.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/forums/forms.html#PostForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.PostForm.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'forums.forms', 'model': &lt;class 'forums.models.Post'&gt;, 'fields': ('forum', 'title', 'comments_allowed', 'summary', 'text'), '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#forums.forms.PostForm.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.PostForm.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.PostForm.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#forums.forms.PostForm.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.fields">
+<code class="sig-name descname">fields</code><em class="property"> = ('forum', 'title', 'comments_allowed', 'summary', 'text')</em><a class="headerlink" href="#forums.forms.PostForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.Meta.model">
+<code class="sig-name descname">model</code><a class="headerlink" href="#forums.forms.PostForm.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#forums.models.Post" title="forums.models.Post"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.Post</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.forms.PostForm.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.PostForm.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/forms.html#PostForm.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.forms.PostForm.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.forms'</em><a class="headerlink" href="#forums.forms.PostForm.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;django.forms.models.ModelFormOptions object&gt;</em><a class="headerlink" href="#forums.forms.PostForm._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'comments_allowed': &lt;django.forms.fields.BooleanField object&gt;, 'forum': &lt;django.forms.models.ModelChoiceField object&gt;, 'summary': &lt;django.forms.fields.CharField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;, 'title': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.PostForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.forms.PostForm.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {'summary': &lt;django.forms.fields.CharField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;, 'title': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.PostForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.forms.PostForm.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#forums.forms.PostForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-forums.models">
+<span id="forums-models-module"></span><h2>forums.models module<a class="headerlink" href="#module-forums.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="forums.models.AbstractForum">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">AbstractForum</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#AbstractForum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.AbstractForum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py class">
+<dt id="forums.models.AbstractForum.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/forums/models.html#AbstractForum.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.AbstractForum.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'forums.models', 'abstract': False, '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#forums.models.AbstractForum.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.abstract">
+<code class="sig-name descname">abstract</code><em class="property"> = False</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.AbstractForum.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.AbstractForum.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for AbstractForum&gt;</em><a class="headerlink" href="#forums.models.AbstractForum._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.author">
+<code class="sig-name descname">author</code><a class="headerlink" href="#forums.models.AbstractForum.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.author_id">
+<code class="sig-name descname">author_id</code><a class="headerlink" href="#forums.models.AbstractForum.author_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.created_date">
+<code class="sig-name descname">created_date</code><a class="headerlink" href="#forums.models.AbstractForum.created_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.AbstractForum.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.AbstractForum.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.AbstractForum.get_next_by_last_change_date">
+<code class="sig-name descname">get_next_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.AbstractForum.get_next_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.AbstractForum.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.AbstractForum.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.AbstractForum.get_previous_by_last_change_date">
+<code class="sig-name descname">get_previous_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.AbstractForum.get_previous_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.last_change_date">
+<code class="sig-name descname">last_change_date</code><a class="headerlink" href="#forums.models.AbstractForum.last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.AbstractLike">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">AbstractLike</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#AbstractLike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.AbstractLike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py class">
+<dt id="forums.models.AbstractLike.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/forums/models.html#AbstractLike.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.AbstractLike.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'forums.models', 'abstract': False, '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#forums.models.AbstractLike.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.AbstractLike.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.AbstractLike.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#forums.models.AbstractLike.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.Meta.abstract">
+<code class="sig-name descname">abstract</code><em class="property"> = False</em><a class="headerlink" href="#forums.models.AbstractLike.Meta.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.AbstractLike.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.AbstractLike.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for AbstractLike&gt;</em><a class="headerlink" href="#forums.models.AbstractLike._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.liker">
+<code class="sig-name descname">liker</code><a class="headerlink" href="#forums.models.AbstractLike.liker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.AbstractLike.liker_id">
+<code class="sig-name descname">liker_id</code><a class="headerlink" href="#forums.models.AbstractLike.liker_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.Comment1">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Comment1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">author</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">post</span></em>, <em class="sig-param"><span class="n">text</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Comment1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Comment1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractForum" title="forums.models.AbstractForum"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractForum</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.Comment1.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.Comment1.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Comment1.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Comment1.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment1.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.Comment1.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.Comment1.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Comment1.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Comment1.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment1.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Comment1(id, author, created_date, last_change_date, post, text)'</em><a class="headerlink" href="#forums.models.Comment1.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment1.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment1.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Comment1.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Comment1.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for Comment1&gt;</em><a class="headerlink" href="#forums.models.Comment1._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.author">
+<code class="sig-name descname">author</code><a class="headerlink" href="#forums.models.Comment1.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.comment2_set">
+<code class="sig-name descname">comment2_set</code><a class="headerlink" href="#forums.models.Comment1.comment2_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment1.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment1.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment1.get_next_by_last_change_date">
+<code class="sig-name descname">get_next_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment1.get_next_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment1.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment1.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment1.get_previous_by_last_change_date">
+<code class="sig-name descname">get_previous_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment1.get_previous_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.Comment1.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.likecomment1_set">
+<code class="sig-name descname">likecomment1_set</code><a class="headerlink" href="#forums.models.Comment1.likecomment1_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.Comment1.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.post">
+<code class="sig-name descname">post</code><a class="headerlink" href="#forums.models.Comment1.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.post_id">
+<code class="sig-name descname">post_id</code><a class="headerlink" href="#forums.models.Comment1.post_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment1.text">
+<code class="sig-name descname">text</code><a class="headerlink" href="#forums.models.Comment1.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.Comment2">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Comment2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">author</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">post</span></em>, <em class="sig-param"><span class="n">comment1</span></em>, <em class="sig-param"><span class="n">text</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Comment2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Comment2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractForum" title="forums.models.AbstractForum"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractForum</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.Comment2.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.Comment2.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Comment2.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Comment2.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment2.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.Comment2.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.Comment2.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Comment2.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Comment2.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment2.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Comment2(id, author, created_date, last_change_date, post, comment1, text)'</em><a class="headerlink" href="#forums.models.Comment2.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Comment2.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for Comment2&gt;</em><a class="headerlink" href="#forums.models.Comment2._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.author">
+<code class="sig-name descname">author</code><a class="headerlink" href="#forums.models.Comment2.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.comment1">
+<code class="sig-name descname">comment1</code><a class="headerlink" href="#forums.models.Comment2.comment1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.comment1_id">
+<code class="sig-name descname">comment1_id</code><a class="headerlink" href="#forums.models.Comment2.comment1_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment2.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment2.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment2.get_next_by_last_change_date">
+<code class="sig-name descname">get_next_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment2.get_next_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment2.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment2.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Comment2.get_previous_by_last_change_date">
+<code class="sig-name descname">get_previous_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Comment2.get_previous_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.Comment2.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.likecomment2_set">
+<code class="sig-name descname">likecomment2_set</code><a class="headerlink" href="#forums.models.Comment2.likecomment2_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.Comment2.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.post">
+<code class="sig-name descname">post</code><a class="headerlink" href="#forums.models.Comment2.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.post_id">
+<code class="sig-name descname">post_id</code><a class="headerlink" href="#forums.models.Comment2.post_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Comment2.text">
+<code class="sig-name descname">text</code><a class="headerlink" href="#forums.models.Comment2.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.Forum">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Forum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">description</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Forum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Forum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py exception">
+<dt id="forums.models.Forum.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.Forum.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Forum.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Forum.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Forum.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.Forum.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.Forum.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Forum.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Forum.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Forum.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Forum(id, title, description)'</em><a class="headerlink" href="#forums.models.Forum.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Forum.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Forum.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Forum.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Forum.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for Forum&gt;</em><a class="headerlink" href="#forums.models.Forum._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.description">
+<code class="sig-name descname">description</code><a class="headerlink" href="#forums.models.Forum.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.Forum.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.Forum.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.post_set">
+<code class="sig-name descname">post_set</code><a class="headerlink" href="#forums.models.Forum.post_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.title">
+<code class="sig-name descname">title</code><a class="headerlink" href="#forums.models.Forum.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Forum.userforumrole_set">
+<code class="sig-name descname">userforumrole_set</code><a class="headerlink" href="#forums.models.Forum.userforumrole_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.LikeComment1">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">LikeComment1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">liker</span></em>, <em class="sig-param"><span class="n">comment1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#LikeComment1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.LikeComment1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractLike" title="forums.models.AbstractLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractLike</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.LikeComment1.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.LikeComment1.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikeComment1.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment1.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.LikeComment1.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.LikeComment1.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikeComment1.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment1.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'LikeComment1(id, liker, comment1)'</em><a class="headerlink" href="#forums.models.LikeComment1.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment1.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for LikeComment1&gt;</em><a class="headerlink" href="#forums.models.LikeComment1._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.comment1">
+<code class="sig-name descname">comment1</code><a class="headerlink" href="#forums.models.LikeComment1.comment1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.comment1_id">
+<code class="sig-name descname">comment1_id</code><a class="headerlink" href="#forums.models.LikeComment1.comment1_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.LikeComment1.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.liker">
+<code class="sig-name descname">liker</code><a class="headerlink" href="#forums.models.LikeComment1.liker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment1.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.LikeComment1.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.LikeComment2">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">LikeComment2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">liker</span></em>, <em class="sig-param"><span class="n">comment2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#LikeComment2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.LikeComment2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractLike" title="forums.models.AbstractLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractLike</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.LikeComment2.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.LikeComment2.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikeComment2.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment2.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.LikeComment2.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.LikeComment2.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikeComment2.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment2.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'LikeComment2(id, liker, comment2)'</em><a class="headerlink" href="#forums.models.LikeComment2.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikeComment2.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for LikeComment2&gt;</em><a class="headerlink" href="#forums.models.LikeComment2._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.comment2">
+<code class="sig-name descname">comment2</code><a class="headerlink" href="#forums.models.LikeComment2.comment2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.comment2_id">
+<code class="sig-name descname">comment2_id</code><a class="headerlink" href="#forums.models.LikeComment2.comment2_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.LikeComment2.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.liker">
+<code class="sig-name descname">liker</code><a class="headerlink" href="#forums.models.LikeComment2.liker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikeComment2.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.LikeComment2.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.LikePost">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">LikePost</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">liker</span></em>, <em class="sig-param"><span class="n">post</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#LikePost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.LikePost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractLike" title="forums.models.AbstractLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractLike</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.LikePost.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.LikePost.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikePost.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikePost.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikePost.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.LikePost.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.LikePost.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.LikePost.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.LikePost.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikePost.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'LikePost(id, liker, post)'</em><a class="headerlink" href="#forums.models.LikePost.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.LikePost.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for LikePost&gt;</em><a class="headerlink" href="#forums.models.LikePost._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.LikePost.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.liker">
+<code class="sig-name descname">liker</code><a class="headerlink" href="#forums.models.LikePost.liker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.LikePost.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.post">
+<code class="sig-name descname">post</code><a class="headerlink" href="#forums.models.LikePost.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.LikePost.post_id">
+<code class="sig-name descname">post_id</code><a class="headerlink" href="#forums.models.LikePost.post_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.Post">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">author</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">forum</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">summary</span></em>, <em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">comments_allowed</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractForum" title="forums.models.AbstractForum"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractForum</span></code></a></p>
+<dl class="py exception">
+<dt id="forums.models.Post.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.Post.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Post.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Post.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Post.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.Post.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.Post.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.Post.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.Post.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Post.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'Post(id, author, created_date, last_change_date, forum, title, summary, text, comments_allowed)'</em><a class="headerlink" href="#forums.models.Post.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.Post.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Post.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Post.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Post.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for Post&gt;</em><a class="headerlink" href="#forums.models.Post._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.author">
+<code class="sig-name descname">author</code><a class="headerlink" href="#forums.models.Post.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.comment1_set">
+<code class="sig-name descname">comment1_set</code><a class="headerlink" href="#forums.models.Post.comment1_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.comment2_set">
+<code class="sig-name descname">comment2_set</code><a class="headerlink" href="#forums.models.Post.comment2_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.comments_allowed">
+<code class="sig-name descname">comments_allowed</code><a class="headerlink" href="#forums.models.Post.comments_allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.forum">
+<code class="sig-name descname">forum</code><a class="headerlink" href="#forums.models.Post.forum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.forum_id">
+<code class="sig-name descname">forum_id</code><a class="headerlink" href="#forums.models.Post.forum_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Post.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Post.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Post.get_next_by_last_change_date">
+<code class="sig-name descname">get_next_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Post.get_next_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Post.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Post.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.Post.get_previous_by_last_change_date">
+<code class="sig-name descname">get_previous_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.Post.get_previous_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.Post.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.likepost_set">
+<code class="sig-name descname">likepost_set</code><a class="headerlink" href="#forums.models.Post.likepost_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.Post.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.summary">
+<code class="sig-name descname">summary</code><a class="headerlink" href="#forums.models.Post.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.text">
+<code class="sig-name descname">text</code><a class="headerlink" href="#forums.models.Post.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.Post.title">
+<code class="sig-name descname">title</code><a class="headerlink" href="#forums.models.Post.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="forums.models.UserForumRole">
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">UserForumRole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">forum</span></em>, <em class="sig-param"><span class="n">role</span></em>, <em class="sig-param"><span class="n">rule</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#UserForumRole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.UserForumRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py exception">
+<dt id="forums.models.UserForumRole.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.UserForumRole.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.UserForumRole.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.UserForumRole.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="forums.models.UserForumRole.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.UserForumRole.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.models.UserForumRole.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.UserForumRole.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.ROLE_TYPE">
+<code class="sig-name descname">ROLE_TYPE</code><em class="property"> = [('Poster', 'Poster - can create a new post'), ('Responder', 'Responder - can reply to a post'), ('Moderator', 'Moderator - can manage the forum')]</em><a class="headerlink" href="#forums.models.UserForumRole.ROLE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.RULE_TYPE">
+<code class="sig-name descname">RULE_TYPE</code><em class="property"> = [('Allow', 'Allows a user to perform a role'), ('Block', 'Blocks a user from performing a role')]</em><a class="headerlink" href="#forums.models.UserForumRole.RULE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'UserForumRole(id, user, forum, role, rule)'</em><a class="headerlink" href="#forums.models.UserForumRole.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.models'</em><a class="headerlink" href="#forums.models.UserForumRole.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for UserForumRole&gt;</em><a class="headerlink" href="#forums.models.UserForumRole._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.forum">
+<code class="sig-name descname">forum</code><a class="headerlink" href="#forums.models.UserForumRole.forum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.forum_id">
+<code class="sig-name descname">forum_id</code><a class="headerlink" href="#forums.models.UserForumRole.forum_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.UserForumRole.get_forums_post_allowed">
+<code class="sig-name descname">get_forums_post_allowed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#UserForumRole.get_forums_post_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.UserForumRole.get_forums_post_allowed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.UserForumRole.get_role_display">
+<code class="sig-name descname">get_role_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: role&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.UserForumRole.get_role_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.models.UserForumRole.get_rule_display">
+<code class="sig-name descname">get_rule_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: rule&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.UserForumRole.get_rule_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.UserForumRole.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.UserForumRole.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.role">
+<code class="sig-name descname">role</code><a class="headerlink" href="#forums.models.UserForumRole.role" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.rule">
+<code class="sig-name descname">rule</code><a class="headerlink" href="#forums.models.UserForumRole.rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.user">
+<code class="sig-name descname">user</code><a class="headerlink" href="#forums.models.UserForumRole.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.models.UserForumRole.user_id">
+<code class="sig-name descname">user_id</code><a class="headerlink" href="#forums.models.UserForumRole.user_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-forums.tests">
+<span id="forums-tests-module"></span><h2>forums.tests module<a class="headerlink" href="#module-forums.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="forums.tests.TestViews">
+<em class="property">class </em><code class="sig-prename descclassname">forums.tests.</code><code class="sig-name descname">TestViews</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/tests.html#TestViews"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.tests.TestViews" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<dl class="py attribute">
+<dt id="forums.tests.TestViews.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#forums.tests.TestViews.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="forums.tests.TestViews.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'forums.tests'</em><a class="headerlink" href="#forums.tests.TestViews.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="forums.tests.TestViews.setUp">
+<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/tests.html#TestViews.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.tests.TestViews.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>This sets up each test the same way with the objects that are
+required</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="forums.tests.contains">
+<code class="sig-prename descclassname">forums.tests.</code><code class="sig-name descname">contains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">haystack</span></em>, <em class="sig-param"><span class="n">needle</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/tests.html#contains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.tests.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is used to check whether a string (needle) is found in the
+response.contain (haystack) which is the html file that is returned.  This html
+file is a binary file so needs to be converted to a string for processing.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="forums.tests.contains_count">
+<code class="sig-prename descclassname">forums.tests.</code><code class="sig-name descname">contains_count</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">haystack</span></em>, <em class="sig-param"><span class="n">needle</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/tests.html#contains_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.tests.contains_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is used to the number of times a string (needle) is found in the
+response.contain (haystack) which is the html file that is returned.  This html
+file is a binary file so needs to be converted to a string for processing.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-forums.urls">
+<span id="forums-urls-module"></span><h2>forums.urls module<a class="headerlink" href="#module-forums.urls" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-forums.views">
+<span id="forums-views-module"></span><h2>forums.views module<a class="headerlink" href="#module-forums.views" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="forums.views.like_comment1">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">like_comment1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#like_comment1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.like_comment1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.like_comment2">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">like_comment2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#like_comment2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.like_comment2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.like_post">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">like_post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#like_post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.like_post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.post_detail">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">post_detail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#post_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.post_detail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.post_list">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">post_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#post_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.post_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.post_list_dashboard">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">post_list_dashboard</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#post_list_dashboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.post_list_dashboard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="forums.views.post_new">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">post_new</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#post_new"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.post_new" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-forums">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-forums" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, ABF
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

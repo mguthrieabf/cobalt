@@ -10,6 +10,7 @@ from organisations.models import Organisation
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from logs.views import log_event
+from accounts.models import User
 from django.contrib import messages
 import stripe
 import json
@@ -44,10 +45,10 @@ def get_balance(member):
     return balance
 
 #########################
-# create_payment_intent #
+# create_manual_payment_intent #
 #########################
 @login_required()
-def create_payment_intent(request):
+def create_manual_payment_intent(request):
     """ Called from the checkout webpage.
 
 When a user is going to pay with a credit card we
@@ -79,7 +80,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_payment_intent",
+                  sub_source = "create_manual_payment_intent",
                   message = "Invalid payload: %s" % data)
             return JsonResponse({'error': 'Invalid payload'})
 
@@ -91,7 +92,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_payment_intent",
+                  sub_source = "create_manual_payment_intent",
                   message = "StripeTransaction id: %s not found" % payload_cobalt_pay_id)
             return JsonResponse({'error': 'Invalid payload'})
 
@@ -101,7 +102,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "ERROR",
                   source = "Payments",
-                  sub_source = "create_payment_intent",
+                  sub_source = "create_manual_payment_intent",
                   message = "StripeTransaction id: %s. Browser sent %s cents." %
                         (payload_cobalt_pay_id, payload_cents))
             return JsonResponse({'error': 'Invalid payload'})
@@ -116,7 +117,7 @@ get back from Stripe
                   user = request.user.full_name,
                   severity = "INFO",
                   source = "Payments",
-                  sub_source = "create_payment_intent",
+                  sub_source = "create_manual_payment_intent",
                   message = "Created payment intent with Stripe. Cobalt_pay_id: %s" % payload_cobalt_pay_id)
 
 # Update Status
@@ -126,10 +127,10 @@ get back from Stripe
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 ####################################
-# create_payment_superintent       #
+# create_auto_payment_intent       #
 ####################################
 @login_required()
-def create_payment_superintent(request):
+def create_auto_payment_intent(request):
     """ Called from the auto top up webpage.
 
 This is very similar to the one off payment. It lets Stripe
@@ -138,24 +139,6 @@ which one it is.
 """
     if request.method == 'POST':
         data = json.loads(request.body)
-
-        # if request.user.auto_amount == None:
-        #     log_event(request = request,
-        #           user = request.user.full_name,
-        #           severity = "ERROR",
-        #           source = "Payments",
-        #           sub_source = "create_payment_superintent",
-        #           message = "No auto_amount found for user: %s" % request.user)
-        #     return JsonResponse({'error': 'user not found'})
-        #
-        # if request.user.stripe_customer_id == None:
-        #     log_event(request = request,
-        #           user = request.user.full_name,
-        #           severity = "ERROR",
-        #           source = "Payments",
-        #           sub_source = "create_payment_superintent",
-        #           message = "No Stripe customer id found for user: %s" % request.user)
-        #     return JsonResponse({'error': 'user not found'})
 
         stripe.api_key = STRIPE_SECRET_KEY
         intent = stripe.SetupIntent.create(
@@ -167,9 +150,9 @@ which one it is.
               user = request.user.full_name,
               severity = "INFO",
               source = "Payments",
-              sub_source = "create_payment_superintent",
+              sub_source = "create_auto_payment_intent",
               message = "Intent created for: %s" % request.user)
-              
+
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
 
 
@@ -357,7 +340,6 @@ def stripe_webhook(request):
               sub_source = "stripe_webhook",
               message = "Invalid Payload in message from Stripe")
 
-        print("Invalid payload")
         return HttpResponse(status=400)
 
     if event.type == 'payment_intent.succeeded':
@@ -446,6 +428,16 @@ def stripe_webhook(request):
 
         # make Callback
         callback_router(tran.route_code, tran.route_payload, tran)
+
+    elif event.type == 'payment_method.attached':  # auto top up set up successful
+        stripe_customer  = event.data.object.customer
+        member = User.objects.filter(stripe_customer_id=stripe_customer).last()
+
+        balance = get_balance(member)
+        print(balance)
+        if balance < AUTO_TOP_UP_LOW_LIMIT:
+            print("Auto top up")
+            (rc, message) = auto_topup_member(member)
 
     else:
         # Unexpected event type

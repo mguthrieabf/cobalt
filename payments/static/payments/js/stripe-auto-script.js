@@ -98,7 +98,8 @@ var pay = function(stripe, card, clientSecret) {
 var orderComplete = function(clientSecret) {
     document.querySelector(".sr-payment-form").classList.add("hidden");
     document.querySelector(".sr-result").textContent = "Card Setup Successful!";
-
+    document.getElementById("cancel").style.visibility='hidden';
+    document.getElementById("autotopdiv").style.visibility='hidden';
     document.querySelector(".sr-result").classList.remove("hidden");
     // setTimeout(function() {
     //   document.querySelector(".sr-result").classList.add("expand");

@@ -1,0 +1,1372 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>payments package &mdash; Cobalt 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cobalt
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">payments package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-payments.admin">payments.admin module</a></li>
+<li><a class="reference internal" href="#module-payments.apps">payments.apps module</a></li>
+<li><a class="reference internal" href="#module-payments.core">payments.core module</a></li>
+<li><a class="reference internal" href="#module-payments.forms">payments.forms module</a></li>
+<li><a class="reference internal" href="#module-payments.models">payments.models module</a></li>
+<li><a class="reference internal" href="#module-payments.tests">payments.tests module</a></li>
+<li><a class="reference internal" href="#module-payments.urls">payments.urls module</a></li>
+<li><a class="reference internal" href="#module-payments.views">payments.views module</a></li>
+<li><a class="reference internal" href="#module-payments">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cobalt</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>payments package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/payments.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="payments-package">
+<h1>payments package<a class="headerlink" href="#payments-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-payments.admin">
+<span id="payments-admin-module"></span><h2>payments.admin module<a class="headerlink" href="#module-payments.admin" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="payments.admin.MemberTransactionAdmin">
+<em class="property">class </em><code class="sig-prename descclassname">payments.admin.</code><code class="sig-name descname">MemberTransactionAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/admin.html#MemberTransactionAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.admin.MemberTransactionAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt id="payments.admin.MemberTransactionAdmin.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.admin.MemberTransactionAdmin.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.MemberTransactionAdmin.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.admin'</em><a class="headerlink" href="#payments.admin.MemberTransactionAdmin.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.admin.MemberTransactionAdmin.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.admin.MemberTransactionAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.MemberTransactionAdmin.search_fields">
+<code class="sig-name descname">search_fields</code><em class="property"> = ['reference_no', 'type']</em><a class="headerlink" href="#payments.admin.MemberTransactionAdmin.search_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.admin.OrganisationTransactionAdmin">
+<em class="property">class </em><code class="sig-prename descclassname">payments.admin.</code><code class="sig-name descname">OrganisationTransactionAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/admin.html#OrganisationTransactionAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.admin.OrganisationTransactionAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt id="payments.admin.OrganisationTransactionAdmin.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.admin.OrganisationTransactionAdmin.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.OrganisationTransactionAdmin.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.admin'</em><a class="headerlink" href="#payments.admin.OrganisationTransactionAdmin.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.admin.OrganisationTransactionAdmin.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.admin.OrganisationTransactionAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.OrganisationTransactionAdmin.search_fields">
+<code class="sig-name descname">search_fields</code><em class="property"> = ['reference_no', 'type']</em><a class="headerlink" href="#payments.admin.OrganisationTransactionAdmin.search_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.admin.StripeTransactionAdmin">
+<em class="property">class </em><code class="sig-prename descclassname">payments.admin.</code><code class="sig-name descname">StripeTransactionAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/admin.html#StripeTransactionAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.admin.StripeTransactionAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt id="payments.admin.StripeTransactionAdmin.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.admin.StripeTransactionAdmin.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.StripeTransactionAdmin.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.admin'</em><a class="headerlink" href="#payments.admin.StripeTransactionAdmin.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.admin.StripeTransactionAdmin.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.admin.StripeTransactionAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.admin.StripeTransactionAdmin.search_fields">
+<code class="sig-name descname">search_fields</code><em class="property"> = ['stripe_reference']</em><a class="headerlink" href="#payments.admin.StripeTransactionAdmin.search_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.apps">
+<span id="payments-apps-module"></span><h2>payments.apps module<a class="headerlink" href="#module-payments.apps" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="payments.apps.PaymentsConfig">
+<em class="property">class </em><code class="sig-prename descclassname">payments.apps.</code><code class="sig-name descname">PaymentsConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_name</span></em>, <em class="sig-param"><span class="n">app_module</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/apps.html#PaymentsConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.apps.PaymentsConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<dl class="py attribute">
+<dt id="payments.apps.PaymentsConfig.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.apps.PaymentsConfig.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.apps.PaymentsConfig.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.apps'</em><a class="headerlink" href="#payments.apps.PaymentsConfig.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.apps.PaymentsConfig.name">
+<code class="sig-name descname">name</code><em class="property"> = 'payments'</em><a class="headerlink" href="#payments.apps.PaymentsConfig.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.core">
+<span id="payments-core-module"></span><h2>payments.core module<a class="headerlink" href="#module-payments.core" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="payments.core.auto_topup_member">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">auto_topup_member</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">topup_required</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#auto_topup_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.auto_topup_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>process an auto top up. Optionally pass parameter with amount required</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.callback_router">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">callback_router</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tran</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">status</span><span class="o">=</span><span class="default_value">'Success'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#callback_router"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.callback_router" title="Permalink to this definition">¶</a></dt>
+<dd><p>Central function to handle callbacks.
+Callbacks are an asynchronous way for us to let the calling application
+know if a payment successed or not.</p>
+<p>We could use a routing table for this but there will only ever be a small
+number of callbacks in Cobalt so we are okay to hardcode it.</p>
+<p>We should not get tran provided but do for early testing. This will be
+removed later, but for now allows us to reverse the transaction for testing</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.create_auto_payment_intent">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">create_auto_payment_intent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#create_auto_payment_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.create_auto_payment_intent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from the auto top up webpage.</p>
+<p>This is very similar to the one off payment. It lets Stripe
+know to expect a credit card and provides a token to confirm
+which one it is.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.create_manual_payment_intent">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">create_manual_payment_intent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#create_manual_payment_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.create_manual_payment_intent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from the checkout webpage.</p>
+<p>When a user is going to pay with a credit card we
+tell stripe and stripe gets ready for it.</p>
+<p>This functions expects a json payload:</p>
+<blockquote>
+<div><p>“id”: This is the StripeTransaction in our table that we are handling
+“amount”: The amount in dollars</p>
+</div></blockquote>
+<p>Payments only knows how to pay things, not why. Some other part of the
+system needs to be informed once we are done. The route_code tells us
+what to call. There are only ever going to be a small number of things
+to call so we hard code them.</p>
+<p>This function returns our public key and the client secret that we
+get back from Stripe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.get_balance">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance" title="Permalink to this definition">¶</a></dt>
+<dd><p>get members account balance</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.get_balance_detail">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance_detail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>called by dashboard to show basic information</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.payment_api">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">payment_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#payment_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.payment_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>API for payments from other parts of the application.</p>
+<p>There is a user on the end of this who needs to know what is happening,
+so we return a page that tells them. It could be:</p>
+<ol class="arabic simple">
+<li><p>A payment page for one off payments</p></li>
+<li><p>A failed auto payment message</p></li>
+<li><p>A success page from auto topup</p></li>
+<li><p>A success page because they had enough funds in the account</p></li>
+</ol>
+<p>The route_code provides a callback and the route_payload is the string
+to return. For 3 and 4, the callback will be called before the page is
+returned.</p>
+<p>Payments should be the last step in the process for the calling application
+as there is no way to return control to the application after payments is
+done. Note: This would be possible if required.</p>
+<p>amount is the amount to be deducted from the users account. A positive
+amount is a charge, a negative amount is an incoming payment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.stripe_webhook">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback from Stripe webhook</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.update_account">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_member</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>method to update a customer account</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.core.update_organisation">
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">organisation</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">other_organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">member</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_organisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>method to update an organisations account</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.forms">
+<span id="payments-forms-module"></span><h2>payments.forms module<a class="headerlink" href="#module-payments.forms" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="payments.forms.MemberTransfer">
+<em class="property">class </em><code class="sig-prename descclassname">payments.forms.</code><code class="sig-name descname">MemberTransfer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#MemberTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.MemberTransfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.forms.Form</span></code></p>
+<dl class="py attribute">
+<dt id="payments.forms.MemberTransfer.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.forms.MemberTransfer.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.MemberTransfer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#MemberTransfer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.MemberTransfer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.MemberTransfer.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.forms'</em><a class="headerlink" href="#payments.forms.MemberTransfer.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.MemberTransfer.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'transfer_to': &lt;django.forms.models.ModelChoiceField object&gt;}</em><a class="headerlink" href="#payments.forms.MemberTransfer.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.MemberTransfer.clean_amount">
+<code class="sig-name descname">clean_amount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#MemberTransfer.clean_amount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.MemberTransfer.clean_amount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.MemberTransfer.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'transfer_to': &lt;django.forms.models.ModelChoiceField object&gt;}</em><a class="headerlink" href="#payments.forms.MemberTransfer.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.MemberTransfer.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.forms.MemberTransfer.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.forms.TestTransaction">
+<em class="property">class </em><code class="sig-prename descclassname">payments.forms.</code><code class="sig-name descname">TestTransaction</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">field_order=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#TestTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.TestTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.forms.Form</span></code></p>
+<dl class="py attribute">
+<dt id="payments.forms.TestTransaction.TRANSACTION_TYPE">
+<code class="sig-name descname">TRANSACTION_TYPE</code><em class="property"> = [('Transfer Out', 'Money transfered out of account'), ('Transfer In', 'Money transfered in to account'), ('Auto Top Up', 'Automated CC top up'), ('Congress Entry', 'Entry to a congress'), ('CC Payment', 'Credit Card payment'), ('Club Payment', 'Club game payment'), ('Club Membership', 'Club membership payment'), ('Miscellaneous', 'Miscellaneous payment')]</em><a class="headerlink" href="#payments.forms.TestTransaction.TRANSACTION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.TestTransaction.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.forms.TestTransaction.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.TestTransaction.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.forms'</em><a class="headerlink" href="#payments.forms.TestTransaction.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.TestTransaction.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'organisation': &lt;django.forms.models.ModelChoiceField object&gt;, 'type': &lt;django.forms.fields.ChoiceField object&gt;, 'url': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#payments.forms.TestTransaction.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.TestTransaction.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'organisation': &lt;django.forms.models.ModelChoiceField object&gt;, 'type': &lt;django.forms.fields.ChoiceField object&gt;, 'url': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#payments.forms.TestTransaction.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.TestTransaction.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.forms.TestTransaction.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.models">
+<span id="payments-models-module"></span><h2>payments.models module<a class="headerlink" href="#module-payments.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="payments.models.AbstractTransaction">
+<em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">AbstractTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py class">
+<dt id="payments.models.AbstractTransaction.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.Meta.__dict__">
+<code class="sig-name descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'payments.models', 'abstract': False, '__dict__': &lt;attribute '__dict__' of 'Meta' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Meta' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#payments.models.AbstractTransaction.Meta.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.Meta.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.AbstractTransaction.Meta.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.Meta.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.AbstractTransaction.Meta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.Meta.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#payments.models.AbstractTransaction.Meta.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.Meta.abstract">
+<code class="sig-name descname">abstract</code><em class="property"> = False</em><a class="headerlink" href="#payments.models.AbstractTransaction.Meta.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.TRANSACTION_TYPE">
+<code class="sig-name descname">TRANSACTION_TYPE</code><em class="property"> = [('Transfer Out', 'Money transfered out of account'), ('Transfer In', 'Money transfered in to account'), ('Auto Top Up', 'Automated CC top up'), ('Congress Entry', 'Entry to a congress'), ('CC Payment', 'Credit Card payment'), ('Club Payment', 'Club game payment'), ('Club Membership', 'Club membership payment'), ('Miscellaneous', 'Miscellaneous payment')]</em><a class="headerlink" href="#payments.models.AbstractTransaction.TRANSACTION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.AbstractTransaction.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.AbstractTransaction.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for AbstractTransaction&gt;</em><a class="headerlink" href="#payments.models.AbstractTransaction._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.amount">
+<code class="sig-name descname">amount</code><a class="headerlink" href="#payments.models.AbstractTransaction.amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.balance">
+<code class="sig-name descname">balance</code><a class="headerlink" href="#payments.models.AbstractTransaction.balance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.created_date">
+<code class="sig-name descname">created_date</code><a class="headerlink" href="#payments.models.AbstractTransaction.created_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.description">
+<code class="sig-name descname">description</code><a class="headerlink" href="#payments.models.AbstractTransaction.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.AbstractTransaction.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.AbstractTransaction.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.AbstractTransaction.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.AbstractTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.AbstractTransaction.get_type_display">
+<code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.AbstractTransaction.get_type_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.reference_no">
+<code class="sig-name descname">reference_no</code><a class="headerlink" href="#payments.models.AbstractTransaction.reference_no" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.AbstractTransaction.type">
+<code class="sig-name descname">type</code><a class="headerlink" href="#payments.models.AbstractTransaction.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.models.MemberTransaction">
+<em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">MemberTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">balance</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">reference_no</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span></em>, <em class="sig-param"><span class="n">other_member</span></em>, <em class="sig-param"><span class="n">organisation</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#MemberTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.MemberTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
+<dl class="py exception">
+<dt id="payments.models.MemberTransaction.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.MemberTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.MemberTransaction.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.MemberTransaction.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="payments.models.MemberTransaction.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#payments.models.MemberTransaction.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.MemberTransaction.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.MemberTransaction.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'MemberTransaction(id, created_date, amount, balance, description, reference_no, type, member, stripe_transaction, other_member, organisation)'</em><a class="headerlink" href="#payments.models.MemberTransaction.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.MemberTransaction.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.MemberTransaction.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#MemberTransaction.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.MemberTransaction.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for MemberTransaction&gt;</em><a class="headerlink" href="#payments.models.MemberTransaction._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.MemberTransaction.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.MemberTransaction.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.MemberTransaction.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.MemberTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.MemberTransaction.get_type_display">
+<code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.MemberTransaction.get_type_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#payments.models.MemberTransaction.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.member">
+<code class="sig-name descname">member</code><a class="headerlink" href="#payments.models.MemberTransaction.member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.member_id">
+<code class="sig-name descname">member_id</code><a class="headerlink" href="#payments.models.MemberTransaction.member_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#payments.models.MemberTransaction.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.organisation">
+<code class="sig-name descname">organisation</code><a class="headerlink" href="#payments.models.MemberTransaction.organisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.organisation_id">
+<code class="sig-name descname">organisation_id</code><a class="headerlink" href="#payments.models.MemberTransaction.organisation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.other_member">
+<code class="sig-name descname">other_member</code><a class="headerlink" href="#payments.models.MemberTransaction.other_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.other_member_id">
+<code class="sig-name descname">other_member_id</code><a class="headerlink" href="#payments.models.MemberTransaction.other_member_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.MemberTransaction.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#MemberTransaction.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.MemberTransaction.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.stripe_transaction">
+<code class="sig-name descname">stripe_transaction</code><a class="headerlink" href="#payments.models.MemberTransaction.stripe_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.MemberTransaction.stripe_transaction_id">
+<code class="sig-name descname">stripe_transaction_id</code><a class="headerlink" href="#payments.models.MemberTransaction.stripe_transaction_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.models.OrganisationTransaction">
+<em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">OrganisationTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">balance</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">reference_no</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">organisation</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span></em>, <em class="sig-param"><span class="n">other_organisation</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#OrganisationTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.OrganisationTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
+<dl class="py exception">
+<dt id="payments.models.OrganisationTransaction.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.OrganisationTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.OrganisationTransaction.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.OrganisationTransaction.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="payments.models.OrganisationTransaction.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#payments.models.OrganisationTransaction.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.OrganisationTransaction.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.OrganisationTransaction.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'OrganisationTransaction(id, created_date, amount, balance, description, reference_no, type, organisation, member, stripe_transaction, other_organisation)'</em><a class="headerlink" href="#payments.models.OrganisationTransaction.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.OrganisationTransaction.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.OrganisationTransaction.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#OrganisationTransaction.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.OrganisationTransaction.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for OrganisationTransaction&gt;</em><a class="headerlink" href="#payments.models.OrganisationTransaction._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.OrganisationTransaction.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.OrganisationTransaction.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.OrganisationTransaction.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.OrganisationTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.OrganisationTransaction.get_type_display">
+<code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.OrganisationTransaction.get_type_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#payments.models.OrganisationTransaction.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.member">
+<code class="sig-name descname">member</code><a class="headerlink" href="#payments.models.OrganisationTransaction.member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.member_id">
+<code class="sig-name descname">member_id</code><a class="headerlink" href="#payments.models.OrganisationTransaction.member_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#payments.models.OrganisationTransaction.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.organisation">
+<code class="sig-name descname">organisation</code><a class="headerlink" href="#payments.models.OrganisationTransaction.organisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.organisation_id">
+<code class="sig-name descname">organisation_id</code><a class="headerlink" href="#payments.models.OrganisationTransaction.organisation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.other_organisation">
+<code class="sig-name descname">other_organisation</code><a class="headerlink" href="#payments.models.OrganisationTransaction.other_organisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.other_organisation_id">
+<code class="sig-name descname">other_organisation_id</code><a class="headerlink" href="#payments.models.OrganisationTransaction.other_organisation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.OrganisationTransaction.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#OrganisationTransaction.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.OrganisationTransaction.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.stripe_transaction">
+<code class="sig-name descname">stripe_transaction</code><a class="headerlink" href="#payments.models.OrganisationTransaction.stripe_transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.OrganisationTransaction.stripe_transaction_id">
+<code class="sig-name descname">stripe_transaction_id</code><a class="headerlink" href="#payments.models.OrganisationTransaction.stripe_transaction_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.models.StripeTransaction">
+<em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">StripeTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">status</span></em>, <em class="sig-param"><span class="n">stripe_reference</span></em>, <em class="sig-param"><span class="n">stripe_method</span></em>, <em class="sig-param"><span class="n">stripe_currency</span></em>, <em class="sig-param"><span class="n">stripe_receipt_url</span></em>, <em class="sig-param"><span class="n">stripe_brand</span></em>, <em class="sig-param"><span class="n">stripe_country</span></em>, <em class="sig-param"><span class="n">stripe_exp_month</span></em>, <em class="sig-param"><span class="n">stripe_exp_year</span></em>, <em class="sig-param"><span class="n">stripe_last4</span></em>, <em class="sig-param"><span class="n">route_code</span></em>, <em class="sig-param"><span class="n">route_payload</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">linked_organisation</span></em>, <em class="sig-param"><span class="n">linked_transaction_type</span></em>, <em class="sig-param"><span class="n">linked_amount</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#StripeTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.StripeTransaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<dl class="py exception">
+<dt id="payments.models.StripeTransaction.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.StripeTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.DoesNotExist.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.StripeTransaction.DoesNotExist.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.DoesNotExist.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.StripeTransaction.DoesNotExist.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="payments.models.StripeTransaction.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#payments.models.StripeTransaction.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.MultipleObjectsReturned.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.models.StripeTransaction.MultipleObjectsReturned.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.MultipleObjectsReturned.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.StripeTransaction.MultipleObjectsReturned.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.TRANSACTION_STATUS">
+<code class="sig-name descname">TRANSACTION_STATUS</code><em class="property"> = [('Initiated', 'Started - payment needs made'), ('Intent', 'Intent - received customer intent to pay from Stripe'), ('Complete', 'Success - payment completed successfully'), ('Failed', 'Failed - payment failed')]</em><a class="headerlink" href="#payments.models.StripeTransaction.TRANSACTION_STATUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = 'StripeTransaction(id, member, description, amount, status, stripe_reference, stripe_method, stripe_currency, stripe_receipt_url, stripe_brand, stripe_country, stripe_exp_month, stripe_exp_year, stripe_last4, route_code, route_payload, created_date, last_change_date, linked_organisation, linked_transaction_type, linked_amount)'</em><a class="headerlink" href="#payments.models.StripeTransaction.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.models'</em><a class="headerlink" href="#payments.models.StripeTransaction.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#StripeTransaction.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.StripeTransaction.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction._meta">
+<code class="sig-name descname">_meta</code><em class="property"> = &lt;Options for StripeTransaction&gt;</em><a class="headerlink" href="#payments.models.StripeTransaction._meta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.amount">
+<code class="sig-name descname">amount</code><a class="headerlink" href="#payments.models.StripeTransaction.amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.created_date">
+<code class="sig-name descname">created_date</code><a class="headerlink" href="#payments.models.StripeTransaction.created_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.description">
+<code class="sig-name descname">description</code><a class="headerlink" href="#payments.models.StripeTransaction.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.StripeTransaction.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.get_next_by_last_change_date">
+<code class="sig-name descname">get_next_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.StripeTransaction.get_next_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.StripeTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.get_previous_by_last_change_date">
+<code class="sig-name descname">get_previous_by_last_change_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_change_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.StripeTransaction.get_previous_by_last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.models.StripeTransaction.get_status_display">
+<code class="sig-name descname">get_status_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: status&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.StripeTransaction.get_status_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#payments.models.StripeTransaction.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.last_change_date">
+<code class="sig-name descname">last_change_date</code><a class="headerlink" href="#payments.models.StripeTransaction.last_change_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_amount">
+<code class="sig-name descname">linked_amount</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_organisation">
+<code class="sig-name descname">linked_organisation</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_organisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_organisation_id">
+<code class="sig-name descname">linked_organisation_id</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_organisation_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_transaction_type">
+<code class="sig-name descname">linked_transaction_type</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_transaction_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.member">
+<code class="sig-name descname">member</code><a class="headerlink" href="#payments.models.StripeTransaction.member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.member_id">
+<code class="sig-name descname">member_id</code><a class="headerlink" href="#payments.models.StripeTransaction.member_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.membertransaction_set">
+<code class="sig-name descname">membertransaction_set</code><a class="headerlink" href="#payments.models.StripeTransaction.membertransaction_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#payments.models.StripeTransaction.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.organisationtransaction_set">
+<code class="sig-name descname">organisationtransaction_set</code><a class="headerlink" href="#payments.models.StripeTransaction.organisationtransaction_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.route_code">
+<code class="sig-name descname">route_code</code><a class="headerlink" href="#payments.models.StripeTransaction.route_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.route_payload">
+<code class="sig-name descname">route_payload</code><a class="headerlink" href="#payments.models.StripeTransaction.route_payload" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.status">
+<code class="sig-name descname">status</code><a class="headerlink" href="#payments.models.StripeTransaction.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_brand">
+<code class="sig-name descname">stripe_brand</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_brand" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_country">
+<code class="sig-name descname">stripe_country</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_country" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_currency">
+<code class="sig-name descname">stripe_currency</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_currency" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_exp_month">
+<code class="sig-name descname">stripe_exp_month</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_exp_month" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_exp_year">
+<code class="sig-name descname">stripe_exp_year</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_exp_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_last4">
+<code class="sig-name descname">stripe_last4</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_last4" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_method">
+<code class="sig-name descname">stripe_method</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_receipt_url">
+<code class="sig-name descname">stripe_receipt_url</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_receipt_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.stripe_reference">
+<code class="sig-name descname">stripe_reference</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.tests">
+<span id="payments-tests-module"></span><h2>payments.tests module<a class="headerlink" href="#module-payments.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="payments.tests.UserTestCase">
+<em class="property">class </em><code class="sig-prename descclassname">payments.tests.</code><code class="sig-name descname">UserTestCase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/tests.html#UserTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.tests.UserTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<dl class="py attribute">
+<dt id="payments.tests.UserTestCase.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.tests.UserTestCase.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.tests.UserTestCase.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.tests'</em><a class="headerlink" href="#payments.tests.UserTestCase.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.tests.UserTestCase.setUp">
+<code class="sig-name descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/tests.html#UserTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.tests.UserTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="payments.tests.UserViewCase">
+<em class="property">class </em><code class="sig-prename descclassname">payments.tests.</code><code class="sig-name descname">UserViewCase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodName</span><span class="o">=</span><span class="default_value">'runTest'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/tests.html#UserViewCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.tests.UserViewCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.testcases.TestCase</span></code></p>
+<dl class="py attribute">
+<dt id="payments.tests.UserViewCase.__doc__">
+<code class="sig-name descname">__doc__</code><em class="property"> = None</em><a class="headerlink" href="#payments.tests.UserViewCase.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.tests.UserViewCase.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'payments.tests'</em><a class="headerlink" href="#payments.tests.UserViewCase.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments.urls">
+<span id="payments-urls-module"></span><h2>payments.urls module<a class="headerlink" href="#module-payments.urls" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-payments.views">
+<span id="payments-views-module"></span><h2>payments.views module<a class="headerlink" href="#module-payments.views" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="payments.views.home">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">home</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#home"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.member_transfer">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">member_transfer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#member_transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.member_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>view to transfer $ to another member</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.setup_autotopup">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">setup_autotopup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#setup_autotopup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.setup_autotopup" title="Permalink to this definition">¶</a></dt>
+<dd><p>view to sign up to auto top up. Creates Stripe customer if not already defined.
+Hands over to Stripe to process card.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.statement">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Member statement view</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.statement_common">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_common</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_common"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_common" title="Permalink to this definition">¶</a></dt>
+<dd><p>Member statement view - common part across online, pdf and csv</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.statement_csv">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Member statement view - csv download</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.statement_pdf">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Member statement view - pdf download</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.stripe_create_customer">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">stripe_create_customer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#stripe_create_customer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.stripe_create_customer" title="Permalink to this definition">¶</a></dt>
+<dd><p>calls Stripe to register a customer</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="payments.views.update_auto_amount">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">update_auto_amount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#update_auto_amount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.update_auto_amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the auto top up page when a user changes the amount of the auto top up</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-payments">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-payments" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, ABF
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

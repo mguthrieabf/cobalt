@@ -194,8 +194,11 @@ if 'GLOBAL_MPSERVER' in os.environ:
 
 # Stripe is our payment gateway
 
-STRIPE_SECRET_KEY="sk_test_tbD1kQf7S7aBrWdpaAkdK60e"
-STRIPE_PUBLISHABLE_KEY="pk_test_vx2RPX6BXeETHa3MJycvArkx"
+#STRIPE_SECRET_KEY="sk_test_tbD1kQf7S7aBrWdpaAkdK60e"
+#STRIPE_PUBLISHABLE_KEY="pk_test_vx2RPX6BXeETHa3MJycvArkx"
+STRIPE_SECRET_KEY="sk_test_tnjlQRkdt1wH7XMIe6qt6hBF00tBWjSPGl"
+STRIPE_PUBLISHABLE_KEY="pk_test_fE1LvnH8aQWUC11pj2ZL9Z8F000zhXsgaV"
+
 if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
@@ -234,12 +237,12 @@ SUMMERNOTE_CONFIG = {
 
 # Bring in Elastic Beanstalk config if present.
 #with open("/opt/elasticbeanstalk/deployment/env") as env:
-with open("/tmp/env") as env:
-    lines=env.readlines()
-    for line in lines:
-        if not line.find("PATH")>=0:
-            parts=line.split("=")
-            exec(f"{parts[0]}='{parts[1].strip()}'")
+# with open("/tmp/env") as env:
+#     lines=env.readlines()
+#     for line in lines:
+#         if not line.find("PATH")>=0:
+#             parts=line.split("=")
+#             exec(f"{parts[0]}='{parts[1].strip()}'")
 
 
 try:

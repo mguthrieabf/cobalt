@@ -8,6 +8,13 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript" src="{% static "payments/js/stripe-auto-script.js" %}" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<style>
+  .cobalt-form-error {
+    color: red;
+    font-weight: bold;
+    font-size: 18px;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -28,9 +35,10 @@
           <div align="center">
             <div class="sr-main">
               <form>
-               <div class="form-group">
+               <div id="autotopdiv" class="form-group">
                  <label class="bmd-label-floating">Auto Top Up Amount</label>
                  <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ user.auto_amount }}">
+                 <span class="cobalt-form-error" id="id_errors" name="id_errors"></span>
                </div>
               </form>
               <h3 align="center">Card Details</h3>
@@ -57,7 +65,7 @@
               </div>
             </div>
             <br>
-            <button class="btn btn-warning col-3" onclick="window.location.href='{% url "payments:payments" %}'">Cancel</button>
+            <button id="cancel" name="cancel" class="btn btn-warning col-3" onclick="window.location.href='{% url "payments:payments" %}'">Cancel</button>
           </div>
         </div>
       </div>
@@ -66,4 +74,38 @@
 </div>
 
 
+{% endblock %}
+{% block footer %}
+<script>
+  $(document).ready(function() {
+    var amt_field = $('#id_auto_amount');
+    var error_field = $('#id_errors');
+    amt_field.on('change', function(e) {
+      error_field.text("");
+       var auto_amt = Number(amt_field.val());
+       if (auto_amt < 50) {
+         error_field.text("Insufficient amount. Must be at least $50.")
+         window.setTimeout(function () {  // needed for focus to work
+           amt_field.focus();
+         }, 100);
+         return;
+       }
+       if (auto_amt > 2000) {
+         error_field.text("Too large. $2000 is the maximum.")
+         window.setTimeout(function () {
+           amt_field.focus();
+         }, 100);
+         return;
+       }
+       var strURL = "{% url "payments:update_auto_amount" %}?amount=" + auto_amt;
+
+       $.ajax({
+           url: strURL,
+           context: document.body,
+           success: function(txt){
+           }
+      });
+    });
+  });
+</script>
 {% endblock %}
