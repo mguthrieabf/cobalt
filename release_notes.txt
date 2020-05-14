@@ -1,0 +1,5 @@
+Registration form changed names to readonly. Check for already registered.
+AutoTopUpConfig moved to the User object
+Profile works now and only shows auto top up amount if registered
+Cancel button on Auto top up
+Auto top up amount now on form

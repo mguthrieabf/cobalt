@@ -187,22 +187,31 @@ def masterpoints_search(request):
        return redirect("view/%s/" % request.user.system_number)
 
 def system_number_lookup(request):
-   if request.method == "GET":
-       system_number = request.GET['system_number']
-       member=None
-       if system_number.isdigit():
-           try:
-               member = requests.get('%s/id/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
-           except:
-               member=None
-       result = "Invalid or inactive number"
-       if member:
-           if member["IsActive"]=="Y":
-               given_name = member["GivenNames"]
-               surname = member["Surname"]
-               result = "%s %s" % (given_name, surname)
+    """
+    Called from the registration page. Takes in a system number and returns
+    the member first and lastname or an error message.
+    """
+    if request.method == "GET":
+        system_number = request.GET['system_number']
+        member = None
+        result = "Error: Invalid or inactive number"
+        if system_number.isdigit():
+            try:
+                member = requests.get('%s/id/%s' % (GLOBAL_MPSERVER, system_number)).json()[0]
+            except:
+                member = None
 
-       return render(request, 'masterpoints/system-number-lookup.html', {'result' : result})
+        if member:
+            m = User.objects.filter(system_number=system_number)
+            if m:   # already registered
+                result = "Error: User already registered"
+            else:
+                if member["IsActive"]=="Y":
+                    given_name = member["GivenNames"]
+                    surname = member["Surname"]
+                    result = "%s %s" % (given_name, surname)
+
+    return render(request, 'masterpoints/system-number-lookup.html', {'result' : result})
 
 def get_masterpoints(system_number):
 # Called from Dashboard

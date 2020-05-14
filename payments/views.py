@@ -323,3 +323,16 @@ def member_transfer(request):
 
     return render(request, 'payments/member_transfer.html', {'form': form,
                                                              'balance': balance})
+
+########################
+# update_auto_amount   #
+########################
+def update_auto_amount(request):
+    """
+    Called by the auto top up page when a user changes the amount of the auto top up
+    """
+    if request.method == "GET":
+        amount = request.GET['amount']
+        request.user.auto_amount = amount
+        request.user.save()
+        return HttpResponse("Successful")
