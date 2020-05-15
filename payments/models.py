@@ -84,6 +84,7 @@ class MemberTransaction(AbstractTransaction):
     organisation = models.ForeignKey(Organisation, blank=True, null=True, on_delete=models.SET_NULL)
 
     def save(self, *args, **kwargs):
+        self.description = self.description[:79]
         if not self.reference_no:
             self.reference_no = "%s-%s-%s" % (
                             ''.join(random.choices(string.ascii_uppercase + string.digits, k=4)),

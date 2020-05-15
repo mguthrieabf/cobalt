@@ -27,7 +27,7 @@ def log_event(user, severity, source, sub_source, message, request=None):
     l.severity = severity
     l.source = source
     l.sub_source = sub_source
-    l.message = message
+    l.message = message[:199]
     l.save()
 
     if severity=="CRITICAL":
