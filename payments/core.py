@@ -30,29 +30,32 @@ Todo:
     * For module TODOs
     * You have to also use ``sphinx.ext.todo`` extension
 
+.. todo::
+
 .. _Payments Views:
    #module-payments.views
 
 """
-
+import json
+import stripe
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import (StripeTransaction, MemberTransaction,
-                     OrganisationTransaction)
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from logs.views import log_event
 from accounts.models import User
-from django.contrib import messages
-import stripe
-import json
 from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
                              AUTO_TOP_UP_LOW_LIMIT)
+from .models import (StripeTransaction, MemberTransaction,
+                     OrganisationTransaction)
 
+
+#TODO: Complete doco
 #######################
 # get_balance_detail  #
 #######################
@@ -204,6 +207,7 @@ which one it is.
         return JsonResponse({'publishableKey':STRIPE_PUBLISHABLE_KEY,
                              'clientSecret': intent.client_secret})
 
+    return JsonResponse({'error': 'POST required'})
 
 ######################
 # test_callback      #
@@ -220,14 +224,14 @@ def test_callback(status, payload, tran):
               severity="DEBUG",
               source="Payments",
               sub_source="test_callback",
-              message="Received callback from payment: %s %s" % (status, payload))
+              message="Received callback from payment: %s %s %s" % (status, payload, tran))
 
 #####################
 # payment_api       #
 #####################
 def payment_api(request, description, amount, member, route_code=None,
                 route_payload=None, organisation=None,
-                log_msg=None, type=None, url=None):
+                log_msg=None, payment_type=None, url=None):
     """ API for payments from other parts of the application.
 
     There is a user on the end of this who needs to know what is happening,
@@ -258,8 +262,8 @@ def payment_api(request, description, amount, member, route_code=None,
     if not log_msg:
         log_msg = description
 
-    if not type:
-        type = "Miscellaneous"
+    if not payment_type:
+        payment_type = "Miscellaneous"
 
     if not url:  # where to next
         url = "dashboard"
@@ -275,7 +279,7 @@ def payment_api(request, description, amount, member, route_code=None,
                        log_msg=log_msg,
                        source="Payments",
                        sub_source="payments_api",
-                       type=type
+                       payment_type=payment_type
                        )
 
 # If we got an organisation then make their payment too
@@ -285,7 +289,7 @@ def payment_api(request, description, amount, member, route_code=None,
                             log_msg=log_msg,
                             source="Payments",
                             sub_source="payments_api",
-                            type=type,
+                            payment_type=payment_type,
                             member=member)
 
         messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
@@ -299,8 +303,8 @@ def payment_api(request, description, amount, member, route_code=None,
 
         if member.auto_amount:
             if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
-                (rc, msg) = auto_topup_member(member)
-                if rc:
+                (return_code, msg) = auto_topup_member(member)
+                if return_code:
                     messages.success(request, msg,
                                      extra_tags='cobalt-message-success')
                 else:
@@ -315,9 +319,9 @@ def payment_api(request, description, amount, member, route_code=None,
 # The balance afterwards should be the auto amount the user has set
             topup_required = member.auto_amount - balance + amount
 
-            (rc, msg) = auto_topup_member(member, topup_required=topup_required)
+            (return_code, msg) = auto_topup_member(member, topup_required=topup_required)
 
-            if rc:
+            if return_code:
                 update_account(member=member,
                                amount=-amount,
                                organisation=organisation,
@@ -325,7 +329,7 @@ def payment_api(request, description, amount, member, route_code=None,
                                log_msg=log_msg,
                                source="Payments",
                                sub_source="payments_api",
-                               type=type
+                               payment_type=payment_type
                                )
 
         # If we got an organisation then make their payment too
@@ -335,7 +339,7 @@ def payment_api(request, description, amount, member, route_code=None,
                                     log_msg=log_msg,
                                     source="Payments",
                                     sub_source="payments_api",
-                                    type=type,
+                                    payment_type=payment_type,
                                     member=member)
 
                 messages.success(request, f"Payment successful! You paid \
@@ -366,7 +370,7 @@ def payment_api(request, description, amount, member, route_code=None,
             trans.route_payload = route_payload
             trans.linked_amount = amount
             trans.linked_organisation = organisation
-            trans.linked_transaction_type = type
+            trans.linked_transaction_type = payment_type
             trans.save()
             return render(request, 'payments/checkout.html', {'trans': trans})
 
@@ -376,58 +380,61 @@ def payment_api(request, description, amount, member, route_code=None,
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):
-    """ Callback from Stripe webhook """
+    """ Callback from Stripe webhook
+
+Stuff
+
+.. todo::
+
+    Seriously?
+    Myself?
+
+..todolist::
+
+"""
     payload = request.body
     event = None
 
     try:
         event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
-    except ValueError as e:
+    except ValueError as error:
         # Invalid payload
         log_event(user="Stripe API",
                   severity="HIGH",
                   source="Payments",
                   sub_source="stripe_webhook",
-                  message="Invalid Payload in message from Stripe")
+                  message=f"Invalid Payload in message from Stripe: {error}")
 
         return HttpResponse(status=400)
 
     if event.type == 'payment_intent.succeeded':
     # get data from payload
         payment_intent = event.data.object
+        payment_intent_data = payment_intent.charges.data[0]
 
-        pi_reference = payment_intent.id
-        pi_method = payment_intent.payment_method
-        pi_amount = payment_intent.amount
-        pi_currency = payment_intent.currency
-        pi_payment_id = payment_intent.metadata.cobalt_pay_id
-        pi_receipt_url = payment_intent.charges.data[0].receipt_url
-        pi_brand = payment_intent.charges.data[0].payment_method_details.card.brand
-        pi_country = payment_intent.charges.data[0].payment_method_details.card.country
-        pi_exp_month = payment_intent.charges.data[0].payment_method_details.card.exp_month
-        pi_exp_year = payment_intent.charges.data[0].payment_method_details.card.exp_year
-        pi_last4 = payment_intent.charges.data[0].payment_method_details.card.last4
-
+# TODO: catch error if ids not present
         log_event(user="Stripe API",
                   severity="INFO",
                   source="Payments",
                   sub_source="stripe_webhook",
                   message="Received payment_intent.succeeded. Our id=%s - \
-                           Their id=%s" % (pi_payment_id, pi_reference))
+                           Their id=%s" % (payment_intent.metadata.cobalt_pay_id,
+                                           payment_intent.id))
+
 
     # Update StripeTransaction
         try:
-            tran = StripeTransaction.objects.get(pk=pi_payment_id)
+            tran = StripeTransaction.objects.get(pk=payment_intent.metadata.cobalt_pay_id)
 
-            tran.stripe_reference = pi_reference
-            tran.stripe_method = pi_method
-            tran.stripe_currency = pi_currency
-            tran.stripe_receipt_url = pi_receipt_url
-            tran.stripe_brand = pi_brand
-            tran.stripe_country = pi_country
-            tran.stripe_exp_month = pi_exp_month
-            tran.stripe_exp_year = pi_exp_year
-            tran.stripe_last4 = pi_last4
+            tran.stripe_reference = payment_intent.id
+            tran.stripe_method = payment_intent.payment_method
+            tran.stripe_currency = payment_intent.currency
+            tran.stripe_receipt_url = payment_intent_data.receipt_url
+            tran.stripe_brand = payment_intent_data.payment_method_details.card.brand
+            tran.stripe_country = payment_intent_data.payment_method_details.card.country
+            tran.stripe_exp_month = payment_intent_data.payment_method_details.card.exp_month
+            tran.stripe_exp_year = payment_intent_data.payment_method_details.card.exp_year
+            tran.stripe_last4 = payment_intent_data.payment_method_details.card.last4
             tran.last_change_date = timezone.now()
             tran.status = "Complete"
             tran.save()
@@ -437,7 +444,8 @@ def stripe_webhook(request):
                       source="Payments",
                       sub_source="stripe_webhook",
                       message="Successfully updated stripe transaction table. \
-                      Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
+                      Our id=%s - Stripe id=%s" % (payment_intent.metadata.cobalt_pay_id,
+                                                   payment_intent.id))
 
         except ObjectDoesNotExist:
             log_event(user="Stripe API",
@@ -445,7 +453,8 @@ def stripe_webhook(request):
                       source="Payments",
                       sub_source="stripe_webhook",
                       message="Unable to load stripe transaction. Check StripeTransaction \
-                      table. Our id=%s - Stripe id=%s" % (pi_payment_id, pi_reference))
+                      table. Our id=%s - Stripe id=%s" % (payment_intent.metadata.cobalt_pay_id,
+                                                          payment_intent.id))
 
         update_account(member=tran.member,
                        amount=tran.amount,
@@ -457,7 +466,7 @@ def stripe_webhook(request):
                        (tran.amount, tran.id),
                        source="Payments",
                        sub_source="stripe_webhook",
-                       type="CC Payment"
+                       payment_type="CC Payment"
                        )
 
 # Money in from stripe so we can now process the original transaction
@@ -466,7 +475,7 @@ def stripe_webhook(request):
                        description=tran.description,
                        source="Payments",
                        sub_source="stripe_webhook",
-                       type=tran.linked_transaction_type,
+                       payment_type=tran.linked_transaction_type,
                        log_msg=tran.description,
                        organisation=tran.linked_organisation
                        )
@@ -477,7 +486,7 @@ def stripe_webhook(request):
                             description=tran.description,
                             source="Payments",
                             sub_source="stripe_webhook",
-                            type=tran.linked_transaction_type,
+                            payment_type=tran.linked_transaction_type,
                             log_msg=tran.description,
                             member=tran.member)
 
@@ -488,11 +497,23 @@ def stripe_webhook(request):
         stripe_customer = event.data.object.customer
         member = User.objects.filter(stripe_customer_id=stripe_customer).last()
 
+# check if we should make an auto top up now
+# TODO: move to its own function and handle notifying user if it fails
         balance = get_balance(member)
-        print(balance)
         if balance < AUTO_TOP_UP_LOW_LIMIT:
-            print("Auto top up")
-            (rc, message) = auto_topup_member(member)
+            (return_code, message) = auto_topup_member(member)
+            if return_code:
+                log_event(user="Stripe API",
+                          severity="INFO",
+                          source="Payments",
+                          sub_source="stripe_webhook",
+                          message=message)
+            else:
+                log_event(user="Stripe API",
+                          severity="INFO",
+                          source="Payments",
+                          sub_source="stripe_webhook",
+                          message=message)
 
     else:
         # Unexpected event type
@@ -542,7 +563,7 @@ def callback_router(route_code=None, route_payload=None, tran=None, status="Succ
 # update_account     #
 ######################
 def update_account(member, amount, description, log_msg, source,
-                   sub_source, type, stripe_transaction=None,
+                   sub_source, payment_type, stripe_transaction=None,
                    other_member=None, organisation=None):
     """ method to update a customer account """
 # Get old balance
@@ -570,7 +591,7 @@ def update_account(member, amount, description, log_msg, source,
 # update_organisation   #
 #########################
 def update_organisation(organisation, amount, description, log_msg, source,
-                        sub_source, type, other_organisation=None,
+                        sub_source, payment_type, other_organisation=None,
                         member=None):
     """ method to update an organisations account """
 
@@ -587,7 +608,7 @@ def update_organisation(organisation, amount, description, log_msg, source,
     act.other_organisation = other_organisation
     act.balance = balance
     act.description = description
-    act.type = type
+    act.type = payment_type
 
     act.save()
 
@@ -635,7 +656,7 @@ def auto_topup_member(member, topup_required=None):
 
 # try payment
     try:
-        rc = stripe.PaymentIntent.create(
+        stripe_return = stripe.PaymentIntent.create(
             amount=int(amount * 100),
             currency='aud',
             customer=member.stripe_customer_id,
@@ -645,17 +666,7 @@ def auto_topup_member(member, topup_required=None):
         )
 
 # It worked so create a stripe record
-        payload = rc.charges.data[0]
-
-        pi_reference = payload.id
-        pi_method = payload.payment_method
-        pi_currency = payload.currency
-        pi_receipt_url = payload.receipt_url
-        pi_brand = payload.payment_method_details.card.brand
-        pi_country = payload.payment_method_details.card.country
-        pi_exp_month = payload.payment_method_details.card.exp_month
-        pi_exp_year = payload.payment_method_details.card.exp_year
-        pi_last4 = payload.payment_method_details.card.last4
+        payload = stripe_return.charges.data[0]
 
         stripe_tran = StripeTransaction()
         stripe_tran.description = f"Auto top up for \
@@ -664,15 +675,15 @@ def auto_topup_member(member, topup_required=None):
         stripe_tran.member = member
         stripe_tran.route_code = None
         stripe_tran.route_payload = None
-        stripe_tran.stripe_reference = pi_reference
-        stripe_tran.stripe_method = pi_method
-        stripe_tran.stripe_currency = pi_currency
-        stripe_tran.stripe_receipt_url = pi_receipt_url
-        stripe_tran.stripe_brand = pi_brand
-        stripe_tran.stripe_country = pi_country
-        stripe_tran.stripe_exp_month = pi_exp_month
-        stripe_tran.stripe_exp_year = pi_exp_year
-        stripe_tran.stripe_last4 = pi_last4
+        stripe_tran.stripe_reference = payload.id
+        stripe_tran.stripe_method = payload.payment_method
+        stripe_tran.stripe_currency = payload.currency
+        stripe_tran.stripe_receipt_url = payload.receipt_url
+        stripe_tran.stripe_brand = payload.payment_method_details.card.brand
+        stripe_tran.stripe_country = payload.payment_method_details.card.country
+        stripe_tran.stripe_exp_month = payload.payment_method_details.card.exp_month
+        stripe_tran.stripe_exp_year = payload.payment_method_details.card.exp_year
+        stripe_tran.stripe_last4 = payload.payment_method_details.card.last4
         stripe_tran.last_change_date = timezone.now()
         stripe_tran.status = "Complete"
         stripe_tran.save()
@@ -680,20 +691,25 @@ def auto_topup_member(member, topup_required=None):
 # Update members account
         update_account(member=member,
                        amount=amount,
-                       description=f"Auto Top Up with {pi_brand} card **** **** **** \
-                       {pi_last4} Exp {pi_exp_month}/{pi_exp_year}",
+                       description=f"Auto Top Up with {payload.payment_method_details.card.brand} \
+                       card **** **** **** \{payload.payment_method_details.card.last4} \
+                       Exp {payload.payment_method_details.card.exp_month}/\
+                       {payload.payment_method_details.card.exp_year}",
                        log_msg="$%s Auto Top Up" % amount,
                        source="Payments",
                        sub_source="auto_topup_member",
-                       type="Auto Top Up",
+                       payment_type="Auto Top Up",
                        stripe_transaction=stripe_tran
                        )
 
         return(True, f"Auto top up successful. ${amount:.2f} added to your account from \
-                      {pi_brand} card **** **** **** {pi_last4} Exp {pi_exp_month}/{pi_exp_year}")
+                      {payload.payment_method_details.card.brand} card **** **** **** \
+                      {payload.payment_method_details.card.last4} \
+                      Exp {payload.payment_method_details.card.exp_month}/\
+                      {payload.payment_method_details.card.exp_year}")
 
-    except stripe.error.CardError as e:
-        err = e.error
+    except stripe.error.CardError as error:
+        err = error.error
         # Error code will be authentication_required if authentication is needed
         log_event(user=member.full_name,
                   severity="WARN",
@@ -702,6 +718,7 @@ def auto_topup_member(member, topup_required=None):
                   message="Error from stripe - see logs")
 
         print("Code is: %s" % err.code)
-        payment_intent_id = err.payment_intent['id']
-        payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        # payment_intent_id = err.payment_intent['id']
+        # payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+# TODO: handle auth required from Stripe
         return(False, "FIX LATER - MAYBE AUTH required from Stripe")

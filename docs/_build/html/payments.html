@@ -295,22 +295,18 @@ removed later, but for now allows us to reverse the transaction for testing</p>
 <dl class="py function">
 <dt id="payments.core.get_balance_detail">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance_detail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance_detail" title="Permalink to this definition">¶</a></dt>
-<dd><p>called by dashboard to show basic information</p>
-<p><a class="reference external" href="https://www.python.org/dev/peps/pep-0484/">PEP 484</a> type annotations are supported. If attribute, parameter, and
-return types are annotated according to <a class="reference external" href="https://www.python.org/dev/peps/pep-0484/">PEP 484</a>, they do not need to be
-included in the docstring:</p>
+<dd><p>Called by dashboard to show basic information</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>param1 (int): The first parameter.
-param2 (str): The second parameter.</p>
+<dt>Args:</dt><dd><p>member: A User object - the member whose balance is required</p>
 </dd>
-<dt>Returns:</dt><dd><p>bool: The return value. True for success, False otherwise.</p>
+<dt>Returns:</dt><dd><p>dict: Keys - balance and last_top_up</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="payments.core.payment_api">
-<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">payment_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#payment_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.payment_api" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">payment_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payment_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#payment_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.payment_api" title="Permalink to this definition">¶</a></dt>
 <dd><p>API for payments from other parts of the application.</p>
 <p>There is a user on the end of this who needs to know what is happening,
 so we return a page that tells them. It could be:</p>
@@ -362,6 +358,13 @@ get back from Stripe</p>
 <dt id="payments.core.stripe_webhook">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback from Stripe webhook</p>
+<p>Stuff</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Seriously?
+Myself?</p>
+</div>
+<p>..todolist:</p>
 </dd></dl>
 
 <dl class="py function">
@@ -375,13 +378,13 @@ actions, but for testing I get the StripeTransaction passed so I can reverse it.
 
 <dl class="py function">
 <dt id="payments.core.update_account">
-<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_member</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_account" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">payment_type</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_member</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>method to update a customer account</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="payments.core.update_organisation">
-<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">organisation</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">other_organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">member</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_organisation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">organisation</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">payment_type</span></em>, <em class="sig-param"><span class="n">other_organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">member</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_organisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>method to update an organisations account</p>
 </dd></dl>
 

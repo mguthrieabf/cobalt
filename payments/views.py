@@ -46,7 +46,7 @@ def test_payment(request):
             member = request.user
             organisation = form.cleaned_data['organisation']
             url = form.cleaned_data['url']
-            type = form.cleaned_data['type']
+            payment_type = form.cleaned_data['type']
 
             return payment_api(request=request,
                               description=description,
@@ -56,7 +56,7 @@ def test_payment(request):
                               route_payload=None,
                               organisation=organisation,
                               log_msg=None,
-                              type=type,
+                              payment_type=payment_type,
                               url=url)
     else:
         form = TestTransaction()
