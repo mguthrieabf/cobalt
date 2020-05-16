@@ -3,37 +3,27 @@
 
 This module handles all of the functions that do not interact directly with
 a user. i.e. they do not generally accept a ``Request`` and return an
-``HttpResponse``.
+``HttpResponse``. Arguably these could have been put directly into models.py
+but it seems cleaner to store them here.
 
-See also `Payments Views`_.
+See also `Payments Views`_. This handles the user side of the interactions.
+They both work together.
 
 Key Points:
     - Payments is a service module, it is requested to do things on behalf of
       another module and does not know why it is doing them.
     - Payments are often not real time, for manual payments, the user will
       be taken to another screen that interacts directly with Stripe, and for
-      automatic top up payments, the top up may fail and requuire user input.
-
-Section breaks are created by resuming unindented text. Section breaks
-are also implicitly created anytime a new section starts.
-
-Attributes:
-    module_level_variable1 (int): Module level variables may be documented in
-        either the ``Attributes`` section of the module docstring, or in an
-        inline docstring immediately following the variable.
-
-        Either form is acceptable, but the two should not be mixed. Choose
-        one convention to document module level variables and be consistent
-        with it.
-
-Todo:
-    * For module TODOs
-    * You have to also use ``sphinx.ext.todo`` extension
-
-.. todo::
+      automatic top up payments, the top up may fail and require user input.
+    - The asynchronous nature of payments makes it more complex than many of
+      the Cobalt modules so the documentation needs to be of a higher standard.
+      See `Payments Overview`_ for more details.
 
 .. _Payments Views:
    #module-payments.views
+
+.. _Payments Overview:
+   ./payments_overview.html
 
 """
 import json
@@ -81,7 +71,17 @@ def get_balance_detail(member):
 # get_balance  #
 ################
 def get_balance(member):
-    """ get members account balance """
+    """ Gets member account balance
+
+    This function returns the current balance of the member's account.
+
+    Args:
+        member (User): A User object
+
+    Returns:
+        float: The member's current balance
+
+    """
 
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
@@ -98,21 +98,28 @@ def get_balance(member):
 def stripe_manual_payment_intent(request):
     """ Called from the checkout webpage.
 
-When a user is going to pay with a credit card we
-tell stripe and stripe gets ready for it.
+    When a user is going to pay with a credit card we
+    tell Stripe and Stripe gets ready for it. By this point in the process
+    we have handed over control to the Stripe code which calls this function
+    over Ajax.
 
-This functions expects a json payload:
+    This functions expects a json payload as part of `request`.
 
-  "id": This is the StripeTransaction in our table that we are handling
-  "amount": The amount in dollars
+    Args:
+        request - This needs to contain a Json payload.
 
-Payments only knows how to pay things, not why. Some other part of the
-system needs to be informed once we are done. The route_code tells us
-what to call. There are only ever going to be a small number of things
-to call so we hard code them.
+    Notes:
+        The Json should include:
+        data{"id": This is the StripeTransaction in our table that we are handling
+        "amount": The amount in the system currency}
 
-This function returns our public key and the client secret that we
-get back from Stripe
+    Returns:
+        json: {'publishableKey':? 'clientSecret':?}
+
+    Notes:
+        publishableKey = our Public Stripe key, 
+        clientSecret = client secret from Stripe
+
 """
 
     if request.method == 'POST':

@@ -34,7 +34,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="results package" href="results.html" />
+    <link rel="prev" title="organisations package" href="organisations.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -78,24 +80,42 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">payments package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-payments.admin">payments.admin module</a></li>
-<li><a class="reference internal" href="#module-payments.apps">payments.apps module</a></li>
-<li><a class="reference internal" href="#module-payments.core">payments.core module</a></li>
-<li><a class="reference internal" href="#module-payments.forms">payments.forms module</a></li>
-<li><a class="reference internal" href="#module-payments.models">payments.models module</a></li>
-<li><a class="reference internal" href="#module-payments.tests">payments.tests module</a></li>
-<li><a class="reference internal" href="#module-payments.urls">payments.urls module</a></li>
-<li><a class="reference internal" href="#module-payments.views">payments.views module</a></li>
-<li><a class="reference internal" href="#module-payments">Module contents</a></li>
+              <p class="caption"><span class="caption-text">Cobalt Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">cobalt</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="accounts.html">accounts package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calendar_app.html">calendar_app package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cobalt.html">cobalt package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dashboard.html">dashboard package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="events.html">events package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forums.html">forums package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logs.html">logs package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manage.html">manage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="masterpoints.html">masterpoints package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">notifications package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organisations.html">organisations package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">payments package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.admin">payments.admin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.apps">payments.apps module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.core">payments.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.forms">payments.forms module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.models">payments.models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.tests">payments.tests module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.urls">payments.urls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments.views">payments.views module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-payments">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="results.html">results package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">support package</a></li>
 </ul>
 </li>
 </ul>
-</div>
+
             
           
         </div>
@@ -138,6 +158,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">cobalt</a> &raquo;</li>
         
       <li>payments package</li>
     
@@ -238,33 +260,20 @@
 <p>Handles all activities associated with payments that do not talk to users.</p>
 <p>This module handles all of the functions that do not interact directly with
 a user. i.e. they do not generally accept a <code class="docutils literal notranslate"><span class="pre">Request</span></code> and return an
-<code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code>.</p>
-<p>See also <a class="reference external" href="#module-payments.views">Payments Views</a>.</p>
+<code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code>. Arguably these could have been put directly into models.py
+but it seems cleaner to store them here.</p>
+<p>See also <a class="reference external" href="#module-payments.views">Payments Views</a>. This handles the user side of the interactions.
+They both work together.</p>
 <dl class="simple">
 <dt>Key Points:</dt><dd><ul class="simple">
 <li><p>Payments is a service module, it is requested to do things on behalf of
 another module and does not know why it is doing them.</p></li>
 <li><p>Payments are often not real time, for manual payments, the user will
 be taken to another screen that interacts directly with Stripe, and for
-automatic top up payments, the top up may fail and requuire user input.</p></li>
-</ul>
-</dd>
-</dl>
-<p>Section breaks are created by resuming unindented text. Section breaks
-are also implicitly created anytime a new section starts.</p>
-<dl>
-<dt>Attributes:</dt><dd><dl>
-<dt>module_level_variable1 (int): Module level variables may be documented in</dt><dd><p>either the <code class="docutils literal notranslate"><span class="pre">Attributes</span></code> section of the module docstring, or in an
-inline docstring immediately following the variable.</p>
-<p>Either form is acceptable, but the two should not be mixed. Choose
-one convention to document module level variables and be consistent
-with it.</p>
-</dd>
-</dl>
-</dd>
-<dt>Todo:</dt><dd><ul class="simple">
-<li><p>For module TODOs</p></li>
-<li><p>You have to also use <code class="docutils literal notranslate"><span class="pre">sphinx.ext.todo</span></code> extension</p></li>
+automatic top up payments, the top up may fail and require user input.</p></li>
+<li><p>The asynchronous nature of payments makes it more complex than many of
+the Cobalt modules so the documentation needs to be of a higher standard.
+See <a class="reference external" href="./payments_overview.html">Payments Overview</a> for more details.</p></li>
 </ul>
 </dd>
 </dl>
@@ -289,7 +298,14 @@ removed later, but for now allows us to reverse the transaction for testing</p>
 <dl class="py function">
 <dt id="payments.core.get_balance">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance" title="Permalink to this definition">¶</a></dt>
-<dd><p>get members account balance</p>
+<dd><p>Gets member account balance</p>
+<p>This function returns the current balance of the member’s account.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>member (User): A User object</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The member’s current balance</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -340,18 +356,23 @@ which one it is.</p>
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_manual_payment_intent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_manual_payment_intent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_manual_payment_intent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called from the checkout webpage.</p>
 <p>When a user is going to pay with a credit card we
-tell stripe and stripe gets ready for it.</p>
-<p>This functions expects a json payload:</p>
-<blockquote>
-<div><p>“id”: This is the StripeTransaction in our table that we are handling
-“amount”: The amount in dollars</p>
-</div></blockquote>
-<p>Payments only knows how to pay things, not why. Some other part of the
-system needs to be informed once we are done. The route_code tells us
-what to call. There are only ever going to be a small number of things
-to call so we hard code them.</p>
-<p>This function returns our public key and the client secret that we
-get back from Stripe</p>
+tell Stripe and Stripe gets ready for it. By this point in the process
+we have handed over control to the Stripe code which calls this function
+over Ajax.</p>
+<p>This functions expects a json payload as part of <cite>request</cite>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - This needs to contain a Json payload.</p>
+</dd>
+<dt>Notes:</dt><dd><p>The Json should include:
+data{“id”: This is the StripeTransaction in our table that we are handling
+“amount”: The amount in the system currency}</p>
+</dd>
+<dt>Returns:</dt><dd><p>json: {‘publishableKey’:? ‘clientSecret’:?}</p>
+</dd>
+<dt>Notes:</dt><dd><p>publishableKey = our Public Stripe key, 
+clientSecret = client secret from Stripe</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1161,6 +1182,15 @@ a members account. This simulates them entering an event or paying a subscriptio
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="results.html" class="btn btn-neutral float-right" title="results package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="organisations.html" class="btn btn-neutral float-left" title="organisations package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

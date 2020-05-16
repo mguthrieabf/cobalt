@@ -149,37 +149,27 @@
 
 <span class="sd">This module handles all of the functions that do not interact directly with</span>
 <span class="sd">a user. i.e. they do not generally accept a ``Request`` and return an</span>
-<span class="sd">``HttpResponse``.</span>
+<span class="sd">``HttpResponse``. Arguably these could have been put directly into models.py</span>
+<span class="sd">but it seems cleaner to store them here.</span>
 
-<span class="sd">See also `Payments Views`_.</span>
+<span class="sd">See also `Payments Views`_. This handles the user side of the interactions.</span>
+<span class="sd">They both work together.</span>
 
 <span class="sd">Key Points:</span>
 <span class="sd">    - Payments is a service module, it is requested to do things on behalf of</span>
 <span class="sd">      another module and does not know why it is doing them.</span>
 <span class="sd">    - Payments are often not real time, for manual payments, the user will</span>
 <span class="sd">      be taken to another screen that interacts directly with Stripe, and for</span>
-<span class="sd">      automatic top up payments, the top up may fail and requuire user input.</span>
-
-<span class="sd">Section breaks are created by resuming unindented text. Section breaks</span>
-<span class="sd">are also implicitly created anytime a new section starts.</span>
-
-<span class="sd">Attributes:</span>
-<span class="sd">    module_level_variable1 (int): Module level variables may be documented in</span>
-<span class="sd">        either the ``Attributes`` section of the module docstring, or in an</span>
-<span class="sd">        inline docstring immediately following the variable.</span>
-
-<span class="sd">        Either form is acceptable, but the two should not be mixed. Choose</span>
-<span class="sd">        one convention to document module level variables and be consistent</span>
-<span class="sd">        with it.</span>
-
-<span class="sd">Todo:</span>
-<span class="sd">    * For module TODOs</span>
-<span class="sd">    * You have to also use ``sphinx.ext.todo`` extension</span>
-
-<span class="sd">.. todo::</span>
+<span class="sd">      automatic top up payments, the top up may fail and require user input.</span>
+<span class="sd">    - The asynchronous nature of payments makes it more complex than many of</span>
+<span class="sd">      the Cobalt modules so the documentation needs to be of a higher standard.</span>
+<span class="sd">      See `Payments Overview`_ for more details.</span>
 
 <span class="sd">.. _Payments Views:</span>
 <span class="sd">   #module-payments.views</span>
+
+<span class="sd">.. _Payments Overview:</span>
+<span class="sd">   ./payments_overview.html</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -227,7 +217,17 @@
 <span class="c1"># get_balance  #</span>
 <span class="c1">################</span>
 <div class="viewcode-block" id="get_balance"><a class="viewcode-back" href="../../payments.html#payments.core.get_balance">[docs]</a><span class="k">def</span> <span class="nf">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; get members account balance &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Gets member account balance</span>
+
+<span class="sd">    This function returns the current balance of the member&#39;s account.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        member (User): A User object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The member&#39;s current balance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
@@ -244,21 +244,28 @@
 <span class="k">def</span> <span class="nf">stripe_manual_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called from the checkout webpage.</span>
 
-<span class="sd">When a user is going to pay with a credit card we</span>
-<span class="sd">tell stripe and stripe gets ready for it.</span>
+<span class="sd">    When a user is going to pay with a credit card we</span>
+<span class="sd">    tell Stripe and Stripe gets ready for it. By this point in the process</span>
+<span class="sd">    we have handed over control to the Stripe code which calls this function</span>
+<span class="sd">    over Ajax.</span>
 
-<span class="sd">This functions expects a json payload:</span>
+<span class="sd">    This functions expects a json payload as part of `request`.</span>
 
-<span class="sd">  &quot;id&quot;: This is the StripeTransaction in our table that we are handling</span>
-<span class="sd">  &quot;amount&quot;: The amount in dollars</span>
+<span class="sd">    Args:</span>
+<span class="sd">        request - This needs to contain a Json payload.</span>
 
-<span class="sd">Payments only knows how to pay things, not why. Some other part of the</span>
-<span class="sd">system needs to be informed once we are done. The route_code tells us</span>
-<span class="sd">what to call. There are only ever going to be a small number of things</span>
-<span class="sd">to call so we hard code them.</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        The Json should include:</span>
+<span class="sd">        data{&quot;id&quot;: This is the StripeTransaction in our table that we are handling</span>
+<span class="sd">        &quot;amount&quot;: The amount in the system currency}</span>
 
-<span class="sd">This function returns our public key and the client secret that we</span>
-<span class="sd">get back from Stripe</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        json: {&#39;publishableKey&#39;:? &#39;clientSecret&#39;:?}</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        publishableKey = our Public Stripe key, </span>
+<span class="sd">        clientSecret = client secret from Stripe</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>

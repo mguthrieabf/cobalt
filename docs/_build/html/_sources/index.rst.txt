@@ -6,7 +6,7 @@
 
 .. image:: images/cobalt.jpg
  :width: 300
- :alt: Alternative text
+ :alt: Cobalt Chemical Symbol
 
 Welcome to Cobalt's Developer documentation
 ===========================================
@@ -20,8 +20,11 @@ User Guides
 
 These are links to documents that describe each module.
 
+* :doc:`payments_overview`
+
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Cobalt Modules
 
    modules
