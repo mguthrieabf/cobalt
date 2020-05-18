@@ -369,7 +369,7 @@ data{“id”: This is the StripeTransaction in our table that we are handling
 </dd>
 <dt>Returns:</dt><dd><p>json: {‘publishableKey’:? ‘clientSecret’:?}</p>
 </dd>
-<dt>Notes:</dt><dd><p>publishableKey = our Public Stripe key, 
+<dt>Notes:</dt><dd><p>publishableKey = our Public Stripe key,
 clientSecret = client secret from Stripe</p>
 </dd>
 </dl>
@@ -379,13 +379,50 @@ clientSecret = client secret from Stripe</p>
 <dt id="payments.core.stripe_webhook">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callback from Stripe webhook</p>
-<p>Stuff</p>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>Seriously?
-Myself?</p>
-</div>
-<p>..todolist:</p>
+<p>In development, Stripe sends us everything. In production we can configure
+the events that we receive. This is the only way for Stripe to communicate
+with us.</p>
+<dl class="simple">
+<dt>Note:</dt><dd><p>Stripe sends us multiple similar things, for example <em>payment.intent.succeeded</em>
+will accompany anything that uses a payment intent. Be careful to only
+handle one out of the multiple events.</p>
+</dd>
+</dl>
+<p>For <strong>manual payments</strong> we can receive:</p>
+<ul class="simple">
+<li><p>payment.intent.created - ignore</p></li>
+<li><p>charge.succeeded - process</p></li>
+<li><p>payment.intent.succeeded - ignore</p></li>
+</ul>
+<p>For <strong>automatic payment set up</strong>, we get:</p>
+<ul class="simple">
+<li><p>customer.created - ignore</p></li>
+<li><p>setup_intent.created - ignore</p></li>
+<li><p>payment_method.attached - process</p></li>
+<li><p>setup_intent.succeeded - ignore</p></li>
+</ul>
+<p>For <strong>automatic payments</strong> we get:</p>
+<ul class="simple">
+<li><p>payment_intent.succeeded - ignore</p></li>
+<li><p>payment_intent.created - ignore</p></li>
+<li><p>charge_succeeded - process</p></li>
+</ul>
+<p><strong>Meta data</strong></p>
+<p>We use meta data to track what the event related to. This is added by us
+when we call Stripe and returned to us by Stripe in the callback.</p>
+<p>Fields used:</p>
+<ul class="simple">
+<li><p><strong>cobalt_tran_type</strong> - either <em>Manual</em> or <em>Auto</em> for manual and auto top up
+transactions. If this is missing then the transaction is invalid.</p></li>
+<li><p><strong>cobalt_pay_id</strong> - for manual payments this is the linked transaction in
+MemberTransaction.</p></li>
+</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>Stripe json payload - see Stripe documentation</p>
+</dd>
+<dt>Returns:</dt><dd><p>HTTPStatus Code</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

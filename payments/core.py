@@ -117,10 +117,10 @@ def stripe_manual_payment_intent(request):
         json: {'publishableKey':? 'clientSecret':?}
 
     Notes:
-        publishableKey = our Public Stripe key, 
+        publishableKey = our Public Stripe key,
         clientSecret = client secret from Stripe
 
-"""
+    """
 
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -166,7 +166,8 @@ def stripe_manual_payment_intent(request):
         intent = stripe.PaymentIntent.create(
             amount=payload_cents,
             currency='aud',
-            metadata={'cobalt_pay_id': payload_cobalt_pay_id}
+            metadata={'cobalt_pay_id': payload_cobalt_pay_id,
+                      'cobalt_tran_type': 'Manual'}
             )
         log_event(request=request,
                   user=request.user.full_name,
@@ -192,16 +193,42 @@ def stripe_manual_payment_intent(request):
 def stripe_auto_payment_intent(request):
     """ Called from the auto top up webpage.
 
-This is very similar to the one off payment. It lets Stripe
-know to expect a credit card and provides a token to confirm
-which one it is.
-"""
+    This is very similar to the one off payment. It lets Stripe
+    know to expect a credit card and provides a token to confirm
+    which one it is.
+
+    When a user is going to set up a credit card we
+    tell Stripe and Stripe gets ready for it. By this point in the process
+    we have handed over control to the Stripe code which calls this function
+    over Ajax.
+
+    This functions expects a json payload as part of `request`.
+
+    Args:
+        request - This needs to contain a Json payload.
+
+    Notes:
+        The Json should include:
+        data{"id": This is the StripeTransaction in our table that we are handling
+        "amount": The amount in the system currency}
+
+    Returns:
+        json: {'publishableKey':? 'clientSecret':?}
+
+    Notes:
+        publishableKey = our Public Stripe key,
+        clientSecret = client secret from Stripe
+
+    """
+
+
     if request.method == 'POST':
 
         stripe.api_key = STRIPE_SECRET_KEY
         intent = stripe.SetupIntent.create(
             customer=request.user.stripe_customer_id,
-            metadata={'cobalt_member_id': request.user.id}
+            metadata={'cobalt_member_id': request.user.id,
+                      'cobalt_tran_type': 'Auto'}
             )
 
         log_event(request=request,
@@ -259,6 +286,21 @@ def payment_api(request, description, amount, member, route_code=None,
 
     amount is the amount to be deducted from the users account. A positive
     amount is a charge, a negative amount is an incoming payment.
+
+    args:
+        request - standard request object
+        description - text description of the payment
+        amount - how much
+        member - User object related to the payment
+        route_code - code to map to a callback
+        route_payload - value to retirn on completion
+        organisation - linked organisation
+        log_msg - message for the log
+        payment_type - description of payment
+        url - next url to go to
+
+    returns:
+        request - page for user
 
 """
     balance = float(get_balance(member))
@@ -389,14 +431,51 @@ def payment_api(request, description, amount, member, route_code=None,
 def stripe_webhook(request):
     """ Callback from Stripe webhook
 
-Stuff
+    In development, Stripe sends us everything. In production we can configure
+    the events that we receive. This is the only way for Stripe to communicate
+    with us.
 
-.. todo::
+    Note:
+        Stripe sends us multiple similar things, for example *payment.intent.succeeded*
+        will accompany anything that uses a payment intent. Be careful to only
+        handle one out of the multiple events.
 
-    Seriously?
-    Myself?
+    For **manual payments** we can receive:
 
-..todolist::
+    * payment.intent.created - ignore
+    * charge.succeeded - process
+    * payment.intent.succeeded - ignore
+
+    For **automatic payment set up**, we get:
+
+    * customer.created - ignore
+    * setup_intent.created - ignore
+    * payment_method.attached - process
+    * setup_intent.succeeded - ignore
+
+    For **automatic payments** we get:
+
+    * payment_intent.succeeded - ignore
+    * payment_intent.created - ignore
+    * charge_succeeded - ignore (we already know this from the API call)
+
+    **Meta data**
+
+    We use meta data to track what the event related to. This is added by us
+    when we call Stripe and returned to us by Stripe in the callback.
+
+    Fields used:
+
+    * **cobalt_tran_type** - either *Manual* or *Auto* for manual and auto top up
+      transactions. If this is missing then the transaction is invalid.
+    * **cobalt_pay_id** - for manual payments this is the linked transaction in
+      MemberTransaction.
+
+    Args:
+        Stripe json payload - see Stripe documentation
+
+    Returns:
+        HTTPStatus Code
 
 """
     payload = request.body
@@ -414,10 +493,23 @@ Stuff
 
         return HttpResponse(status=400)
 
-    if event.type == 'payment_intent.succeeded':
+    print("##############################\n\n")
+    print(event.data.object.metadata)
+    print("##############################\n\n")
+
+    print("##############################\n\n")
+    print(event.data.object)
+    print("##############################\n\n")
+
+    print("##############################\n\n")
+    print(event.data.object.amount)
+    print("##############################\n\n")
+
+
+    if event.type == 'charge.succeeded':
     # get data from payload
-        payment_intent = event.data.object
-        payment_intent_data = payment_intent.charges.data[0]
+        charge = event.data.object
+#        payment_intent_data = payment_intent.charges.data[0]
 
 # TODO: catch error if ids not present
         log_event(user="Stripe API",
@@ -425,23 +517,22 @@ Stuff
                   source="Payments",
                   sub_source="stripe_webhook",
                   message="Received payment_intent.succeeded. Our id=%s - \
-                           Their id=%s" % (payment_intent.metadata.cobalt_pay_id,
-                                           payment_intent.id))
-
+                           Their id=%s" % (charge.metadata.cobalt_pay_id,
+                                           charge.id))
 
     # Update StripeTransaction
         try:
-            tran = StripeTransaction.objects.get(pk=payment_intent.metadata.cobalt_pay_id)
+            tran = StripeTransaction.objects.get(pk=charge.metadata.cobalt_pay_id)
 
-            tran.stripe_reference = payment_intent.id
-            tran.stripe_method = payment_intent.payment_method
-            tran.stripe_currency = payment_intent.currency
-            tran.stripe_receipt_url = payment_intent_data.receipt_url
-            tran.stripe_brand = payment_intent_data.payment_method_details.card.brand
-            tran.stripe_country = payment_intent_data.payment_method_details.card.country
-            tran.stripe_exp_month = payment_intent_data.payment_method_details.card.exp_month
-            tran.stripe_exp_year = payment_intent_data.payment_method_details.card.exp_year
-            tran.stripe_last4 = payment_intent_data.payment_method_details.card.last4
+            tran.stripe_reference = charge.id
+            tran.stripe_method = charge.payment_method
+            tran.stripe_currency = charge.currency
+            tran.stripe_receipt_url = charge.receipt_url
+            tran.stripe_brand = charge.payment_method_details.card.brand
+            tran.stripe_country = charge.payment_method_details.card.country
+            tran.stripe_exp_month = charge.payment_method_details.card.exp_month
+            tran.stripe_exp_year = charge.payment_method_details.card.exp_year
+            tran.stripe_last4 = charge.payment_method_details.card.last4
             tran.last_change_date = timezone.now()
             tran.status = "Complete"
             tran.save()
@@ -451,8 +542,8 @@ Stuff
                       source="Payments",
                       sub_source="stripe_webhook",
                       message="Successfully updated stripe transaction table. \
-                      Our id=%s - Stripe id=%s" % (payment_intent.metadata.cobalt_pay_id,
-                                                   payment_intent.id))
+                      Our id=%s - Stripe id=%s" % (charge.metadata.cobalt_pay_id,
+                                                   charge.id))
 
         except ObjectDoesNotExist:
             log_event(user="Stripe API",
@@ -460,8 +551,8 @@ Stuff
                       source="Payments",
                       sub_source="stripe_webhook",
                       message="Unable to load stripe transaction. Check StripeTransaction \
-                      table. Our id=%s - Stripe id=%s" % (payment_intent.metadata.cobalt_pay_id,
-                                                          payment_intent.id))
+                      table. Our id=%s - Stripe id=%s" % (charge.metadata.cobalt_pay_id,
+                                                          charge.id))
 
         update_account(member=tran.member,
                        amount=tran.amount,
@@ -539,7 +630,8 @@ Stuff
 # callback_router       #
 #########################
 def callback_router(route_code=None, route_payload=None, tran=None, status="Success"):
-    """ Central function to handle callbacks.
+    """ Central function to handle callbacks
+
     Callbacks are an asynchronous way for us to let the calling application
     know if a payment successed or not.
 
@@ -572,7 +664,24 @@ def callback_router(route_code=None, route_payload=None, tran=None, status="Succ
 def update_account(member, amount, description, log_msg, source,
                    sub_source, payment_type, stripe_transaction=None,
                    other_member=None, organisation=None):
-    """ method to update a customer account """
+    """ Function to update a customer account
+
+        args:
+            member - owner of the account
+            amount - value (plus is a deduction, minus is a credit)
+            description - to appear on statement
+            log_msg - to appear on logs
+            source - for logs
+            sub_source - for logs
+            payment_type - type of payment
+            stripe_transaction - linked Stripe transaction (optional)
+            other_member - linked member (optional)
+            organisation - linked organisation (optional)
+
+        returns:
+            nothing
+
+    """
 # Get old balance
     balance = get_balance(member) + float(amount)
 
@@ -585,7 +694,7 @@ def update_account(member, amount, description, log_msg, source,
     act.organisation = organisation
     act.balance = balance
     act.description = description
-    act.type = type
+    act.type = payment_type
 
     act.save()
 
@@ -670,6 +779,7 @@ def auto_topup_member(member, topup_required=None):
             payment_method=pay_method_id,
             off_session=True,
             confirm=True,
+            metadata={'cobalt_tran_type': 'Auto'}
         )
 
 # It worked so create a stripe record
