@@ -22,5 +22,5 @@ class Command(BaseCommand):
         print("Running createsu.")
         self.CreateDefaultTestUsers("admin", "a@b.com", "99", "Admin", "Admin")
         self.CreateDefaultTestUsers("Mark", "m@rkguthrie.com", "620246", "Mark", "Guthrie")
-        self.CreateDefaultTestUsers("Julian", "julianrfoster@gmail.com", "518891", "Julian", "Foster")
+    #    self.CreateDefaultTestUsers("Julian", "julianrfoster@gmail.com", "518891", "Julian", "Foster")
     #    self.CreateDefaultTestUsers("Neil", "nwilliams36@internode.on.net", "952281", "Neil", "Williams")
