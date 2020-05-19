@@ -5,3 +5,10 @@ Cancel button on Auto top up
 Auto top up amount now on form
 pylint --output-format=colorized payments/core.py
 read the docs
+Cards do not delete old cards, just uses most recent.
+Auto top up setting now global in config file
+Django 3 testing
+Fixed bug in statement view for auto top up
+Member to Member - description mandatory
+Exclude self
+Error for no matches

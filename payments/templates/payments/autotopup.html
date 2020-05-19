@@ -83,15 +83,15 @@
     amt_field.on('change', function(e) {
       error_field.text("");
        var auto_amt = Number(amt_field.val());
-       if (auto_amt < 50) {
-         error_field.text("Insufficient amount. Must be at least $50.")
+       if (auto_amt < {{ AUTO_TOP_UP_MIN_AMT }}) {
+         error_field.text("Insufficient amount. Must be at least {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.")
          window.setTimeout(function () {  // needed for focus to work
            amt_field.focus();
          }, 100);
          return;
        }
-       if (auto_amt > 2000) {
-         error_field.text("Too large. $2000 is the maximum.")
+       if (auto_amt > {{ AUTO_TOP_UP_MAX_AMT }}) {
+         error_field.text("Too large. {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }} is the maximum.")
          window.setTimeout(function () {
            amt_field.focus();
          }, 100);

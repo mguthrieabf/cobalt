@@ -134,18 +134,19 @@ def search_ajax(request):
             search_first_name = None
 
         if search_first_name and search_last_name:
-            members = User.objects.filter(first_name__istartswith=search_first_name, last_name__istartswith=search_last_name)
+            members = User.objects.filter(first_name__istartswith=search_first_name,
+                      last_name__istartswith=search_last_name).exclude(pk=request.user.id)
         elif search_last_name:
-            members = User.objects.filter(last_name__istartswith=search_last_name)
+            members = User.objects.filter(last_name__istartswith=search_last_name).exclude(pk=request.user.id)
         else:
-            members = User.objects.filter(first_name__istartswith=search_first_name)
-        print(members)
+            members = User.objects.filter(first_name__istartswith=search_first_name).exclude(pk=request.user.id)
 
         if request.is_ajax:
-            print("ok")
             if members.count()>30:
                 msg="Too many results (%s)" % members.count()
                 members=None
+            elif members.count() == 0:
+                msg="No matches found"
             html = render_to_string(
                 template_name="accounts/search_results.html",
                 context={"members": members, "msg": msg}

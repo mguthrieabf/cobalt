@@ -17,7 +17,9 @@ from datetime import datetime
 from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
 from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
-                             GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT)
+                             GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT,
+                             AUTO_TOP_UP_MIN_AMT, AUTO_TOP_UP_MAX_AMT,
+                             AUTO_TOP_UP_DEFAULT_AMT)
 
 ####################
 # Home             #
@@ -104,7 +106,7 @@ def statement_common(request):
 
     # get auto top up
     if request.user.auto_amount:
-        auto_button = "Update Auto Top Up"
+        auto_button = "Auto Top Up Enabled"
     else:
         auto_button = "Add Auto Top Up"
 
@@ -186,9 +188,9 @@ def stripe_create_customer(request):
     """ calls Stripe to register a customer
     """
     stripe.api_key = STRIPE_SECRET_KEY
-    customer = stripe.Customer.create()
+    customer = stripe.Customer.create(metadata={'cobalt_tran_type': 'Auto'})
     request.user.stripe_customer_id = customer.id
-    request.user.auto_amount = 100.0   # make me a config setting
+    request.user.auto_amount = AUTO_TOP_UP_DEFAULT_AMT
     request.user.save()
 
 #######################
@@ -202,8 +204,8 @@ def setup_autotopup(request):
     stripe.api_key = STRIPE_SECRET_KEY
     warn = ""
 
-# Already a customer?
-    if request.user.auto_amount and request.user.stripe_customer_id:   # record exists
+# Already set up?
+    if request.user.stripe_auto_confirmed:
         try:
             paylist = stripe.PaymentMethod.list(
               customer=request.user.stripe_customer_id,
@@ -267,6 +269,15 @@ def setup_autotopup(request):
 @login_required()
 def member_transfer(request):
     """ view to transfer $ to another member
+
+    This view allows a member to transfer money to another member.
+
+    Args:
+        Request - standard request object
+
+    Returns:
+        HTTPResponse
+
     """
 
     msg = ""
@@ -287,7 +298,7 @@ def member_transfer(request):
                                 form.cleaned_data['amount']),
                                source="Payments",
                                sub_source="member_transfer",
-                               type="Transfer In"
+                               payment_type="Transfer In"
                                )
                 # Money out
                 update_account(member=request.user,
@@ -301,7 +312,7 @@ def member_transfer(request):
                                 form.cleaned_data['amount']),
                                source="Payments",
                                sub_source="member_transfer",
-                               type="Transfer Out"
+                               payment_type="Transfer Out"
                                )
 
             msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],

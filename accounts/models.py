@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cobalt.settings import GLOBAL_ORG
 from django.core.validators import MaxValueValidator
+from cobalt.settings import AUTO_TOP_UP_MAX_AMT
 
 class User(AbstractUser):
     """
@@ -15,8 +16,10 @@ class User(AbstractUser):
     pic = models.ImageField(upload_to = 'pic_folder/', default = 'pic_folder/default-avatar.png')
     dob = models.DateField(blank="True", null=True)
     bbo_name = models.CharField("BBO Username", blank=True, null=True, max_length=20)
-    auto_amount = models.PositiveIntegerField("Auto Top Up Amount", blank=True, null=True, validators=[MaxValueValidator(2000)])
+    auto_amount = models.PositiveIntegerField("Auto Top Up Amount", blank=True,
+    null=True, validators=[MaxValueValidator(AUTO_TOP_UP_MAX_AMT)])
     stripe_customer_id = models.CharField("Stripe Customer Id", blank=True, null=True, max_length=25)
+    stripe_auto_confirmed = models.BooleanField(blank=True, null=True)
 
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 

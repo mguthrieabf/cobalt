@@ -188,6 +188,8 @@ GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
 GLOBAL_PRODUCTION="abftech.com.au"
 GLOBAL_MPSERVER="http://127.0.0.1:8081"
+GLOBAL_CURRENCY_SYMBOL="$"
+GLOBAL_CURRENCY_NAME="Dollar"
 
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
@@ -203,7 +205,11 @@ if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
 
-AUTO_TOP_UP_LOW_LIMIT = 20.0
+# Payments auto amounts
+AUTO_TOP_UP_LOW_LIMIT = 20
+AUTO_TOP_UP_DEFAULT_AMT = 100
+AUTO_TOP_UP_MIN_AMT = 50
+AUTO_TOP_UP_MAX_AMT = 2000
 
 # django-summernote provides the rich text entry fields
 

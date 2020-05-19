@@ -18,7 +18,7 @@
   <div class="row justify-content-center">
     <div class="card col-11 col-md-6">
       <div class="card-header card-header-primary">
-        <h3 class="card-title">{{ GLOBAL_ORG }} Dollar Transfer</h3>
+        <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }} Transfer</h3>
         <h5>Transfer funds online to another member</h5>
         <h5>Balance: ${{ balance }}</h5>
       </div>
@@ -75,14 +75,23 @@
                 <div class="w-100"></div>
                 {{ form.description.errors }}
                 <div class="form-group">
-                  <label for="id_description" class="bmd-label-floating">Description (optional)</label>
+                  <label for="id_description" class="bmd-label-floating">Description</label>
                   {% render_field form.description class+="form-control" %}
                 </div>
               </div>
 
             <div class="row justify-content-center">
               <div id="cobalt-hidden-member"><input type='hidden' id='id_transfer_to' name='transfer_to' value='{{ form.transfer_to.value }}'></div>
-             <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-block col-11 col-md-5" disabled>
+
+               <div class="d-flex">
+                <div>
+                  <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-success center-text" disabled>
+                </div>
+                <div class="ml-auto">
+                 <button class="btn btn-info center-text" onclick="window.location.href='{% url "dashboard" %}'">Cancel</button>
+                </div>
+              </div>
+
             </div>
           </div>
           </form>

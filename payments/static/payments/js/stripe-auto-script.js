@@ -78,8 +78,9 @@ var pay = function(stripe, card, clientSecret) {
   stripe
     .confirmCardSetup(clientSecret, {
       payment_method: {
-        card: card
-      }
+        card: card,
+        metadata: {cobalt_tran_type: 'Auto'}
+      },
     })
     .then(function(result) {
       if (result.error) {
