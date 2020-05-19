@@ -91,9 +91,9 @@ def get_balance(member):
 
     return balance
 
-#########################
+################################
 # stripe_manual_payment_intent #
-#########################
+################################
 @login_required()
 def stripe_manual_payment_intent(request):
     """ Called from the checkout webpage.
@@ -129,7 +129,7 @@ def stripe_manual_payment_intent(request):
         try:
             payload_cents = int(float(data["amount"]) * 100.0)
             payload_cobalt_pay_id = data["id"]
-        except:
+        except KeyError:
             log_event(request=request,
                       user=request.user.full_name,
                       severity="ERROR",
@@ -304,8 +304,6 @@ def payment_api(request, description, amount, member, route_code=None,
 """
     balance = float(get_balance(member))
     amount = float(amount)
-    print("DEBUG: balance: %s" % balance)
-    print("DEBUG: amount: %s" % amount)
 
     if not log_msg:
         log_msg = description
@@ -317,8 +315,6 @@ def payment_api(request, description, amount, member, route_code=None,
         url = "dashboard"
 
     if amount <= balance:  # sufficient funds
-
-        print("DEBUG: Sufficient funds")
 
         update_account(member=member,
                        amount=-amount,
@@ -343,13 +339,11 @@ def payment_api(request, description, amount, member, route_code=None,
         messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
                          extra_tags='cobalt-message-success')
 
-        print("DEBUG: calling callback")
         callback_router(route_code=route_code, route_payload=route_payload, tran=None)
-        print("DEBUG: return from callback")
 
 # check for auto top up required - if user not set for auto topup then ignore
 
-        if member.auto_amount:
+        if member.stripe_auto_confirmed:
             if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
                 (return_code, msg) = auto_topup_member(member)
                 if return_code: # Success
@@ -362,7 +356,7 @@ def payment_api(request, description, amount, member, route_code=None,
         return redirect(url)
 
     else: # insufficient funds
-        if member.auto_amount:
+        if member.stripe_auto_confirmed:
 
 # calculate required top up amount
             topup_required = amount
@@ -834,7 +828,7 @@ def auto_topup_member(member, topup_required=None):
 
     stripe.api_key = STRIPE_SECRET_KEY
 
-    if not member.auto_amount:
+    if not member.stripe_auto_confirmed:
         return(False, "Member not set up for Auto Top Up")
 
     if not member.stripe_customer_id:
@@ -852,7 +846,7 @@ def auto_topup_member(member, topup_required=None):
             type="card",
         )
         pay_method_id = paylist.data[0].id
-    except InvalidRequestError:
+    except stripe.error.InvalidRequestError:
         log_event(user=member,
                   severity="WARN",
                   source="Payments",
@@ -901,9 +895,9 @@ def auto_topup_member(member, topup_required=None):
                        amount=amount,
                        description="Payment from %s card **** **** ***** %s Exp %s/%s" %
                        (payload.payment_method_details.card.brand,
-                       payload.payment_method_details.card.last4,
-                       payload.payment_method_details.card.exp_month,
-                       abs(payload.payment_method_details.card.exp_year) % 100),
+                        payload.payment_method_details.card.last4,
+                        payload.payment_method_details.card.exp_month,
+                        abs(payload.payment_method_details.card.exp_year) % 100),
                        log_msg="$%s Auto Top Up" % amount,
                        source="Payments",
                        sub_source="auto_topup_member",

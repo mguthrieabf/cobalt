@@ -1,8 +1,9 @@
+# pylint: disable=missing-module-docstring,missing-class-docstring
 from django.urls import path
 from . import views
 from . import core
 
-app_name = 'payments'
+app_name = 'payments' # pylint: disable=invalid-name
 
 urlpatterns = [
     path('', views.home, name='payments'),

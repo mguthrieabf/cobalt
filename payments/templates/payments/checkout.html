@@ -16,7 +16,7 @@
 <div align="center">
   <div class="sr-main">
     <h3 align="center">Credit Card Payment</h3>
-    <h4 align="center">${{ trans.amount|floatformat:2|intcomma }}</h4>
+    <h4 align="center">{{ GLOBAL_CURRENCY_SYMBOL}}{{ trans.amount|floatformat:2|intcomma }}</h4>
     <form id="payment-form" class="sr-payment-form">
       <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
       <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">

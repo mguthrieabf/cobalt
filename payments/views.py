@@ -1,35 +1,56 @@
+# -*- coding: utf-8 -*-
+"""Handles all activities associated with payments that talk to users.
+
+This module handles all of the functions that interact directly with
+a user. i.e. they generally accept a ``Request`` and return an
+``HttpResponse``.
+See also `Payments Core`_. This handles the other side of the interactions.
+They both work together.
+
+Key Points:
+    - Payments is a service module, it is requested to do things on behalf of
+      another module and does not know why it is doing them.
+    - Payments are often not real time, for manual payments, the user will
+      be taken to another screen that interacts directly with Stripe, and for
+      automatic top up payments, the top up may fail and require user input.
+    - The asynchronous nature of payments makes it more complex than many of
+      the Cobalt modules so the documentation needs to be of a higher standard.
+      See `Payments Overview`_ for more details.
+
+.. _Payments Core:
+   #module-payments.core
+
+.. _Payments Overview:
+   ./payments_overview.html
+
+"""
+
+import csv
+from datetime import datetime
 import requests
 import stripe
-import json
-import csv
-from .forms import TestTransaction, MemberTransfer
-from .core import payment_api, update_account, auto_topup_member, get_balance
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from .models import StripeTransaction, MemberTransaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib import messages
-from logs.views import log_event
-from django.utils import timezone
-from datetime import datetime
 from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
-from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
+from logs.views import log_event
+from cobalt.settings import (STRIPE_SECRET_KEY,
                              GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT,
-                             AUTO_TOP_UP_MIN_AMT, AUTO_TOP_UP_MAX_AMT,
                              AUTO_TOP_UP_DEFAULT_AMT)
+from .forms import TestTransaction, MemberTransfer
+from .core import payment_api, update_account, get_balance
+from .models import MemberTransaction
 
 ####################
 # Home             #
 ####################
 @login_required()
 def home(request):
-    """ Default page.
-    """
-    return render(request, 'payments/home.html')
+    """ Default page. """
 
+    return render(request, 'payments/home.html')
 
 @login_required()
 #################################
@@ -51,15 +72,15 @@ def test_payment(request):
             payment_type = form.cleaned_data['type']
 
             return payment_api(request=request,
-                              description=description,
-                              amount=amount,
-                              member=member,
-                              route_code="MAN",
-                              route_payload=None,
-                              organisation=organisation,
-                              log_msg=None,
-                              payment_type=payment_type,
-                              url=url)
+                               description=description,
+                               amount=amount,
+                               member=member,
+                               route_code="MAN",
+                               route_payload=None,
+                               organisation=organisation,
+                               log_msg=None,
+                               payment_type=payment_type,
+                               url=url)
     else:
         form = TestTransaction()
 
@@ -68,12 +89,12 @@ def test_payment(request):
     else:
         auto_amount = None
 
-    balance=get_balance(request.user)
+    balance = get_balance(request.user)
 
     return render(request, 'payments/test_payment.html', {'form': form,
                                                           'auto_amount' : auto_amount,
                                                           'balance': balance,
-                                                          'lowbalance': AUTO_TOP_UP_LOW_LIMIT })
+                                                          'lowbalance': AUTO_TOP_UP_LOW_LIMIT})
 
 ####################
 # statement_common #
@@ -81,6 +102,17 @@ def test_payment(request):
 @login_required()
 def statement_common(request):
     """ Member statement view - common part across online, pdf and csv
+
+    Args:
+        request - standard request object
+
+    Returns:
+        summary - dict of basic info about user from MasterPoints
+        club - Home club name
+        balance - Users account Balance
+        auto_button - text for button (activated or press to setup)
+        events_list - list of Member Transactions
+
     """
 
 # Get summary data
@@ -119,7 +151,16 @@ def statement_common(request):
 #####################
 @login_required()
 def statement(request):
-    """ Member statement view
+    """ Member statement view.
+
+    Basic view of statement showing transactions in a web page.
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HTTPResponse
+
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request)
 
@@ -146,8 +187,17 @@ def statement(request):
 @login_required()
 def statement_csv(request):
     """ Member statement view - csv download
+
+    Generates a CSV of the statement.
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HTTPResponse - CSV
+
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(request)
+    (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="statement.csv"'
@@ -158,7 +208,7 @@ def statement_csv(request):
 
     for row in events_list:
         writer.writerow([row.created_date, row.reference_no,
-                        row.type, row.description, row.amount, row.balance])
+                         row.type, row.description, row.amount, row.balance])
 
     return response
 
@@ -167,25 +217,47 @@ def statement_csv(request):
 #####################
 @login_required()
 def statement_pdf(request):
-    """ Member statement view - pdf download
+    """ Member statement view - csv download
+
+    Generates a PDF of the statement.
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HTTPResponse - PDF
+
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(request)
+    (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
 
     today = datetime.today().strftime('%-m %B %Y')
 
-    return render_to_pdf_response(request, 'payments/statement_pdf.html', {
-                                                        'events': events_list,
-                                                        'user': request.user,
-                                                        'summary': summary,
-                                                        'club': club,
-                                                        'balance': balance,
-                                                        'today': today})
+    return render_to_pdf_response(request, 'payments/statement_pdf.html',
+                                  {
+                                      'events': events_list,
+                                      'user': request.user,
+                                      'summary': summary,
+                                      'club': club,
+                                      'balance': balance,
+                                      'today': today
+                                  })
 ############################
 # Stripe_create_customer   #
 ############################
 @login_required()
 def stripe_create_customer(request):
-    """ calls Stripe to register a customer
+    """ calls Stripe to register a customer.
+
+    Creates a new customer entry with Stripe and sets this member's
+    stripe_customer_id to match the customer created. Also sets the
+    auto_amount for the member to the system default.
+
+    Args:
+        request - a standard request object
+
+    Returns:
+        Nothing.
+
     """
     stripe.api_key = STRIPE_SECRET_KEY
     customer = stripe.Customer.create(metadata={'cobalt_tran_type': 'Auto'})
@@ -198,8 +270,17 @@ def stripe_create_customer(request):
 #######################
 @login_required()
 def setup_autotopup(request):
-    """ view to sign up to auto top up. Creates Stripe customer if not already defined.
-        Hands over to Stripe to process card.
+    """ view to sign up to auto top up.
+
+    Creates Stripe customer if not already defined.
+    Hands over to Stripe to process card.
+
+    Args:
+        request - a standard request object
+
+    Returns:
+        HTTPResponse
+
     """
     stripe.api_key = STRIPE_SECRET_KEY
     warn = ""
@@ -208,45 +289,45 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed:
         try:
             paylist = stripe.PaymentMethod.list(
-              customer=request.user.stripe_customer_id,
-              type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
-        except stripe.error.InvalidRequestError as e:
+        except stripe.error.InvalidRequestError as error:
             log_event(user=request.user.full_name,
                       severity="HIGH",
                       source="Payments",
                       sub_source="setup_autotopup",
-                      message="Stripe InvalidRequestError: %s" % e.error.message)
+                      message="Stripe InvalidRequestError: %s" % error.error.message)
             stripe_create_customer(request)
-            paylist=None
+            paylist = None
 
-        except stripe.error.RateLimitError as e:
+        except stripe.error.RateLimitError:
             log_event(user=request.user.full_name,
-                    severity="HIGH",
-                    source="Payments",
-                    sub_source="setup_autotopup",
-                    message="Stripe RateLimitError")
+                      severity="HIGH",
+                      source="Payments",
+                      sub_source="setup_autotopup",
+                      message="Stripe RateLimitError")
 
-        except stripe.error.AuthenticationError as e:
+        except stripe.error.AuthenticationError:
             log_event(user=request.user.full_name,
-                    severity="CRITICAL",
-                    source="Payments",
-                    sub_source="setup_autotopup",
-                    message="Stripe AuthenticationError")
+                      severity="CRITICAL",
+                      source="Payments",
+                      sub_source="setup_autotopup",
+                      message="Stripe AuthenticationError")
 
-        except stripe.error.APIConnectionError as e:
+        except stripe.error.APIConnectionError:
             log_event(user=request.user.full_name,
-                    severity="HIGH",
-                    source="Payments",
-                    sub_source="setup_autotopup",
-                    message="Stripe APIConnectionError - likely network problems")
+                      severity="HIGH",
+                      source="Payments",
+                      sub_source="setup_autotopup",
+                      message="Stripe APIConnectionError - likely network problems")
 
-        except stripe.error.StripeError as e:
+        except stripe.error.StripeError:
             log_event(user=request.user.full_name,
-                    severity="CRITICAL",
-                    source="Payments",
-                    sub_source="setup_autotopup",
-                    message="Stripe generic StripeError")
+                      severity="CRITICAL",
+                      source="Payments",
+                      sub_source="setup_autotopup",
+                      message="Stripe generic StripeError")
 
         if paylist:  # if customer has a card associated
             card = paylist.data[0].card
@@ -340,10 +421,21 @@ def member_transfer(request):
 ########################
 def update_auto_amount(request):
     """
-    Called by the auto top up page when a user changes the amount of the auto top up
+    Called by the auto top up page when a user changes the amount of the auto top up.
+
+    The auto top up page has Stripe code on it so a standard form won't work
+    for this. Instead we use a little Ajax code on the page to handle this.
+
+    Args:
+        request - a standard request object
+
+    Returns:
+        HTTPResponse
+
     """
     if request.method == "GET":
         amount = request.GET['amount']
         request.user.auto_amount = amount
         request.user.save()
-        return HttpResponse("Successful")
+
+    return HttpResponse("Successful")

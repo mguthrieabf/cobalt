@@ -1,6 +1,7 @@
+# pylint: disable=missing-module-docstring,missing-class-docstring
 from django.contrib import admin
 from .models import (StripeTransaction, MemberTransaction,
-                    OrganisationTransaction)
+                     OrganisationTransaction)
 
 class MemberTransactionAdmin(admin.ModelAdmin):
     search_fields = ['reference_no', 'type']

@@ -18,6 +18,7 @@ ALLOWED_HOSTS = ['test.abftech.com.au', 'uat.abftech.com.au', '127.0.0.1', 'coba
 
 # For AWS we also need to add the local IP address as this is used by the health checks
 # We do this dynamically
+# This gives an error on windows but it can be ignored
 try:
     local_ip = os.popen("hostname -I 2>/dev/null").read()
     ALLOWED_HOSTS.append(local_ip.strip())
@@ -132,11 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.ipage.com'
-EMAIL_HOST_USER = 'test@drunkguthrie.com'
-EMAIL_HOST_PASSWORD = 'F1shcake'
 EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = 'donotreply@drunkguthrie.com'
 SUPPORT_EMAIL=['m@rkguthrie.com']
 
 if 'EMAIL_HOST' in os.environ:
@@ -181,25 +178,21 @@ MESSAGE_TAGS = {
 }
 
 # Local settings for this Application
-GLOBAL_ORG="ABF"
-GLOBAL_TITLE="ABF Technology"
+GLOBAL_ORG="EBU"
+GLOBAL_TITLE="EBU Technology"
 GLOBAL_CONTACT="https://abf.com.au"
 GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
 GLOBAL_PRODUCTION="abftech.com.au"
 GLOBAL_MPSERVER="http://127.0.0.1:8081"
-GLOBAL_CURRENCY_SYMBOL="$"
-GLOBAL_CURRENCY_NAME="Dollar"
+GLOBAL_CURRENCY_SYMBOL="?"
+GLOBAL_CURRENCY_NAME="Pound"
 
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
 
-# Stripe is our payment gateway
-
-#STRIPE_SECRET_KEY="sk_test_tbD1kQf7S7aBrWdpaAkdK60e"
-#STRIPE_PUBLISHABLE_KEY="pk_test_vx2RPX6BXeETHa3MJycvArkx"
-STRIPE_SECRET_KEY="sk_test_tnjlQRkdt1wH7XMIe6qt6hBF00tBWjSPGl"
-STRIPE_PUBLISHABLE_KEY="pk_test_fE1LvnH8aQWUC11pj2ZL9Z8F000zhXsgaV"
+# Stripe is our payment gateway - for dev create your own free stripe
+# account and set your keys
 
 if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
