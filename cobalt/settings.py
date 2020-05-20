@@ -98,6 +98,15 @@ DATABASES = {
     },
 }
 
+# Dummy settings required so read the docs will work
+GLOBAL_MPSERVER = 'dummy'
+EMAIL_HOST = 'smtp.com'
+EMAIL_HOST_USER = 'a@b.com'
+EMAIL_HOST_PASSWORD = 'password'
+DEFAULT_FROM_EMAIL = 'donotreply@a.com'
+STRIPE_SECRET_KEY = 'not-set'
+STRIPE_PUBLISHABLE_KEY = 'not-set'
+
 if 'RDS_HOSTNAME' in os.environ:
     DATABASES = {
         'default': {

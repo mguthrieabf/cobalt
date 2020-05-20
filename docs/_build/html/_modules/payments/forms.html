@@ -144,22 +144,16 @@
            <div itemprop="articleBody">
             
   <h1>Source code for payments.forms</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span></span><span class="sd">&quot;&quot;&quot; Payment forms with validation &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
 <span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">Organisation</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">TRANSACTION_TYPE</span>
 
 <div class="viewcode-block" id="TestTransaction"><a class="viewcode-back" href="../../payments.html#payments.forms.TestTransaction">[docs]</a><span class="k">class</span> <span class="nc">TestTransaction</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
-    <span class="n">TRANSACTION_TYPE</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;Transfer Out&#39;</span><span class="p">,</span> <span class="s1">&#39;Money transfered out of account&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Transfer In&#39;</span><span class="p">,</span> <span class="s1">&#39;Money transfered in to account&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Auto Top Up&#39;</span><span class="p">,</span> <span class="s1">&#39;Automated CC top up&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Congress Entry&#39;</span><span class="p">,</span> <span class="s1">&#39;Entry to a congress&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;CC Payment&#39;</span><span class="p">,</span> <span class="s1">&#39;Credit Card payment&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Club Payment&#39;</span><span class="p">,</span> <span class="s1">&#39;Club game payment&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Club Membership&#39;</span><span class="p">,</span> <span class="s1">&#39;Club membership payment&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Miscellaneous&#39;</span><span class="p">,</span> <span class="s1">&#39;Miscellaneous payment&#39;</span><span class="p">),</span>
-    <span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot; Temporary - will be removed &quot;&quot;&quot;</span>
+
     <span class="n">amount</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Amount&#39;</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
     <span class="n">organisation</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">queryset</span><span class="o">=</span><span class="n">Organisation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
@@ -167,9 +161,10 @@
     <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;URL&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MemberTransfer"><a class="viewcode-back" href="../../payments.html#payments.forms.MemberTransfer">[docs]</a><span class="k">class</span> <span class="nc">MemberTransfer</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; M2M transfer form &quot;&quot;&quot;</span>
     <span class="n">transfer_to</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">queryset</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
     <span class="n">amount</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Amount&#39;</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">description</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># We need the logged in user to check the balance, add a parameter</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -177,6 +172,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">MemberTransfer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MemberTransfer.clean_amount"><a class="viewcode-back" href="../../payments.html#payments.forms.MemberTransfer.clean_amount">[docs]</a>    <span class="k">def</span> <span class="nf">clean_amount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; validation for the amount field &quot;&quot;&quot;</span>
         <span class="n">amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Negative amounts are not allowed&quot;</span><span class="p">)</span>
@@ -184,9 +180,9 @@
         <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="n">last_tran</span><span class="o">.</span><span class="n">balance</span><span class="p">:</span>
-                <span class="k">raise</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Insufficient funds&quot;</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Insufficient funds&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Insufficient funds&quot;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Insufficient funds&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">amount</span></div></div>
 </pre></div>
 

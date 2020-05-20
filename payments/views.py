@@ -420,8 +420,7 @@ def member_transfer(request):
 # update_auto_amount   #
 ########################
 def update_auto_amount(request):
-    """
-    Called by the auto top up page when a user changes the amount of the auto top up.
+    """ Called by the auto top up page when a user changes the amount of the auto top up.
 
     The auto top up page has Stripe code on it so a standard form won't work
     for this. Instead we use a little Ajax code on the page to handle this.
@@ -439,3 +438,73 @@ def update_auto_amount(request):
         request.user.save()
 
     return HttpResponse("Successful")
+
+###################
+# manual_topup    #
+###################
+def manual_topup(request):
+    """ Page to allow credit card top up regardless of auto status.
+
+    This page allows a member to add to their account using a credit card,
+    they can do this even if they have already set up for auto top up.
+
+    Args:
+        request - a standard request object
+
+    Returns:
+        HttpResponse
+
+    """
+
+    if request.method == 'POST':
+        form = MemberTransfer(request.POST, user=request.user)
+        if form.is_valid():
+            with transaction.atomic():
+                # Money in
+                update_account(member=form.cleaned_data['transfer_to'],
+                               other_member=request.user,
+                               amount=form.cleaned_data['amount'],
+                               description=form.cleaned_data['description'],
+                               log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.system_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].system_number,
+                                form.cleaned_data['amount']),
+                               source="Payments",
+                               sub_source="member_transfer",
+                               payment_type="Transfer In"
+                               )
+                # Money out
+                update_account(member=request.user,
+                               other_member=form.cleaned_data['transfer_to'],
+                               amount=-form.cleaned_data['amount'],
+                               description=form.cleaned_data['description'],
+                               log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
+                               (request.user.full_name, request.user.system_number,
+                                form.cleaned_data['transfer_to'].full_name,
+                                form.cleaned_data['transfer_to'].system_number,
+                                form.cleaned_data['amount']),
+                               source="Payments",
+                               sub_source="member_transfer",
+                               payment_type="Transfer Out"
+                               )
+
+            msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
+                                     form.cleaned_data['transfer_to'].full_name,
+                                     form.cleaned_data['transfer_to'].system_number)
+            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
+        else:
+            print(form.errors)
+
+    else:
+        form = MemberTransfer(user=request.user)
+
+    # get balance
+    last_tran = MemberTransaction.objects.filter(member=request.user).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        balance = "Nil"
+
+    return render(request, 'payments/member_transfer.html', {'form': form,
+                                                             'balance': balance})

@@ -144,9 +144,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for payments.admin</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<span></span><span class="c1"># pylint: disable=missing-module-docstring,missing-class-docstring</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">StripeTransaction</span><span class="p">,</span> <span class="n">MemberTransaction</span><span class="p">,</span>
-                    <span class="n">OrganisationTransaction</span><span class="p">)</span>
+                     <span class="n">OrganisationTransaction</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MemberTransactionAdmin"><a class="viewcode-back" href="../../payments.html#payments.admin.MemberTransactionAdmin">[docs]</a><span class="k">class</span> <span class="nc">MemberTransactionAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
     <span class="n">search_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;reference_no&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]</span></div>

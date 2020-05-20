@@ -237,9 +237,9 @@
 
     <span class="k">return</span> <span class="n">balance</span></div>
 
-<span class="c1">#########################</span>
+<span class="c1">################################</span>
 <span class="c1"># stripe_manual_payment_intent #</span>
-<span class="c1">#########################</span>
+<span class="c1">################################</span>
 <div class="viewcode-block" id="stripe_manual_payment_intent"><a class="viewcode-back" href="../../payments.html#payments.core.stripe_manual_payment_intent">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">stripe_manual_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called from the checkout webpage.</span>
@@ -266,7 +266,7 @@
 <span class="sd">        publishableKey = our Public Stripe key,</span>
 <span class="sd">        clientSecret = client secret from Stripe</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
@@ -275,7 +275,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">payload_cents</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">)</span>
             <span class="n">payload_cobalt_pay_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
                       <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                       <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
@@ -312,7 +312,8 @@
         <span class="n">intent</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">PaymentIntent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">amount</span><span class="o">=</span><span class="n">payload_cents</span><span class="p">,</span>
             <span class="n">currency</span><span class="o">=</span><span class="s1">&#39;aud&#39;</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_pay_id&#39;</span><span class="p">:</span> <span class="n">payload_cobalt_pay_id</span><span class="p">}</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_pay_id&#39;</span><span class="p">:</span> <span class="n">payload_cobalt_pay_id</span><span class="p">,</span>
+                      <span class="s1">&#39;cobalt_tran_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Manual&#39;</span><span class="p">}</span>
             <span class="p">)</span>
         <span class="n">log_event</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
                   <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
@@ -338,16 +339,41 @@
 <span class="k">def</span> <span class="nf">stripe_auto_payment_intent</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called from the auto top up webpage.</span>
 
-<span class="sd">This is very similar to the one off payment. It lets Stripe</span>
-<span class="sd">know to expect a credit card and provides a token to confirm</span>
-<span class="sd">which one it is.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is very similar to the one off payment. It lets Stripe</span>
+<span class="sd">    know to expect a credit card and provides a token to confirm</span>
+<span class="sd">    which one it is.</span>
+
+<span class="sd">    When a user is going to set up a credit card we</span>
+<span class="sd">    tell Stripe and Stripe gets ready for it. By this point in the process</span>
+<span class="sd">    we have handed over control to the Stripe code which calls this function</span>
+<span class="sd">    over Ajax.</span>
+
+<span class="sd">    This functions expects a json payload as part of `request`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - This needs to contain a Json payload.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The Json should include:</span>
+<span class="sd">        data{&quot;stripe_customer_id&quot;: This is the Stripe customer_id in our table</span>
+<span class="sd">        for the customer that we are handling}</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        json: {&#39;publishableKey&#39;:? &#39;clientSecret&#39;:?}</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        publishableKey = our Public Stripe key,</span>
+<span class="sd">        clientSecret = client secret from Stripe</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
 
         <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
         <span class="n">intent</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">SetupIntent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
             <span class="n">customer</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_member_id&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_member_id&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                      <span class="s1">&#39;cobalt_tran_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">}</span>
             <span class="p">)</span>
 
         <span class="n">log_event</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
@@ -406,11 +432,24 @@
 <span class="sd">    amount is the amount to be deducted from the users account. A positive</span>
 <span class="sd">    amount is a charge, a negative amount is an incoming payment.</span>
 
+<span class="sd">    args:</span>
+<span class="sd">        request - standard request object</span>
+<span class="sd">        description - text description of the payment</span>
+<span class="sd">        amount - how much</span>
+<span class="sd">        member - User object related to the payment</span>
+<span class="sd">        route_code - code to map to a callback</span>
+<span class="sd">        route_payload - value to retirn on completion</span>
+<span class="sd">        organisation - linked organisation</span>
+<span class="sd">        log_msg - message for the log</span>
+<span class="sd">        payment_type - description of payment</span>
+<span class="sd">        url - next url to go to</span>
+
+<span class="sd">    returns:</span>
+<span class="sd">        request - page for user</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
     <span class="n">balance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">))</span>
     <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: balance: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">balance</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: amount: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">amount</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">log_msg</span><span class="p">:</span>
         <span class="n">log_msg</span> <span class="o">=</span> <span class="n">description</span>
@@ -422,8 +461,6 @@
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;dashboard&quot;</span>
 
     <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="n">balance</span><span class="p">:</span>  <span class="c1"># sufficient funds</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: Sufficient funds&quot;</span><span class="p">)</span>
 
         <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
                        <span class="n">amount</span><span class="o">=-</span><span class="n">amount</span><span class="p">,</span>
@@ -448,33 +485,31 @@
         <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Payment successful! You paid $</span><span class="si">{</span><span class="n">amount</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">organisation</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
                          <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-success&#39;</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: calling callback&quot;</span><span class="p">)</span>
         <span class="n">callback_router</span><span class="p">(</span><span class="n">route_code</span><span class="o">=</span><span class="n">route_code</span><span class="p">,</span> <span class="n">route_payload</span><span class="o">=</span><span class="n">route_payload</span><span class="p">,</span> <span class="n">tran</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: return from callback&quot;</span><span class="p">)</span>
 
 <span class="c1"># check for auto top up required - if user not set for auto topup then ignore</span>
 
-        <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">auto_amount</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">balance</span> <span class="o">-</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">:</span>
                 <span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="o">=</span> <span class="n">auto_topup_member</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span> <span class="c1"># Success</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
                                      <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-success&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># Failure</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
                                    <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-error&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span> <span class="c1"># insufficient funds</span>
-        <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">auto_amount</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
 
-<span class="c1"># The balance afterwards should be the auto amount the user has set</span>
-            <span class="n">topup_required</span> <span class="o">=</span> <span class="n">member</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">-</span> <span class="n">balance</span> <span class="o">+</span> <span class="n">amount</span>
+<span class="c1"># calculate required top up amount</span>
+            <span class="n">topup_required</span> <span class="o">=</span> <span class="n">amount</span>
 
             <span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="o">=</span> <span class="n">auto_topup_member</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">topup_required</span><span class="o">=</span><span class="n">topup_required</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span> <span class="c1"># success</span>
                 <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
                                <span class="n">amount</span><span class="o">=-</span><span class="n">amount</span><span class="p">,</span>
                                <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">,</span>
@@ -527,6 +562,170 @@
             <span class="n">trans</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/checkout.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;trans&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">})</span></div>
 
+<span class="c1">#########################</span>
+<span class="c1"># stripe_webhook_manual #</span>
+<span class="c1">#########################</span>
+<div class="viewcode-block" id="stripe_webhook_manual"><a class="viewcode-back" href="../../payments.html#payments.core.stripe_webhook_manual">[docs]</a><span class="k">def</span> <span class="nf">stripe_webhook_manual</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Handles manual payment events from Stripe webhook</span>
+
+<span class="sd">    Called by stripe_webhook to look after incoming manual payments.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        event - the event payload from Stripe</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse code - 200 for success, 400 for error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="c1"># get data from payload</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">object</span>
+
+<span class="c1"># TODO: catch error if ids not present</span>
+    <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+              <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+              <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+              <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+              <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Received charge.succeeded for Manual payment. Our id=</span><span class="si">%s</span><span class="s2"> - </span><span class="se">\</span>
+<span class="s2">                       Their id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">charge</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
+                                       <span class="n">charge</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+<span class="c1"># Update StripeTransaction</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tran</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">charge</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">)</span>
+
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_reference</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_method</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_currency</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">currency</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_receipt_url</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">receipt_url</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_brand</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">brand</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_country</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">country</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_month</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_month</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_year</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_year</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">stripe_last4</span> <span class="o">=</span> <span class="n">charge</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">last4</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">last_change_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Complete&quot;</span>
+        <span class="n">tran</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                  <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                  <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Successfully updated stripe transaction table. </span><span class="se">\</span>
+<span class="s2">                  Our id=</span><span class="si">%s</span><span class="s2"> - Stripe id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">charge</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
+                                               <span class="n">charge</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+    <span class="k">except</span> <span class="n">ObjectDoesNotExist</span><span class="p">:</span>
+        <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
+                  <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                  <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Unable to load stripe transaction. Check StripeTransaction </span><span class="se">\</span>
+<span class="s2">                  table. Our id=</span><span class="si">%s</span><span class="s2"> - Stripe id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">charge</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
+                                                      <span class="n">charge</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+  <span class="c1"># TODO: change to 400</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+    <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">,</span>
+                   <span class="n">amount</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span>
+                   <span class="n">stripe_transaction</span><span class="o">=</span><span class="n">tran</span><span class="p">,</span>
+                   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Payment from card **** **** ***** </span><span class="si">%s</span><span class="s2"> Exp </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                   <span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">stripe_last4</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_month</span><span class="p">,</span>
+                    <span class="nb">abs</span><span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_year</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">),</span>
+                   <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> Payment from Stripe Transaction=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                   <span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                   <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                   <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                   <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;CC Payment&quot;</span>
+                   <span class="p">)</span>
+
+<span class="c1"># Money in from stripe so we can now process the original transaction</span>
+    <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">,</span>
+                   <span class="n">amount</span><span class="o">=-</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_amount</span><span class="p">,</span>
+                   <span class="n">description</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                   <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                   <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                   <span class="n">payment_type</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">,</span>
+                   <span class="n">log_msg</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                   <span class="n">organisation</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_organisation</span>
+                   <span class="p">)</span>
+
+<span class="c1"># make organisation payment too</span>
+    <span class="n">update_organisation</span><span class="p">(</span><span class="n">organisation</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_organisation</span><span class="p">,</span>
+                        <span class="n">amount</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_amount</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                        <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                        <span class="n">payment_type</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">,</span>
+                        <span class="n">log_msg</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                        <span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">)</span>
+
+    <span class="c1"># make Callback</span>
+    <span class="n">callback_router</span><span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">route_code</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">route_payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">)</span>
+
+<span class="c1"># succcess</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span></div>
+
+<span class="c1">##############################</span>
+<span class="c1"># stripe_webhook_autosetup   #</span>
+<span class="c1">##############################</span>
+<div class="viewcode-block" id="stripe_webhook_autosetup"><a class="viewcode-back" href="../../payments.html#payments.core.stripe_webhook_autosetup">[docs]</a><span class="k">def</span> <span class="nf">stripe_webhook_autosetup</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Handles auto top up setup events from Stripe webhook</span>
+
+<span class="sd">    Called by stripe_webhook to look after sucessful incoming auto top up set ups.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        event - the event payload from Stripe</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse code - 200 for success, 400 for error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="c1"># Get customer id</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">stripe_customer</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">customer</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
+                  <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                  <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Error retrieving Stripe customer id from message&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="c1"># find member</span>
+    <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stripe_customer_id</span><span class="o">=</span><span class="n">stripe_customer</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">member</span><span class="p">:</span>
+        <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
+                  <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                  <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                  <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Error cannot find member with stripe_customer_id=</span><span class="si">{</span><span class="n">stripe_customer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="c1"># confirm card set up</span>
+    <span class="n">member</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">member</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;member stripe auto&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">)</span>
+
+<span class="c1"># check if we should make an auto top up now</span>
+    <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">balance</span> <span class="o">&lt;</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="o">=</span> <span class="n">auto_topup_member</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span> <span class="c1"># success</span>
+            <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># failure</span>
+            <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span></div>
 <span class="c1">####################</span>
 <span class="c1"># stripe_webhook   #</span>
 <span class="c1">####################</span>
@@ -561,7 +760,7 @@
 
 <span class="sd">    * payment_intent.succeeded - ignore</span>
 <span class="sd">    * payment_intent.created - ignore</span>
-<span class="sd">    * charge_succeeded - process</span>
+<span class="sd">    * charge_succeeded - ignore (we already know this from the API call)</span>
 
 <span class="sd">    **Meta data**</span>
 
@@ -597,113 +796,27 @@
 
         <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;payment_intent.succeeded&#39;</span><span class="p">:</span>
-    <span class="c1"># get data from payload</span>
-        <span class="n">payment_intent</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">object</span>
-        <span class="n">payment_intent_data</span> <span class="o">=</span> <span class="n">payment_intent</span><span class="o">.</span><span class="n">charges</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># TODO: catch error if ids not present</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tran_type</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_tran_type</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
         <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                  <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
                   <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                   <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                  <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Received payment_intent.succeeded. Our id=</span><span class="si">%s</span><span class="s2"> - </span><span class="se">\</span>
-<span class="s2">                           Their id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">payment_intent</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
-                                           <span class="n">payment_intent</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+                  <span class="n">message</span><span class="o">=</span><span class="s2">&quot;cobalt_tran_type missing from Stripe webhook&quot;</span><span class="p">)</span>
+    <span class="c1"># TODO: change to 400</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 
+<span class="c1"># We only process change succeeded for Manual charges - for auto topup</span>
+<span class="c1"># we get this synchronously through the API call, this is additional info.</span>
+<span class="c1"># Don&#39;t process it twice.</span>
 
-    <span class="c1"># Update StripeTransaction</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">tran</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">payment_intent</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">)</span>
-
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_reference</span> <span class="o">=</span> <span class="n">payment_intent</span><span class="o">.</span><span class="n">id</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_method</span> <span class="o">=</span> <span class="n">payment_intent</span><span class="o">.</span><span class="n">payment_method</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_currency</span> <span class="o">=</span> <span class="n">payment_intent</span><span class="o">.</span><span class="n">currency</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_receipt_url</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">receipt_url</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_brand</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">brand</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_country</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">country</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_month</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_month</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_year</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_year</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">stripe_last4</span> <span class="o">=</span> <span class="n">payment_intent_data</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">last4</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">last_change_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Complete&quot;</span>
-            <span class="n">tran</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
-            <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Successfully updated stripe transaction table. </span><span class="se">\</span>
-<span class="s2">                      Our id=</span><span class="si">%s</span><span class="s2"> - Stripe id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">payment_intent</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
-                                                   <span class="n">payment_intent</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
-
-        <span class="k">except</span> <span class="n">ObjectDoesNotExist</span><span class="p">:</span>
-            <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
-                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Unable to load stripe transaction. Check StripeTransaction </span><span class="se">\</span>
-<span class="s2">                      table. Our id=</span><span class="si">%s</span><span class="s2"> - Stripe id=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">payment_intent</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">cobalt_pay_id</span><span class="p">,</span>
-                                                          <span class="n">payment_intent</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
-
-        <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">,</span>
-                       <span class="n">amount</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span>
-                       <span class="n">stripe_transaction</span><span class="o">=</span><span class="n">tran</span><span class="p">,</span>
-                       <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Payment from card **** **** ***** </span><span class="si">%s</span><span class="s2"> Exp </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                       <span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">stripe_last4</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_month</span><span class="p">,</span>
-                        <span class="nb">abs</span><span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">stripe_exp_year</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">),</span>
-                       <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> Payment from Stripe Transaction=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                       <span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
-                       <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                       <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                       <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;CC Payment&quot;</span>
-                       <span class="p">)</span>
-
-<span class="c1"># Money in from stripe so we can now process the original transaction</span>
-        <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">,</span>
-                       <span class="n">amount</span><span class="o">=-</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_amount</span><span class="p">,</span>
-                       <span class="n">description</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                       <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                       <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                       <span class="n">payment_type</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">,</span>
-                       <span class="n">log_msg</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                       <span class="n">organisation</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_organisation</span>
-                       <span class="p">)</span>
-
-<span class="c1"># If we got an organisation then make their payment too</span>
-        <span class="n">update_organisation</span><span class="p">(</span><span class="n">organisation</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_organisation</span><span class="p">,</span>
-                            <span class="n">amount</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_amount</span><span class="p">,</span>
-                            <span class="n">description</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                            <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                            <span class="n">payment_type</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">,</span>
-                            <span class="n">log_msg</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                            <span class="n">member</span><span class="o">=</span><span class="n">tran</span><span class="o">.</span><span class="n">member</span><span class="p">)</span>
-
-        <span class="c1"># make Callback</span>
-        <span class="n">callback_router</span><span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">route_code</span><span class="p">,</span> <span class="n">tran</span><span class="o">.</span><span class="n">route_payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;charge.succeeded&#39;</span> <span class="ow">and</span> <span class="n">tran_type</span> <span class="o">==</span> <span class="s2">&quot;Manual&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">stripe_webhook_manual</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;payment_method.attached&#39;</span><span class="p">:</span>  <span class="c1"># auto top up set up successful</span>
-        <span class="n">stripe_customer</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">customer</span>
-        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stripe_customer_id</span><span class="o">=</span><span class="n">stripe_customer</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
-
-<span class="c1"># check if we should make an auto top up now</span>
-<span class="c1"># TODO: move to its own function and handle notifying user if it fails</span>
-        <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">balance</span> <span class="o">&lt;</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="o">=</span> <span class="n">auto_topup_member</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>
-                <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                          <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-                          <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                          <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                          <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                          <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
-                          <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                          <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
-                          <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stripe_webhook_autosetup</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Unexpected event type</span>
@@ -714,7 +827,8 @@
                   <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Unexpected event received from Stripe - &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected event found - &quot;</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+        <span class="c1"># TODO - change to 400</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span></div>
 
@@ -722,7 +836,8 @@
 <span class="c1"># callback_router       #</span>
 <span class="c1">#########################</span>
 <div class="viewcode-block" id="callback_router"><a class="viewcode-back" href="../../payments.html#payments.core.callback_router">[docs]</a><span class="k">def</span> <span class="nf">callback_router</span><span class="p">(</span><span class="n">route_code</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">route_payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tran</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Success&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Central function to handle callbacks.</span>
+    <span class="sd">&quot;&quot;&quot; Central function to handle callbacks</span>
+
 <span class="sd">    Callbacks are an asynchronous way for us to let the calling application</span>
 <span class="sd">    know if a payment successed or not.</span>
 
@@ -730,8 +845,18 @@
 <span class="sd">    number of callbacks in Cobalt so we are okay to hardcode it.</span>
 
 <span class="sd">    We should not get tran provided but do for early testing. This will be</span>
-<span class="sd">    removed later, but for now allows us to reverse the transaction for testing</span>
+<span class="sd">    removed later, but for now allows us to reverse the transaction for testing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        route_code - hard coded value to map to a function call</span>
+<span class="sd">        route_payload - value to return to function</span>
+<span class="sd">        tran - for testing only. remove later</span>
+<span class="sd">        status - Success (default) or Failure. Did the payment work or not.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">route_code</span><span class="p">:</span>  <span class="c1"># do nothing in no route_code passed</span>
 
         <span class="k">if</span> <span class="n">route_code</span> <span class="o">==</span> <span class="s2">&quot;MAN&quot;</span><span class="p">:</span>
@@ -743,11 +868,10 @@
                       <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Callback made to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">route_code</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
                       <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                       <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
                       <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Unable to make callback. Invalid route_code: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">route_code</span><span class="p">)</span></div>
-
 
 <span class="c1">######################</span>
 <span class="c1"># update_account     #</span>
@@ -755,7 +879,24 @@
 <div class="viewcode-block" id="update_account"><a class="viewcode-back" href="../../payments.html#payments.core.update_account">[docs]</a><span class="k">def</span> <span class="nf">update_account</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">log_msg</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span>
                    <span class="n">sub_source</span><span class="p">,</span> <span class="n">payment_type</span><span class="p">,</span> <span class="n">stripe_transaction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">other_member</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">organisation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; method to update a customer account &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Function to update a customer account</span>
+
+<span class="sd">        args:</span>
+<span class="sd">            member - owner of the account</span>
+<span class="sd">            amount - value (plus is a deduction, minus is a credit)</span>
+<span class="sd">            description - to appear on statement</span>
+<span class="sd">            log_msg - to appear on logs</span>
+<span class="sd">            source - for logs</span>
+<span class="sd">            sub_source - for logs</span>
+<span class="sd">            payment_type - type of payment</span>
+<span class="sd">            stripe_transaction - linked Stripe transaction (optional)</span>
+<span class="sd">            other_member - linked member (optional)</span>
+<span class="sd">            organisation - linked organisation (optional)</span>
+
+<span class="sd">        returns:</span>
+<span class="sd">            nothing</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 <span class="c1"># Get old balance</span>
     <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
 
@@ -768,7 +909,7 @@
     <span class="n">act</span><span class="o">.</span><span class="n">organisation</span> <span class="o">=</span> <span class="n">organisation</span>
     <span class="n">act</span><span class="o">.</span><span class="n">balance</span> <span class="o">=</span> <span class="n">balance</span>
     <span class="n">act</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
-    <span class="n">act</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+    <span class="n">act</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">payment_type</span>
 
     <span class="n">act</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
@@ -812,12 +953,28 @@
 <span class="c1"># auto_topup_member       #</span>
 <span class="c1">###########################</span>
 <div class="viewcode-block" id="auto_topup_member"><a class="viewcode-back" href="../../payments.html#payments.core.auto_topup_member">[docs]</a><span class="k">def</span> <span class="nf">auto_topup_member</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">topup_required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; process an auto top up. Optionally pass parameter with amount required</span>
+    <span class="sd">&quot;&quot;&quot; process an auto top up for a member.</span>
+
+<span class="sd">    Internal function to handle a member needing to process an auto top up.</span>
+<span class="sd">    This function deals with successful top ups and failed top ups. For</span>
+<span class="sd">    failed top ups it will notify the user and disable auto topups. It is</span>
+<span class="sd">    the calling functions problem to handle the consequences of the non-payment.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        member - a User object.</span>
+<span class="sd">        topup_required - the amount of the top up (optional). This is required</span>
+<span class="sd">        if the payment is larger than the top up amount. e.g. balance is 25,</span>
+<span class="sd">        top up amount is 50, payment is 300.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        return_code - True for success, False for failure</span>
+<span class="sd">        message - explanation</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">member</span><span class="o">.</span><span class="n">auto_amount</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">member</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
         <span class="k">return</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Member not set up for Auto Top Up&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">member</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">:</span>
@@ -835,7 +992,7 @@
             <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;card&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">pay_method_id</span> <span class="o">=</span> <span class="n">paylist</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
-    <span class="k">except</span> <span class="n">InvalidRequestError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">InvalidRequestError</span><span class="p">:</span>
         <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
                   <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;WARN&quot;</span><span class="p">,</span>
                   <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
@@ -853,6 +1010,7 @@
             <span class="n">payment_method</span><span class="o">=</span><span class="n">pay_method_id</span><span class="p">,</span>
             <span class="n">off_session</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">confirm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_tran_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">}</span>
         <span class="p">)</span>
 
 <span class="c1"># It worked so create a stripe record</span>
@@ -881,10 +1039,11 @@
 <span class="c1"># Update members account</span>
         <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
                        <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span>
-                       <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Auto Top Up with </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">brand</span><span class="si">}</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">                       card **** **** **** \</span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">last4</span><span class="si">}</span><span class="s2"> </span><span class="se">\</span>
-<span class="s2">                       Exp </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_month</span><span class="si">}</span><span class="s2">/</span><span class="se">\</span>
-<span class="s2">                       </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                       <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Payment from </span><span class="si">%s</span><span class="s2"> card **** **** ***** </span><span class="si">%s</span><span class="s2"> Exp </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                       <span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">brand</span><span class="p">,</span>
+                        <span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">last4</span><span class="p">,</span>
+                        <span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_month</span><span class="p">,</span>
+                        <span class="nb">abs</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">payment_method_details</span><span class="o">.</span><span class="n">card</span><span class="o">.</span><span class="n">exp_year</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">),</span>
                        <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> Auto Top Up&quot;</span> <span class="o">%</span> <span class="n">amount</span><span class="p">,</span>
                        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                        <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;auto_topup_member&quot;</span><span class="p">,</span>

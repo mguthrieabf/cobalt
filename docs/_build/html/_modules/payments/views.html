@@ -144,36 +144,59 @@
            <div itemprop="articleBody">
             
   <h1>Source code for payments.views</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">stripe</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Handles all activities associated with payments that talk to users.</span>
+
+<span class="sd">This module handles all of the functions that interact directly with</span>
+<span class="sd">a user. i.e. they generally accept a ``Request`` and return an</span>
+<span class="sd">``HttpResponse``.</span>
+<span class="sd">See also `Payments Core`_. This handles the other side of the interactions.</span>
+<span class="sd">They both work together.</span>
+
+<span class="sd">Key Points:</span>
+<span class="sd">    - Payments is a service module, it is requested to do things on behalf of</span>
+<span class="sd">      another module and does not know why it is doing them.</span>
+<span class="sd">    - Payments are often not real time, for manual payments, the user will</span>
+<span class="sd">      be taken to another screen that interacts directly with Stripe, and for</span>
+<span class="sd">      automatic top up payments, the top up may fail and require user input.</span>
+<span class="sd">    - The asynchronous nature of payments makes it more complex than many of</span>
+<span class="sd">      the Cobalt modules so the documentation needs to be of a higher standard.</span>
+<span class="sd">      See `Payments Overview`_ for more details.</span>
+
+<span class="sd">.. _Payments Core:</span>
+<span class="sd">   #module-payments.core</span>
+
+<span class="sd">.. _Payments Overview:</span>
+<span class="sd">   ./payments_overview.html</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">csv</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TestTransaction</span><span class="p">,</span> <span class="n">MemberTransfer</span>
-<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">payment_api</span><span class="p">,</span> <span class="n">update_account</span><span class="p">,</span> <span class="n">auto_topup_member</span><span class="p">,</span> <span class="n">get_balance</span>
-<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
-<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
-<span class="kn">from</span> <span class="nn">django.views.decorators.csrf</span> <span class="kn">import</span> <span class="n">csrf_exempt</span>
-<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">StripeTransaction</span><span class="p">,</span> <span class="n">MemberTransaction</span>
-<span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
-<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
-<span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">log_event</span>
-<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">stripe</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
 <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">transaction</span>
 <span class="kn">from</span> <span class="nn">easy_pdf.rendering</span> <span class="kn">import</span> <span class="n">render_to_pdf_response</span>
-<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="p">(</span><span class="n">STRIPE_SECRET_KEY</span><span class="p">,</span> <span class="n">STRIPE_PUBLISHABLE_KEY</span><span class="p">,</span>
-                             <span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">log_event</span>
+<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="p">(</span><span class="n">STRIPE_SECRET_KEY</span><span class="p">,</span>
+                             <span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">,</span>
+                             <span class="n">AUTO_TOP_UP_DEFAULT_AMT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TestTransaction</span><span class="p">,</span> <span class="n">MemberTransfer</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">payment_api</span><span class="p">,</span> <span class="n">update_account</span><span class="p">,</span> <span class="n">get_balance</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span>
 
 <span class="c1">####################</span>
 <span class="c1"># Home             #</span>
 <span class="c1">####################</span>
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../payments.html#payments.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Default page.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/home.html&#39;</span><span class="p">)</span></div>
+    <span class="sd">&quot;&quot;&quot; Default page. &quot;&quot;&quot;</span>
 
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/home.html&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="test_payment"><a class="viewcode-back" href="../../payments.html#payments.views.test_payment">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="c1">#################################</span>
@@ -195,15 +218,15 @@
             <span class="n">payment_type</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
 
             <span class="k">return</span> <span class="n">payment_api</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
-                              <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-                              <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span>
-                              <span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
-                              <span class="n">route_code</span><span class="o">=</span><span class="s2">&quot;MAN&quot;</span><span class="p">,</span>
-                              <span class="n">route_payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                              <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">,</span>
-                              <span class="n">log_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                              <span class="n">payment_type</span><span class="o">=</span><span class="n">payment_type</span><span class="p">,</span>
-                              <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
+                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                               <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span>
+                               <span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
+                               <span class="n">route_code</span><span class="o">=</span><span class="s2">&quot;MAN&quot;</span><span class="p">,</span>
+                               <span class="n">route_payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">,</span>
+                               <span class="n">log_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">payment_type</span><span class="o">=</span><span class="n">payment_type</span><span class="p">,</span>
+                               <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">TestTransaction</span><span class="p">()</span>
 
@@ -212,12 +235,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">auto_amount</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">balance</span><span class="o">=</span><span class="n">get_balance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/test_payment.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
                                                           <span class="s1">&#39;auto_amount&#39;</span> <span class="p">:</span> <span class="n">auto_amount</span><span class="p">,</span>
                                                           <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
-                                                          <span class="s1">&#39;lowbalance&#39;</span><span class="p">:</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span> <span class="p">})</span></div>
+                                                          <span class="s1">&#39;lowbalance&#39;</span><span class="p">:</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">})</span></div>
 
 <span class="c1">####################</span>
 <span class="c1"># statement_common #</span>
@@ -225,6 +248,17 @@
 <div class="viewcode-block" id="statement_common"><a class="viewcode-back" href="../../payments.html#payments.views.statement_common">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Member statement view - common part across online, pdf and csv</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        summary - dict of basic info about user from MasterPoints</span>
+<span class="sd">        club - Home club name</span>
+<span class="sd">        balance - Users account Balance</span>
+<span class="sd">        auto_button - text for button (activated or press to setup)</span>
+<span class="sd">        events_list - list of Member Transactions</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <span class="c1"># Get summary data</span>
@@ -250,7 +284,7 @@
 
     <span class="c1"># get auto top up</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span><span class="p">:</span>
-        <span class="n">auto_button</span> <span class="o">=</span> <span class="s2">&quot;Update Auto Top Up&quot;</span>
+        <span class="n">auto_button</span> <span class="o">=</span> <span class="s2">&quot;Auto Top Up Enabled&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">auto_button</span> <span class="o">=</span> <span class="s2">&quot;Add Auto Top Up&quot;</span>
 
@@ -263,7 +297,16 @@
 <span class="c1">#####################</span>
 <div class="viewcode-block" id="statement"><a class="viewcode-back" href="../../payments.html#payments.views.statement">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">statement</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Member statement view</span>
+    <span class="sd">&quot;&quot;&quot; Member statement view.</span>
+
+<span class="sd">    Basic view of statement showing transactions in a web page.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
@@ -290,8 +333,17 @@
 <div class="viewcode-block" id="statement_csv"><a class="viewcode-back" href="../../payments.html#payments.views.statement_csv">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">statement_csv</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Member statement view - csv download</span>
+
+<span class="sd">    Generates a CSV of the statement.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse - CSV</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/csv&#39;</span><span class="p">)</span>
     <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;statement.csv&quot;&#39;</span>
@@ -302,7 +354,7 @@
 
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">events_list</span><span class="p">:</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">reference_no</span><span class="p">,</span>
-                        <span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">balance</span><span class="p">])</span>
+                         <span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">balance</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">response</span></div>
 
@@ -311,30 +363,52 @@
 <span class="c1">#####################</span>
 <div class="viewcode-block" id="statement_pdf"><a class="viewcode-back" href="../../payments.html#payments.views.statement_pdf">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">statement_pdf</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Member statement view - pdf download</span>
+    <span class="sd">&quot;&quot;&quot; Member statement view - csv download</span>
+
+<span class="sd">    Generates a PDF of the statement.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse - PDF</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
 
     <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%-m %B %Y&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render_to_pdf_response</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/statement_pdf.html&#39;</span><span class="p">,</span> <span class="p">{</span>
-                                                        <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">events_list</span><span class="p">,</span>
-                                                        <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                                                        <span class="s1">&#39;summary&#39;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
-                                                        <span class="s1">&#39;club&#39;</span><span class="p">:</span> <span class="n">club</span><span class="p">,</span>
-                                                        <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
-                                                        <span class="s1">&#39;today&#39;</span><span class="p">:</span> <span class="n">today</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render_to_pdf_response</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/statement_pdf.html&#39;</span><span class="p">,</span>
+                                  <span class="p">{</span>
+                                      <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">events_list</span><span class="p">,</span>
+                                      <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                      <span class="s1">&#39;summary&#39;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
+                                      <span class="s1">&#39;club&#39;</span><span class="p">:</span> <span class="n">club</span><span class="p">,</span>
+                                      <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
+                                      <span class="s1">&#39;today&#39;</span><span class="p">:</span> <span class="n">today</span>
+                                  <span class="p">})</span></div>
 <span class="c1">############################</span>
 <span class="c1"># Stripe_create_customer   #</span>
 <span class="c1">############################</span>
 <div class="viewcode-block" id="stripe_create_customer"><a class="viewcode-back" href="../../payments.html#payments.views.stripe_create_customer">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">stripe_create_customer</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; calls Stripe to register a customer</span>
+    <span class="sd">&quot;&quot;&quot; calls Stripe to register a customer.</span>
+
+<span class="sd">    Creates a new customer entry with Stripe and sets this member&#39;s</span>
+<span class="sd">    stripe_customer_id to match the customer created. Also sets the</span>
+<span class="sd">    auto_amount for the member to the system default.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - a standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
-    <span class="n">customer</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">Customer</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+    <span class="n">customer</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">Customer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_tran_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">})</span>
     <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span> <span class="o">=</span> <span class="n">customer</span><span class="o">.</span><span class="n">id</span>
-    <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">=</span> <span class="mf">100.0</span>   <span class="c1"># make me a config setting</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">=</span> <span class="n">AUTO_TOP_UP_DEFAULT_AMT</span>
     <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
 
 <span class="c1">#######################</span>
@@ -342,55 +416,64 @@
 <span class="c1">#######################</span>
 <div class="viewcode-block" id="setup_autotopup"><a class="viewcode-back" href="../../payments.html#payments.views.setup_autotopup">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">setup_autotopup</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; view to sign up to auto top up. Creates Stripe customer if not already defined.</span>
-<span class="sd">        Hands over to Stripe to process card.</span>
+    <span class="sd">&quot;&quot;&quot; view to sign up to auto top up.</span>
+
+<span class="sd">    Creates Stripe customer if not already defined.</span>
+<span class="sd">    Hands over to Stripe to process card.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - a standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
     <span class="n">warn</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-<span class="c1"># Already a customer?</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">:</span>   <span class="c1"># record exists</span>
+<span class="c1"># Already set up?</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">paylist</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">PaymentMethod</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
-              <span class="n">customer</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">,</span>
-              <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;card&quot;</span><span class="p">,</span>
+                <span class="n">customer</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;card&quot;</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">InvalidRequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">InvalidRequestError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
                       <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;HIGH&quot;</span><span class="p">,</span>
                       <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                       <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
-                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe InvalidRequestError: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe InvalidRequestError: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">error</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
             <span class="n">stripe_create_customer</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-            <span class="n">paylist</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">paylist</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RateLimitError</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;HIGH&quot;</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                    <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
-                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe RateLimitError&quot;</span><span class="p">)</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;HIGH&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe RateLimitError&quot;</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">AuthenticationError</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                    <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
-                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe AuthenticationError&quot;</span><span class="p">)</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe AuthenticationError&quot;</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">APIConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">APIConnectionError</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;HIGH&quot;</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                    <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
-                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe APIConnectionError - likely network problems&quot;</span><span class="p">)</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;HIGH&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe APIConnectionError - likely network problems&quot;</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">StripeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">stripe</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">StripeError</span><span class="p">:</span>
             <span class="n">log_event</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
-                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                    <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
-                    <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe generic StripeError&quot;</span><span class="p">)</span>
+                      <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                      <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;setup_autotopup&quot;</span><span class="p">,</span>
+                      <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Stripe generic StripeError&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">paylist</span><span class="p">:</span>  <span class="c1"># if customer has a card associated</span>
             <span class="n">card</span> <span class="o">=</span> <span class="n">paylist</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">card</span>
@@ -413,6 +496,15 @@
 <div class="viewcode-block" id="member_transfer"><a class="viewcode-back" href="../../payments.html#payments.views.member_transfer">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">member_transfer</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; view to transfer $ to another member</span>
+
+<span class="sd">    This view allows a member to transfer money to another member.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -433,7 +525,7 @@
                                 <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
                                <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                                <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Transfer In&quot;</span>
+                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer In&quot;</span>
                                <span class="p">)</span>
                 <span class="c1"># Money out</span>
                 <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
@@ -447,7 +539,7 @@
                                 <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
                                <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
                                <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Transfer Out&quot;</span>
+                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer Out&quot;</span>
                                <span class="p">)</span>
 
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
@@ -474,14 +566,94 @@
 <span class="c1"># update_auto_amount   #</span>
 <span class="c1">########################</span>
 <div class="viewcode-block" id="update_auto_amount"><a class="viewcode-back" href="../../payments.html#payments.views.update_auto_amount">[docs]</a><span class="k">def</span> <span class="nf">update_auto_amount</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Called by the auto top up page when a user changes the amount of the auto top up</span>
+    <span class="sd">&quot;&quot;&quot; Called by the auto top up page when a user changes the amount of the auto top up.</span>
+
+<span class="sd">    The auto top up page has Stripe code on it so a standard form won&#39;t work</span>
+<span class="sd">    for this. Instead we use a little Ajax code on the page to handle this.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - a standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
         <span class="n">amount</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span>
         <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">=</span> <span class="n">amount</span>
         <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Successful&quot;</span><span class="p">)</span></div>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Successful&quot;</span><span class="p">)</span></div>
+
+<span class="c1">###################</span>
+<span class="c1"># manual_topup    #</span>
+<span class="c1">###################</span>
+<div class="viewcode-block" id="manual_topup"><a class="viewcode-back" href="../../payments.html#payments.views.manual_topup">[docs]</a><span class="k">def</span> <span class="nf">manual_topup</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Page to allow credit card top up regardless of auto status.</span>
+
+<span class="sd">    This page allows a member to add to their account using a credit card,</span>
+<span class="sd">    they can do this even if they have already set up for auto top up.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - a standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="c1"># Money in</span>
+                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
+                               <span class="n">other_member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                               <span class="n">amount</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
+                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Received </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
+                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
+                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer In&quot;</span>
+                               <span class="p">)</span>
+                <span class="c1"># Money out</span>
+                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                               <span class="n">other_member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
+                               <span class="n">amount</span><span class="o">=-</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
+                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Sent </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
+                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
+                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
+                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer Out&quot;</span>
+                               <span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
+                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
+                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer_successful.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="c1"># get balance</span>
+    <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="n">last_tran</span><span class="o">.</span><span class="n">balance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                                                             <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
 </pre></div>
 
            </div>

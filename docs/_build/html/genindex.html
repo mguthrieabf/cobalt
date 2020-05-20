@@ -1083,6 +1083,8 @@
         <li><a href="manage.html#module-manage">module</a>
 </li>
       </ul></li>
+      <li><a href="payments.html#payments.views.manual_topup">manual_topup() (in module payments.views)</a>
+</li>
       <li>
     masterpoints
 
@@ -1886,11 +1888,7 @@
       <li><a href="organisations.html#organisations.models.Organisation.secondary_org">secondary_org (organisations.models.Organisation attribute)</a>
 </li>
       <li><a href="forums.html#forums.tests.TestViews.setUp">setUp() (forums.tests.TestViews method)</a>
-
-      <ul>
-        <li><a href="payments.html#payments.tests.UserTestCase.setUp">(payments.tests.UserTestCase method)</a>
 </li>
-      </ul></li>
       <li><a href="payments.html#payments.views.setup_autotopup">setup_autotopup() (in module payments.views)</a>
 </li>
       <li><a href="logs.html#logs.models.Log.severity">severity (logs.models.Log attribute)</a>
@@ -1910,6 +1908,8 @@
       <li><a href="payments.html#payments.views.statement_pdf">statement_pdf() (in module payments.views)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.status">status (payments.models.StripeTransaction attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.User.stripe_auto_confirmed">stripe_auto_confirmed (accounts.models.User attribute)</a>
 </li>
       <li><a href="payments.html#payments.core.stripe_auto_payment_intent">stripe_auto_payment_intent() (in module payments.core)</a>
 </li>
@@ -1935,10 +1935,10 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_receipt_url">stripe_receipt_url (payments.models.StripeTransaction attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_reference">stripe_reference (payments.models.StripeTransaction attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="payments.html#payments.models.MemberTransaction.stripe_transaction">stripe_transaction (payments.models.MemberTransaction attribute)</a>
 
       <ul>
@@ -1952,6 +1952,10 @@
 </li>
       </ul></li>
       <li><a href="payments.html#payments.core.stripe_webhook">stripe_webhook() (in module payments.core)</a>
+</li>
+      <li><a href="payments.html#payments.core.stripe_webhook_autosetup">stripe_webhook_autosetup() (in module payments.core)</a>
+</li>
+      <li><a href="payments.html#payments.core.stripe_webhook_manual">stripe_webhook_manual() (in module payments.core)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction">StripeTransaction (class in payments.models)</a>
 </li>
@@ -2044,10 +2048,6 @@
 </li>
       <li><a href="payments.html#payments.views.test_payment">test_payment() (in module payments.views)</a>
 </li>
-      <li><a href="payments.html#payments.tests.UserViewCase.test_public_profile">test_public_profile() (payments.tests.UserViewCase method)</a>
-</li>
-      <li><a href="payments.html#payments.tests.UserTestCase.test_user_created">test_user_created() (payments.tests.UserTestCase method)</a>
-</li>
       <li><a href="payments.html#payments.forms.TestTransaction">TestTransaction (class in payments.forms)</a>
 </li>
       <li><a href="forums.html#forums.tests.TestViews">TestViews (class in forums.tests)</a>
@@ -2072,12 +2072,6 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.TRANSACTION_STATUS">TRANSACTION_STATUS (payments.models.StripeTransaction attribute)</a>
 </li>
-      <li><a href="payments.html#payments.forms.TestTransaction.TRANSACTION_TYPE">TRANSACTION_TYPE (payments.forms.TestTransaction attribute)</a>
-
-      <ul>
-        <li><a href="payments.html#payments.models.AbstractTransaction.TRANSACTION_TYPE">(payments.models.AbstractTransaction attribute)</a>
-</li>
-      </ul></li>
       <li><a href="organisations.html#organisations.models.Organisation.type">type (organisations.models.Organisation attribute)</a>
 
       <ul>
@@ -2112,10 +2106,10 @@
 </li>
       <li><a href="accounts.html#accounts.models.User.user_permissions">user_permissions (accounts.models.User attribute)</a>
 </li>
-      <li><a href="accounts.html#accounts.admin.UserAdmin">UserAdmin (class in accounts.admin)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="accounts.html#accounts.admin.UserAdmin">UserAdmin (class in accounts.admin)</a>
+</li>
       <li><a href="forums.html#forums.models.UserForumRole">UserForumRole (class in forums.models)</a>
 </li>
       <li><a href="forums.html#forums.models.UserForumRole.DoesNotExist">UserForumRole.DoesNotExist</a>
@@ -2132,13 +2126,9 @@
 </li>
       <li><a href="accounts.html#accounts.forms.UserRegisterForm.Meta">UserRegisterForm.Meta (class in accounts.forms)</a>
 </li>
-      <li><a href="payments.html#payments.tests.UserTestCase">UserTestCase (class in payments.tests)</a>
-</li>
       <li><a href="accounts.html#accounts.forms.UserUpdateForm">UserUpdateForm (class in accounts.forms)</a>
 </li>
       <li><a href="accounts.html#accounts.forms.UserUpdateForm.Meta">UserUpdateForm.Meta (class in accounts.forms)</a>
-</li>
-      <li><a href="payments.html#payments.tests.UserViewCase">UserViewCase (class in payments.tests)</a>
 </li>
   </ul></td>
 </tr></table>
