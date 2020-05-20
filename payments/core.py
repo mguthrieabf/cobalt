@@ -479,6 +479,13 @@ def stripe_webhook_manual(event):
   # TODO: change to 400
         return HttpResponse(status=200)
 
+# Set the payment type - this could be for a linked transaction or a manual
+# payment.
+    if tran.linked_transaction_type: # payment for a linked transaction
+        paytype = "CC Payment"
+    else:  # manual top up
+        paytype = "Manual Top Up"
+
     update_account(member=tran.member,
                    amount=tran.amount,
                    stripe_transaction=tran,
@@ -489,29 +496,34 @@ def stripe_webhook_manual(event):
                    (tran.amount, tran.id),
                    source="Payments",
                    sub_source="stripe_webhook",
-                   payment_type="CC Payment"
+                   payment_type=paytype
                    )
 
-# Money in from stripe so we can now process the original transaction
-    update_account(member=tran.member,
-                   amount=-tran.linked_amount,
-                   description=tran.description,
-                   source="Payments",
-                   sub_source="stripe_webhook",
-                   payment_type=tran.linked_transaction_type,
-                   log_msg=tran.description,
-                   organisation=tran.linked_organisation
-                   )
+# Money in from stripe so we can now process the original transaction, if
+# we have one. For manual top ups we don't have another transaction and
+# linked_transaction_type will be None
 
-# make organisation payment too
-    update_organisation(organisation=tran.linked_organisation,
-                        amount=tran.linked_amount,
-                        description=tran.description,
-                        source="Payments",
-                        sub_source="stripe_webhook",
-                        payment_type=tran.linked_transaction_type,
-                        log_msg=tran.description,
-                        member=tran.member)
+    if tran.linked_transaction_type:
+
+        update_account(member=tran.member,
+                       amount=-tran.linked_amount,
+                       description=tran.description,
+                       source="Payments",
+                       sub_source="stripe_webhook",
+                       payment_type=tran.linked_transaction_type,
+                       log_msg=tran.description,
+                       organisation=tran.linked_organisation
+                       )
+
+    # make organisation payment too
+        update_organisation(organisation=tran.linked_organisation,
+                            amount=tran.linked_amount,
+                            description=tran.description,
+                            source="Payments",
+                            sub_source="stripe_webhook",
+                            payment_type=tran.linked_transaction_type,
+                            log_msg=tran.description,
+                            member=tran.member)
 
     # make Callback
     callback_router(tran.route_code, tran.route_payload, tran)

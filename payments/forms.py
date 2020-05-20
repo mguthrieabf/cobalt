@@ -3,6 +3,8 @@
 from django import forms
 from accounts.models import User
 from organisations.models import Organisation
+from cobalt.settings import (AUTO_TOP_UP_MIN_AMT, AUTO_TOP_UP_MAX_AMT,
+                             GLOBAL_CURRENCY_SYMBOL)
 from .models import MemberTransaction, TRANSACTION_TYPE
 
 class TestTransaction(forms.Form):
@@ -16,6 +18,7 @@ class TestTransaction(forms.Form):
 
 class MemberTransfer(forms.Form):
     """ M2M transfer form """
+
     transfer_to = forms.ModelChoiceField(queryset=User.objects.all())
     amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
     description = forms.CharField(label='Description', max_length=100)
@@ -37,4 +40,30 @@ class MemberTransfer(forms.Form):
                 raise forms.ValidationError("Insufficient funds")
         else:
             raise forms.ValidationError("Insufficient funds")
+        return amount
+
+class ManualTopup(forms.Form):
+    """ Manual top up form """
+
+    CARD_CHOICES = [("Existing", "Use Registered Card"),
+                    ("Another", "Use Another Card")]
+
+    amount = forms.DecimalField(label='Amount', max_digits=8, decimal_places=2)
+    card_choice = forms.ChoiceField(label="Card Option", choices=CARD_CHOICES,
+                                    required=False)
+
+    def clean_amount(self):
+        """ validation for the amount field """
+        amount = self.cleaned_data['amount']
+        if amount < 0:
+            raise forms.ValidationError("Negative amounts are not allowed")
+        if amount < AUTO_TOP_UP_MIN_AMT:
+            raise forms.ValidationError("Too small. Must be at least %s%s" %
+                                        (GLOBAL_CURRENCY_SYMBOL,
+                                         AUTO_TOP_UP_MIN_AMT))
+        if amount > AUTO_TOP_UP_MAX_AMT:
+            raise forms.ValidationError("Too large. Maximum is %s%s" %
+                                        (GLOBAL_CURRENCY_SYMBOL,
+                                         AUTO_TOP_UP_MAX_AMT))
+
         return amount

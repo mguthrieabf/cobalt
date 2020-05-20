@@ -29,19 +29,20 @@ import csv
 from datetime import datetime
 import requests
 import stripe
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
 from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
 from cobalt.settings import (STRIPE_SECRET_KEY,
                              GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT,
                              AUTO_TOP_UP_DEFAULT_AMT)
-from .forms import TestTransaction, MemberTransfer
-from .core import payment_api, update_account, get_balance
-from .models import MemberTransaction
+from .forms import TestTransaction, MemberTransfer, ManualTopup
+from .core import payment_api, update_account, get_balance, auto_topup_member
+from .models import MemberTransaction, StripeTransaction
 
 ####################
 # Home             #
@@ -137,7 +138,7 @@ def statement_common(request):
         balance = "Nil"
 
     # get auto top up
-    if request.user.auto_amount:
+    if request.user.stripe_auto_confirmed:
         auto_button = "Auto Top Up Enabled"
     else:
         auto_button = "Add Auto Top Up"
@@ -457,54 +458,28 @@ def manual_topup(request):
     """
 
     if request.method == 'POST':
-        form = MemberTransfer(request.POST, user=request.user)
+        form = ManualTopup(request.POST)
         if form.is_valid():
-            with transaction.atomic():
-                # Money in
-                update_account(member=form.cleaned_data['transfer_to'],
-                               other_member=request.user,
-                               amount=form.cleaned_data['amount'],
-                               description=form.cleaned_data['description'],
-                               log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                               source="Payments",
-                               sub_source="member_transfer",
-                               payment_type="Transfer In"
-                               )
-                # Money out
-                update_account(member=request.user,
-                               other_member=form.cleaned_data['transfer_to'],
-                               amount=-form.cleaned_data['amount'],
-                               description=form.cleaned_data['description'],
-                               log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                               source="Payments",
-                               sub_source="member_transfer",
-                               payment_type="Transfer Out"
-                               )
-
-            msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
-                                     form.cleaned_data['transfer_to'].full_name,
-                                     form.cleaned_data['transfer_to'].system_number)
-            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
-        else:
-            print(form.errors)
+            if form.cleaned_data['card_choice'] == "Existing":  # Use Auto
+                (return_code, msg) = auto_topup_member(request.user)
+                if return_code:  # success
+                    messages.success(request, msg,
+                                     extra_tags='cobalt-message-success')
+                    return redirect("dashboard")
+                else: # error
+                    messages.error(request, msg,
+                                   extra_tags='cobalt-message-error')
+            else:  # Use Manual
+                trans = StripeTransaction()
+                trans.description = "Manual Top Up"
+                trans.amount = form.cleaned_data['amount']
+                trans.member = request.user
+                trans.save()
+                return render(request, 'payments/checkout.html', {'trans': trans})
+        # else:
+        #     print(form.errors)
 
     else:
-        form = MemberTransfer(user=request.user)
+        form = ManualTopup()
 
-    # get balance
-    last_tran = MemberTransaction.objects.filter(member=request.user).last()
-    if last_tran:
-        balance = last_tran.balance
-    else:
-        balance = "Nil"
-
-    return render(request, 'payments/member_transfer.html', {'form': form,
-                                                             'balance': balance})
+    return render(request, 'payments/manual_topup.html', {'form': form})

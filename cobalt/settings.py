@@ -187,15 +187,15 @@ MESSAGE_TAGS = {
 }
 
 # Local settings for this Application
-GLOBAL_ORG="EBU"
-GLOBAL_TITLE="EBU Technology"
+GLOBAL_ORG="ABF"
+GLOBAL_TITLE="ABF Technology"
 GLOBAL_CONTACT="https://abf.com.au"
 GLOBAL_ABOUT="https://abf.com.au"
 GLOBAL_PRIVACY="https://abf.com.au"
 GLOBAL_PRODUCTION="abftech.com.au"
 GLOBAL_MPSERVER="http://127.0.0.1:8081"
-GLOBAL_CURRENCY_SYMBOL="?"
-GLOBAL_CURRENCY_NAME="Pound"
+GLOBAL_CURRENCY_SYMBOL="$"
+GLOBAL_CURRENCY_NAME="Dollar"
 
 if 'GLOBAL_MPSERVER' in os.environ:
     GLOBAL_MPSERVER = os.environ['GLOBAL_MPSERVER']
