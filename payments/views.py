@@ -461,7 +461,8 @@ def manual_topup(request):
         form = ManualTopup(request.POST)
         if form.is_valid():
             if form.cleaned_data['card_choice'] == "Existing":  # Use Auto
-                (return_code, msg) = auto_topup_member(request.user)
+                (return_code, msg) = auto_topup_member(request.user,
+                                     topup_required=form.cleaned_data['amount'])
                 if return_code:  # success
                     messages.success(request, msg,
                                      extra_tags='cobalt-message-success')

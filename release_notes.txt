@@ -1,2 +1,1 @@
-Manual top up
-All of payments now pylinted
+
