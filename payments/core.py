@@ -40,7 +40,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from logs.views import log_event
 from accounts.models import User
 from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
-                             AUTO_TOP_UP_LOW_LIMIT)
+                             AUTO_TOP_UP_LOW_LIMIT, GLOBAL_CURRENCY_SYMBOL)
 from .models import (StripeTransaction, MemberTransaction,
                      OrganisationTransaction)
 
@@ -917,11 +917,21 @@ def auto_topup_member(member, topup_required=None):
                        stripe_transaction=stripe_tran
                        )
 
-        return(True, f"Auto top up successful. ${amount:.2f} added to your account from \
-                      {payload.payment_method_details.card.brand} card **** **** **** \
-                      {payload.payment_method_details.card.last4} \
-                      Exp {payload.payment_method_details.card.exp_month}/\
-                      {payload.payment_method_details.card.exp_year}")
+        # return(True, f"Auto top up successful. ${amount:.2f} added to your account from \
+        #               {payload.payment_method_details.card.brand} card **** **** **** \
+        #               {payload.payment_method_details.card.last4} \
+        #               Exp {payload.payment_method_details.card.exp_month}/\
+        #               {payload.payment_method_details.card.exp_year}")
+
+        return(True, "Auto top up sucessful. %s%.2f added to your account \
+                     from %s card **** **** ***** %s Exp %s/%s" %
+                     (GLOBAL_CURRENCY_SYMBOL, amount,
+                     payload.payment_method_details.card.brand,
+                     payload.payment_method_details.card.last4,
+                     payload.payment_method_details.card.exp_month,
+                     abs(payload.payment_method_details.card.exp_year) % 100))
+
+
 
     except stripe.error.CardError as error:
         err = error.error

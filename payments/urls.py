@@ -18,4 +18,5 @@ urlpatterns = [
     path('update-auto-amount', views.update_auto_amount, name='update_auto_amount'),
     path('member-transfer', views.member_transfer, name='member_transfer'),
     path('manual-topup', views.manual_topup, name='manual_topup'),
+    path('cancel-autotopup', views.cancel_auto_top_up, name='cancel_autotopup'),
 ]

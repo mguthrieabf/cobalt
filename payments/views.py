@@ -484,3 +484,31 @@ def manual_topup(request):
         form = ManualTopup()
 
     return render(request, 'payments/manual_topup.html', {'form': form})
+
+######################
+# cancel_auto_top_up #
+######################
+def cancel_auto_top_up(request):
+    """ Cancel auto top up.
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if request.method == 'POST':
+        if request.POST.get("stop_auto"):
+            request.user.auto_amount = None
+            request.user.stripe_auto_confirmed = None
+            request.user.stripe_customer_id = None
+            request.user.save()
+
+            messages.info(request, "Auto top up disabled",
+                          extra_tags='cobalt-message-success')
+            return redirect("dashboard")
+        else:
+            return redirect("dashboard")
+
+    return render(request, 'payments/cancel_autotopup.html')

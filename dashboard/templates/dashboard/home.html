@@ -12,7 +12,7 @@
           <i class="material-icons">attach_money</i>
         </div>
         <p class="card-category">Account Balance</p>
-      <a href='#'>  <h3 class="card-title"> {{ payments.balance }}</h3></a>
+      <a href=' {% url "payments:payments" %}'>  <h3 class="card-title"> {{ payments.balance }}</h3></a>
       </div>
       <div class="card-footer">
         <div class="stats">
