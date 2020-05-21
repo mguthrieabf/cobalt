@@ -3,7 +3,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, RegexValidator
-from phonenumber_field.modelfields import PhoneNumberField
 from cobalt.settings import AUTO_TOP_UP_MAX_AMT, GLOBAL_ORG
 
 class User(AbstractUser):
