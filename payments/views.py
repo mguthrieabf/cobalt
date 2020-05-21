@@ -507,8 +507,8 @@ def cancel_auto_top_up(request):
 
             messages.info(request, "Auto top up disabled",
                           extra_tags='cobalt-message-success')
-            return redirect("dashboard")
+            return redirect("payments:payments")
         else:
-            return redirect("dashboard")
+            return redirect("payments:payments")
 
     return render(request, 'payments/cancel_autotopup.html')
