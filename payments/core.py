@@ -917,13 +917,7 @@ def auto_topup_member(member, topup_required=None):
                        stripe_transaction=stripe_tran
                        )
 
-        # return(True, f"Auto top up successful. ${amount:.2f} added to your account from \
-        #               {payload.payment_method_details.card.brand} card **** **** **** \
-        #               {payload.payment_method_details.card.last4} \
-        #               Exp {payload.payment_method_details.card.exp_month}/\
-        #               {payload.payment_method_details.card.exp_year}")
-
-        return(True, "Auto top up sucessful. %s%.2f added to your account \
+        return(True, "Top up sucessful. %s%.2f added to your account \
                      from %s card **** **** ***** %s Exp %s/%s" %
                      (GLOBAL_CURRENCY_SYMBOL, amount,
                      payload.payment_method_details.card.brand,
