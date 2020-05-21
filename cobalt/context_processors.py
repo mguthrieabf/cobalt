@@ -14,4 +14,5 @@ def global_settings(request):
             'GLOBAL_CURRENCY_NAME': settings.GLOBAL_CURRENCY_NAME,
             'AUTO_TOP_UP_MAX_AMT': settings.AUTO_TOP_UP_MAX_AMT,
             'AUTO_TOP_UP_MIN_AMT': settings.AUTO_TOP_UP_MIN_AMT,
+            'AUTO_TOP_UP_LOW_LIMIT': settings.AUTO_TOP_UP_LOW_LIMIT,
            }

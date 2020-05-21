@@ -100,7 +100,15 @@
                 <p>Admin</p>
               </a>
             </li>
+
           {% endif %}
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/payments/test-payment">
+              <i class="material-icons">credit_card</i>
+              <p>Test Payments</p>
+            </a>
+          </li>
 
           <li class="nav-item {% if request.path|slice:":8" == "/support" %}active{% endif %} ">
             <a class="nav-link" href="/support">

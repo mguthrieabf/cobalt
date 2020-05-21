@@ -56,21 +56,29 @@
     {% if events.has_other_pages %}
       <ul class="pagination">
         {% if events.has_previous %}
-          <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ events.previous_page_number }}">Previous</a>
+          </li>
         {% else %}
-          <li class="disabled"><span>&laquo;&nbsp;</span></li>
+          <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+          </li>
         {% endif %}
         {% for i in events.paginator.page_range %}
           {% if events.number == i %}
-            <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
+            <li class="page-item active">    <span class="page-link">
+                  {{ i }}
+                  <span class="sr-only">(current)</span>
+                </span>
+              </li>
           {% else %}
-            <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}&nbsp;</a></li>
           {% endif %}
         {% endfor %}
         {% if events.has_next %}
-          <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ events.next_page_number }}">Next</a></li>
         {% else %}
-          <li class="disabled"><span>&raquo;</span></li>
+          <li class="page-item disabled"><span>Next</span></li>
         {% endif %}
       </ul>
     {% endif %}

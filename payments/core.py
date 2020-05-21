@@ -570,9 +570,7 @@ def stripe_webhook_autosetup(event):
 # confirm card set up
     member.stripe_auto_confirmed = True
     member.save()
-    print("member stripe auto")
-    print(member.stripe_auto_confirmed)
-
+    
 # check if we should make an auto top up now
     balance = get_balance(member)
     if balance < AUTO_TOP_UP_LOW_LIMIT:

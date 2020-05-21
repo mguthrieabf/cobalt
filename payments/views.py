@@ -39,7 +39,7 @@ from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
 from cobalt.settings import (STRIPE_SECRET_KEY,
                              GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT,
-                             AUTO_TOP_UP_DEFAULT_AMT)
+                             AUTO_TOP_UP_DEFAULT_AMT, GLOBAL_CURRENCY_SYMBOL)
 from .forms import TestTransaction, MemberTransfer, ManualTopup
 from .core import payment_api, update_account, get_balance, auto_topup_member
 from .models import MemberTransaction, StripeTransaction
@@ -397,10 +397,14 @@ def member_transfer(request):
                                payment_type="Transfer Out"
                                )
 
-            msg = "$%s to %s(%s)" % (form.cleaned_data['amount'],
+            msg = "You transferred %s%s to %s(%s)" % (GLOBAL_CURRENCY_SYMBOL,
+                                     form.cleaned_data['amount'],
                                      form.cleaned_data['transfer_to'].full_name,
                                      form.cleaned_data['transfer_to'].system_number)
-            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
+            messages.success(request, msg,
+                             extra_tags='cobalt-message-success')
+            return redirect("payments:payments")
+#            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
         else:
             print(form.errors)
 

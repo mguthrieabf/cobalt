@@ -95,18 +95,9 @@ var pay = function(stripe, card, clientSecret) {
 
 /* ------- Post-payment helpers ------- */
 
-/* Shows a success / error message when the payment is complete */
+/* Shows a success message when the payment is complete */
 var orderComplete = function(clientSecret) {
-    document.querySelector(".sr-payment-form").classList.add("hidden");
-    document.querySelector(".sr-result").textContent = "Card Setup Successful!";
-    document.getElementById("cancel").style.visibility='hidden';
-    document.getElementById("autotopdiv").style.visibility='hidden';
-    document.querySelector(".sr-result").classList.remove("hidden");
-    // setTimeout(function() {
-    //   document.querySelector(".sr-result").classList.add("expand");
-    // }, 200);
-
-    changeLoadingState(false);
+    $("#cobalt-main-body").html("<h1>Success!</h1><h3>Your card details have been recorded</h3>");
 };
 
 var showError = function(errorMsgText) {
