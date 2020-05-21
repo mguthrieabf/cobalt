@@ -1,8 +1,10 @@
+""" Models for our definitions of a user within the system. """
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from cobalt.settings import GLOBAL_ORG
-from django.core.validators import MaxValueValidator
-from cobalt.settings import AUTO_TOP_UP_MAX_AMT
+from django.core.validators import MaxValueValidator, RegexValidator
+from phonenumber_field.modelfields import PhoneNumberField
+from cobalt.settings import AUTO_TOP_UP_MAX_AMT, GLOBAL_ORG
 
 class User(AbstractUser):
     """
@@ -10,15 +12,23 @@ class User(AbstractUser):
     """
     email = models.EmailField(unique=False)
     system_number = models.IntegerField("%s Number" % GLOBAL_ORG, blank=True, unique=True)
-    mobile = models.IntegerField("Mobile Number", blank=True, unique=True, null=True)
-    headline = models.TextField("Headline", blank=True, null=True, default="Not filled in", max_length=100)
-    about = models.TextField("About Me", blank=True, null=True, default="Not filled in", max_length=800)
-    pic = models.ImageField(upload_to = 'pic_folder/', default = 'pic_folder/default-avatar.png')
+
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
+                                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    mobile = models.CharField("Mobile Number", blank=True, unique=True, null=True, max_length=15, validators=[phone_regex])
+    headline = models.TextField("Headline", blank=True, null=True,
+                                default="Not filled in", max_length=100)
+    about = models.TextField("About Me", blank=True, null=True,
+                             default="Not filled in", max_length=800)
+    pic = models.ImageField(upload_to='pic_folder/',
+                            default='pic_folder/default-avatar.png')
     dob = models.DateField(blank="True", null=True)
     bbo_name = models.CharField("BBO Username", blank=True, null=True, max_length=20)
     auto_amount = models.PositiveIntegerField("Auto Top Up Amount", blank=True,
-    null=True, validators=[MaxValueValidator(AUTO_TOP_UP_MAX_AMT)])
-    stripe_customer_id = models.CharField("Stripe Customer Id", blank=True, null=True, max_length=25)
+                                              null=True,
+                                              validators=[MaxValueValidator(AUTO_TOP_UP_MAX_AMT)])
+    stripe_customer_id = models.CharField("Stripe Customer Id", blank=True,
+                                          null=True, max_length=25)
     stripe_auto_confirmed = models.BooleanField(blank=True, null=True)
 
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them

@@ -18,6 +18,11 @@ class UserUpdateForm(forms.ModelForm):
                   'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name',
                   'auto_amount', 'stripe_customer_id']
 
+    # def clean_mobile(self):
+    #     mobile = self.cleaned_data.get('mobile')
+    #     print(mobile)
+    #     raise forms.ValidationError('values must be three times')
+
 class BlurbUpdateForm(forms.ModelForm):
 
     class Meta:

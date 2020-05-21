@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'health_check.storage',
     'widget_tweaks',
     'django_extensions',
-    'django.contrib.admindocs'
+    'django.contrib.admindocs',
 ]
 
 MIDDLEWARE = [

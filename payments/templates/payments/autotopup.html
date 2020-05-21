@@ -8,6 +8,25 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script type="text/javascript" src="{% static "payments/js/stripe-auto-script.js" %}" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<style>
+  /* HIDE RADIO */
+[type=radio] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* IMAGE STYLES */
+[type=radio] + img {
+  cursor: pointer;
+}
+
+/* CHECKED STYLES */
+[type=radio]:checked + img {
+  outline: 4px solid #f00;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -19,20 +38,43 @@
           <h1>Auto Top Up - {{ user.full_name}}</h1>
         </div>
         <div class="card-body">
-          <h5>{{ warn }}</h5>
+          <p class="cobalt-form-error">{{ warn }}</p>
           <p>Thank you for chosing auto top up. When your balance falls below
-          $20.00 your account will automatically be topped up using the credit card details that you provide.
-          As long as your payment goes through, you don't need to do a thing.</p>
-          <p>You can cancel any time by going to your statement.</p>
+          {{GLOBAL_CURRENCY_SYMBOL}}{{AUTO_TOP_UP_LOW_LIMIT}} your account will automatically be topped up.
 
           <div align="center">
             <div class="sr-main">
               <form>
+                <div id="autotopdiv">
+                  <h3>Auto Top Up Amount</h3>
+
+                  <label>
+                    <input type="radio" name="cobalt-amount-radio" value="50">
+                    <img width="60px" src="{% static "assets/img/50.png" %}">
+                  </label>
+
+                  <label>
+                    <input type="radio" name="cobalt-amount-radio" value="100" checked>
+                    <img width="60px" src="{% static "assets/img/100.png" %}">
+                  </label>
+
+                  <label>
+                    <input type="radio" name="cobalt-amount-radio" value="150">
+                    <img width="60px" src="{% static "assets/img/150.png" %}">
+                  </label>
+
+                  <label>
+                    <input type="radio" name="cobalt-amount-radio" value="200">
+                    <img width="60px" src="{% static "assets/img/200.png" %}">
+                  </label>
+                </div>
+
+<!--
                <div id="autotopdiv" class="form-group">
                  <label class="bmd-label-floating">Auto Top Up Amount</label>
                  <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ user.auto_amount }}">
                  <span class="cobalt-form-error" id="id_errors" name="id_errors"></span>
-               </div>
+               </div> -->
               </form>
               <h3 align="center">Card Details</h3>
               <form id="payment-form" class="sr-payment-form">
@@ -71,32 +113,15 @@
 {% block footer %}
 <script>
   $(document).ready(function() {
-    var amt_field = $('#id_auto_amount');
-    var error_field = $('#id_errors');
-    amt_field.on('change', function(e) {
-      error_field.text("");
-       var auto_amt = Number(amt_field.val());
-       if (auto_amt < {{ AUTO_TOP_UP_MIN_AMT }}) {
-         error_field.text("Insufficient amount. Must be at least {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.")
-         window.setTimeout(function () {  // needed for focus to work
-           amt_field.focus();
-         }, 100);
-         return;
-       }
-       if (auto_amt > {{ AUTO_TOP_UP_MAX_AMT }}) {
-         error_field.text("Too large. {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }} is the maximum.")
-         window.setTimeout(function () {
-           amt_field.focus();
-         }, 100);
-         return;
-       }
-       var strURL = "{% url "payments:update_auto_amount" %}?amount=" + auto_amt;
+    $("input[name='cobalt-amount-radio']").click(function(){
+      var auto_amt = $('input[name="cobalt-amount-radio"]:checked').val();
+      var strURL = "{% url "payments:update_auto_amount" %}?amount=" + auto_amt;
 
-       $.ajax({
-           url: strURL,
-           context: document.body,
-           success: function(txt){
-           }
+      $.ajax({
+          url: strURL,
+          context: document.body,
+          success: function(txt){
+          }
       });
     });
   });

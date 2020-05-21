@@ -2,9 +2,13 @@
 {% load static %}
 {% block content %}
 
+{% block header %}
+
+ <link href="{% static "assets/demo/demo.css" %}" rel="stylesheet" />
+
+ {% endblock %}
 
  <div class="container-fluid">
-   <h3>{{ msg }}</h3>
    <h2>{{ form.errors }}</h2>
    <h2>{{ topupform.errors }}</h2>
    <div class="row">
@@ -85,11 +89,9 @@
 
 
 
-
-
        <div class="card card-profile">
          <div class="card-avatar">
-              <img class="img" src="/media/{{ form.pic.value }}" />
+              <img id="cobalt-pic" class="img" src="/media/{{ form.pic.value }}" />
           </div>
          <div class="card-body">
 
@@ -100,7 +102,7 @@
                <span class="btn btn-raised btn-round btn-rose btn-file">
                    <span class="fileinput-new">Change Photo</span>
             <span class="fileinput-exists">Change</span>
-            <input type="file" name="pic" accept="image/*" id="id_pic"/></span>
+            <input onchange="readURL(this);" type="file" name="pic" accept="image/*" id="id_pic"/></span>
                    <br />
                    <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
                </div>
@@ -123,7 +125,6 @@
      </div>
    </div>
 
-
    <div class="form-group">
      <button onclick="location.href='/accounts/change-password';" class="btn-success btn">Change Password</button>
    </div>
@@ -134,40 +135,26 @@
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
+
+// show preview of profile picture
+  function readURL(input) {
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+              $('#cobalt-pic')
+                  .attr('src', e.target.result);
+          };
+          reader.readAsDataURL(input.files[0]);
+      }
+  }
+
   $(document).ready(function() {
     // initialise Datetimepicker and Sliders
     md.initFormExtendedDatetimepickers();
     if ($('.slider').length != 0) {
        md.initSliders();
     }
-
-        //
-        // function readURL(input) {
-        //   if (input.files && input.files[0]) {
-        //     var reader = new FileReader();
-        //
-        //     reader.onload = function(e) {
-        //       $('#wizardPicturePreview').attr('src', e.target.result).fadeIn('slow');
-        //     }
-        //     reader.readAsDataURL(input.files[0]);
-        //   }
-        // }
-
-
-  // $('#fixme').removeClass('is-empty');
-
-  //  $('.datepicker').pickadate();
-
-// fix datepicker label
-        // $('.datepicker').on('changeDate', function(e){
-        //     alert("Changed");
-        //     $(this).parent('.label-floating').removeClass('is-empty');
-        // });
-
-        // $(document).on('change', '#sid_dob', function() {
-        //   alert("Me");
-        // });
-
   });
 </script>
 
