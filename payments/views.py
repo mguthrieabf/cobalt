@@ -139,9 +139,9 @@ def statement_common(request):
 
     # get auto top up
     if request.user.stripe_auto_confirmed:
-        auto_button = "Auto Top Up Enabled"
+        auto_button = True
     else:
-        auto_button = "Add Auto Top Up"
+        auto_button = False
 
     events_list = MemberTransaction.objects.filter(member=request.user).order_by('-created_date')
 

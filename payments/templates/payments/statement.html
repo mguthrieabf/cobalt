@@ -1,27 +1,61 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% load humanize %}
+
+{% block header %}
+<link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
+<script src="{% static "assets/js/bootstrap4-toggle.min.js" %}"></script>
+{% endblock %}
 
 {% block content %}
 
 <div class="">
   <div class="card">
-    <div class="card-header card-header-primary">
+    <div class="card-header card-header-warning">
       <h1>Statement - {{ user.full_name}}</h1>
-      <h2>{{ summary.ABFNumber }} - {{ summary.RankName }} Master</h2>
-      <h3><i>{% if summary.IsActive %}Home club is {{club}}{% else %}Used to play at {{club}}{% endif %}</i></h3>
-      <h2>Balance: ${{ balance|intcomma }}</h2>
-      <div class="float-left">
-        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:setup_autotopup' %}';">{{ auto_button }}</button>
-      </div>
-      <div class="float-right">
-        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:statement_csv' %}';">Export CSV</button>
-        <button class="btn btn-secondary" onclick="location.href = '{% url 'payments:statement_pdf' %}';">Export PDF</button>
+      <h3>{% if summary.IsActive %}{{club}}{% else %}Inactive - Used to play at {{club}}{% endif %}</h3>
+      <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}{{ balance|intcomma }}</h2>
 
-      </div>
-      <div class="clearfix"></div>
+          <div class="float-left">
+
+              <b>Auto Top Up</b>
+              <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm"
+              {% if auto_button %} checked {% endif %}
+               >
+              <div id="console-event"></div>
+
+          </div>
+
     </div>
     <div class="card-body table-responsive">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm text-left">
+            <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 180px">
+              <i class="material-icons">people_alt</i>&nbsp;Pay A Friend
+            </button>
+            </a>
+            <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 180px">
+              <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
+            </button>
+            </a>
+
+          </div>
+          <div class="col-sm text-right">
+            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 180px">
+              <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
+            </button>
+            </a>
+            <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 180px">
+              <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
+            </button>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
       <table class="table table-hover">
         <thead class="text-info">
           <tr>
@@ -30,9 +64,9 @@
             <th>Counterparty</th>
             <th>Type</th>
             <th>Description</th>
-            <th class="text-right">In($)</th>
-            <th class="text-right">Out($)</th>
-            <th class="text-right">Balance($)</th>
+            <th class="text-right">In({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th class="text-right">Out({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th class="text-right">Balance({{ GLOBAL_CURRENCY_SYMBOL }})</th>
           </tr>
         </thead>
         <tbody>
@@ -81,5 +115,32 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block footer %}
+
+<script>
+$( document ).ready(function() {
+  if(window.performance.navigation.type === 2) {
+     // the page was navigated to via the forward or back button
+     // refresh
+     location.reload();
+  }
+});
+
+  $(function() {
+    $('#auto-button').change(function() {
+      if ($(this).prop('checked')) {
+    //    $('#auto-button').bootstrapToggle('off')
+        window.location.href = "{% url "payments:setup_autotopup" %}";
+      } else {
+  //      $('#auto-button').bootstrapToggle('on')
+        window.location.href = "{% url "payments:cancel_autotopup" %}";
+      }
+      $('#console-event').html('Toggle: ' + $(this).prop('checked'))
+    })
+  })
+</script>
 
 {% endblock %}
