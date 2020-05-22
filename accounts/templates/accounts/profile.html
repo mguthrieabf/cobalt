@@ -66,12 +66,18 @@
                  </div>
                </div>
             </div>
+            <input type="hidden" name="stripe_auto_confirmed" id="id_stripe_auto_confirmed" value="{{ form.stripe_auto_confirmed.value }}">
             {% if form.stripe_auto_confirmed.value %}
             <div class="row">
              <div class="col-md-3">
                <div class="form-group">
                  <label class="bmd-label-floating">Auto Top Up Amount</label>
-                 <input type="number" name="auto_amount" id="id_auto_amount" class="form-control" value="{{ form.auto_amount.value|default_if_none:'' }}">
+                 <select name="auto_amount" id="id_auto_amount">
+                    <option value="50"{% if form.auto_amount.value == 50 %} selected{% endif %}>{{ GLOBAL_CURRENCY_SYMBOL}}50.00</option>
+                    <option value="100"{% if form.auto_amount.value == 100 %} selected{% endif %}>{{ GLOBAL_CURRENCY_SYMBOL}}100.00</option>
+                    <option value="150"{% if form.auto_amount.value == 150 %} selected{% endif %}>{{ GLOBAL_CURRENCY_SYMBOL}}150.00</option>
+                    <option value="200"{% if form.auto_amount.value == 200 %} selected{% endif %}>{{ GLOBAL_CURRENCY_SYMBOL}}200.00</option>
+                </select>
                </div>
              </div>
            </div>

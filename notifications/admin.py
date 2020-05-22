@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import InAppNotification
 
-# Register your models here.
+class InAppNotificationAdmin(admin.ModelAdmin):
+    search_fields = ('member',)
+
+admin.site.register(InAppNotification, InAppNotificationAdmin)

@@ -78,7 +78,7 @@
                   <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-success center-text" disabled>
                 </div>
                 <div class="ml-auto">
-                 <button class="btn btn-info center-text" onclick="window.location.href='{% url "dashboard" %}'">Cancel</button>
+                 <button class="btn btn-info center-text" onclick="window.location.href='{% url "payments:payments" %}'">Cancel</button>
                 </div>
               </div>
 
@@ -100,6 +100,8 @@
 // Dynamic search when input fields change
 
   jQuery(document).ready(function() {
+    const amount = $("#id_amount");
+    const amount_err = $("#id_amount_errors");
     const lastname = $("#id_lastname")
     const firstname = $("#id_firstname")
     const search_results = $('#search-results')
@@ -123,6 +125,15 @@
     form_dets.show();
   });
 {% endif %}
+
+// validate amount
+    amount.blur(function() {
+      amount_err.html("");
+      if (amount.val()<0){
+        amount_err.html("Must be a positive amount");
+        amount.focus();
+      }
+    });
 
 // enable submit if we have a value
     $("#id_amount").on('keyup', function() {

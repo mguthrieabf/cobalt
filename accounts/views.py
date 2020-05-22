@@ -240,11 +240,10 @@ def profile(request):
         form = UserUpdateForm(data=request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            # auto top up select list needs to be refreshed
+            form = UserUpdateForm(instance=request.user)
             messages.success(request, "Profile Updated",
                              extra_tags='cobalt-message-success')
-        else:
-            print("invlaid")
-            print(form.errors)
     else:
 # Fix DOB format for browser - expects DD/MM/YYYY
         if request.user.dob:

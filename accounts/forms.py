@@ -16,12 +16,7 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'system_number',
                   'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name',
-                  'auto_amount', 'stripe_customer_id']
-
-    # def clean_mobile(self):
-    #     mobile = self.cleaned_data.get('mobile')
-    #     print(mobile)
-    #     raise forms.ValidationError('values must be three times')
+                  'auto_amount', 'stripe_auto_confirmed']
 
 class BlurbUpdateForm(forms.ModelForm):
 
