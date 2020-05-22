@@ -106,6 +106,10 @@ EMAIL_HOST_PASSWORD = 'password'
 DEFAULT_FROM_EMAIL = 'donotreply@a.com'
 STRIPE_SECRET_KEY = 'not-set'
 STRIPE_PUBLISHABLE_KEY = 'not-set'
+AWS_ACCESS_KEY_ID = 'not-set'
+AWS_SECRET_ACCESS_KEY = 'not-set'
+
+AWS_REGION_NAME = "ap-southeast-2"
 
 if 'RDS_HOSTNAME' in os.environ:
     DATABASES = {
@@ -206,6 +210,11 @@ if 'GLOBAL_MPSERVER' in os.environ:
 if 'STRIPE_SECRET_KEY' in os.environ:
     STRIPE_SECRET_KEY = os.environ['STRIPE_SECRET_KEY']
     STRIPE_PUBLISHABLE_KEY = os.environ['STRIPE_PUBLISHABLE_KEY']
+
+# AWS keys are used to send SMS
+if 'AWS_ACCESS_KEY_ID' in os.environ:
+    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 
 # Payments auto amounts
 AUTO_TOP_UP_LOW_LIMIT = 20
