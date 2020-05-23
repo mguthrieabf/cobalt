@@ -404,10 +404,6 @@ def member_transfer(request):
             messages.success(request, msg,
                              extra_tags='cobalt-message-success')
             return redirect("payments:payments")
-#            return render(request, 'payments/member_transfer_successful.html', {"msg": msg})
-        else:
-            print(form.errors)
-
     else:
         form = MemberTransfer(user=request.user)
 

@@ -359,7 +359,25 @@ def payment_api(request, description, amount, member, route_code=None,
         if member.stripe_auto_confirmed:
 
 # calculate required top up amount
-            topup_required = amount
+# Generally top by the largest of amount and auto_amount, BUT if the
+# balance after that will be low enough to require another top up then
+# we ensure that the final balance equals the top up amount.
+            topup_required = amount # normal top up
+            if balance < AUTO_TOP_UP_LOW_LIMIT:
+                print("balance < AUTO_TOP_UP_LOW_LIMIT")
+                if member.auto_amount >= amount: # use biggest
+                    print("member.auto_amount >= amount")
+                    print("topup_required = member.auto_amount")
+                    topup_required = member.auto_amount
+                else:
+                    print("topup_required = amount")
+                    topup_required = amount
+                # check if we will still be under threshold
+                if balance + topup_required - amount < AUTO_TOP_UP_LOW_LIMIT:
+                    print("balance + topup_required - amount < AUTO_TOP_UP_LOW_LIMIT")
+                    print("topup_required = member.auto_amount - balance + amount")
+                    topup_required = member.auto_amount - balance + amount
+                    print("top up required: %s" % topup_required)
 
             (return_code, msg) = auto_topup_member(member, topup_required=topup_required)
 
@@ -570,7 +588,7 @@ def stripe_webhook_autosetup(event):
 # confirm card set up
     member.stripe_auto_confirmed = True
     member.save()
-    
+
 # check if we should make an auto top up now
     balance = get_balance(member)
     if balance < AUTO_TOP_UP_LOW_LIMIT:
