@@ -57,7 +57,8 @@ def register(request):
                 'user': user,
                 'domain': current_site.domain,
                 'org': settings.GLOBAL_ORG,
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+#                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),     Django upgrade broke this
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)),
                 'token':account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
