@@ -52,6 +52,7 @@ def get_stories_for_user(user):
 
 #        return(row)
 
+    return("In 18th Century England, having a pineapple was a symbol of wealth because of high import fees. They would be used as displays instead of being eaten")
     return(random.choice(list))
 
 def add_in_app_notification(member, msg, link=None):
