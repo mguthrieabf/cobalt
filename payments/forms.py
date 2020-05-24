@@ -52,18 +52,40 @@ class ManualTopup(forms.Form):
     card_choice = forms.ChoiceField(label="Card Option", choices=CARD_CHOICES,
                                     required=False)
 
-    def clean_amount(self):
+    def clean(self):
         """ validation for the amount field """
-        amount = self.cleaned_data['amount']
-        if amount < 0:
-            raise forms.ValidationError("Negative amounts are not allowed")
-        if amount < AUTO_TOP_UP_MIN_AMT:
-            raise forms.ValidationError("Too small. Must be at least %s%s" %
-                                        (GLOBAL_CURRENCY_SYMBOL,
-                                         AUTO_TOP_UP_MIN_AMT))
-        if amount > AUTO_TOP_UP_MAX_AMT:
-            raise forms.ValidationError("Too large. Maximum is %s%s" %
-                                        (GLOBAL_CURRENCY_SYMBOL,
-                                         AUTO_TOP_UP_MAX_AMT))
+        cleaned_data = super(ManualTopup, self).clean()
+        print(cleaned_data)
+        if cleaned_data.get('amount'):
+            amount = self.cleaned_data['amount']
+            print(amount)
+            if amount < 0:
+                self._errors['amount'] = "Negative amounts are not allowed"
+            if amount < AUTO_TOP_UP_MIN_AMT:
+                raise forms.ValidationError("Too small. Must be at least %s%s" %
+                                            (GLOBAL_CURRENCY_SYMBOL,
+                                             AUTO_TOP_UP_MIN_AMT))
+            if amount > AUTO_TOP_UP_MAX_AMT:
+                raise forms.ValidationError("Too large. Maximum is %s%s" %
+                                            (GLOBAL_CURRENCY_SYMBOL,
+                                             AUTO_TOP_UP_MAX_AMT))
+        else:
+            self._errors['amount'] = "Please enter a value"
 
-        return amount
+        return self.cleaned_data
+
+    # def clean_amount(self):
+    #     """ validation for the amount field """
+    #     amount = self.cleaned_data['amount']
+    #     if amount < 0:
+    #         raise forms.ValidationError("Negative amounts are not allowed")
+    #     if amount < AUTO_TOP_UP_MIN_AMT:
+    #         raise forms.ValidationError("Too small. Must be at least %s%s" %
+    #                                     (GLOBAL_CURRENCY_SYMBOL,
+    #                                      AUTO_TOP_UP_MIN_AMT))
+    #     if amount > AUTO_TOP_UP_MAX_AMT:
+    #         raise forms.ValidationError("Too large. Maximum is %s%s" %
+    #                                     (GLOBAL_CURRENCY_SYMBOL,
+    #                                      AUTO_TOP_UP_MAX_AMT))
+    #
+    #     return amount

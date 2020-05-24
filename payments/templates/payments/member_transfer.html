@@ -127,26 +127,36 @@
 {% endif %}
 
 // validate amount
-    amount.blur(function() {
+    amount.blur(function(e) {
       amount_err.html("");
       if (amount.val()<0){
         amount_err.html("Must be a positive amount");
         amount.focus();
+        e.preventDefault();
       }
       if (amount.val()>{{ balance }}){
         amount_err.html("Insufficient funds. Try doing a manual top up first.");
         amount.focus();
+        e.preventDefault();
       }
 
     });
 
-// enable submit if we have a value
-    $("#id_amount").on('keyup', function() {
-      if ($("#id_amount").val()>0){
+// enable submit if we have a value and description
+    function check_enable(){
+      if ($("#id_amount").val()>0 && $("#id_description").val()){
         $("#cobalt-button").prop('disabled', false);
       } else {
         $("#cobalt-button").prop('disabled', true);
       }
+    }
+
+    $("#id_amount").on('keyup', function() {
+      check_enable()
+    });
+
+    $("#id_description").on('keyup', function() {
+      check_enable()
     });
 
 // dynamic search

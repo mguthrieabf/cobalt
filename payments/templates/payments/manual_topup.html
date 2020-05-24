@@ -40,7 +40,7 @@
               <input type="submit" value="Top Up" class="btn btn-success center-text">
             </div>
             <div class="ml-auto">
-             <button class="btn btn-info center-text" onclick="window.location.href='{% url "payments:payments" %}'; return false;">Cancel</button>
+             <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
             </div>
           </div>
 
@@ -50,5 +50,34 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block footer %}
+
+<script>
+
+  jQuery(document).ready(function() {
+    const amount = $("#id_amount");
+    const amount_err = $("#id_amount_errors");
+
+    // validate amount
+        amount.blur(function(e) {
+          amount_err.html("");
+          if (amount.val()<{{ AUTO_TOP_UP_MIN_AMT }}){
+            amount_err.html("Insufficient amount. Minimum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.");
+            amount.focus();
+            e.preventDefault();
+          }
+          if (amount.val()>{{ AUTO_TOP_UP_MAX_AMT }}){
+            amount_err.html("Too large. Maximum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }}.");
+            amount.focus();
+            e.preventDefault();
+          }
+
+        });
+    });
+
+</script>
 
 {% endblock %}

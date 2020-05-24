@@ -199,16 +199,23 @@ def statement_csv(request):
 
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
+    today = datetime.today().strftime('%-d %B %Y at %I:%H:%M')
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="statement.csv"'
 
     writer = csv.writer(response)
-    writer.writerow([request.user.full_name, request.user.system_number])
-    writer.writerow(['Date', 'Reference', 'Type', 'Description', 'Amount', 'Balance'])
+    writer.writerow([request.user.full_name, request.user.system_number, today])
+    writer.writerow(['Date', 'Counterparty', 'Reference', 'Type', 'Description',
+                    'Amount', 'Balance'])
 
     for row in events_list:
-        writer.writerow([row.created_date, row.reference_no,
+        counterparty = ""
+        if row.other_member:
+            counterparty = row.other_member
+        if row.organisation:
+            counterparty = row.organisation
+        writer.writerow([row.created_date, counterparty, row.reference_no,
                          row.type, row.description, row.amount, row.balance])
 
     return response
@@ -231,7 +238,7 @@ def statement_pdf(request):
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
 
-    today = datetime.today().strftime('%-m %B %Y')
+    today = datetime.today().strftime('%-d %B %Y')
 
     return render_to_pdf_response(request, 'payments/statement_pdf.html',
                                   {
@@ -367,6 +374,11 @@ def member_transfer(request):
     if request.method == 'POST':
         form = MemberTransfer(request.POST, user=request.user)
         if form.is_valid():
+
+            # payment_api(request, description, amount, member, route_code=None,
+            #                 route_payload=None, organisation=None,
+            #                 log_msg=None, payment_type=None, url=None):
+
             with transaction.atomic():
                 # Money in
                 update_account(member=form.cleaned_data['transfer_to'],

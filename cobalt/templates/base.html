@@ -124,16 +124,13 @@
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
           <div class="navbar-wrapper">
-            <span>Hi
-
+            <span>
+            Hi
               {% if request.user.first_name %}
                 {{ request.user.first_name }}
               {% else %}
                 {{ request.user.username }}
               {% endif %}
-
-
-            {{ story }}
             </span>
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">

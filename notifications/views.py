@@ -13,7 +13,7 @@ import random
 from django.db import connection
 from django.db import connections
 import boto3
-from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID
+from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID, BASE_DIR
 from .models import InAppNotification
 
 def get_notifications_for_user(user):
@@ -23,13 +23,6 @@ def get_notifications_for_user(user):
         notifications[note.id]=(note.message, note.link)
     return(notifications)
 
-def get_stories_for_user(user):
-    list=[
-            "Welcome back.",
-            "Good to see you.",
-            "Hello.",
-            "How are you?",
-         ]
     # Create an SNS client
     # client = boto3.client(
     #     "sns",
@@ -49,11 +42,6 @@ def get_stories_for_user(user):
     #         }
     #     }
     # )
-
-#        return(row)
-
-    return("In 18th Century England, having a pineapple was a symbol of wealth because of high import fees. They would be used as displays instead of being eaten")
-    return(random.choice(list))
 
 def add_in_app_notification(member, msg, link=None):
     note = InAppNotification()

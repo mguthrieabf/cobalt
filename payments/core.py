@@ -379,6 +379,13 @@ def payment_api(request, description, amount, member, route_code=None,
                     topup_required = member.auto_amount - balance + amount
                     print("top up required: %s" % topup_required)
 
+            else: # not below auto limit, but insufficient funds - use largest of amt and auto
+                print("balance < AUTO_TOP_UP_LOW_LIMIT")
+                if member.auto_amount >= amount: # use biggest
+                    print("member.auto_amount >= amount")
+                    print("topup_required = member.auto_amount")
+                    topup_required = member.auto_amount
+
             (return_code, msg) = auto_topup_member(member, topup_required=topup_required)
 
             if return_code: # success
@@ -940,8 +947,6 @@ def auto_topup_member(member, topup_required=None):
                      payload.payment_method_details.card.last4,
                      payload.payment_method_details.card.exp_month,
                      abs(payload.payment_method_details.card.exp_year) % 100))
-
-
 
     except stripe.error.CardError as error:
         err = error.error
