@@ -263,7 +263,7 @@ def test_callback(status, payload, tran):
 # payment_api       #
 #####################
 def payment_api(request, description, amount, member, route_code=None,
-                route_payload=None, organisation=None,
+                route_payload=None, organisation=None, other_member=None,
                 log_msg=None, payment_type=None, url=None):
     """ API for payments from other parts of the application.
 
@@ -286,6 +286,10 @@ def payment_api(request, description, amount, member, route_code=None,
     amount is the amount to be deducted from the users account. A positive
     amount is a charge, a negative amount is an incoming payment.
 
+    We accept either organisation as the counterpart for this payment or
+    other_member. We must have either an organisation or a member, but
+    we can't pay to both.
+
     args:
         request - standard request object
         description - text description of the payment
@@ -294,6 +298,7 @@ def payment_api(request, description, amount, member, route_code=None,
         route_code - code to map to a callback
         route_payload - value to retirn on completion
         organisation - linked organisation
+        other_member - User object
         log_msg - message for the log
         payment_type - description of payment
         url - next url to go to
@@ -301,9 +306,35 @@ def payment_api(request, description, amount, member, route_code=None,
     returns:
         request - page for user
 
-"""
+    """
+
+    print("inside")
+    print("Member - %s" % other_member)
+    print("Org - %s" % organisation)
+
+    if other_member and organisation: # one or the other, not both
+        print("other and org")
+        log_event(user="Stripe API",
+                  severity="CRITICAL",
+                  source="Payments",
+                  sub_source="payments_api",
+                  message="Received both other_member and organisation. Code Error.")
+        return HttpResponse(status=500)
+
+    if not other_member and not organisation: # must have one
+        print("neither")
+        log_event(user="Stripe API",
+                  severity="CRITICAL",
+                  source="Payments",
+                  sub_source="payments_api",
+                  message="Received neither other_member nor organisation. Code Error.")
+        return HttpResponse(status=500)
+
+
     balance = float(get_balance(member))
     amount = float(amount)
+
+    print(balance)
 
     if not log_msg:
         log_msg = description
@@ -319,6 +350,7 @@ def payment_api(request, description, amount, member, route_code=None,
         update_account(member=member,
                        amount=-amount,
                        organisation=organisation,
+                       other_member=other_member,
                        description=description,
                        log_msg=log_msg,
                        source="Payments",
@@ -327,17 +359,32 @@ def payment_api(request, description, amount, member, route_code=None,
                        )
 
 # If we got an organisation then make their payment too
-        update_organisation(organisation=organisation,
-                            amount=amount,
-                            description=description,
-                            log_msg=log_msg,
-                            source="Payments",
-                            sub_source="payments_api",
-                            payment_type=payment_type,
-                            member=member)
+        if organisation:
+            update_organisation(organisation=organisation,
+                                amount=amount,
+                                description=description,
+                                log_msg=log_msg,
+                                source="Payments",
+                                sub_source="payments_api",
+                                payment_type=payment_type,
+                                member=member)
 
-        messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
-                         extra_tags='cobalt-message-success')
+            messages.success(request, f"Payment successful! You paid ${amount:.2f} to {organisation}.",
+                             extra_tags='cobalt-message-success')
+
+# If we got an other_member then make their payment too
+        if other_member:
+            update_account(amount=amount,
+                           description=description,
+                           log_msg=log_msg,
+                           source="Payments",
+                           sub_source="payments_api",
+                           payment_type=payment_type,
+                           other_member=member,
+                           member=other_member)
+
+            messages.success(request, f"Payment successful! You paid ${amount:.2f} to {other_member}.",
+                             extra_tags='cobalt-message-success')
 
         callback_router(route_code=route_code, route_payload=route_payload, tran=None)
 
@@ -400,18 +447,34 @@ def payment_api(request, description, amount, member, route_code=None,
                                )
 
         # If we got an organisation then make their payment too
-                update_organisation(organisation=organisation,
-                                    amount=amount,
-                                    description=description,
-                                    log_msg=log_msg,
-                                    source="Payments",
-                                    sub_source="payments_api",
-                                    payment_type=payment_type,
-                                    member=member)
+                if organisation:
+                    update_organisation(organisation=organisation,
+                                        amount=amount,
+                                        description=description,
+                                        log_msg=log_msg,
+                                        source="Payments",
+                                        sub_source="payments_api",
+                                        payment_type=payment_type,
+                                        member=member)
 
-                messages.success(request, f"Payment successful! You paid \
-                                 ${amount:.2f} to {organisation}.",
-                                 extra_tags='cobalt-message-success')
+                    messages.success(request, f"Payment successful! You paid \
+                                     ${amount:.2f} to {organisation}.",
+                                     extra_tags='cobalt-message-success')
+
+        # If we got an other_member then make their payment too
+                if other_member:
+                    update_account(amount=amount,
+                                   description=description,
+                                   log_msg=log_msg,
+                                   source="Payments",
+                                   sub_source="payments_api",
+                                   payment_type=payment_type,
+                                   other_member=member,
+                                   member=other_member)
+
+                    messages.success(request, f"Payment successful! You paid ${amount:.2f} to {other_member}.",
+                                     extra_tags='cobalt-message-success')
+
                 messages.success(request, msg,
                                  extra_tags='cobalt-message-success')
                 callback_router(route_code=route_code, route_payload=route_payload,
@@ -436,6 +499,7 @@ def payment_api(request, description, amount, member, route_code=None,
             trans.route_code = route_code
             trans.route_payload = route_payload
             trans.linked_amount = amount
+            trans.linked_member = other_member
             trans.linked_organisation = organisation
             trans.linked_transaction_type = payment_type
             trans.save()
@@ -506,6 +570,9 @@ def stripe_webhook_manual(event):
 
 # Set the payment type - this could be for a linked transaction or a manual
 # payment.
+
+    print("linked?")
+    print(tran.linked_transaction_type)
     if tran.linked_transaction_type: # payment for a linked transaction
         paytype = "CC Payment"
     else:  # manual top up
@@ -529,26 +596,55 @@ def stripe_webhook_manual(event):
 # linked_transaction_type will be None
 
     if tran.linked_transaction_type:
+        print("linked?")
+        print(tran.linked_organisation)
+        print(tran.linked_member)
 
-        update_account(member=tran.member,
-                       amount=-tran.linked_amount,
-                       description=tran.description,
-                       source="Payments",
-                       sub_source="stripe_webhook",
-                       payment_type=tran.linked_transaction_type,
-                       log_msg=tran.description,
-                       organisation=tran.linked_organisation
-                       )
+# We could be linked to a member payment or an organisation payment
+        if tran.linked_organisation:
 
-    # make organisation payment too
-        update_organisation(organisation=tran.linked_organisation,
-                            amount=tran.linked_amount,
-                            description=tran.description,
-                            source="Payments",
-                            sub_source="stripe_webhook",
-                            payment_type=tran.linked_transaction_type,
-                            log_msg=tran.description,
-                            member=tran.member)
+            update_account(member=tran.member,
+                           amount=-tran.linked_amount,
+                           description=tran.description,
+                           source="Payments",
+                           sub_source="stripe_webhook",
+                           payment_type=tran.linked_transaction_type,
+                           log_msg=tran.description,
+                           organisation=tran.linked_organisation
+                           )
+
+        # make organisation payment too
+            update_organisation(organisation=tran.linked_organisation,
+                                amount=tran.linked_amount,
+                                description=tran.description,
+                                source="Payments",
+                                sub_source="stripe_webhook",
+                                payment_type=tran.linked_transaction_type,
+                                log_msg=tran.description,
+                                member=tran.member)
+
+        if tran.linked_member:
+
+            update_account(member=tran.member,
+                           amount=-tran.linked_amount,
+                           description=tran.description,
+                           source="Payments",
+                           sub_source="stripe_webhook",
+                           payment_type=tran.linked_transaction_type,
+                           log_msg=tran.description,
+                           other_member=tran.linked_member,
+                           )
+
+        # make member payment too
+            update_account(member=tran.linked_member,
+                           other_member=tran.member,
+                           amount=tran.linked_amount,
+                           description=tran.description,
+                           source="Payments",
+                           sub_source="stripe_webhook",
+                           payment_type=tran.linked_transaction_type,
+                           log_msg=tran.description,
+                           )
 
     # make Callback
     callback_router(tran.route_code, tran.route_payload, tran)
@@ -702,6 +798,7 @@ def stripe_webhook(request):
 # Don't process it twice.
 
     if event.type == 'charge.succeeded' and tran_type == "Manual":
+        print("manula and charge succeeded")
         return stripe_webhook_manual(event)
 
     elif event.type == 'payment_method.attached':  # auto top up set up successful
@@ -841,7 +938,7 @@ def update_organisation(organisation, amount, description, log_msg, source,
 ###########################
 # auto_topup_member       #
 ###########################
-def auto_topup_member(member, topup_required=None):
+def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
     """ process an auto top up for a member.
 
     Internal function to handle a member needing to process an auto top up.
@@ -854,6 +951,9 @@ def auto_topup_member(member, topup_required=None):
         topup_required - the amount of the top up (optional). This is required
         if the payment is larger than the top up amount. e.g. balance is 25,
         top up amount is 50, payment is 300.
+        payment_type - defaults to Auto Top Up. We allow this to be overriden
+        so that a member manually topping up their account using their registered
+        auto top up card get the payment type of Manual Top Up on their statement.
 
     Returns:
         return_code - True for success, False for failure
@@ -933,10 +1033,10 @@ def auto_topup_member(member, topup_required=None):
                         payload.payment_method_details.card.last4,
                         payload.payment_method_details.card.exp_month,
                         abs(payload.payment_method_details.card.exp_year) % 100),
-                       log_msg="$%s Auto Top Up" % amount,
+                       log_msg="$%s %s" % (amount, payment_type),
                        source="Payments",
                        sub_source="auto_topup_member",
-                       payment_type="Auto Top Up",
+                       payment_type=payment_type,
                        stripe_transaction=stripe_tran
                        )
 

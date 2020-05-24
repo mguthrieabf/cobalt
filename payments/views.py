@@ -374,48 +374,49 @@ def member_transfer(request):
     if request.method == 'POST':
         form = MemberTransfer(request.POST, user=request.user)
         if form.is_valid():
+            print("member_transfer - about to call")
+            return payment_api(request=request, description=form.cleaned_data['description'],
+                        amount=form.cleaned_data['amount'], member=request.user,
+                        other_member=form.cleaned_data['transfer_to'],
+                        payment_type="Pay a Friend")
 
-            # payment_api(request, description, amount, member, route_code=None,
-            #                 route_payload=None, organisation=None,
-            #                 log_msg=None, payment_type=None, url=None):
-
-            with transaction.atomic():
-                # Money in
-                update_account(member=form.cleaned_data['transfer_to'],
-                               other_member=request.user,
-                               amount=form.cleaned_data['amount'],
-                               description=form.cleaned_data['description'],
-                               log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                               source="Payments",
-                               sub_source="member_transfer",
-                               payment_type="Transfer In"
-                               )
-                # Money out
-                update_account(member=request.user,
-                               other_member=form.cleaned_data['transfer_to'],
-                               amount=-form.cleaned_data['amount'],
-                               description=form.cleaned_data['description'],
-                               log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
-                               (request.user.full_name, request.user.system_number,
-                                form.cleaned_data['transfer_to'].full_name,
-                                form.cleaned_data['transfer_to'].system_number,
-                                form.cleaned_data['amount']),
-                               source="Payments",
-                               sub_source="member_transfer",
-                               payment_type="Transfer Out"
-                               )
-
-            msg = "You transferred %s%s to %s(%s)" % (GLOBAL_CURRENCY_SYMBOL,
-                                     form.cleaned_data['amount'],
-                                     form.cleaned_data['transfer_to'].full_name,
-                                     form.cleaned_data['transfer_to'].system_number)
-            messages.success(request, msg,
-                             extra_tags='cobalt-message-success')
-            return redirect("payments:payments")
+            # with transaction.atomic():
+            #     # Money in
+            #     update_account(member=form.cleaned_data['transfer_to'],
+            #                    other_member=request.user,
+            #                    amount=form.cleaned_data['amount'],
+            #                    description=form.cleaned_data['description'],
+            #                    log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
+            #                    (request.user.full_name, request.user.system_number,
+            #                     form.cleaned_data['transfer_to'].full_name,
+            #                     form.cleaned_data['transfer_to'].system_number,
+            #                     form.cleaned_data['amount']),
+            #                    source="Payments",
+            #                    sub_source="member_transfer",
+            #                    payment_type="Transfer In"
+            #                    )
+            #     # Money out
+            #     update_account(member=request.user,
+            #                    other_member=form.cleaned_data['transfer_to'],
+            #                    amount=-form.cleaned_data['amount'],
+            #                    description=form.cleaned_data['description'],
+            #                    log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
+            #                    (request.user.full_name, request.user.system_number,
+            #                     form.cleaned_data['transfer_to'].full_name,
+            #                     form.cleaned_data['transfer_to'].system_number,
+            #                     form.cleaned_data['amount']),
+            #                    source="Payments",
+            #                    sub_source="member_transfer",
+            #                    payment_type="Transfer Out"
+            #                    )
+            #
+            # msg = "You transferred %s%s to %s(%s)" % (GLOBAL_CURRENCY_SYMBOL,
+            #                          form.cleaned_data['amount'],
+            #                          form.cleaned_data['transfer_to'].full_name,
+            #                          form.cleaned_data['transfer_to'].system_number)
+            # messages.success(request, msg,
+            #                  extra_tags='cobalt-message-success')
+            # return redirect("payments:payments")
     else:
         form = MemberTransfer(user=request.user)
 
@@ -474,7 +475,8 @@ def manual_topup(request):
         if form.is_valid():
             if form.cleaned_data['card_choice'] == "Existing":  # Use Auto
                 (return_code, msg) = auto_topup_member(request.user,
-                                     topup_required=form.cleaned_data['amount'])
+                                     topup_required=form.cleaned_data['amount'],
+                                     payment_type="Manual Top Up")
                 if return_code:  # success
                     messages.success(request, msg,
                                      extra_tags='cobalt-message-success')

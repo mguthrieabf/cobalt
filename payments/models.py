@@ -25,6 +25,7 @@ TRANSACTION_TYPE = [
     ('CC Payment', 'Credit Card payment'),
     ('Club Payment', 'Club game payment'),
     ('Club Membership', 'Club membership payment'),
+    ('Pay a Friend', 'Payment to another member'),
     ('Miscellaneous', 'Miscellaneous payment'),
 ]
 
@@ -48,7 +49,7 @@ class StripeTransaction(models.Model):
     ]
 
     member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                               on_delete=models.SET_NULL)
+                               on_delete=models.SET_NULL, related_name="main_member")
     description = models.CharField("Description", max_length=100)
     amount = models.DecimalField("Amount", max_digits=8, decimal_places=2)
     status = models.CharField("Status", max_length=9,
@@ -72,11 +73,17 @@ class StripeTransaction(models.Model):
                                      null=True, max_length=40)
     created_date = models.DateTimeField("Creation Date", default=timezone.now)
     last_change_date = models.DateTimeField("Last Update Date", default=timezone.now)
+
+    """ A stripe payment can be linked to a payment to an organisation or
+    to a member, but not both """
     linked_organisation = models.ForeignKey(Organisation, blank=True, null=True,
                                             on_delete=models.SET_NULL)
+    linked_member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                         on_delete=models.SET_NULL, related_name="linked_member")
+
     linked_transaction_type = models.CharField("Linked Transaction Type", blank=True,
                                                null=True, max_length=20)
-    # linked amount can be different to amount if the member had some money in their account already
+    """linked amount can be different to amount if the member had some money in their account already"""
     linked_amount = models.DecimalField("Linked Amount", blank=True, null=True,
                                         max_digits=12, decimal_places=2)
 

@@ -78,7 +78,7 @@
                   <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-success center-text" disabled>
                 </div>
                 <div class="ml-auto">
-                 <button class="btn btn-info center-text" onclick="window.location.href='{% url "payments:payments" %}'; return false;">Cancel</button>
+                 <button class="btn btn-info center-text" onclick="onclick="history.back(); return false;">Cancel</button>
                 </div>
               </div>
 
@@ -134,11 +134,11 @@
         amount.focus();
         e.preventDefault();
       }
-      if (amount.val()>{{ balance }}){
-        amount_err.html("Insufficient funds. Try doing a manual top up first.");
-        amount.focus();
-        e.preventDefault();
-      }
+//      if (amount.val()>{{ balance }}){
+//        amount_err.html("Insufficient funds. Try doing a manual top up first.");
+//        amount.focus();
+//        e.preventDefault();
+//      }
 
     });
 
