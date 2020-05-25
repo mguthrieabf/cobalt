@@ -313,7 +313,6 @@ def payment_api(request, description, amount, member, route_code=None,
     print("Org - %s" % organisation)
 
     if other_member and organisation: # one or the other, not both
-        print("other and org")
         log_event(user="Stripe API",
                   severity="CRITICAL",
                   source="Payments",
@@ -322,7 +321,6 @@ def payment_api(request, description, amount, member, route_code=None,
         return HttpResponse(status=500)
 
     if not other_member and not organisation: # must have one
-        print("neither")
         log_event(user="Stripe API",
                   severity="CRITICAL",
                   source="Payments",
@@ -333,8 +331,6 @@ def payment_api(request, description, amount, member, route_code=None,
 
     balance = float(get_balance(member))
     amount = float(amount)
-
-    print(balance)
 
     if not log_msg:
         log_msg = description
@@ -503,7 +499,14 @@ def payment_api(request, description, amount, member, route_code=None,
             trans.linked_organisation = organisation
             trans.linked_transaction_type = payment_type
             trans.save()
-            return render(request, 'payments/checkout.html', {'trans': trans})
+
+            msg = "Payment for: " + description
+            if balance > 0.0:
+                msg = "Partial payment for: %s. <br>Also using your current balance \
+                      of %s%.2f to make total payment of %s%.2f." % (description,
+                      GLOBAL_CURRENCY_SYMBOL, balance, GLOBAL_CURRENCY_SYMBOL, amount)
+            return render(request, 'payments/checkout.html', {'trans': trans,
+                                                              'msg': msg})
 
 #########################
 # stripe_webhook_manual #
@@ -658,7 +661,7 @@ def stripe_webhook_manual(event):
 def stripe_webhook_autosetup(event):
     """ Handles auto top up setup events from Stripe webhook
 
-    Called by stripe_webhook to look after sucessful incoming auto top up set ups.
+    Called by stripe_webhook to look after successful incoming auto top up set ups.
 
     Args:
         event - the event payload from Stripe
@@ -1040,7 +1043,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
                        stripe_transaction=stripe_tran
                        )
 
-        return(True, "Top up sucessful. %s%.2f added to your account \
+        return(True, "Top up successful. %s%.2f added to your account \
                      from %s card **** **** ***** %s Exp %s/%s" %
                      (GLOBAL_CURRENCY_SYMBOL, amount,
                      payload.payment_method_details.card.brand,

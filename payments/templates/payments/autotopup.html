@@ -107,6 +107,9 @@
 {% endblock %}
 {% block footer %}
 <script>
+
+// change auto top up amount when user clicks on a value
+
   $(document).ready(function() {
     $("input[name='cobalt-amount-radio']").click(function(){
       var auto_amt = $('input[name="cobalt-amount-radio"]:checked').val();

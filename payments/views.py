@@ -43,6 +43,7 @@ from cobalt.settings import (STRIPE_SECRET_KEY,
 from .forms import TestTransaction, MemberTransfer, ManualTopup
 from .core import payment_api, update_account, get_balance, auto_topup_member
 from .models import MemberTransaction, StripeTransaction
+from accounts.models import User
 
 ####################
 # Home             #
@@ -427,7 +428,13 @@ def member_transfer(request):
     else:
         balance = "Nil"
 
+    recents = MemberTransaction.objects.filter(member=request.user).exclude(other_member=None).values('other_member').distinct()
+    recent_transfer_to=[]
+    for r in recents:
+        member = User.objects.get(pk=r['other_member'])
+        recent_transfer_to.append(member)
     return render(request, 'payments/member_transfer.html', {'form': form,
+                                                             'recents': recent_transfer_to,
                                                              'balance': balance})
 
 ########################
@@ -490,7 +497,9 @@ def manual_topup(request):
                 trans.amount = form.cleaned_data['amount']
                 trans.member = request.user
                 trans.save()
-                return render(request, 'payments/checkout.html', {'trans': trans})
+                msg = "Manual Top Up - Checkout"
+                return render(request, 'payments/checkout.html', {'trans': trans,
+                                                                  'msg': msg})
         # else:
         #     print(form.errors)
 
