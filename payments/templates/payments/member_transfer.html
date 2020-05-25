@@ -15,16 +15,28 @@
       <div class="card-body">
         <div class="container">
           <br>
-          {% if recents %}
-          <select>
-            {% for member in recents %}
-              <option value={{ recents.id }}>
-              {{ member.full_name }}
-              </option>
-            {% endfor %}
-          </select>
-          {% endif %}
+
+
+
+
           <div id="cobalt-search" class="row justify-content-center">
+
+            {% if recents %}
+            <div class="form-group col-md-6">
+              <label for="cobalt-recent">Recent Transfers</label>
+              <select id="cobalt-recent" class="form-control">
+                <option>Choose...</option>
+              {% for member in recents %}
+                <option value={{ recents.id }}>
+                {{ member.full_name }}
+                </option>
+              {% endfor %}
+              </select>
+            </div>
+            {% endif %}
+
+
+
             <div class="card col-11 col-md-9">
               <div class="card-header card-header-warning">
                 <h4>Member Lookup</h4>
@@ -143,12 +155,6 @@
         amount.focus();
         e.preventDefault();
       }
-//      if (amount.val()>{{ balance }}){
-//        amount_err.html("Insufficient funds. Try doing a manual top up first.");
-//        amount.focus();
-//        e.preventDefault();
-//      }
-
     });
 
 // enable submit if we have a value and description
