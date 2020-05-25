@@ -7,4 +7,4 @@ from notifications.views import get_notifications_for_user
 @login_required()
 def home(request):
     notification_list = get_notifications_for_user(request.user)
-    return render(request, 'events/home.html', {'notifications': notification_list, 'story': story})
+    return render(request, 'events/home.html', {'notifications': notification_list})
