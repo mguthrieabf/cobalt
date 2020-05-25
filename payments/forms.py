@@ -28,20 +28,6 @@ class MemberTransfer(forms.Form):
         self.user = kwargs.pop('user', None)
         super(MemberTransfer, self).__init__(*args, **kwargs)
 
-    # def clean_amount(self):
-    #     """ validation for the amount field """
-    #     amount = self.cleaned_data['amount']
-    #     if amount < 0:
-    #         raise forms.ValidationError("Negative amounts are not allowed")
-    #     print(self.user)
-    #     last_tran = MemberTransaction.objects.filter(member=self.user).last()
-    #     if last_tran:
-    #         if amount > last_tran.balance:
-    #             raise forms.ValidationError("Insufficient funds")
-    #     else:
-    #         raise forms.ValidationError("Insufficient funds")
-    #     return amount
-
 class ManualTopup(forms.Form):
     """ Manual top up form """
 
@@ -73,19 +59,3 @@ class ManualTopup(forms.Form):
             self._errors['amount'] = "Please enter a value"
 
         return self.cleaned_data
-
-    # def clean_amount(self):
-    #     """ validation for the amount field """
-    #     amount = self.cleaned_data['amount']
-    #     if amount < 0:
-    #         raise forms.ValidationError("Negative amounts are not allowed")
-    #     if amount < AUTO_TOP_UP_MIN_AMT:
-    #         raise forms.ValidationError("Too small. Must be at least %s%s" %
-    #                                     (GLOBAL_CURRENCY_SYMBOL,
-    #                                      AUTO_TOP_UP_MIN_AMT))
-    #     if amount > AUTO_TOP_UP_MAX_AMT:
-    #         raise forms.ValidationError("Too large. Maximum is %s%s" %
-    #                                     (GLOBAL_CURRENCY_SYMBOL,
-    #                                      AUTO_TOP_UP_MAX_AMT))
-    #
-    #     return amount

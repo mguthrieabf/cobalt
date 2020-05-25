@@ -404,7 +404,7 @@ def payment_api(request, description, amount, member, route_code=None,
 # calculate required top up amount
 # Generally top by the largest of amount and auto_amount, BUT if the
 # balance after that will be low enough to require another top up then
-# we ensure that the final balance equals the top up amount.
+# we top up by increments of the top up amount.
             topup_required = amount # normal top up
             if balance < AUTO_TOP_UP_LOW_LIMIT:
                 print("balance < AUTO_TOP_UP_LOW_LIMIT")
@@ -420,6 +420,20 @@ def payment_api(request, description, amount, member, route_code=None,
                     print("balance + topup_required - amount < AUTO_TOP_UP_LOW_LIMIT")
                     print("topup_required = member.auto_amount - balance + amount")
                     topup_required = member.auto_amount - balance + amount
+
+####
+#### Change from magic number to multiples of auto top up
+####
+
+                    min_required_amt = amount - balance + AUTO_TOP_UP_LOW_LIMIT
+                    n = int(min_required_amt / member.auto_amount) + 1
+                    topup_required = member.auto_amount * n
+
+                    (n + 1) * tu + balance_after > low_limit
+                    n * tu + balance_after < low_limit
+
+
+
                     print("top up required: %s" % topup_required)
 
             else: # not below auto limit, but insufficient funds - use largest of amt and auto

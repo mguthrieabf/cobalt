@@ -380,44 +380,8 @@ def member_transfer(request):
                         amount=form.cleaned_data['amount'], member=request.user,
                         other_member=form.cleaned_data['transfer_to'],
                         payment_type="Pay a Friend")
-
-            # with transaction.atomic():
-            #     # Money in
-            #     update_account(member=form.cleaned_data['transfer_to'],
-            #                    other_member=request.user,
-            #                    amount=form.cleaned_data['amount'],
-            #                    description=form.cleaned_data['description'],
-            #                    log_msg="Member Payment Received %s(%s) to %s(%s) $%s" %
-            #                    (request.user.full_name, request.user.system_number,
-            #                     form.cleaned_data['transfer_to'].full_name,
-            #                     form.cleaned_data['transfer_to'].system_number,
-            #                     form.cleaned_data['amount']),
-            #                    source="Payments",
-            #                    sub_source="member_transfer",
-            #                    payment_type="Transfer In"
-            #                    )
-            #     # Money out
-            #     update_account(member=request.user,
-            #                    other_member=form.cleaned_data['transfer_to'],
-            #                    amount=-form.cleaned_data['amount'],
-            #                    description=form.cleaned_data['description'],
-            #                    log_msg="Member Payment Sent %s(%s) to %s(%s) $%s" %
-            #                    (request.user.full_name, request.user.system_number,
-            #                     form.cleaned_data['transfer_to'].full_name,
-            #                     form.cleaned_data['transfer_to'].system_number,
-            #                     form.cleaned_data['amount']),
-            #                    source="Payments",
-            #                    sub_source="member_transfer",
-            #                    payment_type="Transfer Out"
-            #                    )
-            #
-            # msg = "You transferred %s%s to %s(%s)" % (GLOBAL_CURRENCY_SYMBOL,
-            #                          form.cleaned_data['amount'],
-            #                          form.cleaned_data['transfer_to'].full_name,
-            #                          form.cleaned_data['transfer_to'].system_number)
-            # messages.success(request, msg,
-            #                  extra_tags='cobalt-message-success')
-            # return redirect("payments:payments")
+        else:
+            print(form.errors)
     else:
         form = MemberTransfer(user=request.user)
 
