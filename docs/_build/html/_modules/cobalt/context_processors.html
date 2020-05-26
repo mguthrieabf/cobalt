@@ -144,10 +144,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cobalt.context_processors</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span></span><span class="sd">&quot;&quot;&quot; values set in here are passed to every template &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
 
 <div class="viewcode-block" id="global_settings"><a class="viewcode-back" href="../../cobalt.html#cobalt.context_processors.global_settings">[docs]</a><span class="k">def</span> <span class="nf">global_settings</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="c1"># Global values to configure by installation</span>
     <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;GLOBAL_ORG&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_ORG</span><span class="p">,</span>
             <span class="s1">&#39;GLOBAL_TITLE&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_TITLE</span><span class="p">,</span>
@@ -160,6 +161,7 @@
             <span class="s1">&#39;GLOBAL_CURRENCY_NAME&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_CURRENCY_NAME</span><span class="p">,</span>
             <span class="s1">&#39;AUTO_TOP_UP_MAX_AMT&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">,</span>
             <span class="s1">&#39;AUTO_TOP_UP_MIN_AMT&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTO_TOP_UP_MIN_AMT</span><span class="p">,</span>
+            <span class="s1">&#39;AUTO_TOP_UP_LOW_LIMIT&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">,</span>
            <span class="p">}</span></div>
 </pre></div>
 

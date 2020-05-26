@@ -96,7 +96,7 @@ var pay = function(stripe, card, clientSecret) {
 
 /* Shows a success / error message when the payment is complete */
 var orderComplete = function(clientSecret) {
-  // Just for the purpose of the sample, show the PaymentIntent response object
+  $("#cobalt-cancel-button").html("");
   stripe.retrievePaymentIntent(clientSecret).then(function(result) {
     var paymentIntent = result.paymentIntent;
     var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);

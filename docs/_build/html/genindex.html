@@ -267,11 +267,13 @@
       </ul></li>
       <li><a href="accounts.html#accounts.apps.AccountsConfig">AccountsConfig (class in accounts.apps)</a>
 </li>
-      <li><a href="notifications.html#notifications.apps.Notifications.acknowledge_notification">acknowledge_notification() (notifications.apps.Notifications method)</a>
+      <li><a href="notifications.html#notifications.views.acknowledge__in_app_notification">acknowledge__in_app_notification() (in module notifications.views)</a>
+</li>
+      <li><a href="notifications.html#notifications.models.InAppNotification.acknowledged">acknowledged (notifications.models.InAppNotification attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.views.activate">activate() (in module accounts.views)</a>
 </li>
-      <li><a href="notifications.html#notifications.apps.Notifications.add_notification">add_notification() (notifications.apps.Notifications method)</a>
+      <li><a href="notifications.html#notifications.views.add_in_app_notification">add_in_app_notification() (in module notifications.views)</a>
 </li>
       <li><a href="organisations.html#organisations.models.Organisation.address1">address1 (organisations.models.Organisation attribute)</a>
 </li>
@@ -321,6 +323,8 @@
         <li><a href="forums.html#forums.forms.CommentForm.base_fields">(forums.forms.CommentForm attribute)</a>
 </li>
         <li><a href="forums.html#forums.forms.PostForm.base_fields">(forums.forms.PostForm attribute)</a>
+</li>
+        <li><a href="payments.html#payments.forms.ManualTopup.base_fields">(payments.forms.ManualTopup attribute)</a>
 </li>
         <li><a href="payments.html#payments.forms.MemberTransfer.base_fields">(payments.forms.MemberTransfer attribute)</a>
 </li>
@@ -396,9 +400,13 @@
 </li>
       <li><a href="payments.html#payments.core.callback_router">callback_router() (in module payments.core)</a>
 </li>
+      <li><a href="payments.html#payments.views.cancel_auto_top_up">cancel_auto_top_up() (in module payments.views)</a>
+</li>
+      <li><a href="payments.html#payments.forms.ManualTopup.CARD_CHOICES">CARD_CHOICES (payments.forms.ManualTopup attribute)</a>
+</li>
       <li><a href="accounts.html#accounts.views.change_password">change_password() (in module accounts.views)</a>
 </li>
-      <li><a href="payments.html#payments.forms.MemberTransfer.clean_amount">clean_amount() (payments.forms.MemberTransfer method)</a>
+      <li><a href="payments.html#payments.forms.ManualTopup.clean">clean() (payments.forms.ManualTopup method)</a>
 </li>
       <li>
     cobalt
@@ -498,6 +506,8 @@
       <li><a href="forums.html#forums.models.AbstractForum.created_date">created_date (forums.models.AbstractForum attribute)</a>
 
       <ul>
+        <li><a href="notifications.html#notifications.models.InAppNotification.created_date">(notifications.models.InAppNotification attribute)</a>
+</li>
         <li><a href="payments.html#payments.models.AbstractTransaction.created_date">(payments.models.AbstractTransaction attribute)</a>
 </li>
         <li><a href="payments.html#payments.models.StripeTransaction.created_date">(payments.models.StripeTransaction attribute)</a>
@@ -575,11 +585,15 @@
 </li>
         <li><a href="forums.html#forums.forms.PostForm.declared_fields">(forums.forms.PostForm attribute)</a>
 </li>
+        <li><a href="payments.html#payments.forms.ManualTopup.declared_fields">(payments.forms.ManualTopup attribute)</a>
+</li>
         <li><a href="payments.html#payments.forms.MemberTransfer.declared_fields">(payments.forms.MemberTransfer attribute)</a>
 </li>
         <li><a href="payments.html#payments.forms.TestTransaction.declared_fields">(payments.forms.TestTransaction attribute)</a>
 </li>
       </ul></li>
+      <li><a href="notifications.html#notifications.views.delete__in_app_notification">delete__in_app_notification() (in module notifications.views)</a>
+</li>
       <li><a href="forums.html#forums.models.Forum.description">description (forums.models.Forum attribute)</a>
 
       <ul>
@@ -776,6 +790,8 @@
 </li>
         <li><a href="forums.html#forums.models.Post.get_next_by_created_date">(forums.models.Post method)</a>
 </li>
+        <li><a href="notifications.html#notifications.models.InAppNotification.get_next_by_created_date">(notifications.models.InAppNotification method)</a>
+</li>
         <li><a href="payments.html#payments.models.AbstractTransaction.get_next_by_created_date">(payments.models.AbstractTransaction method)</a>
 </li>
         <li><a href="payments.html#payments.models.MemberTransaction.get_next_by_created_date">(payments.models.MemberTransaction method)</a>
@@ -801,7 +817,7 @@
         <li><a href="payments.html#payments.models.StripeTransaction.get_next_by_last_change_date">(payments.models.StripeTransaction method)</a>
 </li>
       </ul></li>
-      <li><a href="notifications.html#notifications.apps.Notifications.get_notifications_for_user">get_notifications_for_user() (notifications.apps.Notifications method)</a>
+      <li><a href="notifications.html#notifications.views.get_notifications_for_user">get_notifications_for_user() (in module notifications.views)</a>
 </li>
       <li><a href="forums.html#forums.models.AbstractForum.get_previous_by_created_date">get_previous_by_created_date() (forums.models.AbstractForum method)</a>
 
@@ -811,6 +827,8 @@
         <li><a href="forums.html#forums.models.Comment2.get_previous_by_created_date">(forums.models.Comment2 method)</a>
 </li>
         <li><a href="forums.html#forums.models.Post.get_previous_by_created_date">(forums.models.Post method)</a>
+</li>
+        <li><a href="notifications.html#notifications.models.InAppNotification.get_previous_by_created_date">(notifications.models.InAppNotification method)</a>
 </li>
         <li><a href="payments.html#payments.models.AbstractTransaction.get_previous_by_created_date">(payments.models.AbstractTransaction method)</a>
 </li>
@@ -847,16 +865,10 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.get_status_display">get_status_display() (payments.models.StripeTransaction method)</a>
 </li>
-      <li><a href="notifications.html#notifications.apps.Notifications.get_stories_for_user">get_stories_for_user() (notifications.apps.Notifications method)</a>
-</li>
       <li><a href="organisations.html#organisations.models.Organisation.get_type_display">get_type_display() (organisations.models.Organisation method)</a>
 
       <ul>
         <li><a href="payments.html#payments.models.AbstractTransaction.get_type_display">(payments.models.AbstractTransaction method)</a>
-</li>
-        <li><a href="payments.html#payments.models.MemberTransaction.get_type_display">(payments.models.MemberTransaction method)</a>
-</li>
-        <li><a href="payments.html#payments.models.OrganisationTransaction.get_type_display">(payments.models.OrganisationTransaction method)</a>
 </li>
       </ul></li>
       <li><a href="cobalt.html#cobalt.context_processors.global_settings">global_settings() (in module cobalt.context_processors)</a>
@@ -916,6 +928,8 @@
 </li>
         <li><a href="logs.html#logs.models.Log.id">(logs.models.Log attribute)</a>
 </li>
+        <li><a href="notifications.html#notifications.models.InAppNotification.id">(notifications.models.InAppNotification attribute)</a>
+</li>
         <li><a href="organisations.html#organisations.models.MemberOrganisation.id">(organisations.models.MemberOrganisation attribute)</a>
 </li>
         <li><a href="organisations.html#organisations.models.Organisation.id">(organisations.models.Organisation attribute)</a>
@@ -929,6 +943,16 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="notifications.html#notifications.models.InAppNotification">InAppNotification (class in notifications.models)</a>
+</li>
+      <li><a href="notifications.html#notifications.models.InAppNotification.DoesNotExist">InAppNotification.DoesNotExist</a>
+</li>
+      <li><a href="notifications.html#notifications.models.InAppNotification.MultipleObjectsReturned">InAppNotification.MultipleObjectsReturned</a>
+</li>
+      <li><a href="accounts.html#accounts.models.User.inappnotification_set">inappnotification_set (accounts.models.User attribute)</a>
+</li>
+      <li><a href="notifications.html#notifications.admin.InAppNotificationAdmin">InAppNotificationAdmin (class in notifications.admin)</a>
+</li>
       <li><a href="logs.html#logs.models.Log.ip">ip (logs.models.Log attribute)</a>
 </li>
   </ul></td>
@@ -997,9 +1021,19 @@
       </ul></li>
       <li><a href="forums.html#forums.models.AbstractLike.liker_id">liker_id (forums.models.AbstractLike attribute)</a>
 </li>
+      <li><a href="notifications.html#notifications.models.InAppNotification.link">link (notifications.models.InAppNotification attribute)</a>
+</li>
+      <li><a href="payments.html#payments.models.StripeTransaction.linked_amount">linked_amount (payments.models.StripeTransaction attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="payments.html#payments.models.StripeTransaction.linked_amount">linked_amount (payments.models.StripeTransaction attribute)</a>
+      <li><a href="accounts.html#accounts.models.User.linked_member">linked_member (accounts.models.User attribute)</a>
+
+      <ul>
+        <li><a href="payments.html#payments.models.StripeTransaction.linked_member">(payments.models.StripeTransaction attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="payments.html#payments.models.StripeTransaction.linked_member_id">linked_member_id (payments.models.StripeTransaction attribute)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.linked_organisation">linked_organisation (payments.models.StripeTransaction attribute)</a>
 </li>
@@ -1076,6 +1110,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="accounts.html#accounts.models.User.main_member">main_member (accounts.models.User attribute)</a>
+</li>
       <li>
     manage
 
@@ -1084,6 +1120,8 @@
 </li>
       </ul></li>
       <li><a href="payments.html#payments.views.manual_topup">manual_topup() (in module payments.views)</a>
+</li>
+      <li><a href="payments.html#payments.forms.ManualTopup">ManualTopup (class in payments.forms)</a>
 </li>
       <li>
     masterpoints
@@ -1157,6 +1195,8 @@
 </li>
         <li><a href="forums.html#forums.forms.PostForm.media">(forums.forms.PostForm property)</a>
 </li>
+        <li><a href="notifications.html#notifications.admin.InAppNotificationAdmin.media">(notifications.admin.InAppNotificationAdmin property)</a>
+</li>
         <li><a href="organisations.html#organisations.admin.OrganisationAdmin.media">(organisations.admin.OrganisationAdmin property)</a>
 </li>
         <li><a href="payments.html#payments.admin.MemberTransactionAdmin.media">(payments.admin.MemberTransactionAdmin property)</a>
@@ -1165,14 +1205,18 @@
 </li>
         <li><a href="payments.html#payments.admin.StripeTransactionAdmin.media">(payments.admin.StripeTransactionAdmin property)</a>
 </li>
+        <li><a href="payments.html#payments.forms.ManualTopup.media">(payments.forms.ManualTopup property)</a>
+</li>
         <li><a href="payments.html#payments.forms.MemberTransfer.media">(payments.forms.MemberTransfer property)</a>
 </li>
         <li><a href="payments.html#payments.forms.TestTransaction.media">(payments.forms.TestTransaction property)</a>
 </li>
       </ul></li>
-      <li><a href="organisations.html#organisations.models.MemberOrganisation.member">member (organisations.models.MemberOrganisation attribute)</a>
+      <li><a href="notifications.html#notifications.models.InAppNotification.member">member (notifications.models.InAppNotification attribute)</a>
 
       <ul>
+        <li><a href="organisations.html#organisations.models.MemberOrganisation.member">(organisations.models.MemberOrganisation attribute)</a>
+</li>
         <li><a href="payments.html#payments.models.MemberTransaction.member">(payments.models.MemberTransaction attribute)</a>
 </li>
         <li><a href="payments.html#payments.models.OrganisationTransaction.member">(payments.models.OrganisationTransaction attribute)</a>
@@ -1182,9 +1226,11 @@
       </ul></li>
       <li><a href="accounts.html#accounts.views.member_detail_ajax">member_detail_ajax() (in module accounts.views)</a>
 </li>
-      <li><a href="organisations.html#organisations.models.MemberOrganisation.member_id">member_id (organisations.models.MemberOrganisation attribute)</a>
+      <li><a href="notifications.html#notifications.models.InAppNotification.member_id">member_id (notifications.models.InAppNotification attribute)</a>
 
       <ul>
+        <li><a href="organisations.html#organisations.models.MemberOrganisation.member_id">(organisations.models.MemberOrganisation attribute)</a>
+</li>
         <li><a href="payments.html#payments.models.MemberTransaction.member_id">(payments.models.MemberTransaction attribute)</a>
 </li>
         <li><a href="payments.html#payments.models.OrganisationTransaction.member_id">(payments.models.OrganisationTransaction attribute)</a>
@@ -1223,7 +1269,11 @@
       <li><a href="payments.html#payments.forms.MemberTransfer">MemberTransfer (class in payments.forms)</a>
 </li>
       <li><a href="logs.html#logs.models.Log.message">message (logs.models.Log attribute)</a>
+
+      <ul>
+        <li><a href="notifications.html#notifications.models.InAppNotification.message">(notifications.models.InAppNotification attribute)</a>
 </li>
+      </ul></li>
       <li><a href="accounts.html#accounts.models.User.mobile">mobile (accounts.models.User attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.forms.BlurbUpdateForm.Meta.model">model (accounts.forms.BlurbUpdateForm.Meta attribute)</a>
@@ -1467,10 +1517,10 @@
         <li><a href="support.html#support.apps.SupportConfig.name">(support.apps.SupportConfig attribute)</a>
 </li>
       </ul></li>
-      <li><a href="accounts.html#accounts.urls.not_found_handler">not_found_handler() (in module accounts.urls)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="accounts.html#accounts.urls.not_found_handler">not_found_handler() (in module accounts.urls)</a>
+</li>
       <li>
     notifications
 
@@ -1478,8 +1528,6 @@
         <li><a href="notifications.html#module-notifications">module</a>
 </li>
       </ul></li>
-      <li><a href="notifications.html#notifications.apps.Notifications">Notifications (class in notifications.apps)</a>
-</li>
       <li>
     notifications.admin
 
@@ -1541,6 +1589,8 @@
         <li><a href="forums.html#forums.models.UserForumRole.objects">(forums.models.UserForumRole attribute)</a>
 </li>
         <li><a href="logs.html#logs.models.Log.objects">(logs.models.Log attribute)</a>
+</li>
+        <li><a href="notifications.html#notifications.models.InAppNotification.objects">(notifications.models.InAppNotification attribute)</a>
 </li>
         <li><a href="organisations.html#organisations.models.MemberOrganisation.objects">(organisations.models.MemberOrganisation attribute)</a>
 </li>
@@ -1726,12 +1776,14 @@
       </ul></li>
       <li><a href="payments.html#payments.apps.PaymentsConfig">PaymentsConfig (class in payments.apps)</a>
 </li>
-      <li><a href="accounts.html#accounts.models.User.pic">pic (accounts.models.User attribute)</a>
+      <li><a href="accounts.html#accounts.models.User.phone_regex">phone_regex (accounts.models.User attribute)</a>
 </li>
-      <li><a href="forums.html#forums.models.Post">Post (class in forums.models)</a>
+      <li><a href="accounts.html#accounts.models.User.pic">pic (accounts.models.User attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="forums.html#forums.models.Post">Post (class in forums.models)</a>
+</li>
       <li><a href="forums.html#forums.models.Comment1.post">post (forums.models.Comment1 attribute)</a>
 
       <ul>
@@ -1876,6 +1928,8 @@
       <li><a href="accounts.html#accounts.admin.UserAdmin.search_fields">search_fields (accounts.admin.UserAdmin attribute)</a>
 
       <ul>
+        <li><a href="notifications.html#notifications.admin.InAppNotificationAdmin.search_fields">(notifications.admin.InAppNotificationAdmin attribute)</a>
+</li>
         <li><a href="organisations.html#organisations.admin.OrganisationAdmin.search_fields">(organisations.admin.OrganisationAdmin attribute)</a>
 </li>
         <li><a href="payments.html#payments.admin.MemberTransactionAdmin.search_fields">(payments.admin.MemberTransactionAdmin attribute)</a>
@@ -1935,10 +1989,10 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_receipt_url">stripe_receipt_url (payments.models.StripeTransaction attribute)</a>
 </li>
-      <li><a href="payments.html#payments.models.StripeTransaction.stripe_reference">stripe_reference (payments.models.StripeTransaction attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="payments.html#payments.models.StripeTransaction.stripe_reference">stripe_reference (payments.models.StripeTransaction attribute)</a>
+</li>
       <li><a href="payments.html#payments.models.MemberTransaction.stripe_transaction">stripe_transaction (payments.models.MemberTransaction attribute)</a>
 
       <ul>
@@ -1963,12 +2017,8 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.MultipleObjectsReturned">StripeTransaction.MultipleObjectsReturned</a>
 </li>
-      <li><a href="accounts.html#accounts.models.User.stripetransaction_set">stripetransaction_set (accounts.models.User attribute)</a>
-
-      <ul>
-        <li><a href="organisations.html#organisations.models.Organisation.stripetransaction_set">(organisations.models.Organisation attribute)</a>
+      <li><a href="organisations.html#organisations.models.Organisation.stripetransaction_set">stripetransaction_set (organisations.models.Organisation attribute)</a>
 </li>
-      </ul></li>
       <li><a href="payments.html#payments.admin.StripeTransactionAdmin">StripeTransactionAdmin (class in payments.admin)</a>
 </li>
       <li><a href="logs.html#logs.models.Log.sub_source">sub_source (logs.models.Log attribute)</a>

@@ -1,3 +1,4 @@
-Statement changes
-Fixed profile pic upload
-Cancel auto top up
+Updated MP query
+Updated MP screen - remove provisional
+Added images to statement and link to the receipt
+Hide cancel on manual payment after payment goes through

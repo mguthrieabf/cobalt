@@ -189,35 +189,25 @@
 </div>
 <div class="section" id="module-notifications.admin">
 <span id="notifications-admin-module"></span><h2>notifications.admin module<a class="headerlink" href="#module-notifications.admin" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-notifications.apps">
-<span id="notifications-apps-module"></span><h2>notifications.apps module<a class="headerlink" href="#module-notifications.apps" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="notifications.apps.Notifications">
-<em class="property">class </em><code class="sig-prename descclassname">notifications.apps.</code><code class="sig-name descname">Notifications</code><a class="reference internal" href="_modules/notifications/apps.html#Notifications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.Notifications" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dt id="notifications.admin.InAppNotificationAdmin">
+<em class="property">class </em><code class="sig-prename descclassname">notifications.admin.</code><code class="sig-name descname">InAppNotificationAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/admin.html#InAppNotificationAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.admin.InAppNotificationAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code></p>
 <dl class="py method">
-<dt id="notifications.apps.Notifications.acknowledge_notification">
-<code class="sig-name descname">acknowledge_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/apps.html#Notifications.acknowledge_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.Notifications.acknowledge_notification" title="Permalink to this definition">¶</a></dt>
+<dt id="notifications.admin.InAppNotificationAdmin.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#notifications.admin.InAppNotificationAdmin.media" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="notifications.apps.Notifications.add_notification">
-<code class="sig-name descname">add_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">priority</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/apps.html#Notifications.add_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.Notifications.add_notification" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="notifications.apps.Notifications.get_notifications_for_user">
-<code class="sig-name descname">get_notifications_for_user</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/apps.html#Notifications.get_notifications_for_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.Notifications.get_notifications_for_user" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="notifications.apps.Notifications.get_stories_for_user">
-<code class="sig-name descname">get_stories_for_user</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/apps.html#Notifications.get_stories_for_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.Notifications.get_stories_for_user" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt id="notifications.admin.InAppNotificationAdmin.search_fields">
+<code class="sig-name descname">search_fields</code><em class="property"> = ('member',)</em><a class="headerlink" href="#notifications.admin.InAppNotificationAdmin.search_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="module-notifications.apps">
+<span id="notifications-apps-module"></span><h2>notifications.apps module<a class="headerlink" href="#module-notifications.apps" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="notifications.apps.NotificationsConfig">
 <em class="property">class </em><code class="sig-prename descclassname">notifications.apps.</code><code class="sig-name descname">NotificationsConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_name</span></em>, <em class="sig-param"><span class="n">app_module</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/apps.html#NotificationsConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.apps.NotificationsConfig" title="Permalink to this definition">¶</a></dt>
@@ -232,12 +222,127 @@
 </div>
 <div class="section" id="module-notifications.models">
 <span id="notifications-models-module"></span><h2>notifications.models module<a class="headerlink" href="#module-notifications.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="notifications.models.InAppNotification">
+<em class="property">class </em><code class="sig-prename descclassname">notifications.models.</code><code class="sig-name descname">InAppNotification</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/models.html#InAppNotification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.models.InAppNotification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<p>Temporary storage for notification messages.</p>
+<p>Stores any event that a Cobalt module wants to notify a user about.</p>
+<dl class="py exception">
+<dt id="notifications.models.InAppNotification.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#notifications.models.InAppNotification.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="notifications.models.InAppNotification.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#notifications.models.InAppNotification.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.acknowledged">
+<code class="sig-name descname">acknowledged</code><a class="headerlink" href="#notifications.models.InAppNotification.acknowledged" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.created_date">
+<code class="sig-name descname">created_date</code><a class="headerlink" href="#notifications.models.InAppNotification.created_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="notifications.models.InAppNotification.get_next_by_created_date">
+<code class="sig-name descname">get_next_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#notifications.models.InAppNotification.get_next_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="notifications.models.InAppNotification.get_previous_by_created_date">
+<code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#notifications.models.InAppNotification.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#notifications.models.InAppNotification.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.link">
+<code class="sig-name descname">link</code><a class="headerlink" href="#notifications.models.InAppNotification.link" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.member">
+<code class="sig-name descname">member</code><a class="headerlink" href="#notifications.models.InAppNotification.member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.member_id">
+<code class="sig-name descname">member_id</code><a class="headerlink" href="#notifications.models.InAppNotification.member_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.message">
+<code class="sig-name descname">message</code><a class="headerlink" href="#notifications.models.InAppNotification.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="notifications.models.InAppNotification.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#notifications.models.InAppNotification.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-notifications.tests">
 <span id="notifications-tests-module"></span><h2>notifications.tests module<a class="headerlink" href="#module-notifications.tests" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-notifications.views">
 <span id="notifications-views-module"></span><h2>notifications.views module<a class="headerlink" href="#module-notifications.views" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>Notifications handles messages that Cobalt applications wish to pass to</dt><dd><p>users.</p>
+<p>See <a class="reference external" href="./notifications_overview.html">Notifications Overview</a> for more details.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt id="notifications.views.acknowledge__in_app_notification">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">acknowledge__in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#acknowledge__in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.acknowledge__in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.add_in_app_notification">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">add_in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#add_in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.add_in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.delete__in_app_notification">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">delete__in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#delete__in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.delete__in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.get_notifications_for_user">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">get_notifications_for_user</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#get_notifications_for_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.get_notifications_for_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-notifications">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-notifications" title="Permalink to this headline">¶</a></h2>

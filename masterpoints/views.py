@@ -53,6 +53,7 @@ def masterpoints_detail(request, system_number=None):
 # Get the detail list of recent activity
    qry = '%s/mpdetail/%s/postingyear/%s/postingmonth/%s' % \
         (GLOBAL_MPSERVER, system_number, year, month)
+   print(qry)
    details = requests.get(qry).json()
 
    counter = summary['TotalMPs'] # we need to construct the balance to show

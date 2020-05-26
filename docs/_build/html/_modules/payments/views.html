@@ -175,19 +175,21 @@
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">stripe</span>
-<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
 <span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
 <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">transaction</span>
 <span class="kn">from</span> <span class="nn">easy_pdf.rendering</span> <span class="kn">import</span> <span class="n">render_to_pdf_response</span>
 <span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">log_event</span>
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="p">(</span><span class="n">STRIPE_SECRET_KEY</span><span class="p">,</span>
                              <span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">,</span>
-                             <span class="n">AUTO_TOP_UP_DEFAULT_AMT</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TestTransaction</span><span class="p">,</span> <span class="n">MemberTransfer</span>
-<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">payment_api</span><span class="p">,</span> <span class="n">update_account</span><span class="p">,</span> <span class="n">get_balance</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span>
+                             <span class="n">AUTO_TOP_UP_DEFAULT_AMT</span><span class="p">,</span> <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TestTransaction</span><span class="p">,</span> <span class="n">MemberTransfer</span><span class="p">,</span> <span class="n">ManualTopup</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">payment_api</span><span class="p">,</span> <span class="n">update_account</span><span class="p">,</span> <span class="n">get_balance</span><span class="p">,</span> <span class="n">auto_topup_member</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">StripeTransaction</span>
+<span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 
 <span class="c1">####################</span>
 <span class="c1"># Home             #</span>
@@ -283,10 +285,10 @@
         <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
 
     <span class="c1"># get auto top up</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span><span class="p">:</span>
-        <span class="n">auto_button</span> <span class="o">=</span> <span class="s2">&quot;Auto Top Up Enabled&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
+        <span class="n">auto_button</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">auto_button</span> <span class="o">=</span> <span class="s2">&quot;Add Auto Top Up&quot;</span>
+        <span class="n">auto_button</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">events_list</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)</span>
 
@@ -344,16 +346,23 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-d</span><span class="s1"> %B %Y at %I:%H:%M&#39;</span><span class="p">)</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;text/csv&#39;</span><span class="p">)</span>
     <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;statement.csv&quot;&#39;</span>
 
     <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">])</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Reference&#39;</span><span class="p">,</span> <span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">,</span> <span class="s1">&#39;Balance&#39;</span><span class="p">])</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span> <span class="n">today</span><span class="p">])</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Counterparty&#39;</span><span class="p">,</span> <span class="s1">&#39;Reference&#39;</span><span class="p">,</span> <span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Amount&#39;</span><span class="p">,</span> <span class="s1">&#39;Balance&#39;</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">events_list</span><span class="p">:</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">reference_no</span><span class="p">,</span>
+        <span class="n">counterparty</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">other_member</span><span class="p">:</span>
+            <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">other_member</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">organisation</span><span class="p">:</span>
+            <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">organisation</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span> <span class="n">counterparty</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">reference_no</span><span class="p">,</span>
                          <span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">balance</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">response</span></div>
@@ -376,7 +385,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
 
-    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%-m %B %Y&#39;</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-d</span><span class="s1"> %B %Y&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render_to_pdf_response</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/statement_pdf.html&#39;</span><span class="p">,</span>
                                   <span class="p">{</span>
@@ -512,43 +521,13 @@
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
-                <span class="c1"># Money in</span>
-                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
-                               <span class="n">other_member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                               <span class="n">amount</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
-                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Received </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
-                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer In&quot;</span>
-                               <span class="p">)</span>
-                <span class="c1"># Money out</span>
-                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                               <span class="n">other_member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
-                               <span class="n">amount</span><span class="o">=-</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
-                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Sent </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
-                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer Out&quot;</span>
-                               <span class="p">)</span>
-
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer_successful.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;member_transfer - about to call&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">payment_api</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                        <span class="n">amount</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span> <span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                        <span class="n">other_member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
+                        <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Pay a Friend&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
-
     <span class="k">else</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
@@ -559,7 +538,13 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
 
+    <span class="n">recents</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">other_member</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;other_member&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+    <span class="n">recent_transfer_to</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">recents</span><span class="p">:</span>
+        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;other_member&#39;</span><span class="p">])</span>
+        <span class="n">recent_transfer_to</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                                                             <span class="s1">&#39;recents&#39;</span><span class="p">:</span> <span class="n">recent_transfer_to</span><span class="p">,</span>
                                                              <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
 
 <span class="c1">########################</span>
@@ -603,57 +588,63 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ManualTopup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
-                <span class="c1"># Money in</span>
-                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
-                               <span class="n">other_member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                               <span class="n">amount</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
-                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Received </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
-                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer In&quot;</span>
-                               <span class="p">)</span>
-                <span class="c1"># Money out</span>
-                <span class="n">update_account</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                               <span class="n">other_member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">],</span>
-                               <span class="n">amount</span><span class="o">=-</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                               <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
-                               <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Member Payment Sent </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) $</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                               <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span>
-                                <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]),</span>
-                               <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-                               <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;member_transfer&quot;</span><span class="p">,</span>
-                               <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Transfer Out&quot;</span>
-                               <span class="p">)</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;card_choice&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Existing&quot;</span><span class="p">:</span>  <span class="c1"># Use Auto</span>
+                <span class="p">(</span><span class="n">return_code</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="o">=</span> <span class="n">auto_topup_member</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                     <span class="n">topup_required</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
+                                     <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Manual Top Up&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>  <span class="c1"># success</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
+                                     <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-success&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;dashboard&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span> <span class="c1"># error</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
+                                   <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-error&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Use Manual</span>
+                <span class="n">trans</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="p">()</span>
+                <span class="n">trans</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Manual Top Up&quot;</span>
+                <span class="n">trans</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span>
+                <span class="n">trans</span><span class="o">.</span><span class="n">member</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+                <span class="n">trans</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Manual Top Up - Checkout&quot;</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/checkout.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;trans&#39;</span><span class="p">:</span> <span class="n">trans</span><span class="p">,</span>
+                                                                  <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     print(form.errors)</span>
 
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">],</span>
-                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span>
-                                     <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;transfer_to&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer_successful.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ManualTopup</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/manual_topup.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+<span class="c1">######################</span>
+<span class="c1"># cancel_auto_top_up #</span>
+<span class="c1">######################</span>
+<div class="viewcode-block" id="cancel_auto_top_up"><a class="viewcode-back" href="../../payments.html#payments.views.cancel_auto_top_up">[docs]</a><span class="k">def</span> <span class="nf">cancel_auto_top_up</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Cancel auto top up.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stop_auto&quot;</span><span class="p">):</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Auto top up disabled&quot;</span><span class="p">,</span>
+                          <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-success&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;payments:payments&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;payments:payments&quot;</span><span class="p">)</span>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">MemberTransfer</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
-
-    <span class="c1"># get balance</span>
-    <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
-        <span class="n">balance</span> <span class="o">=</span> <span class="n">last_tran</span><span class="o">.</span><span class="n">balance</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
-
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/member_transfer.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
-                                                             <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/cancel_autotopup.html&#39;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -279,7 +279,7 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 </dl>
 <dl class="py function">
 <dt id="payments.core.auto_topup_member">
-<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">auto_topup_member</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">topup_required</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#auto_topup_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.auto_topup_member" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">auto_topup_member</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">topup_required</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payment_type</span><span class="o">=</span><span class="default_value">'Auto Top Up'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#auto_topup_member"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.auto_topup_member" title="Permalink to this definition">¶</a></dt>
 <dd><p>process an auto top up for a member.</p>
 <p>Internal function to handle a member needing to process an auto top up.
 This function deals with successful top ups and failed top ups. For
@@ -289,7 +289,10 @@ the calling functions problem to handle the consequences of the non-payment.</p>
 <dt>Args:</dt><dd><p>member - a User object.
 topup_required - the amount of the top up (optional). This is required
 if the payment is larger than the top up amount. e.g. balance is 25,
-top up amount is 50, payment is 300.</p>
+top up amount is 50, payment is 300.
+payment_type - defaults to Auto Top Up. We allow this to be overriden
+so that a member manually topping up their account using their registered
+auto top up card get the payment type of Manual Top Up on their statement.</p>
 </dd>
 <dt>Returns:</dt><dd><p>return_code - True for success, False for failure
 message - explanation</p>
@@ -345,7 +348,7 @@ status - Success (default) or Failure. Did the payment work or not.</p>
 
 <dl class="py function">
 <dt id="payments.core.payment_api">
-<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">payment_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payment_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#payment_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.payment_api" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">payment_api</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">route_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">route_payload</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_member</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payment_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">url</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#payment_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.payment_api" title="Permalink to this definition">¶</a></dt>
 <dd><p>API for payments from other parts of the application.</p>
 <p>There is a user on the end of this who needs to know what is happening,
 so we return a page that tells them. It could be:</p>
@@ -363,6 +366,9 @@ as there is no way to return control to the application after payments is
 done. Note: This would be possible if required.</p>
 <p>amount is the amount to be deducted from the users account. A positive
 amount is a charge, a negative amount is an incoming payment.</p>
+<p>We accept either organisation as the counterpart for this payment or
+other_member. We must have either an organisation or a member, but
+we can’t pay to both.</p>
 <dl class="simple">
 <dt>args:</dt><dd><p>request - standard request object
 description - text description of the payment
@@ -371,6 +377,7 @@ member - User object related to the payment
 route_code - code to map to a callback
 route_payload - value to retirn on completion
 organisation - linked organisation
+other_member - User object
 log_msg - message for the log
 payment_type - description of payment
 url - next url to go to</p>
@@ -485,7 +492,7 @@ MemberTransaction.</p></li>
 <dt id="payments.core.stripe_webhook_autosetup">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook_autosetup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook_autosetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook_autosetup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles auto top up setup events from Stripe webhook</p>
-<p>Called by stripe_webhook to look after sucessful incoming auto top up set ups.</p>
+<p>Called by stripe_webhook to look after successful incoming auto top up set ups.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>event - the event payload from Stripe</p>
 </dd>
@@ -548,6 +555,39 @@ organisation - linked organisation (optional)</p>
 <span id="payments-forms-module"></span><h2>payments.forms module<a class="headerlink" href="#module-payments.forms" title="Permalink to this headline">¶</a></h2>
 <p>Payment forms with validation</p>
 <dl class="py class">
+<dt id="payments.forms.ManualTopup">
+<em class="property">class </em><code class="sig-prename descclassname">payments.forms.</code><code class="sig-name descname">ManualTopup</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">field_order=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#ManualTopup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.ManualTopup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.forms.Form</span></code></p>
+<p>Manual top up form</p>
+<dl class="py attribute">
+<dt id="payments.forms.ManualTopup.CARD_CHOICES">
+<code class="sig-name descname">CARD_CHOICES</code><em class="property"> = [('Existing', 'Use Registered Card'), ('Another', 'Use Another Card')]</em><a class="headerlink" href="#payments.forms.ManualTopup.CARD_CHOICES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.ManualTopup.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'card_choice': &lt;django.forms.fields.ChoiceField object&gt;}</em><a class="headerlink" href="#payments.forms.ManualTopup.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.ManualTopup.clean">
+<code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#ManualTopup.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.ManualTopup.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>validation for the amount field</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.forms.ManualTopup.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'card_choice': &lt;django.forms.fields.ChoiceField object&gt;}</em><a class="headerlink" href="#payments.forms.ManualTopup.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="payments.forms.ManualTopup.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#payments.forms.ManualTopup.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="payments.forms.MemberTransfer">
 <em class="property">class </em><code class="sig-prename descclassname">payments.forms.</code><code class="sig-name descname">MemberTransfer</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#MemberTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.MemberTransfer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.forms.Form</span></code></p>
@@ -556,12 +596,6 @@ organisation - linked organisation (optional)</p>
 <dt id="payments.forms.MemberTransfer.base_fields">
 <code class="sig-name descname">base_fields</code><em class="property"> = {'amount': &lt;django.forms.fields.DecimalField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'transfer_to': &lt;django.forms.models.ModelChoiceField object&gt;}</em><a class="headerlink" href="#payments.forms.MemberTransfer.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt id="payments.forms.MemberTransfer.clean_amount">
-<code class="sig-name descname">clean_amount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/forms.html#MemberTransfer.clean_amount"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.forms.MemberTransfer.clean_amount" title="Permalink to this definition">¶</a></dt>
-<dd><p>validation for the amount field</p>
-</dd></dl>
 
 <dl class="py attribute">
 <dt id="payments.forms.MemberTransfer.declared_fields">
@@ -607,6 +641,18 @@ organisation - linked organisation (optional)</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">AbstractTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Common attributes for the other transaction classes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
+<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
+<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
+<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
+<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
+<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py class">
 <dt id="payments.models.AbstractTransaction.Meta">
 <em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction.Meta" title="Permalink to this definition">¶</a></dt>
@@ -682,6 +728,23 @@ object the first time, the query is executed.</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">MemberTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#MemberTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.MemberTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
 <p>Member Transactions. May have a linked transaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
+<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
+<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
+<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
+<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
+<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
+<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
+<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Member</p></li>
+<li><p><strong>stripe_transaction_id</strong> (ForeignKey to <a class="reference internal" href="#payments.models.StripeTransaction" title="payments.models.StripeTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">StripeTransaction</span></code></a>) – Stripe transaction</p></li>
+<li><p><strong>other_member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Other member</p></li>
+<li><p><strong>organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Organisation</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt id="payments.models.MemberTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.MemberTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -702,11 +765,6 @@ object the first time, the query is executed.</p>
 <dl class="py method">
 <dt id="payments.models.MemberTransaction.get_previous_by_created_date">
 <code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.MemberTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="payments.models.MemberTransaction.get_type_display">
-<code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.MemberTransaction.get_type_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -818,6 +876,23 @@ object the first time, the query is executed.</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">OrganisationTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#OrganisationTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.OrganisationTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
 <p>Organisation transactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
+<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
+<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
+<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
+<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
+<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
+<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
+<li><p><strong>organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Organisation</p></li>
+<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Member</p></li>
+<li><p><strong>stripe_transaction_id</strong> (ForeignKey to <a class="reference internal" href="#payments.models.StripeTransaction" title="payments.models.StripeTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">StripeTransaction</span></code></a>) – Stripe transaction</p></li>
+<li><p><strong>other_organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Other organisation</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt id="payments.models.OrganisationTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.OrganisationTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -838,11 +913,6 @@ object the first time, the query is executed.</p>
 <dl class="py method">
 <dt id="payments.models.OrganisationTransaction.get_previous_by_created_date">
 <code class="sig-name descname">get_previous_by_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.OrganisationTransaction.get_previous_by_created_date" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="payments.models.OrganisationTransaction.get_type_display">
-<code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#payments.models.OrganisationTransaction.get_type_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -956,6 +1026,34 @@ object the first time, the query is executed.</p>
 <p>Our record of Stripe transactions.</p>
 <p>Only stores basic information, for the full details use the
 stripe_reference to look up the transaction in Stripe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
+<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – User object associated with this transaction</p></li>
+<li><p><strong>description</strong> (<em>CharField</em>) – Description</p></li>
+<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
+<li><p><strong>status</strong> (<em>CharField</em>) – Status</p></li>
+<li><p><strong>stripe_reference</strong> (<em>CharField</em>) – Stripe payment intent</p></li>
+<li><p><strong>stripe_method</strong> (<em>CharField</em>) – Stripe payment method</p></li>
+<li><p><strong>stripe_currency</strong> (<em>CharField</em>) – Card native currency</p></li>
+<li><p><strong>stripe_receipt_url</strong> (<em>CharField</em>) – Receipt url</p></li>
+<li><p><strong>stripe_brand</strong> (<em>CharField</em>) – Card brand</p></li>
+<li><p><strong>stripe_country</strong> (<em>CharField</em>) – Card country</p></li>
+<li><p><strong>stripe_exp_month</strong> (<em>IntegerField</em>) – Card expiry month</p></li>
+<li><p><strong>stripe_exp_year</strong> (<em>IntegerField</em>) – Card expiry year</p></li>
+<li><p><strong>stripe_last4</strong> (<em>CharField</em>) – Card last 4 digits</p></li>
+<li><p><strong>route_code</strong> (<em>CharField</em>) – Internal routing code for callback</p></li>
+<li><p><strong>route_payload</strong> (<em>CharField</em>) – Payload to return to callback</p></li>
+<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Creation date</p></li>
+<li><p><strong>last_change_date</strong> (<em>DateTimeField</em>) – Last update date</p></li>
+<li><p><strong>linked_organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Linked organisation</p></li>
+<li><p><strong>linked_member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Linked member</p></li>
+<li><p><strong>linked_transaction_type</strong> (<em>CharField</em>) – Linked transaction type</p></li>
+<li><p><strong>linked_amount</strong> (<em>DecimalField</em>) – Linked amount</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt id="payments.models.StripeTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.StripeTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -1036,6 +1134,19 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.linked_amount">
 <code class="sig-name descname">linked_amount</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_amount" title="Permalink to this definition">¶</a></dt>
+<dd><p>linked amount can be different to amount if the member had some money in their account already</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_member">
+<code class="sig-name descname">linked_member</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>A stripe payment can be linked to a payment to an organisation or
+to a member, but not both</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="payments.models.StripeTransaction.linked_member_id">
+<code class="sig-name descname">linked_member_id</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_member_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -1043,14 +1154,8 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.linked_organisation">
 <code class="sig-name descname">linked_organisation</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_organisation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+<dd><p>A stripe payment can be linked to a payment to an organisation or
+to a member, but not both</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1063,8 +1168,9 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.linked_transaction_type">
 <code class="sig-name descname">linked_transaction_type</code><a class="headerlink" href="#payments.models.StripeTransaction.linked_transaction_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Type of the transaction that we are linked to. This is payload on
+StripeTransaction that is used to create the linked MemberTransaction or
+OrganisationTransaction record.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1236,6 +1342,18 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 </ul>
 </dd>
 </dl>
+<dl class="py function">
+<dt id="payments.views.cancel_auto_top_up">
+<code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">cancel_auto_top_up</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#cancel_auto_top_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.cancel_auto_top_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cancel auto top up.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object</p>
+</dd>
+<dt>Returns:</dt><dd><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt id="payments.views.home">
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">home</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#home"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.home" title="Permalink to this definition">¶</a></dt>

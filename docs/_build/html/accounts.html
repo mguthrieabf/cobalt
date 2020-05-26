@@ -226,14 +226,18 @@
 </div>
 <div class="section" id="module-accounts.backend">
 <span id="accounts-backend-module"></span><h2>accounts.backend module<a class="headerlink" href="#module-accounts.backend" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the login function. This is customised to allow
+users to login using either their email address or system_number.</p>
 <dl class="py class">
 <dt id="accounts.backend.CobaltBackend">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.backend.</code><code class="sig-name descname">CobaltBackend</code><a class="reference internal" href="_modules/accounts/backend.html#CobaltBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.backend.CobaltBackend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.backends.ModelBackend</span></code></p>
+<p>Custom backend to control user logins.</p>
 <dl class="py method">
 <dt id="accounts.backend.CobaltBackend.authenticate">
 <code class="sig-name descname">authenticate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">username</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">password</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/backend.html#CobaltBackend.authenticate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.backend.CobaltBackend.authenticate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>method to authenticate users</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -301,7 +305,7 @@
 
 <dl class="py attribute">
 <dt id="accounts.forms.UserRegisterForm.base_fields">
-<code class="sig-name descname">base_fields</code><em class="property"> = {'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.IntegerField object&gt;, 'password1': &lt;django.forms.fields.CharField object&gt;, 'password2': &lt;django.forms.fields.CharField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserRegisterForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">base_fields</code><em class="property"> = {'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.CharField object&gt;, 'password1': &lt;django.forms.fields.CharField object&gt;, 'password2': &lt;django.forms.fields.CharField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserRegisterForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -326,7 +330,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt id="accounts.forms.UserUpdateForm.Meta.fields">
-<code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name', 'auto_amount', 'stripe_customer_id']</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name', 'auto_amount', 'stripe_auto_confirmed']</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -339,7 +343,7 @@
 
 <dl class="py attribute">
 <dt id="accounts.forms.UserUpdateForm.base_fields">
-<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'auto_amount': &lt;django.forms.fields.IntegerField object&gt;, 'bbo_name': &lt;django.forms.fields.CharField object&gt;, 'dob': &lt;django.forms.fields.DateField object&gt;, 'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'headline': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.IntegerField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;, 'stripe_customer_id': &lt;django.forms.fields.CharField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'auto_amount': &lt;django.forms.fields.IntegerField object&gt;, 'bbo_name': &lt;django.forms.fields.CharField object&gt;, 'dob': &lt;django.forms.fields.DateField object&gt;, 'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'headline': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.CharField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;, 'stripe_auto_confirmed': &lt;django.forms.fields.NullBooleanField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -357,6 +361,7 @@
 </div>
 <div class="section" id="module-accounts.models">
 <span id="accounts-models-module"></span><h2>accounts.models module<a class="headerlink" href="#module-accounts.models" title="Permalink to this headline">¶</a></h2>
+<p>Models for our definitions of a user within the system.</p>
 <dl class="py class">
 <dt id="accounts.models.User">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.models.</code><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/models.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.models.User" title="Permalink to this definition">¶</a></dt>
@@ -484,6 +489,21 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.inappnotification_set">
+<code class="sig-name descname">inappnotification_set</code><a class="headerlink" href="#accounts.models.User.inappnotification_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.likecomment1_set">
 <code class="sig-name descname">likecomment1_set</code><a class="headerlink" href="#accounts.models.User.likecomment1_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
@@ -529,8 +549,38 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.linked_member">
+<code class="sig-name descname">linked_member</code><a class="headerlink" href="#accounts.models.User.linked_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.logentry_set">
 <code class="sig-name descname">logentry_set</code><a class="headerlink" href="#accounts.models.User.logentry_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.main_member">
+<code class="sig-name descname">main_member</code><a class="headerlink" href="#accounts.models.User.main_member" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -596,6 +646,11 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.phone_regex">
+<code class="sig-name descname">phone_regex</code><em class="property"> = &lt;django.core.validators.RegexValidator object&gt;</em><a class="headerlink" href="#accounts.models.User.phone_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.pic">
 <code class="sig-name descname">pic</code><a class="headerlink" href="#accounts.models.User.pic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Just like the FileDescriptor, but for ImageFields. The only difference is
@@ -644,21 +699,6 @@ object the first time, the query is executed.</p>
 <code class="sig-name descname">stripe_customer_id</code><a class="headerlink" href="#accounts.models.User.stripe_customer_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="accounts.models.User.stripetransaction_set">
-<code class="sig-name descname">stripetransaction_set</code><a class="headerlink" href="#accounts.models.User.stripetransaction_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -729,50 +769,130 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </div>
 <div class="section" id="module-accounts.views">
 <span id="accounts-views-module"></span><h2>accounts.views module<a class="headerlink" href="#module-accounts.views" title="Permalink to this headline">¶</a></h2>
+<p>Handles all activities associated with user accounts.</p>
+<p>This module handles all of the functions relating to users such as creating
+accounts, resetting passwords, searches. profiles etc.</p>
 <dl class="py function">
 <dt id="accounts.views.activate">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">activate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">uidb64</span></em>, <em class="sig-param"><span class="n">token</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#activate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.activate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>User activation form</p>
+<p>This is the link sent to the user over email. If the link is valid, then
+the user is logged in, otherwise they are notified that the link is not
+valid.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object
+uidb64 - encrypted user id
+token - generated token</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.blurb_form_upload">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">blurb_form_upload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#blurb_form_upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.blurb_form_upload" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Profile update sub-form. Handles the picture and about fields.</p>
+<p>Allows a user to change their profile settings.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.change_password">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">change_password</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#change_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.change_password" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Password change form</p>
+<p>Allows a user to change their password.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.loggedout">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">loggedout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#loggedout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.loggedout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Should review if this is really needed.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.member_detail_ajax">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">member_detail_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#member_detail_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.member_detail_ajax" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns basic public info on a member</p>
+<p>Ajax call to get basic info on a member. Will return an empty json array
+if the member number is invalid.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>member_id - member number</p>
+</dd>
+<dt>Returns:</dt><dd><p>Json array: member, clubs,  global org name.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.profile">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.profile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Profile update form.</p>
+<p>Allows a user to change their profile settings.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.public_profile">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">public_profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#public_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.public_profile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Public Profile form.</p>
+<p>Shows public information about a member.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object
+pk - key of User</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.register">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.register" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>User registration form</p>
+<p>This form allows a user to register for the system. The form includes
+Ajax code to look up the system number and pre-fill the first and last name.</p>
+<p>This form also sends the email to the user to confirm the email address
+is valid.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>request - standard request object</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="accounts.views.search_ajax">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">search_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#search_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.search_ajax" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Ajax member search function.</p>
+<p>Used to search for members by the Member to Member transfer part of Payments.
+Currently very specific to payments. Could be made more generic if other
+parts of the system need a search function.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>lastname - partial lastname to search for. Wild cards the ending.
+firstname - partial firstname to search for. Wild cards the ending.</p>
+</dd>
+<dt>Returns:</dt><dd><p>HttpResponse - either a message or a list of users in HTML format.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-accounts">

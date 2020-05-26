@@ -44,8 +44,6 @@ from cobalt.settings import (STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
 from .models import (StripeTransaction, MemberTransaction,
                      OrganisationTransaction)
 
-
-#TODO: Complete doco
 #######################
 # get_balance_detail  #
 #######################

@@ -199,6 +199,7 @@
 <span class="c1"># Get the detail list of recent activity</span>
    <span class="n">qry</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/mpdetail/</span><span class="si">%s</span><span class="s1">/postingyear/</span><span class="si">%s</span><span class="s1">/postingmonth/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
         <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">system_number</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
+   <span class="nb">print</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span>
    <span class="n">details</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
    <span class="n">counter</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;TotalMPs&#39;</span><span class="p">]</span> <span class="c1"># we need to construct the balance to show</span>
