@@ -429,11 +429,6 @@ def payment_api(request, description, amount, member, route_code=None,
                     n = int(min_required_amt / member.auto_amount) + 1
                     topup_required = member.auto_amount * n
 
-                    (n + 1) * tu + balance_after > low_limit
-                    n * tu + balance_after < low_limit
-
-
-
                     print("top up required: %s" % topup_required)
 
             else: # not below auto limit, but insufficient funds - use largest of amt and auto

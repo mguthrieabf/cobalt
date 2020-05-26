@@ -48,44 +48,127 @@ class StripeTransaction(models.Model):
         ('Failed', 'Failed - payment failed'),
     ]
 
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                               on_delete=models.SET_NULL, related_name="main_member")
-    description = models.CharField("Description", max_length=100)
-    amount = models.DecimalField("Amount", max_digits=8, decimal_places=2)
-    status = models.CharField("Status", max_length=9,
-                              choices=TRANSACTION_STATUS, default='Initiated')
-    stripe_reference = models.CharField("Stripe Payment Intent", blank=True,
-                                        null=True, max_length=40)
-    stripe_method = models.CharField("Stripe Payment Method", blank=True,
-                                     null=True, max_length=40)
-    stripe_currency = models.CharField("Card Native Currency", blank=True,
-                                       null=True, max_length=3)
-    stripe_receipt_url = models.CharField("Receipt URL", blank=True, null=True,
-                                          max_length=200)
-    stripe_brand = models.CharField("Card brand", blank=True, null=True, max_length=10)
-    stripe_country = models.CharField("Card Country", blank=True, null=True, max_length=5)
-    stripe_exp_month = models.IntegerField("Card Expiry Month", blank=True, null=True)
-    stripe_exp_year = models.IntegerField("Card Expiry Year", blank=True, null=True)
-    stripe_last4 = models.CharField("Card Last 4 Digits", blank=True, null=True, max_length=4)
-    route_code = models.CharField("Internal routing code for callback", blank=True,
-                                  null=True, max_length=4)
-    route_payload = models.CharField("Payload to return to callback", blank=True,
-                                     null=True, max_length=40)
-    created_date = models.DateTimeField("Creation Date", default=timezone.now)
-    last_change_date = models.DateTimeField("Last Update Date", default=timezone.now)
+    member = models.ForeignKey(settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="main_member"
+    )
+
+    description = models.CharField("Description",
+        max_length=100
+    )
+
+    amount = models.DecimalField("Amount",
+        max_digits=8,
+        decimal_places=2
+
+    )
+    status = models.CharField("Status",
+        max_length=9,
+        choices=TRANSACTION_STATUS,
+        default='Initiated'
+    )
+
+    stripe_reference = models.CharField("Stripe Payment Intent",
+        blank=True,
+        null=True,
+        max_length=40
+    )
+
+    stripe_method = models.CharField("Stripe Payment Method",
+        blank=True,
+        null=True,
+        max_length=40
+    )
+
+    stripe_currency = models.CharField("Card Native Currency",
+        blank=True,
+        null=True,
+        max_length=3
+    )
+
+    stripe_receipt_url = models.CharField("Receipt URL",
+        blank=True,
+        null=True,
+        max_length=200
+    )
+
+    stripe_brand = models.CharField("Card brand",
+        blank=True,
+        null=True,
+        max_length=10
+    )
+
+    stripe_country = models.CharField("Card Country",
+        blank=True,
+        null=True,
+        max_length=5
+    )
+
+    stripe_exp_month = models.IntegerField("Card Expiry Month",
+        blank=True,
+        null=True
+    )
+
+    stripe_exp_year = models.IntegerField("Card Expiry Year",
+        blank=True,
+        null=True
+    )
+
+    stripe_last4 = models.CharField("Card Last 4 Digits",
+        blank=True,
+        null=True,
+        max_length=4
+    )
+    route_code = models.CharField("Internal routing code for callback",
+        blank=True,
+        null=True,
+        max_length=4
+    )
+
+    route_payload = models.CharField("Payload to return to callback",
+        blank=True,
+        null=True,
+        max_length=40
+    )
+
+    created_date = models.DateTimeField("Creation Date",
+        default=timezone.now
+    )
+
+    last_change_date = models.DateTimeField("Last Update Date",
+        default=timezone.now
+    )
 
     """ A stripe payment can be linked to a payment to an organisation or
     to a member, but not both """
-    linked_organisation = models.ForeignKey(Organisation, blank=True, null=True,
-                                            on_delete=models.SET_NULL)
-    linked_member = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                         on_delete=models.SET_NULL, related_name="linked_member")
+    linked_organisation = models.ForeignKey(Organisation,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL
+    )
 
-    linked_transaction_type = models.CharField("Linked Transaction Type", blank=True,
-                                               null=True, max_length=20)
+    linked_member = models.ForeignKey(settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="linked_member"
+    )
+
+    linked_transaction_type = models.CharField("Linked Transaction Type",
+        blank=True,
+        null=True,
+        max_length=20
+    )
+
     """linked amount can be different to amount if the member had some money in their account already"""
-    linked_amount = models.DecimalField("Linked Amount", blank=True, null=True,
-                                        max_digits=12, decimal_places=2)
+    linked_amount = models.DecimalField("Linked Amount",
+        blank=True,
+        null=True,
+        max_digits=12,
+        decimal_places=2
+    )
 
     def __str__(self):
         return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
@@ -95,9 +178,20 @@ class StripeTransaction(models.Model):
 class AbstractTransaction(models.Model):
     """ Common attributes for the other transaction classes """
 
-    created_date = models.DateTimeField("Create Date", default=timezone.now)
-    amount = models.DecimalField("Amount", max_digits=12, decimal_places=2)
-    balance = models.DecimalField("Balance After Transaction", max_digits=12, decimal_places=2)
+    created_date = models.DateTimeField("Create Date",
+        default=timezone.now
+    )
+
+    amount = models.DecimalField("Amount",
+        max_digits=12,
+        decimal_places=2
+    )
+
+    balance = models.DecimalField("Balance After Transaction",
+        max_digits=12,
+        decimal_places=2
+    )
+    
     description = models.CharField("Transaction Description", blank=True, null=True, max_length=80)
     reference_no = models.CharField("Reference No", max_length=14, blank=True, null=True)
     type = models.CharField("Transaction Type", choices=TRANSACTION_TYPE, max_length=20)
