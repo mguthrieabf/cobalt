@@ -473,7 +473,10 @@ def manual_topup(request):
     else:
         form = ManualTopup()
 
-    return render(request, 'payments/manual_topup.html', {'form': form})
+    balance = get_balance(request.user)
+
+    return render(request, 'payments/manual_topup.html', {'form': form,
+                                                          'balance': balance})
 
 ######################
 # cancel_auto_top_up #

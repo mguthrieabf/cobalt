@@ -507,11 +507,28 @@ def payment_api(request, description, amount, member, route_code=None,
             trans.linked_transaction_type = payment_type
             trans.save()
 
-            msg = "Payment for: " + description
-            if balance > 0.0:
-                msg = "Partial payment for: %s. <br>Also using your current balance \
-                      of %s%.2f to make total payment of %s%.2f." % (description,
-                      GLOBAL_CURRENCY_SYMBOL, balance, GLOBAL_CURRENCY_SYMBOL, amount)
+            if other_member: # transfer to another member
+                if balance > 0.0:
+                    msg = "Partial payment for transfer to %s (%s). <br>\
+                           Also using your current balance \
+                           of %s%.2f to make total payment of %s%.2f." % (
+                           other_member, description,
+                           GLOBAL_CURRENCY_SYMBOL, balance,
+                           GLOBAL_CURRENCY_SYMBOL, amount)
+                else:
+                    msg = "Payment to %s (%s)" % (other_member, description)
+
+            else:
+                if balance > 0.0:
+                    msg = "Partial payment for %s. <br>\
+                           Also using your current balance \
+                           of %s%.2f to make total payment of %s%.2f." % (
+                           description,
+                           GLOBAL_CURRENCY_SYMBOL, balance,
+                           GLOBAL_CURRENCY_SYMBOL, amount)
+                else:
+                    msg = "Payment for: " + description
+
             return render(request, 'payments/checkout.html', {'trans': trans,
                                                               'msg': msg})
 

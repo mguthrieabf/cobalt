@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 {% block header %}
 <link href="{% static "payments/css/normalize.css" %}" rel="stylesheet" />
 <link href="{% static "payments/css/stripe-global.css" %}" rel="stylesheet" />
@@ -37,7 +38,7 @@
         <div class="card-header card-header-primary">
           <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}</h3>
           <h5>Set Up Auto Top Up</h5>
-          <h5>Balance: ${{ balance }}</h5>
+          <h5>Balance: ${{ balance|floatformat:2|intcomma }}</h5>
         </div>
         <div class="card-body">
           <div id="cobalt-main-body">

@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 
 {% load widget_tweaks %}
+{% load humanize %}
 
 {% block content %}
 <div  class="container">
@@ -10,7 +11,7 @@
       <div class="card-header card-header-primary">
         <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}</h3>
         <h5>Transfer funds online to another member</h5>
-        <h5>Balance: ${{ balance }}</h5>
+        <h5>Balance: ${{ balance|floatformat:2|intcomma }}</h5>
       </div>
       <div class="card-body">
         <div class="container">

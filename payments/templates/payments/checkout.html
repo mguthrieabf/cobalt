@@ -12,33 +12,41 @@
 {% endblock %}
 
 {% block content %}
-
-<div align="center">
-  <div class="sr-main">
-    <h3 align="center">Credit Card Payment</h3>
-    <h4 align="center">{{ GLOBAL_CURRENCY_SYMBOL }}{{ trans.amount|floatformat:2|intcomma }}</h4>
-    <h5 align="center">{{ msg |safe }}</h5>
-    <form id="payment-form" class="sr-payment-form">
-      <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
-      <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
-      <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
-      <div class="sr-combo-inputs-row">
-        <div class="sr-input sr-card-element" id="card-element"></div>
+<div  class="container">
+  <div class="row justify-content-center">
+    <div class="card col-11 col-md-6">
+      <div class="card-header card-header-primary">
+        <h3 align="center">Credit Card Payment</h3>
+        <h5 align="center">{{ GLOBAL_CURRENCY_SYMBOL }}{{ trans.amount|floatformat:2|intcomma }}</h5>
+        <h5 align="center">{{ msg |safe }}</h5>
       </div>
-      <div class="sr-field-error" id="card-errors" role="alert"></div>
-      <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pay</span><span id="order-amount"></span>
-      </button>
-    </form>
-        <div id="cobalt-cancel-button">
-         <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+      <div class="card-body">
+        <div class="container">
+
+          <form id="payment-form" class="sr-payment-form">
+            <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
+            <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
+            <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
+            <div class="sr-combo-inputs-row">
+              <div class="sr-input sr-card-element" id="card-element"></div>
+            </div>
+            <div class="sr-field-error" id="card-errors" role="alert"></div>
+            <button class="btn btn-success" id="submit">
+              <div class="spinner hidden" id="spinner"></div>
+              <span id="button-text">Pay</span><span id="order-amount"></span>
+            </button>
+          </form>
+          <div id="cobalt-cancel-button">
+           <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+          </div>
+          <div class="sr-result hidden">
+            <p>Payment completed<br /></p>
+            <pre>
+              <code></code>
+            </pre>
+          </div>
         </div>
-    <div class="sr-result hidden">
-      <p>Payment completed<br /></p>
-      <pre>
-        <code></code>
-      </pre>
+      </div>
     </div>
   </div>
 </div>
