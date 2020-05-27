@@ -117,9 +117,9 @@ var showError = function(errorMsgText) {
   changeLoadingState(false);
   var errorMsg = document.querySelector(".sr-field-error");
   errorMsg.textContent = errorMsgText;
-  setTimeout(function() {
-    errorMsg.textContent = "";
-  }, 4000);
+  // setTimeout(function() {
+  //   errorMsg.textContent = "";
+  // }, 4000);
 };
 
 // Show a spinner on payment submission

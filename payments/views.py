@@ -350,7 +350,10 @@ def setup_autotopup(request):
     else:
         stripe_create_customer(request)
 
-    return render(request, 'payments/autotopup.html', {'warn': warn})
+    balance = get_balance(request.user)
+
+    return render(request, 'payments/autotopup.html', {'warn': warn,
+                                                        'balance': balance})
 
 
 #######################
@@ -451,7 +454,7 @@ def manual_topup(request):
                 if return_code:  # success
                     messages.success(request, msg,
                                      extra_tags='cobalt-message-success')
-                    return redirect("dashboard")
+                    return redirect("payments:payments")
                 else: # error
                     messages.error(request, msg,
                                    extra_tags='cobalt-message-error')

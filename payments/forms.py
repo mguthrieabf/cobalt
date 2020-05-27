@@ -40,21 +40,22 @@ class ManualTopup(forms.Form):
 
     def clean(self):
         """ validation for the amount field """
+        print("\n\nInside clean\n\n")
         cleaned_data = super(ManualTopup, self).clean()
         print(cleaned_data)
         if cleaned_data.get('amount'):
             amount = self.cleaned_data['amount']
-            print(amount)
-            if amount < 0:
-                self._errors['amount'] = "Negative amounts are not allowed"
-                if amount < AUTO_TOP_UP_MIN_AMT:
-                    raise forms.ValidationError("Too small. Must be at least %s%s" %
-                                                (GLOBAL_CURRENCY_SYMBOL,
-                                                 AUTO_TOP_UP_MIN_AMT))
-                if amount > AUTO_TOP_UP_MAX_AMT:
-                    raise forms.ValidationError("Too large. Maximum is %s%s" %
-                                                (GLOBAL_CURRENCY_SYMBOL,
-                                                 AUTO_TOP_UP_MAX_AMT))
+            if amount < AUTO_TOP_UP_MIN_AMT:
+                txt = "Insufficient amount. Minimum is %s%s" % (GLOBAL_CURRENCY_SYMBOL,
+                                                            AUTO_TOP_UP_MIN_AMT)
+                self._errors['amount'] = txt
+                raise forms.ValidationError(txt)
+            if amount > AUTO_TOP_UP_MAX_AMT:
+
+                txt = "Too large. Maximum is %s%s" % (GLOBAL_CURRENCY_SYMBOL,
+                                                      AUTO_TOP_UP_MAX_AMT)
+                self._errors['amount'] = txt
+                raise forms.ValidationError(txt)
         else:
             self._errors['amount'] = "Please enter a value"
 

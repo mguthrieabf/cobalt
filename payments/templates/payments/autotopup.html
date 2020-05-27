@@ -35,7 +35,9 @@
     <div class="row col-md-8">
       <div class="card">
         <div class="card-header card-header-primary">
-          <h1>Auto Top Up - {{ user.full_name}}</h1>
+          <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}</h3>
+          <h5>Set Up Auto Top Up</h5>
+          <h5>Balance: ${{ balance }}</h5>
         </div>
         <div class="card-body">
           <div id="cobalt-main-body">
@@ -94,7 +96,7 @@
                 </div>
               </div>
               <br>
-              <button id="cancel" name="cancel" class="btn btn-warning col-3" onclick="history.back();">Cancel</button>
+              <button id="cancel" name="cancel" class="btn btn-info col-3" onclick="history.back();">Cancel</button>
             </div>
           </div>
         </div>
