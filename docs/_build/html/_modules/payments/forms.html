@@ -186,21 +186,22 @@
 
 <div class="viewcode-block" id="ManualTopup.clean"><a class="viewcode-back" href="../../payments.html#payments.forms.ManualTopup.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; validation for the amount field &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Inside clean</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">cleaned_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ManualTopup</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">cleaned_data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">):</span>
             <span class="n">amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Negative amounts are not allowed&quot;</span>
-                <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="n">AUTO_TOP_UP_MIN_AMT</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Too small. Must be at least </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                                                <span class="p">(</span><span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
-                                                 <span class="n">AUTO_TOP_UP_MIN_AMT</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Too large. Maximum is </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                                                <span class="p">(</span><span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
-                                                 <span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="n">AUTO_TOP_UP_MIN_AMT</span><span class="p">:</span>
+                <span class="n">txt</span> <span class="o">=</span> <span class="s2">&quot;Insufficient amount. Minimum is </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
+                                                            <span class="n">AUTO_TOP_UP_MIN_AMT</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">txt</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">:</span>
+
+                <span class="n">txt</span> <span class="o">=</span> <span class="s2">&quot;Too large. Maximum is </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
+                                                      <span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">txt</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Please enter a value&quot;</span>
 

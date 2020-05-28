@@ -1,12 +1,11 @@
-{% autoescape off %}
-Hi {{ user.first_name }},
-
+<h1>Welcome {{ user.first_name }}</h1>
+<p>
 Thanks for signing up to the {{ org }} technology site.
-
+</p>
+<p>
 Please click on this link to confirm your registration:
-
+</p>
+<p>
 http://{{ domain }}/accounts/activate/{{ uid }}/{{ token }}
-
-{% endautoescape %}
-
+</p>
 The {{ org }} Technology Team.

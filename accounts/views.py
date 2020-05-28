@@ -21,6 +21,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
 import ipinfo
 from cobalt.settings import DEFAULT_FROM_EMAIL
+from notifications.views import send_cobalt_email
 from logs.views import get_client_ip, log_event
 from organisations.models import MemberOrganisation
 from .models import User
@@ -62,7 +63,9 @@ def register(request):
                 'token':account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
-            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
+
+#            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
+            send_cobalt_email(to_email, mail_subject, message)
             return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
     else:
         form = UserRegisterForm()

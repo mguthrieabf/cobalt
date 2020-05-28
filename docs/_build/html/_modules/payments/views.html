@@ -196,7 +196,15 @@
 <span class="c1">####################</span>
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../payments.html#payments.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Default page. &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Default page.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (HTTPRequest): Standard request object</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            httpResponse: webpage</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/home.html&#39;</span><span class="p">)</span></div>
 
@@ -251,15 +259,18 @@
 <span class="k">def</span> <span class="nf">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Member statement view - common part across online, pdf and csv</span>
 
+<span class="sd">    Handles the non-formatting parts of statements.</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        request - standard request object</span>
+<span class="sd">        request (str): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        summary - dict of basic info about user from MasterPoints</span>
-<span class="sd">        club - Home club name</span>
-<span class="sd">        balance - Users account Balance</span>
-<span class="sd">        auto_button - text for button (activated or press to setup)</span>
-<span class="sd">        events_list - list of Member Transactions</span>
+<span class="sd">        5-element tuple containing</span>
+<span class="sd">            - **summary** (*dict*): Basic info about user from MasterPoints</span>
+<span class="sd">            - **club** (*str*): Home club name</span>
+<span class="sd">            - **balance** (*float* or *str*): Users account balance</span>
+<span class="sd">            - **auto_button** (*bool*): status of auto top up</span>
+<span class="sd">            - **events_list** (*list*): list of MemberTransactions</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -339,10 +350,10 @@
 <span class="sd">    Generates a CSV of the statement.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse - CSV</span>
+<span class="sd">        HTTPResponse: CSV headed response with CSV statement data</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
@@ -377,10 +388,11 @@
 <span class="sd">    Generates a PDF of the statement.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse - PDF</span>
+<span class="sd">        HTTPResponse: PDF headed response with PDF statement data</span>
+
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
@@ -408,12 +420,12 @@
 <span class="sd">    auto_amount for the member to the system default.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - a standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Nothing.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
     <span class="n">customer</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">Customer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cobalt_tran_type&#39;</span><span class="p">:</span> <span class="s1">&#39;Auto&#39;</span><span class="p">})</span>
     <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span> <span class="o">=</span> <span class="n">customer</span><span class="o">.</span><span class="n">id</span>
@@ -431,10 +443,10 @@
 <span class="sd">    Hands over to Stripe to process card.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - a standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse</span>
+<span class="sd">        HTTPResponse: Our page with Stripe code embedded.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stripe</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">STRIPE_SECRET_KEY</span>
@@ -496,7 +508,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">stripe_create_customer</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/autotopup.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="n">warn</span><span class="p">})</span></div>
+    <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/autotopup.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="n">warn</span><span class="p">,</span>
+                                                        <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
 
 
 <span class="c1">#######################</span>
@@ -509,7 +524,7 @@
 <span class="sd">    This view allows a member to transfer money to another member.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        Request - standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        HTTPResponse</span>
@@ -557,10 +572,10 @@
 <span class="sd">    for this. Instead we use a little Ajax code on the page to handle this.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - a standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse</span>
+<span class="sd">        HTTPResponse: &quot;Successful&quot;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
@@ -580,10 +595,10 @@
 <span class="sd">    they can do this even if they have already set up for auto top up.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - a standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        HttpResponse</span>
+<span class="sd">        HTTPResponse</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -597,7 +612,7 @@
                 <span class="k">if</span> <span class="n">return_code</span><span class="p">:</span>  <span class="c1"># success</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
                                      <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-success&#39;</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;dashboard&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;payments:payments&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span> <span class="c1"># error</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span>
                                    <span class="n">extra_tags</span><span class="o">=</span><span class="s1">&#39;cobalt-message-error&#39;</span><span class="p">)</span>
@@ -616,7 +631,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">ManualTopup</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/manual_topup.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+    <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;payments/manual_topup.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+                                                          <span class="s1">&#39;balance&#39;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
 
 <span class="c1">######################</span>
 <span class="c1"># cancel_auto_top_up #</span>
@@ -625,7 +643,7 @@
     <span class="sd">&quot;&quot;&quot; Cancel auto top up.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request - standard request object</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        HTTPResponse</span>

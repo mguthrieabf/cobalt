@@ -148,6 +148,9 @@
   <a class="reference internal image-reference" href="_images/cobalt.jpg" id="notifications-overview"><img alt="Cobalt Chemical Symbol" id="notifications-overview" src="_images/cobalt.jpg" style="width: 300px;" /></a>
 <div class="section" id="id1">
 <h1>Notifications Overview<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Notifications is the communication centre of Cobalt. It is how all other modules
+communicate with members and is also a notice board for events (actions, not
+bridge events) that members may want to subscribe to be notified about.</p>
 <p>There are many events that a Cobalt user may wish to be notified about.
 For example, they may want to hear when a new post is added to a particular
 forum, or when someone replies to a comment that they have made in a forum.
@@ -162,8 +165,91 @@ what it is they are being notified about.</p>
 <div class="section" id="notification-types">
 <h1>Notification Types<a class="headerlink" href="#notification-types" title="Permalink to this headline">¶</a></h1>
 <p>There are three broad categories of notification:</p>
-<p>1. Broadcasts - Users will receive these regardless of preference.
-2.</p>
+<dl class="simple">
+<dt>System Broadcasts</dt><dd><p>Users will receive these regardless of preference. These are rare.</p>
+</dd>
+<dt>Broadcasts</dt><dd><p>These are typically emails from the National Body, Clubs, State
+Bodies etc. Users may opt out of these through their settings.</p>
+</dd>
+<dt>Named Specific</dt><dd><p>The calling module will provide a list of names. Users can
+choose how they are notified or choose to opt out. For example, Results tells
+Notifications that the results for an event are available and who played in the
+event. Notifications passes this information on to the member (or not, if the
+member opts out).</p>
+</dd>
+<dt>Happenings</dt><dd><p>These are things that members choose to listen to. For example,
+a new Forum post.</p>
+</dd>
+<dt>Personal</dt><dd><p>These are messages intended for a single recipient.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="notification-methods">
+<h1>Notification Methods<a class="headerlink" href="#notification-methods" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><strong>In App Notifications</strong> - these are always provided. The user will see this when
+they log in to Cobalt.</p></li>
+<li><p><strong>Email</strong> - HTML format emails.</p></li>
+<li><p><strong>SMS</strong> - Short messages, often with links to pages within Cobalt.</p></li>
+</ul>
+</div>
+<div class="section" id="user-experience">
+<h1>User Experience<a class="headerlink" href="#user-experience" title="Permalink to this headline">¶</a></h1>
+<p>Users always see notifications on the top right hand of the screen. They can
+acknowledge a notification by clicking on them. Notifications should come with a
+link that takes the user to the right relative URL for more information.</p>
+<p>In addition to the In App Notification, users can also receive notifications
+over email or SMS.</p>
+</div>
+<div class="section" id="creating-immediate-notifications">
+<h1>Creating Immediate Notifications<a class="headerlink" href="#creating-immediate-notifications" title="Permalink to this headline">¶</a></h1>
+<p>You can create a notification for a user directly by calling
+<a class="reference internal" href="notifications.html#notifications.views.contact_member" title="notifications.views.contact_member"><code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.views.contact_member()</span></code></a>. You need to provide the member,
+message and type (SMS or Email) as a minimum.</p>
+<p>This is the recommended way of communicating
+with a member if you want standard notifications as this will also create
+an internal notification message.</p>
+<p>If you don’t want the internal notification then you can call the sending
+functions directly.</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.send_cobalt_email()</span></code> - sends an email.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.send_cobalt_sms()</span></code> - sends an sms.</p></li>
+</ul>
+<p>It is recommended that you do this rather than sending messages directly
+so we can have a single point to maintain.</p>
+</div>
+<div class="section" id="creating-user-listens">
+<h1>Creating User Listens<a class="headerlink" href="#creating-user-listens" title="Permalink to this headline">¶</a></h1>
+<p>Sometimes you don’t want to immediately notify a user but you do want to
+set them up for later notifications. For example, if a user posts a an
+article in a Forum, they may want to be notified when someone comments on it.</p>
+<p>In this case you should call <code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.create_user_notification()</span></code>.</p>
+<p>This will set up a rule to listen for the events that you request. If you no
+longer want this (for example, if the post is deleted), then you should call
+<code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.delete_user_notification()</span></code>.</p>
+<div class="section" id="event-types">
+<h2>Event Types<a class="headerlink" href="#event-types" title="Permalink to this headline">¶</a></h2>
+<p>The applications control their own event types, but the format of the string
+used to identify them should follow a standard:</p>
+<p>&lt;application&gt;.&lt;function&gt;.&lt;action&gt;</p>
+<p>If necessary more levels can be added.</p>
+<p>For example:</p>
+<ul class="simple">
+<li><p>forums.post.comment.new - <em>a comment has been added to a post</em></p></li>
+<li><p>forums.post.delete - <em>a post has been deleted</em></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="notification-of-events">
+<h1>Notification of Events<a class="headerlink" href="#notification-of-events" title="Permalink to this headline">¶</a></h1>
+<p>When something has happened in an application that a user <strong>could</strong> be
+interested in, then notifications should be informed. It is better to
+over communicate than to under communicate, but always expect to also have
+to update the code within notifications as it isn’t magic.</p>
+<p>To announce an event has occurred call
+<a class="reference internal" href="notifications.html#notifications.views.notify_happening" title="notifications.views.notify_happening"><code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.views.notify_happening()</span></code></a>.</p>
+<p>This is the point at which if a member has registered to find out about
+an event, then they will be notified.</p>
 </div>
 
 

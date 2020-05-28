@@ -1,5 +1,4 @@
-""" Notifications handles messages that Cobalt applications wish to pass to
-    users.
+""" Notifications handles messages that Cobalt applications wish to pass to users.
 
     See `Notifications Overview`_ for more details.
 
@@ -16,24 +15,35 @@ import boto3
 from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID
 from .models import InAppNotification, NotificationMapping
 from django.core.mail import send_mail
-from cobalt.settings import DEFAULT_FROM_EMAIL
+from django.utils.html import strip_tags
+from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
 
 def send_cobalt_email(to_address, subject, msg):
     """ Send single email
 
     Args:
-        to_address - who to send to
-        subject - subject line for email
-        msg - message to send
+        to_address (str): who to send to
+        subject (str): subject line for email
+        msg (str): message to send in HTML or plain format
 
     Returns:
         Nothing
     """
 
-    send_mail(subject, msg, DEFAULT_FROM_EMAIL, [to_address], fail_silently=False)
+    plain_msg = strip_tags(msg)
+    send_mail(subject, plain_msg, DEFAULT_FROM_EMAIL, [to_address], html_message=msg)
 
 def send_cobalt_sms(phone_number, msg):
-    print("Inside SMS")
+    """ Send single SMS
+
+    Args:
+        phone_number (str): who to send to
+        msg (str): message to send
+
+    Returns:
+        Nothing
+    """
+
     client = boto3.client(
         "sns",
         aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -41,14 +51,13 @@ def send_cobalt_sms(phone_number, msg):
         region_name=AWS_REGION_NAME
     )
 
-    # Send your sms message.
     client.publish(
         PhoneNumber=phone_number,
         Message=msg,
         MessageAttributes={
             'AWS.SNS.SMS.SenderID': {
             'DataType': 'String',
-            'StringValue': 'ABFTech'
+            'StringValue': GLOBAL_TITLE
             }
         }
     )
@@ -56,27 +65,36 @@ def send_cobalt_sms(phone_number, msg):
 def get_notifications_for_user(user):
     """ Get a list of all unacklowledged notifications for a user
 
+    Returns a list of notifications for the user where the status is
+    unacknowledged.
+
+    TODO: Limit the size of the list. Maybe add a home page to manage them.
+
     Args:
-        user - standard User object
+        user (User): standard User object
 
     Returns:
-        list - list of notifications which are dictionaries
-
+        list: List of notifications which themselves are dictionaries
     """
+
     notifications = {}
     notes = InAppNotification.objects.filter(member=user, acknowledged=False)
     for note in notes:
         notifications[note.id]=(note.message, note.link)
     return(notifications)
 
-def contact_member(member, msg, contact_type, link=None, html_msg=None):
+def contact_member(member, msg, contact_type, link=None, html_msg=None,
+                   subject=None):
     """ Contact member using their preferred method """
+
+    if not subject:
+        subject = "Notification from ABFTech"
 
     # Always create an in app notification
     add_in_app_notification(member, msg, link)
 
     if contact_type == "Email":
-        send_cobalt_email(member.email, "Notification from ABFTech", msg)
+        send_cobalt_email(member.email, subject, msg)
     if contact_type == "SMS":
         send_cobalt_sms(member.mobile, msg)
 

@@ -29,23 +29,99 @@ Notification Types
 
 There are three broad categories of notification:
 
-1. System Broadcasts - Users will receive these regardless of preference. These
-are rare.
-2.Broadcasts - These are typically emails from the National Body, Clubs, State
-Bodies etc. Users may opt out of these through their settings.
-3. Named Specific - The calling module will provide a list of names. Users can
-choose how they are notified or choose to opt out. For example, Results tells
-Notifications that the results for an event are available and who played in the
-event. Notifications passes this information on to the member (or not, if the
-member opts out).
-4. Happenings - These are things that members choose to listen to. For example,
-a new Forum post.
-5. Personal - These are messages intended for a single recipient.
+System Broadcasts
+  Users will receive these regardless of preference. These are rare.
+Broadcasts
+  These are typically emails from the National Body, Clubs, State
+  Bodies etc. Users may opt out of these through their settings.
+Named Specific
+   The calling module will provide a list of names. Users can
+   choose how they are notified or choose to opt out. For example, Results tells
+   Notifications that the results for an event are available and who played in the
+   event. Notifications passes this information on to the member (or not, if the
+   member opts out).
+Happenings
+  These are things that members choose to listen to. For example,
+  a new Forum post.
+Personal
+  These are messages intended for a single recipient.
 
 Notification Methods
 ====================
 
-* In App Notifications - these are always provided. The user will see this when
-the log in to Cobalt.
-* Email - HTML format emails.
-* SMS - Short messages, often with links to pages within Cobalt.
+- **In App Notifications** - these are always provided. The user will see this when
+  they log in to Cobalt.
+- **Email** - HTML format emails.
+- **SMS** - Short messages, often with links to pages within Cobalt.
+
+User Experience
+===============
+
+Users always see notifications on the top right hand of the screen. They can
+acknowledge a notification by clicking on them. Notifications should come with a
+link that takes the user to the right relative URL for more information.
+
+In addition to the In App Notification, users can also receive notifications
+over email or SMS.
+
+Creating Immediate Notifications
+================================
+
+You can create a notification for a user directly by calling
+:func:`notifications.views.contact_member`. You need to provide the member,
+message and type (SMS or Email) as a minimum.
+
+This is the recommended way of communicating
+with a member if you want standard notifications as this will also create
+an internal notification message.
+
+If you don't want the internal notification then you can call the sending
+functions directly.
+
+* :func:`notifications.cviews.send_cobalt_email` - sends an email.
+* :func:`notifications.cviews.send_cobalt_sms` - sends an sms.
+
+It is recommended that you do this rather than sending messages directly
+so we can have a single point to maintain.
+
+Creating User Listens
+=====================
+
+Sometimes you don't want to immediately notify a user but you do want to
+set them up for later notifications. For example, if a user posts a an
+article in a Forum, they may want to be notified when someone comments on it.
+
+In this case you should call :func:`notifications.cviews.create_user_notification`.
+
+This will set up a rule to listen for the events that you request. If you no
+longer want this (for example, if the post is deleted), then you should call
+:func:`notifications.cviews.delete_user_notification`.
+
+Event Types
+-----------
+
+The applications control their own event types, but the format of the string
+used to identify them should follow a standard:
+
+<application>.<function>.<action>
+
+If necessary more levels can be added.
+
+For example:
+
+* forums.post.comment.new - *a comment has been added to a post*
+* forums.post.delete - *a post has been deleted*
+
+Notification of Events
+======================
+
+When something has happened in an application that a user **could** be
+interested in, then notifications should be informed. It is better to
+over communicate than to under communicate, but always expect to also have
+to update the code within notifications as it isn't magic.
+
+To announce an event has occurred call
+:func:`notifications.views.notify_happening`.
+
+This is the point at which if a member has registered to find out about
+an event, then they will be notified.

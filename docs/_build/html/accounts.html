@@ -616,6 +616,21 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.notificationmapping_set">
+<code class="sig-name descname">notificationmapping_set</code><a class="headerlink" href="#accounts.models.User.notificationmapping_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.organisationtransaction_set">
 <code class="sig-name descname">organisationtransaction_set</code><a class="headerlink" href="#accounts.models.User.organisationtransaction_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
@@ -779,12 +794,16 @@ accounts, resetting passwords, searches. profiles etc.</p>
 <p>This is the link sent to the user over email. If the link is valid, then
 the user is logged in, otherwise they are notified that the link is not
 valid.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object
-uidb64 - encrypted user id
-token - generated token</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- standard request object</strong> (<em>request</em>) – </p></li>
+<li><p><strong>- encrypted user id</strong> (<em>uidb64</em>) – </p></li>
+<li><p><strong>- generated token</strong> (<em>token</em>) – </p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -794,10 +813,12 @@ token - generated token</p>
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">blurb_form_upload</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#blurb_form_upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.blurb_form_upload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Profile update sub-form. Handles the picture and about fields.</p>
 <p>Allows a user to change their profile settings.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -807,10 +828,12 @@ token - generated token</p>
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">change_password</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#change_password"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.change_password" title="Permalink to this definition">¶</a></dt>
 <dd><p>Password change form</p>
 <p>Allows a user to change their password.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -827,10 +850,15 @@ token - generated token</p>
 <dd><p>Returns basic public info on a member</p>
 <p>Ajax call to get basic info on a member. Will return an empty json array
 if the member number is invalid.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>member_id - member number</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- member number</strong> (<em>member_id</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>Json array: member, clubs,  global org name.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>member, clubs,  global org name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Json array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -840,10 +868,12 @@ if the member number is invalid.</p>
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.profile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Profile update form.</p>
 <p>Allows a user to change their profile settings.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -853,11 +883,15 @@ if the member number is invalid.</p>
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">public_profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#public_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.public_profile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Public Profile form.</p>
 <p>Shows public information about a member.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object
-pk - key of User</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- standard request object</strong> (<em>request</em>) – </p></li>
+<li><p><strong>- key of User</strong> (<em>pk</em>) – </p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -870,10 +904,12 @@ pk - key of User</p>
 Ajax code to look up the system number and pre-fill the first and last name.</p>
 <p>This form also sends the email to the user to confirm the email address
 is valid.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -885,11 +921,15 @@ is valid.</p>
 <p>Used to search for members by the Member to Member transfer part of Payments.
 Currently very specific to payments. Could be made more generic if other
 parts of the system need a search function.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>lastname - partial lastname to search for. Wild cards the ending.
-firstname - partial firstname to search for. Wild cards the ending.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- partial lastname to search for. Wild cards the ending.</strong> (<em>lastname</em>) – </p></li>
+<li><p><strong>- partial firstname to search for. Wild cards the ending.</strong> (<em>firstname</em>) – </p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse - either a message or a list of users in HTML format.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse - either a message or a list of users in HTML format.</p>
 </dd>
 </dl>
 </dd></dl>

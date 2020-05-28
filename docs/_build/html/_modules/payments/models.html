@@ -184,8 +184,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">TRANSACTION_STATUS</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="c1"># This means we have asked a customer for money</span>
-        <span class="p">(</span><span class="s1">&#39;Initiated&#39;</span><span class="p">,</span> <span class="s1">&#39;Started - payment needs made&#39;</span><span class="p">),</span>
         <span class="c1"># This means we have hit the checkout page and Stripe is waiting</span>
         <span class="p">(</span><span class="s1">&#39;Intent&#39;</span><span class="p">,</span> <span class="s1">&#39;Intent - received customer intent to pay from Stripe&#39;</span><span class="p">),</span>
         <span class="c1"># This means it worked and we have their cash</span>
@@ -201,45 +199,56 @@
         <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span>
         <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;main_member&quot;</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Link to the member(User object) that is associated with this transaction.&quot;&quot;&quot;</span>
 
     <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Description&quot;</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Description of the transaction.&quot;&quot;&quot;</span>
 
     <span class="n">amount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="s2">&quot;Amount&quot;</span><span class="p">,</span>
         <span class="n">max_digits</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
         <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span>
-
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Amount of the transaction in currency unit (default Australian Dollars).</span>
+<span class="sd">    Be careful as Stripe stores the amount in cents, not dollars.&quot;&quot;&quot;</span>
+
+
     <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Status&quot;</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
         <span class="n">choices</span><span class="o">=</span><span class="n">TRANSACTION_STATUS</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="s1">&#39;Initiated&#39;</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Status of the transaction. See TRANSACTION_STATUS for options.&quot;&quot;&quot;</span>
 
     <span class="n">stripe_reference</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Stripe Payment Intent&quot;</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">40</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Reference passed by Stripe. Use this to look up more detail within</span>
+<span class="sd">    Stripe itself.&quot;&quot;&quot;</span>
 
     <span class="n">stripe_method</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Stripe Payment Method&quot;</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">40</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Stripe payment method - always &quot;Card&quot;.&quot;&quot;&quot;</span>
 
     <span class="n">stripe_currency</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Card Native Currency&quot;</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">3</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Stripe currency for the transaction.&quot;&quot;&quot;</span>
 
     <span class="n">stripe_receipt_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Receipt URL&quot;</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span>
     <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Stripe receipt URL. User can go directly to this for Stripe info.&quot;&quot;&quot;</span>
 
     <span class="n">stripe_brand</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Card brand&quot;</span><span class="p">,</span>
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

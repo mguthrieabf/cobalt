@@ -50,7 +50,15 @@ from accounts.models import User
 ####################
 @login_required()
 def home(request):
-    """ Default page. """
+    """ Default page.
+
+        Args:
+            request (HTTPRequest): Standard request object
+
+        Returns:
+            httpResponse: webpage
+
+    """
 
     return render(request, 'payments/home.html')
 
@@ -105,15 +113,18 @@ def test_payment(request):
 def statement_common(request):
     """ Member statement view - common part across online, pdf and csv
 
+    Handles the non-formatting parts of statements.
+
     Args:
-        request - standard request object
+        request (str): standard request object
 
     Returns:
-        summary - dict of basic info about user from MasterPoints
-        club - Home club name
-        balance - Users account Balance
-        auto_button - text for button (activated or press to setup)
-        events_list - list of Member Transactions
+        5-element tuple containing
+            - **summary** (*dict*): Basic info about user from MasterPoints
+            - **club** (*str*): Home club name
+            - **balance** (*float* or *str*): Users account balance
+            - **auto_button** (*bool*): status of auto top up
+            - **events_list** (*list*): list of MemberTransactions
 
     """
 
@@ -193,10 +204,10 @@ def statement_csv(request):
     Generates a CSV of the statement.
 
     Args:
-        request - standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
-        HTTPResponse - CSV
+        HTTPResponse: CSV headed response with CSV statement data
 
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
@@ -231,10 +242,11 @@ def statement_pdf(request):
     Generates a PDF of the statement.
 
     Args:
-        request - standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
-        HTTPResponse - PDF
+        HTTPResponse: PDF headed response with PDF statement data
+
 
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
@@ -262,12 +274,12 @@ def stripe_create_customer(request):
     auto_amount for the member to the system default.
 
     Args:
-        request - a standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
         Nothing.
-
     """
+
     stripe.api_key = STRIPE_SECRET_KEY
     customer = stripe.Customer.create(metadata={'cobalt_tran_type': 'Auto'})
     request.user.stripe_customer_id = customer.id
@@ -285,10 +297,10 @@ def setup_autotopup(request):
     Hands over to Stripe to process card.
 
     Args:
-        request - a standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
-        HTTPResponse
+        HTTPResponse: Our page with Stripe code embedded.
 
     """
     stripe.api_key = STRIPE_SECRET_KEY
@@ -366,7 +378,7 @@ def member_transfer(request):
     This view allows a member to transfer money to another member.
 
     Args:
-        Request - standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
         HTTPResponse
@@ -414,10 +426,10 @@ def update_auto_amount(request):
     for this. Instead we use a little Ajax code on the page to handle this.
 
     Args:
-        request - a standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
-        HTTPResponse
+        HTTPResponse: "Successful"
 
     """
     if request.method == "GET":
@@ -437,10 +449,10 @@ def manual_topup(request):
     they can do this even if they have already set up for auto top up.
 
     Args:
-        request - a standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
-        HttpResponse
+        HTTPResponse
 
     """
 
@@ -485,7 +497,7 @@ def cancel_auto_top_up(request):
     """ Cancel auto top up.
 
     Args:
-        request - standard request object
+        request (HTTPRequest): standard request object
 
     Returns:
         HTTPResponse

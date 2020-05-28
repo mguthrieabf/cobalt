@@ -285,16 +285,20 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 This function deals with successful top ups and failed top ups. For
 failed top ups it will notify the user and disable auto topups. It is
 the calling functions problem to handle the consequences of the non-payment.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>member - a User object.
-topup_required - the amount of the top up (optional). This is required
-if the payment is larger than the top up amount. e.g. balance is 25,
-top up amount is 50, payment is 300.
-payment_type - defaults to Auto Top Up. We allow this to be overriden
-so that a member manually topping up their account using their registered
-auto top up card get the payment type of Manual Top Up on their statement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- a User object.</strong> (<em>member</em>) – </p></li>
+<li><p><strong>- the amount of the top up</strong> (<em>topup_required</em>) – </p></li>
+<li><p><strong>the payment is larger than the top up amount. e.g. balance is 25</strong><strong>,</strong> (<em>if</em>) – </p></li>
+<li><p><strong>up amount is 50</strong><strong>, </strong><strong>payment is 300.</strong> (<em>top</em>) – </p></li>
+<li><p><strong>- defaults to Auto Top Up. We allow this to be overriden</strong> (<em>payment_type</em>) – </p></li>
+<li><p><strong>that a member manually topping up their account using their registered</strong> (<em>so</em>) – </p></li>
+<li><p><strong>top up card get the payment type of Manual Top Up on their statement.</strong> (<em>auto</em>) – </p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>return_code - True for success, False for failure
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>return_code - True for success, False for failure
 message - explanation</p>
 </dd>
 </dl>
@@ -310,13 +314,17 @@ know if a payment successed or not.</p>
 number of callbacks in Cobalt so we are okay to hardcode it.</p>
 <p>We should not get tran provided but do for early testing. This will be
 removed later, but for now allows us to reverse the transaction for testing.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>route_code - hard coded value to map to a function call
-route_payload - value to return to function
-tran - for testing only. remove later
-status - Success (default) or Failure. Did the payment work or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- hard coded value to map to a function call</strong> (<em>route_code</em>) – </p></li>
+<li><p><strong>- value to return to function</strong> (<em>route_payload</em>) – </p></li>
+<li><p><strong>- for testing only. remove later</strong> (<em>tran</em>) – </p></li>
+<li><p><strong>- Success</strong> (<em>status</em>) – </p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>Nothing</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing</p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,10 +334,15 @@ status - Success (default) or Failure. Did the payment work or not.</p>
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets member account balance</p>
 <p>This function returns the current balance of the member’s account.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>member (User): A User object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – A User object</p>
 </dd>
-<dt>Returns:</dt><dd><p>float: The member’s current balance</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The member’s current balance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,10 +351,15 @@ status - Success (default) or Failure. Did the payment work or not.</p>
 <dt id="payments.core.get_balance_detail">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">get_balance_detail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#get_balance_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.get_balance_detail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by dashboard to show basic information</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>member: A User object - the member whose balance is required</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>member</strong> – A User object - the member whose balance is required</p>
 </dd>
-<dt>Returns:</dt><dd><p>dict: Keys - balance and last_top_up</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Keys - balance and last_top_up</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -369,20 +387,24 @@ amount is a charge, a negative amount is an incoming payment.</p>
 <p>We accept either organisation as the counterpart for this payment or
 other_member. We must have either an organisation or a member, but
 we can’t pay to both.</p>
-<dl class="simple">
-<dt>args:</dt><dd><p>request - standard request object
-description - text description of the payment
-amount - how much
-member - User object related to the payment
-route_code - code to map to a callback
-route_payload - value to retirn on completion
-organisation - linked organisation
-other_member - User object
-log_msg - message for the log
-payment_type - description of payment
-url - next url to go to</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- standard request object</strong> (<em>request</em>) – </p></li>
+<li><p><strong>- text description of the payment</strong> (<em>description</em>) – </p></li>
+<li><p><strong>- how much</strong> (<em>amount</em>) – </p></li>
+<li><p><strong>- User object related to the payment</strong> (<em>member</em>) – </p></li>
+<li><p><strong>- code to map to a callback</strong> (<em>route_code</em>) – </p></li>
+<li><p><strong>- value to retirn on completion</strong> (<em>route_payload</em>) – </p></li>
+<li><p><strong>- linked organisation</strong> (<em>organisation</em>) – </p></li>
+<li><p><strong>- User object</strong> (<em>other_member</em>) – </p></li>
+<li><p><strong>- message for the log</strong> (<em>log_msg</em>) – </p></li>
+<li><p><strong>- description of payment</strong> (<em>payment_type</em>) – </p></li>
+<li><p><strong>- next url to go to</strong> (<em>url</em>) – </p></li>
+</ul>
 </dd>
-<dt>returns:</dt><dd><p>request - page for user</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>request - page for user</p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,19 +421,26 @@ tell Stripe and Stripe gets ready for it. By this point in the process
 we have handed over control to the Stripe code which calls this function
 over Ajax.</p>
 <p>This functions expects a json payload as part of <cite>request</cite>.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - This needs to contain a Json payload.</p>
-</dd>
-<dt>Notes:</dt><dd><p>The Json should include:
-data{“stripe_customer_id”: This is the Stripe customer_id in our table
-for the customer that we are handling}</p>
-</dd>
-<dt>Returns:</dt><dd><p>json: {‘publishableKey’:? ‘clientSecret’:?}</p>
-</dd>
-<dt>Notes:</dt><dd><p>publishableKey = our Public Stripe key,
-clientSecret = client secret from Stripe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- This needs to contain a Json payload.</strong> (<em>request</em>) – </p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The Json should include:
+data{“stripe_customer_id”: This is the Stripe customer_id in our table
+for the customer that we are handling}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>{‘publishableKey’:? ‘clientSecret’:?}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>json</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>publishableKey = our Public Stripe key,
+clientSecret = client secret from Stripe</p>
 </dd></dl>
 
 <dl class="py function">
@@ -423,19 +452,26 @@ tell Stripe and Stripe gets ready for it. By this point in the process
 we have handed over control to the Stripe code which calls this function
 over Ajax.</p>
 <p>This functions expects a json payload as part of <cite>request</cite>.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - This needs to contain a Json payload.</p>
-</dd>
-<dt>Notes:</dt><dd><p>The Json should include:
-data{“id”: This is the StripeTransaction in our table that we are handling
-“amount”: The amount in the system currency}</p>
-</dd>
-<dt>Returns:</dt><dd><p>json: {‘publishableKey’:? ‘clientSecret’:?}</p>
-</dd>
-<dt>Notes:</dt><dd><p>publishableKey = our Public Stripe key,
-clientSecret = client secret from Stripe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- This needs to contain a Json payload.</strong> (<em>request</em>) – </p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The Json should include:
+data{“id”: This is the StripeTransaction in our table that we are handling
+“amount”: The amount in the system currency}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>{‘publishableKey’:? ‘clientSecret’:?}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>json</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>publishableKey = our Public Stripe key,
+clientSecret = client secret from Stripe</p>
 </dd></dl>
 
 <dl class="py function">
@@ -445,12 +481,12 @@ clientSecret = client secret from Stripe</p>
 <p>In development, Stripe sends us everything. In production we can configure
 the events that we receive. This is the only way for Stripe to communicate
 with us.</p>
-<dl class="simple">
-<dt>Note:</dt><dd><p>Stripe sends us multiple similar things, for example <em>payment.intent.succeeded</em>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Stripe sends us multiple similar things, for example <em>payment.intent.succeeded</em>
 will accompany anything that uses a payment intent. Be careful to only
 handle one out of the multiple events.</p>
-</dd>
-</dl>
+</div>
 <p>For <strong>manual payments</strong> we can receive:</p>
 <ul class="simple">
 <li><p>payment.intent.created - ignore</p></li>
@@ -480,10 +516,12 @@ transactions. If this is missing then the transaction is invalid.</p></li>
 <li><p><strong>cobalt_pay_id</strong> - for manual payments this is the linked transaction in
 MemberTransaction.</p></li>
 </ul>
-<dl class="simple">
-<dt>Args:</dt><dd><p>Stripe json payload - see Stripe documentation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>json payload - see Stripe documentation</strong> (<em>Stripe</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPStatus Code</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPStatus Code</p>
 </dd>
 </dl>
 </dd></dl>
@@ -493,10 +531,12 @@ MemberTransaction.</p></li>
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook_autosetup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook_autosetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook_autosetup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles auto top up setup events from Stripe webhook</p>
 <p>Called by stripe_webhook to look after successful incoming auto top up set ups.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>event - the event payload from Stripe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- the event payload from Stripe</strong> (<em>event</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse code - 200 for success, 400 for error</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse code - 200 for success, 400 for error</p>
 </dd>
 </dl>
 </dd></dl>
@@ -506,10 +546,12 @@ MemberTransaction.</p></li>
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">stripe_webhook_manual</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#stripe_webhook_manual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.stripe_webhook_manual" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles manual payment events from Stripe webhook</p>
 <p>Called by stripe_webhook to look after incoming manual payments.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>event - the event payload from Stripe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- the event payload from Stripe</strong> (<em>event</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse code - 200 for success, 400 for error</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse code - 200 for success, 400 for error</p>
 </dd>
 </dl>
 </dd></dl>
@@ -527,19 +569,23 @@ actions, but for testing I get the StripeTransaction passed so I can reverse it.
 <dt id="payments.core.update_account">
 <code class="sig-prename descclassname">payments.core.</code><code class="sig-name descname">update_account</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">amount</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">log_msg</span></em>, <em class="sig-param"><span class="n">source</span></em>, <em class="sig-param"><span class="n">sub_source</span></em>, <em class="sig-param"><span class="n">payment_type</span></em>, <em class="sig-param"><span class="n">stripe_transaction</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">other_member</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">organisation</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/core.html#update_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.core.update_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to update a customer account</p>
-<dl class="simple">
-<dt>args:</dt><dd><p>member - owner of the account
-amount - value (plus is a deduction, minus is a credit)
-description - to appear on statement
-log_msg - to appear on logs
-source - for logs
-sub_source - for logs
-payment_type - type of payment
-stripe_transaction - linked Stripe transaction (optional)
-other_member - linked member (optional)
-organisation - linked organisation (optional)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- owner of the account</strong> (<em>member</em>) – </p></li>
+<li><p><strong>- value</strong> (<em>amount</em>) – </p></li>
+<li><p><strong>- to appear on statement</strong> (<em>description</em>) – </p></li>
+<li><p><strong>- to appear on logs</strong> (<em>log_msg</em>) – </p></li>
+<li><p><strong>- for logs</strong> (<em>sub_source</em>) – </p></li>
+<li><p><strong>- for logs</strong> – </p></li>
+<li><p><strong>- type of payment</strong> (<em>payment_type</em>) – </p></li>
+<li><p><strong>- linked Stripe transaction</strong> (<em>stripe_transaction</em>) – </p></li>
+<li><p><strong>- linked member</strong> (<em>other_member</em>) – </p></li>
+<li><p><strong>- linked organisation</strong> (<em>organisation</em>) – </p></li>
+</ul>
 </dd>
-<dt>returns:</dt><dd><p>nothing</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>nothing</p>
 </dd>
 </dl>
 </dd></dl>
@@ -641,18 +687,6 @@ organisation - linked organisation (optional)</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">AbstractTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Common attributes for the other transaction classes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
-<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
-<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
-<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
-<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
-<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py class">
 <dt id="payments.models.AbstractTransaction.Meta">
 <em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/payments/models.html#AbstractTransaction.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.AbstractTransaction.Meta" title="Permalink to this definition">¶</a></dt>
@@ -728,23 +762,6 @@ object the first time, the query is executed.</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">MemberTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#MemberTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.MemberTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
 <p>Member Transactions. May have a linked transaction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
-<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
-<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
-<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
-<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
-<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
-<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
-<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Member</p></li>
-<li><p><strong>stripe_transaction_id</strong> (ForeignKey to <a class="reference internal" href="#payments.models.StripeTransaction" title="payments.models.StripeTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">StripeTransaction</span></code></a>) – Stripe transaction</p></li>
-<li><p><strong>other_member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Other member</p></li>
-<li><p><strong>organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Organisation</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py exception">
 <dt id="payments.models.MemberTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.MemberTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -876,23 +893,6 @@ object the first time, the query is executed.</p>
 <em class="property">class </em><code class="sig-prename descclassname">payments.models.</code><code class="sig-name descname">OrganisationTransaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/models.html#OrganisationTransaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.models.OrganisationTransaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#payments.models.AbstractTransaction" title="payments.models.AbstractTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">payments.models.AbstractTransaction</span></code></a></p>
 <p>Organisation transactions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
-<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Create date</p></li>
-<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
-<li><p><strong>balance</strong> (<em>DecimalField</em>) – Balance after transaction</p></li>
-<li><p><strong>description</strong> (<em>CharField</em>) – Transaction description</p></li>
-<li><p><strong>reference_no</strong> (<em>CharField</em>) – Reference no</p></li>
-<li><p><strong>type</strong> (<em>CharField</em>) – Transaction type</p></li>
-<li><p><strong>organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Organisation</p></li>
-<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Member</p></li>
-<li><p><strong>stripe_transaction_id</strong> (ForeignKey to <a class="reference internal" href="#payments.models.StripeTransaction" title="payments.models.StripeTransaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">StripeTransaction</span></code></a>) – Stripe transaction</p></li>
-<li><p><strong>other_organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Other organisation</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py exception">
 <dt id="payments.models.OrganisationTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.OrganisationTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -1026,34 +1026,6 @@ object the first time, the query is executed.</p>
 <p>Our record of Stripe transactions.</p>
 <p>Only stores basic information, for the full details use the
 stripe_reference to look up the transaction in Stripe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>AutoField</em>) – Id</p></li>
-<li><p><strong>member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – User object associated with this transaction</p></li>
-<li><p><strong>description</strong> (<em>CharField</em>) – Description</p></li>
-<li><p><strong>amount</strong> (<em>DecimalField</em>) – Amount</p></li>
-<li><p><strong>status</strong> (<em>CharField</em>) – Status</p></li>
-<li><p><strong>stripe_reference</strong> (<em>CharField</em>) – Stripe payment intent</p></li>
-<li><p><strong>stripe_method</strong> (<em>CharField</em>) – Stripe payment method</p></li>
-<li><p><strong>stripe_currency</strong> (<em>CharField</em>) – Card native currency</p></li>
-<li><p><strong>stripe_receipt_url</strong> (<em>CharField</em>) – Receipt url</p></li>
-<li><p><strong>stripe_brand</strong> (<em>CharField</em>) – Card brand</p></li>
-<li><p><strong>stripe_country</strong> (<em>CharField</em>) – Card country</p></li>
-<li><p><strong>stripe_exp_month</strong> (<em>IntegerField</em>) – Card expiry month</p></li>
-<li><p><strong>stripe_exp_year</strong> (<em>IntegerField</em>) – Card expiry year</p></li>
-<li><p><strong>stripe_last4</strong> (<em>CharField</em>) – Card last 4 digits</p></li>
-<li><p><strong>route_code</strong> (<em>CharField</em>) – Internal routing code for callback</p></li>
-<li><p><strong>route_payload</strong> (<em>CharField</em>) – Payload to return to callback</p></li>
-<li><p><strong>created_date</strong> (<em>DateTimeField</em>) – Creation date</p></li>
-<li><p><strong>last_change_date</strong> (<em>DateTimeField</em>) – Last update date</p></li>
-<li><p><strong>linked_organisation_id</strong> (ForeignKey to <a class="reference internal" href="organisations.html#organisations.models.Organisation" title="organisations.models.Organisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Organisation</span></code></a>) – Linked organisation</p></li>
-<li><p><strong>linked_member_id</strong> (ForeignKey to <a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – Linked member</p></li>
-<li><p><strong>linked_transaction_type</strong> (<em>CharField</em>) – Linked transaction type</p></li>
-<li><p><strong>linked_amount</strong> (<em>DecimalField</em>) – Linked amount</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py exception">
 <dt id="payments.models.StripeTransaction.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#payments.models.StripeTransaction.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -1068,14 +1040,14 @@ stripe_reference to look up the transaction in Stripe.</p>
 
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.TRANSACTION_STATUS">
-<code class="sig-name descname">TRANSACTION_STATUS</code><em class="property"> = [('Initiated', 'Started - payment needs made'), ('Intent', 'Intent - received customer intent to pay from Stripe'), ('Complete', 'Success - payment completed successfully'), ('Failed', 'Failed - payment failed')]</em><a class="headerlink" href="#payments.models.StripeTransaction.TRANSACTION_STATUS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">TRANSACTION_STATUS</code><em class="property"> = [('Intent', 'Intent - received customer intent to pay from Stripe'), ('Complete', 'Success - payment completed successfully'), ('Failed', 'Failed - payment failed')]</em><a class="headerlink" href="#payments.models.StripeTransaction.TRANSACTION_STATUS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.amount">
 <code class="sig-name descname">amount</code><a class="headerlink" href="#payments.models.StripeTransaction.amount" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Amount of the transaction in currency unit (default Australian Dollars).
+Be careful as Stripe stores the amount in cents, not dollars.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1088,8 +1060,7 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.description">
 <code class="sig-name descname">description</code><a class="headerlink" href="#payments.models.StripeTransaction.description" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Description of the transaction.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1176,14 +1147,7 @@ OrganisationTransaction record.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.member">
 <code class="sig-name descname">member</code><a class="headerlink" href="#payments.models.StripeTransaction.member" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+<dd><p>Link to the member(User object) that is associated with this transaction.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1245,8 +1209,7 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.status">
 <code class="sig-name descname">status</code><a class="headerlink" href="#payments.models.StripeTransaction.status" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Status of the transaction. See TRANSACTION_STATUS for options.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1266,8 +1229,7 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.stripe_currency">
 <code class="sig-name descname">stripe_currency</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_currency" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Stripe currency for the transaction.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1294,22 +1256,20 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.stripe_method">
 <code class="sig-name descname">stripe_method</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Stripe payment method - always “Card”.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.stripe_receipt_url">
 <code class="sig-name descname">stripe_receipt_url</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_receipt_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Stripe receipt URL. User can go directly to this for Stripe info.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="payments.models.StripeTransaction.stripe_reference">
 <code class="sig-name descname">stripe_reference</code><a class="headerlink" href="#payments.models.StripeTransaction.stripe_reference" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
+<dd><p>Reference passed by Stripe. Use this to look up more detail within
+Stripe itself.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1346,10 +1306,12 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 <dt id="payments.views.cancel_auto_top_up">
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">cancel_auto_top_up</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#cancel_auto_top_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.cancel_auto_top_up" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cancel auto top up.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1358,6 +1320,17 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 <dt id="payments.views.home">
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">home</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#home"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.home" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – Standard request object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>webpage</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>httpResponse</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1366,10 +1339,12 @@ See <a class="reference external" href="./payments_overview.html">Payments Overv
 <dd><p>Page to allow credit card top up regardless of auto status.</p>
 <p>This page allows a member to add to their account using a credit card,
 they can do this even if they have already set up for auto top up.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - a standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HttpResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1379,10 +1354,12 @@ they can do this even if they have already set up for auto top up.</p>
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">member_transfer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#member_transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.member_transfer" title="Permalink to this definition">¶</a></dt>
 <dd><p>view to transfer $ to another member</p>
 <p>This view allows a member to transfer money to another member.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>Request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1393,10 +1370,15 @@ they can do this even if they have already set up for auto top up.</p>
 <dd><p>view to sign up to auto top up.</p>
 <p>Creates Stripe customer if not already defined.
 Hands over to Stripe to process card.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - a standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Our page with Stripe code embedded.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1406,10 +1388,12 @@ Hands over to Stripe to process card.</p>
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Member statement view.</p>
 <p>Basic view of statement showing transactions in a web page.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1418,14 +1402,23 @@ Hands over to Stripe to process card.</p>
 <dt id="payments.views.statement_common">
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_common</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_common"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_common" title="Permalink to this definition">¶</a></dt>
 <dd><p>Member statement view - common part across online, pdf and csv</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<p>Handles the non-formatting parts of statements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>str</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>summary - dict of basic info about user from MasterPoints
-club - Home club name
-balance - Users account Balance
-auto_button - text for button (activated or press to setup)
-events_list - list of Member Transactions</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>5-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>summary</strong> (<em>dict</em>): Basic info about user from MasterPoints</p></li>
+<li><p><strong>club</strong> (<em>str</em>): Home club name</p></li>
+<li><p><strong>balance</strong> (<em>float</em> or <em>str</em>): Users account balance</p></li>
+<li><p><strong>auto_button</strong> (<em>bool</em>): status of auto top up</p></li>
+<li><p><strong>events_list</strong> (<em>list</em>): list of MemberTransactions</p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1435,10 +1428,15 @@ events_list - list of Member Transactions</p>
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Member statement view - csv download</p>
 <p>Generates a CSV of the statement.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse - CSV</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>CSV headed response with CSV statement data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1448,10 +1446,15 @@ events_list - list of Member Transactions</p>
 <code class="sig-prename descclassname">payments.views.</code><code class="sig-name descname">statement_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/payments/views.html#statement_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#payments.views.statement_pdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Member statement view - csv download</p>
 <p>Generates a PDF of the statement.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse - PDF</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PDF headed response with PDF statement data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1463,10 +1466,12 @@ events_list - list of Member Transactions</p>
 <p>Creates a new customer entry with Stripe and sets this member’s
 stripe_customer_id to match the customer created. Also sets the
 auto_amount for the member to the system default.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - a standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>Nothing.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1484,10 +1489,15 @@ a members account. This simulates them entering an event or paying a subscriptio
 <dd><p>Called by the auto top up page when a user changes the amount of the auto top up.</p>
 <p>The auto top up page has Stripe code on it so a standard form won’t work
 for this. Instead we use a little Ajax code on the page to handle this.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>request - a standard request object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p>
 </dd>
-<dt>Returns:</dt><dd><p>HTTPResponse</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>“Successful”</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
 </dd>
 </dl>
 </dd></dl>

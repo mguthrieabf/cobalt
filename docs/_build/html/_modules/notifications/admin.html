@@ -145,12 +145,16 @@
             
   <h1>Source code for notifications.admin</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">InAppNotification</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">InAppNotification</span><span class="p">,</span> <span class="n">NotificationMapping</span>
 
 <div class="viewcode-block" id="InAppNotificationAdmin"><a class="viewcode-back" href="../../notifications.html#notifications.admin.InAppNotificationAdmin">[docs]</a><span class="k">class</span> <span class="nc">InAppNotificationAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
     <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,)</span></div>
 
+<div class="viewcode-block" id="NotificationMappingAdmin"><a class="viewcode-back" href="../../notifications.html#notifications.admin.NotificationMappingAdmin">[docs]</a><span class="k">class</span> <span class="nc">NotificationMappingAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,)</span></div>
+
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">InAppNotification</span><span class="p">,</span> <span class="n">InAppNotificationAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">NotificationMapping</span><span class="p">,</span> <span class="n">NotificationMappingAdmin</span><span class="p">)</span>
 </pre></div>
 
            </div>
