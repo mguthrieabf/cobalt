@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2
 from .forms import PostForm, CommentForm, Comment2Form
+from notifications.views import notify_happening, create_user_notification
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required()
@@ -49,6 +50,11 @@ def post_detail(request, pk):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+# Tell people
+            notify_happening(application_name="Forums",
+                             event_type="forums.post.comment",
+                             msg="%s commented on your post: %s" % (request.user, post.post.title),
+                             topic=post.post.id)
         else:
             print(form.errors)
     form = CommentForm()
@@ -90,6 +96,22 @@ def post_new(request):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
+            notifymsg = "New post to Forum %s by %s Titled %s" % (post.forum,
+                                                               post.author,
+                                                               post.title)
+
+# Tell people
+            notify_happening(application_name="Forums",
+                             event_type="forums.post.new",
+                             msg=notifymsg,
+                             topic=post.forum.id)
+# notify user of comments
+            create_user_notification(member=post.author,
+                                     application_name="Forums",
+                                     event_type="forums.post.comment",
+                                     topic=post.id,
+                                     notification_type="Email")
+
             return redirect('forums:post_detail', pk=post.pk)
     else:
         form = PostForm()

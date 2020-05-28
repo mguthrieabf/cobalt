@@ -1,9 +1,22 @@
 """ values set in here are passed to every template """
 
 from django.conf import settings
+from notifications.views import get_notifications_for_user
 
 def global_settings(request):
+
+    if request.user.is_anonymous:
+        notifications={}
+    else:
+        print("#################")
+        print(request.user)
+        notifications = get_notifications_for_user(request.user)
+        print("#################")
+
+    print(notifications)
+
     return {
+            'notifications': notifications,
             'GLOBAL_ORG': settings.GLOBAL_ORG,
             'GLOBAL_TITLE': settings.GLOBAL_TITLE,
             'GLOBAL_CONTACT': settings.GLOBAL_CONTACT,
