@@ -1,4 +1,2 @@
-Updated MP query
-Updated MP screen - remove provisional
-Added images to statement and link to the receipt
-Hide cancel on manual payment after payment goes through
+me = User.objects.filter(username="Mark").first()
+UserApplication.create_cobalt_rbac_mapping(member=me, model_name="Forum", model_id=1, role="a.b.c")

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'results',
     'organisations',
     'logs',
+    'rbac',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
