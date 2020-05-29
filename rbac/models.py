@@ -18,7 +18,7 @@ from django.apps import apps
 class UserApplication(models.Model):
     """ Core model to map a User to an Application model instance and a role.
 
-    This uses GenericForeignKey to be able to map to any Cobalt app as if
+    This uses GenericForeignKey to be able to map to any Cobalt app model as if
     it was a foreign key.
 
     - member is a User
@@ -74,6 +74,7 @@ class UserApplication(models.Model):
         Returns:
             Nothing.
         """
-        model = apps.get_model('forums', 'Forum')
+#        model = apps.get_model('forums', 'Forum')
 #        ct = ContentType.objects.get_for_model(model_name)
+        model = ContentType.objects.get(app_label='forums', model='Forum')
         UserApplication(member=member, model_content_type=model, model_id=model_id, role=role)
