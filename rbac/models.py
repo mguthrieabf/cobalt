@@ -57,24 +57,57 @@ class UserApplication(models.Model):
     creates and uses it. Format should be <app>.<noun>.<action>
     """
 
-    def __str__(self):
-        return '%s - %s - %s' % (self.member, self.application_content_type, self.application_id)
+    RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Blcok User Access")]
+    rule_type = models.CharField(max_length=5,
+        choices=RULE_TYPES,
+        default="Allow"
+    )
 
-    def create_cobalt_rbac_mapping(member, model_name, model_id, role):
+    def __str__(self):
+        return '%s - %s - %s' % (self.member, self.model_content_type, self.model_id)
+
+    def create_cobalt_rbac_mapping(member, app_name, model_name, model_id, rule_type, role):
         """ Create an RBAC record
 
         Create RBAC entry.
 
         Args:
             member(User): standard user object
+            app_name(str): name of the application
             model_name(str): name of the application model class
             model_id(int): primary key for the instance of model_name this rule applies for
             role(str): dot format role <app>.<noun>.<action>
+            rule_type(str): Allow or Block
 
         Returns:
             Nothing.
         """
-#        model = apps.get_model('forums', 'Forum')
-#        ct = ContentType.objects.get_for_model(model_name)
-        model = ContentType.objects.get(app_label='forums', model='Forum')
-        UserApplication(member=member, model_content_type=model, model_id=model_id, role=role)
+        model = ContentType.objects.get(app_label=app_name, model=model_name)
+        rule = UserApplication(member=member, model_content_type=model, model_id=model_id, role=role, rule_type=rule_type)
+        rule.save()
+        print(rule)
+
+    def user_role_for_object(member, app_name, model_name, model_id):
+        """ Return an RBAC record
+
+        Args:
+            member(User): standard user object
+            app_name(str): name of the application
+            model_name(str): name of the application model class
+            model_id(int): primary key for the instance of model_name this rule applies for
+
+        Returns:
+            role(str): dot format role <app>.<noun>.<action>. Or None.
+        """
+
+        model = ContentType.objects.get(app_label=app_name, model=model_name)
+        matches = UserApplication.objects.filter(member=member, model_content_type=model, model_id=model_id)
+
+        print("Instance level rules:")
+        print(matches)
+        matches_up = UserApplication.objects.filter(member=member, model_content_type=model, model_id=None)
+        print("High level rules:")
+        print(matches_up)
+
+
+        return matches
