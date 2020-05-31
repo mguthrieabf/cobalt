@@ -64,9 +64,9 @@ class UserApplication(models.Model):
     )
 
     def __str__(self):
-        return '%s - %s - %s' % (self.member, self.model_content_type, self.model_id)
+        return '%s - %s - %s' % (self.member, self.role, self.model_id)
 
-    def create_cobalt_rbac_mapping(member, app_name, model_name, model_id, rule_type, role):
+    def create_cobalt_rbac_mapping(member, app_name, model_name, rule_type, role, model_id=None):
         """ Create an RBAC record
 
         Create RBAC entry.
@@ -87,7 +87,7 @@ class UserApplication(models.Model):
         rule.save()
         print(rule)
 
-    def user_role_for_object(member, app_name, model_name, model_id):
+    def user_rbac_role_for_object(member, app_name, model_name, model_id):
         """ Return an RBAC record
 
         Args:
@@ -111,3 +111,6 @@ class UserApplication(models.Model):
 
 
         return matches
+
+    def user_has_role(member, role, app_name, model_name, model_id=None):
+        return False

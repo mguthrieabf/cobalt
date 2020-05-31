@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>RBAC Overview &mdash; Cobalt 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cobalt
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Cobalt Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">cobalt</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cobalt</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>RBAC Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/rbac_overview.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <a class="reference internal image-reference" href="_images/cobalt.jpg" id="notifications-overview"><img alt="Cobalt Chemical Symbol" id="notifications-overview" src="_images/cobalt.jpg" style="width: 300px;" /></a>
+<div class="section" id="rbac-overview">
+<h1>RBAC Overview<a class="headerlink" href="#rbac-overview" title="Permalink to this headline">¶</a></h1>
+<p>Role Based Access Control (<strong>RBAC</strong>) is a standard approach to security within
+applications that have multiple users with different roles. This allows us to
+control a user being an administrator at Club A, a director at Club B, and
+a simple member of Club C. It allows us to define moderators for Forums at the
+individual forum level rather than having a binary control of being a moderator
+or not being a moderator that applies for all forums.</p>
+<p>One of the key features of RBAC is the use of Groups to define the level of
+access and to encourage users never being given direct security access, but
+rather being part of a group that has that access. This makes it easy to give
+a new user “Fred” access to the same stuff as “Bob” for his job at Club A
+without accidentally also giving him Bob’s special access at Club B that he
+shouldn’t have.</p>
+</div>
+<div class="section" id="security-basics">
+<h1>Security Basics<a class="headerlink" href="#security-basics" title="Permalink to this headline">¶</a></h1>
+<p>There are two main things when it comes to user security:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Authentication</strong> - Is it you? Userids, passwords, two factor authentication
+etc. Things that let us check it is really you.</p></li>
+<li><p><strong>Authorisation</strong> - Ok, it is you, but what are you allowed to do?</p></li>
+</ul>
+</div></blockquote>
+<p>The RBAC module is about <strong>Authorisation</strong>. It has nothing to do with checking
+who you are, just what you can do.</p>
+</div>
+<div class="section" id="background">
+<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="django-options">
+<h2>Django Options<a class="headerlink" href="#django-options" title="Permalink to this headline">¶</a></h2>
+<p><em>Django already provides this, so why are we not using that here?</em></p>
+<p>Django only provides authorisation at a relatively high level.</p>
+<p>Basically, with Django, we can control if someone should be able to create
+a forum post,
+delete a forum post, etc but not which forums they can do this in. We need
+our security to be at the next level down, which Django doesn’t support.</p>
+</div>
+<div class="section" id="third-party-options">
+<h2>Third Party Options<a class="headerlink" href="#third-party-options" title="Permalink to this headline">¶</a></h2>
+<p>Short answer, couldn’t find one that works, is supported and isn’t massively
+more complicated to learn than writing our own. The code here is not difficult so
+if a better third part option appears then we should use it.</p>
+</div>
+</div>
+<div class="section" id="rbac-roles">
+<h1>RBAC Roles<a class="headerlink" href="#rbac-roles" title="Permalink to this headline">¶</a></h1>
+<p>When you interact with RBAC you either create, delete or check upon the roles that a
+user has. Roles are simple strings, with a role_type of either “Allow” or
+“Block”. The strings are arbitrary but important to get right if you want the
+security to work.</p>
+<p><strong>Format:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">app</span><span class="o">&gt;&lt;</span><span class="n">model</span><span class="o">&gt;.&lt;</span><span class="n">optional</span> <span class="n">further</span> <span class="n">divisions</span><span class="o">&gt;.&lt;</span><span class="n">action</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<ol class="arabic simple">
+<li><p>forums.forum.moderate “Allow”</p></li>
+<li><p>forums.post.5.edit “Block”</p></li>
+<li><p>organisations.organisation.7.admin “Allow”</p></li>
+</ol>
+<p>Example 1 says that this user is allowed to moderate all forums (RBAC doesn’t know
+what moderating is, it just handles the rules, it is up to each application
+to implement the required controls itself). We can break this down as follows:</p>
+<ul class="simple">
+<li><p><em>forums</em> - the Django application in question</p></li>
+<li><p><em>forum</em> - the model within the application that this applies to</p></li>
+<li><p><em>moderate</em> - the action</p></li>
+</ul>
+<p>Note that an application can choose to use this structure for anything, it doesn’t
+have to refer to a model, or even an application.</p>
+<p>Example 2 is more specific. It says that this user cannot edit the post with a
+primary key of 5. This relies on the fact that Django primary keys are unique and
+never reused.</p>
+<p><strong>Specific rules take precedent over general rules</strong></p>
+<p>If there are two rules in place as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">payments</span><span class="o">.</span><span class="n">stripetransaction</span><span class="o">.</span><span class="n">view</span> <span class="s2">&quot;Allow&quot;</span>
+<span class="n">payments</span><span class="o">.</span><span class="n">stripetransaction</span><span class="o">.</span><span class="mf">27.</span><span class="n">view</span> <span class="s2">&quot;Block&quot;</span>
+</pre></div>
+</div>
+<p>Then a request for <em>payments.stripetransaction.27.view</em> will return Block.</p>
+<p><strong>Allow is the default behaviour. If no match is found then Allow will be returned</strong></p>
+</div>
+<div class="section" id="groups">
+<h1>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="priorities">
+<h1>Priorities<a class="headerlink" href="#priorities" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="creating-a-role">
+<h1>Creating A Role<a class="headerlink" href="#creating-a-role" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_function</span><span class="p">():</span>
+    <span class="n">interesting</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span> <span class="s1">&#39;This line is highlighted.&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;This one is not...&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;...but this one is.&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="accessing-a-role">
+<h1>Accessing A Role<a class="headerlink" href="#accessing-a-role" title="Permalink to this headline">¶</a></h1>
+<p>The following example shows how to check for a role.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forum</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="k">if</span> <span class="n">rbac</span><span class="o">.</span><span class="n">user_has_role</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;forums.forum.</span><span class="se">{{</span><span class="s2">forum</span><span class="se">}}</span><span class="s2">.create&quot;</span><span class="p">):</span>
+  <span class="c1"># allow user to continue</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="c1"># show user an error screen</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="checking-on-a-role">
+<h1>Checking on A Role<a class="headerlink" href="#checking-on-a-role" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="deleting-a-role">
+<h1>Deleting A Role<a class="headerlink" href="#deleting-a-role" title="Permalink to this headline">¶</a></h1>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, ABF
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

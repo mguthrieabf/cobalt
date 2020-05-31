@@ -167,6 +167,7 @@
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
 <span class="kn">import</span> <span class="nn">ipinfo</span>
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">DEFAULT_FROM_EMAIL</span>
+<span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">send_cobalt_email</span>
 <span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">get_client_ip</span><span class="p">,</span> <span class="n">log_event</span>
 <span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">MemberOrganisation</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">User</span>
@@ -208,7 +209,9 @@
                 <span class="s1">&#39;token&#39;</span><span class="p">:</span><span class="n">account_activation_token</span><span class="o">.</span><span class="n">make_token</span><span class="p">(</span><span class="n">user</span><span class="p">),</span>
             <span class="p">})</span>
             <span class="n">to_email</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">)</span>
-            <span class="n">send_mail</span><span class="p">(</span><span class="n">mail_subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">to_email</span><span class="p">],</span> <span class="n">fail_silently</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1">#            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)</span>
+            <span class="n">send_cobalt_email</span><span class="p">(</span><span class="n">to_email</span><span class="p">,</span> <span class="n">mail_subject</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/register_complete.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;email_address&#39;</span> <span class="p">:</span> <span class="n">to_email</span><span class="p">})</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">UserRegisterForm</span><span class="p">()</span>

@@ -144,8 +144,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for notifications.views</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot; Notifications handles messages that Cobalt applications wish to pass to</span>
-<span class="sd">    users.</span>
+<span></span><span class="sd">&quot;&quot;&quot; Notifications handles messages that Cobalt applications wish to pass to users.</span>
 
 <span class="sd">    See `Notifications Overview`_ for more details.</span>
 
@@ -162,24 +161,35 @@
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">AWS_SECRET_ACCESS_KEY</span><span class="p">,</span> <span class="n">AWS_REGION_NAME</span><span class="p">,</span> <span class="n">AWS_ACCESS_KEY_ID</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">InAppNotification</span><span class="p">,</span> <span class="n">NotificationMapping</span>
 <span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">send_mail</span>
-<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">DEFAULT_FROM_EMAIL</span>
+<span class="kn">from</span> <span class="nn">django.utils.html</span> <span class="kn">import</span> <span class="n">strip_tags</span>
+<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="n">GLOBAL_TITLE</span>
 
 <div class="viewcode-block" id="send_cobalt_email"><a class="viewcode-back" href="../../notifications.html#notifications.views.send_cobalt_email">[docs]</a><span class="k">def</span> <span class="nf">send_cobalt_email</span><span class="p">(</span><span class="n">to_address</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Send single email</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        to_address - who to send to</span>
-<span class="sd">        subject - subject line for email</span>
-<span class="sd">        msg - message to send</span>
+<span class="sd">        to_address (str): who to send to</span>
+<span class="sd">        subject (str): subject line for email</span>
+<span class="sd">        msg (str): message to send in HTML or plain format</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Nothing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">to_address</span><span class="p">],</span> <span class="n">fail_silently</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">plain_msg</span> <span class="o">=</span> <span class="n">strip_tags</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">plain_msg</span><span class="p">,</span> <span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">to_address</span><span class="p">],</span> <span class="n">html_message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="send_cobalt_sms"><a class="viewcode-back" href="../../notifications.html#notifications.views.send_cobalt_sms">[docs]</a><span class="k">def</span> <span class="nf">send_cobalt_sms</span><span class="p">(</span><span class="n">phone_number</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Inside SMS&quot;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Send single SMS</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        phone_number (str): who to send to</span>
+<span class="sd">        msg (str): message to send</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
         <span class="s2">&quot;sns&quot;</span><span class="p">,</span>
         <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">AWS_ACCESS_KEY_ID</span><span class="p">,</span>
@@ -187,14 +197,13 @@
         <span class="n">region_name</span><span class="o">=</span><span class="n">AWS_REGION_NAME</span>
     <span class="p">)</span>
 
-    <span class="c1"># Send your sms message.</span>
     <span class="n">client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
         <span class="n">PhoneNumber</span><span class="o">=</span><span class="n">phone_number</span><span class="p">,</span>
         <span class="n">Message</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
         <span class="n">MessageAttributes</span><span class="o">=</span><span class="p">{</span>
             <span class="s1">&#39;AWS.SNS.SMS.SenderID&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s1">&#39;DataType&#39;</span><span class="p">:</span> <span class="s1">&#39;String&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;StringValue&#39;</span><span class="p">:</span> <span class="s1">&#39;ABFTech&#39;</span>
+            <span class="s1">&#39;StringValue&#39;</span><span class="p">:</span> <span class="n">GLOBAL_TITLE</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">)</span></div>
@@ -202,13 +211,18 @@
 <div class="viewcode-block" id="get_notifications_for_user"><a class="viewcode-back" href="../../notifications.html#notifications.views.get_notifications_for_user">[docs]</a><span class="k">def</span> <span class="nf">get_notifications_for_user</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get a list of all unacklowledged notifications for a user</span>
 
+<span class="sd">    Returns a list of notifications for the user where the status is</span>
+<span class="sd">    unacknowledged.</span>
+
+<span class="sd">    TODO: Limit the size of the list. Maybe add a home page to manage them.</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        user - standard User object</span>
+<span class="sd">        user (User): standard User object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list - list of notifications which are dictionaries</span>
-
+<span class="sd">        list: List of notifications which themselves are dictionaries</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">notifications</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">notes</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">acknowledged</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">note</span> <span class="ow">in</span> <span class="n">notes</span><span class="p">:</span>

@@ -435,11 +435,10 @@ object the first time, the query is executed.</p>
 </div>
 <div class="section" id="module-notifications.views">
 <span id="notifications-views-module"></span><h2>notifications.views module<a class="headerlink" href="#module-notifications.views" title="Permalink to this headline">¶</a></h2>
-<dl>
-<dt>Notifications handles messages that Cobalt applications wish to pass to</dt><dd><p>users.</p>
-<p>See <a class="reference external" href="./notifications_overview.html">Notifications Overview</a> for more details.</p>
-</dd>
-</dl>
+<p>Notifications handles messages that Cobalt applications wish to pass to users.</p>
+<blockquote>
+<div><p>See <a class="reference external" href="./notifications_overview.html">Notifications Overview</a> for more details.</p>
+</div></blockquote>
 <dl class="py function">
 <dt id="notifications.views.acknowledge__in_app_notification">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">acknowledge__in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#acknowledge__in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.acknowledge__in_app_notification" title="Permalink to this definition">¶</a></dt>
@@ -487,12 +486,18 @@ will call this to register a notification for comments on a users post.</p>
 <dt id="notifications.views.get_notifications_for_user">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">get_notifications_for_user</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#get_notifications_for_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.get_notifications_for_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of all unacklowledged notifications for a user</p>
+<p>Returns a list of notifications for the user where the status is
+unacknowledged.</p>
+<p>TODO: Limit the size of the list. Maybe add a home page to manage them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>- standard User object</strong> (<em>user</em>) – </p>
+<dd class="field-odd"><p><strong>user</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard User object</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list - list of notifications which are dictionaries</p>
+<dd class="field-even"><p>List of notifications which themselves are dictionaries</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -535,9 +540,9 @@ Might be able to make this generic</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>- who to send to</strong> (<em>to_address</em>) – </p></li>
-<li><p><strong>- subject line for email</strong> (<em>subject</em>) – </p></li>
-<li><p><strong>- message to send</strong> (<em>msg</em>) – </p></li>
+<li><p><strong>to_address</strong> (<em>str</em>) – who to send to</p></li>
+<li><p><strong>subject</strong> (<em>str</em>) – subject line for email</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – message to send in HTML or plain format</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -549,7 +554,19 @@ Might be able to make this generic</p>
 <dl class="py function">
 <dt id="notifications.views.send_cobalt_sms">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">send_cobalt_sms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phone_number</span></em>, <em class="sig-param"><span class="n">msg</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#send_cobalt_sms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.send_cobalt_sms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Send single SMS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>phone_number</strong> (<em>str</em>) – who to send to</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – message to send</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-notifications">
