@@ -15,46 +15,38 @@ from forums.models import Forum, Post, Comment1, Comment2
 from organisations.models import Organisation
 from django.apps import apps
 
-class UserApplication(models.Model):
-    """ Core model to map a User to an Application model instance and a role.
+class RBACGroup(models.Model):
+    """ Group definitions """
 
-    This uses GenericForeignKey to be able to map to any Cobalt app model as if
-    it was a foreign key.
+    group_name = models.CharField(max_length=50)
 
-    - member is a User
-    - model_content_type is a class within a model definition
-    - model_id is an instance of model_content_type
-    - model_instance is **TBA**
-    - role is the permissioned role
+    def __str__(self):
+        return self.group_name
 
-    E.g.
+class RBACUserGroup(models.Model):
+    """ Maps users to Groups """
 
-    - Member: <John Smith>
-    - model_content_type: "Forum" (=forums.views.Forum). Must match an import in rbac/models.py
-    - model_id: 6 (forum with id=6)
-    - role: forums.content.create (can create content in this forum)
-
-    """
-
-    member = models.ForeignKey(User,
-        on_delete=models.CASCADE
-    )
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
     """ Standard User object """
 
-    model_content_type = models.ForeignKey(ContentType,
+    rbac_group = models.ForeignKey(RBACGroup, on_delete=models.CASCADE)
+    """ RBAC Group """
+
+    def __str__(self):
+        return "%s - %s" % (self.rbac_group, self.member)
+
+class RBACGroupRole(models.Model):
+    """ Core model to map a group to a role. """
+
+    group = models.ForeignKey(RBACGroup,
         on_delete=models.CASCADE
     )
-    """ Maps to the model. Must be imported in rbac/models.py (this file) """
-
-    model_id = models.PositiveIntegerField()
-    """ id of the instance of this class model that this rule applies to """
-
-    model_instance = fields.GenericForeignKey('model_content_type', 'model_id')
-    """ To be better understood """
+    """ RBACGroup for this Role """
 
     role = models.CharField(max_length=50)
     """ The role in dotted format. This is controlled by the Cobalt app that
-    creates and uses it. Format should be <app>.<noun>.<action>
+    creates and uses it. Format should be <app>.<model>.<action> or
+    <app>.<model>.<instance>.<action>
     """
 
     RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Blcok User Access")]
@@ -62,55 +54,7 @@ class UserApplication(models.Model):
         choices=RULE_TYPES,
         default="Allow"
     )
+    """ Rules can Allow or Block permissions """
 
     def __str__(self):
-        return '%s - %s - %s' % (self.member, self.role, self.model_id)
-
-    def create_cobalt_rbac_mapping(member, app_name, model_name, rule_type, role, model_id=None):
-        """ Create an RBAC record
-
-        Create RBAC entry.
-
-        Args:
-            member(User): standard user object
-            app_name(str): name of the application
-            model_name(str): name of the application model class
-            model_id(int): primary key for the instance of model_name this rule applies for
-            role(str): dot format role <app>.<noun>.<action>
-            rule_type(str): Allow or Block
-
-        Returns:
-            Nothing.
-        """
-        model = ContentType.objects.get(app_label=app_name, model=model_name)
-        rule = UserApplication(member=member, model_content_type=model, model_id=model_id, role=role, rule_type=rule_type)
-        rule.save()
-        print(rule)
-
-    def user_rbac_role_for_object(member, app_name, model_name, model_id):
-        """ Return an RBAC record
-
-        Args:
-            member(User): standard user object
-            app_name(str): name of the application
-            model_name(str): name of the application model class
-            model_id(int): primary key for the instance of model_name this rule applies for
-
-        Returns:
-            role(str): dot format role <app>.<noun>.<action>. Or None.
-        """
-
-        model = ContentType.objects.get(app_label=app_name, model=model_name)
-        matches = UserApplication.objects.filter(member=member, model_content_type=model, model_id=model_id)
-
-        print("Instance level rules:")
-        print(matches)
-        matches_up = UserApplication.objects.filter(member=member, model_content_type=model, model_id=None)
-        print("High level rules:")
-        print(matches_up)
-
-
-        return matches
-
-    def user_has_role(member, role, app_name, model_name, model_id=None):
-        return False
+        return '%s - %s - %s' % (self.group, self.role, self.rule_type)

@@ -68,7 +68,7 @@ security to work.
 
 .. code-block:: python
 
-  <app><model>.<optional further divisions>.<action>
+  <app><model>.<optional model_id>.<action>
 
 For example:
 
@@ -107,29 +107,26 @@ Then a request for *payments.stripetransaction.27.view* will return Block.
 Groups
 ======
 
-Priorities
-==========
+Roles are never granted to users, they are only granted to Groups and users
+can be members of Groups.
 
+API Functions
+=============
 
+Mostly, granting access is done by administrators of various levels through
+the user interface, so checking access is the most common function.
 
-Creating A Role
-===============
+Note - there is no validation through the API that this action is allowed.
+The calling application is responsible for checking this.
 
+Checking User Access
+--------------------
 
-.. code-block:: python
-
-   def some_function():
-       interesting = False
-       print 'This line is highlighted.'
-       print 'This one is not...'
-       print '...but this one is.'
-
-Accessing A Role
-================
-
-The following example shows how to check for a role.
+To check access you can use the following:
 
 .. code-block:: python
+
+  from rbac.views import rbac_user_has_role
 
   forum = 6
   if rbac.user_has_role(f"forums.forum.{{forum}}.create"):
@@ -137,8 +134,71 @@ The following example shows how to check for a role.
   else:
     # show user an error screen
 
-Checking on A Role
-==================
+Creating A Group
+----------------
 
-Deleting A Role
-===============
+To create a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_create_group
+
+  id = rbac_create_group("New Group for Something")
+
+Deleting A Group
+----------------
+
+To delete a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_delete_group
+
+  rbac_delete_group(id)
+
+This will also delete all users from the group by removing the entries from
+RBACUserGroup (Django does this for us as a CASCADE).
+
+Adding a Member to a Group
+--------------------------
+
+To add a member to a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_add_user_to_group
+
+  rbac_add_user_to_group(member, group)
+
+Removing a Member from a Group
+------------------------------
+
+To remove a member from a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_remove_user_from_group
+
+  rbac_remove_user_from_group(member, group)
+
+Adding a Role to a Group
+------------------------
+
+To add a role to a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_add_role_to_group
+
+  rbac_add_role_to_group(group, role)
+
+Removing a Role from a Group
+----------------------------
+
+To add a role to a group through the API:
+
+.. code-block:: python
+
+  from rbac.views import rbac_remove_role_from_group
+
+  rbac_remove_role_from_group(group, role)

@@ -33,7 +33,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['system_number', 'email'] # tells createsuperuser to ask for them
 
     def __str__(self):
-        return "%s - %s" % (self.system_number, self.full_name)
+        return "%s(%s: %s)" % (self.full_name, GLOBAL_ORG, self.system_number)
 
     @property
     def full_name(self):
