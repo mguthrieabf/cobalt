@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import RBACGroup, RBACUserGroup, RBACGroupRole
 
-# Register your models here.
+admin.site.register(RBACGroup)
+admin.site.register(RBACUserGroup)
+admin.site.register(RBACGroupRole)

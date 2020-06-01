@@ -18,7 +18,7 @@ from django.apps import apps
 class RBACGroup(models.Model):
     """ Group definitions """
 
-    group_name = models.CharField(max_length=50)
+    group_name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.group_name
@@ -43,7 +43,7 @@ class RBACGroupRole(models.Model):
     )
     """ RBACGroup for this Role """
 
-    role = models.CharField(max_length=50)
+    role = models.CharField(max_length=50, unique=True)
     """ The role in dotted format. This is controlled by the Cobalt app that
     creates and uses it. Format should be <app>.<model>.<action> or
     <app>.<model>.<instance>.<action>

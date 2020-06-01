@@ -1,4 +1,12 @@
-from django.shortcuts import render
+""" Role Based Access Control Core
+
+    This handles the core functions for role based security for Cobalt.
+
+    See `RBAC Overview`_ for more details.
+
+    .. _RBAC Overview:
+       ./rbac_overview.html
+"""
 from .models import RBACGroup, RBACUserGroup, RBACGroupRole
 
 def rbac_create_group(group_name):
