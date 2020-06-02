@@ -68,7 +68,7 @@ def rbac_add_user_to_group(member, group):
         RBACUserGroup
     """
 
-    user_group = RBACUserGroup(member=member, rbac_group=group)
+    user_group = RBACUserGroup(member=member, group=group)
     user_group.save()
     return user_group
 
@@ -84,7 +84,7 @@ def rbac_remove_user_from_group(member, group):
     """
 
     try:
-        user_group = RBACUserGroup.objects.filter(member=member, rbac_group=group)
+        user_group = RBACUserGroup.objects.filter(member=member, group=group)
         user_group.delete()
         return True
     except DoesNotExist:
@@ -151,7 +151,7 @@ def user_has_role(member, role):
     print("model instance: %s" % model_instance)
     print("action: %s" % action)
 
-    groups = RBACUserGroup.objects.filter(member=member).values_list('rbac_group')
+    groups = RBACUserGroup.objects.filter(member=member).values_list('group')
     print("Looked up groups for %s:" % member)
     for g in groups:
         print(g)

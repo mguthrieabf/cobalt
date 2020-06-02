@@ -21,6 +21,7 @@ urlpatterns = [
     path('forums/', include('forums.urls', namespace='forums')),
     path('masterpoints/', include('masterpoints.urls', namespace='masterpoints')),
     path('payments/', include('payments.urls', namespace='payments')),
+    path('rbac/', include('rbac.urls', namespace='rbac')),
     path('logs/', include('logs.urls', namespace='logs')),
     path('support', include('support.urls', namespace='support')),
     path('summernote/', include('django_summernote.urls')),

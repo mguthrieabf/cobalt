@@ -18,10 +18,15 @@ from django.apps import apps
 class RBACGroup(models.Model):
     """ Group definitions """
 
-    group_name = models.CharField(max_length=50, unique=True)
+    group_name = models.CharField(max_length=50)
+    description = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.group_name
+        return self.group_id
+
+    @property
+    def group_id(self):
+        return "%s.%s - %s" % (self.group_name, self.id, self.description)
 
 class RBACUserGroup(models.Model):
     """ Maps users to Groups """
@@ -29,11 +34,11 @@ class RBACUserGroup(models.Model):
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     """ Standard User object """
 
-    rbac_group = models.ForeignKey(RBACGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(RBACGroup, on_delete=models.CASCADE)
     """ RBAC Group """
 
     def __str__(self):
-        return "%s - %s" % (self.rbac_group, self.member)
+        return "%s - %s" % (self.group, self.member)
 
 class RBACGroupRole(models.Model):
     """ Core model to map a group to a role. """
@@ -43,11 +48,17 @@ class RBACGroupRole(models.Model):
     )
     """ RBACGroup for this Role """
 
-    role = models.CharField(max_length=50, unique=True)
-    """ The role in dotted format. This is controlled by the Cobalt app that
-    creates and uses it. Format should be <app>.<model>.<action> or
-    <app>.<model>.<instance>.<action>
-    """
+    app = models.CharField(max_length=15)
+    """ Application level hierarchy """
+
+    model = models.CharField(max_length=15)
+    """ model level hierarchy """
+
+    model_id = models.CharField(max_length=15, default=None)
+    """ Instance of model level hierarchy """
+
+    action = models.CharField(max_length=15)
+    """ What this role allows you to do here """
 
     RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Blcok User Access")]
     rule_type = models.CharField(max_length=5,
@@ -58,3 +69,11 @@ class RBACGroupRole(models.Model):
 
     def __str__(self):
         return '%s - %s - %s' % (self.group, self.role, self.rule_type)
+
+    @property
+    def role(self):
+        "Returns the role in dotted format."
+        if self.model_id:
+            return '%s.%s.%s.%s' % (self.app, self.model, self.model_id, self.action)
+        else:
+            return '%s.%s.%s' % (self.app, self.model, self.action)
