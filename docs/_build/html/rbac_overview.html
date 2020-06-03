@@ -154,10 +154,10 @@ control a user being an administrator at Club A, a director at Club B, and
 a simple member of Club C. It allows us to define moderators for Forums at the
 individual forum level rather than having a binary control of being a moderator
 or not being a moderator that applies for all forums.</p>
-<p>One of the key features of RBAC is the use of Groups to define the level of
-access and to encourage users never being given direct security access, but
-rather being part of a group that has that access. This makes it easy to give
-a new user “Fred” access to the same stuff as “Bob” for his job at Club A
+<p>One of the key features of RBAC is the use of <strong>Groups</strong> to define the level of
+access and to prevent users being given direct security access.
+This makes it easy to give
+a new user <em>Fred</em> access to the same stuff as <em>Bob</em> for his job at Club A,
 without accidentally also giving him Bob’s special access at Club B that he
 shouldn’t have.</p>
 </div>
@@ -179,7 +179,7 @@ who you are, just what you can do.</p>
 <div class="section" id="django-options">
 <h2>Django Options<a class="headerlink" href="#django-options" title="Permalink to this headline">¶</a></h2>
 <p><em>Django already provides this, so why are we not using that here?</em></p>
-<p>Django only provides authorisation at a relatively high level.</p>
+<p>Django only provides authorisation at the model level.</p>
 <p>Basically, with Django, we can control if someone should be able to create
 a forum post,
 delete a forum post, etc but not which forums they can do this in. We need
@@ -187,26 +187,35 @@ our security to be at the next level down, which Django doesn’t support.</p>
 </div>
 <div class="section" id="third-party-options">
 <h2>Third Party Options<a class="headerlink" href="#third-party-options" title="Permalink to this headline">¶</a></h2>
-<p>Short answer, couldn’t find one that works, is supported and isn’t massively
+<p>Short answer, we couldn’t find one that works, is supported and isn’t massively
 more complicated to learn than writing our own. The code here is not difficult so
 if a better third part option appears then we should use it.</p>
 </div>
 </div>
+<div class="section" id="rbac-model-overview">
+<h1>RBAC Model Overview<a class="headerlink" href="#rbac-model-overview" title="Permalink to this headline">¶</a></h1>
+<a class="reference internal image-reference" href="_images/rbac.png"><img alt="Cobalt Chemical Symbol" src="_images/rbac.png" style="width: 800px;" /></a>
+</div>
 <div class="section" id="rbac-roles">
 <h1>RBAC Roles<a class="headerlink" href="#rbac-roles" title="Permalink to this headline">¶</a></h1>
 <p>When you interact with RBAC you either create, delete or check upon the roles that a
-user has. Roles are simple strings, with a role_type of either “Allow” or
-“Block”. The strings are arbitrary but important to get right if you want the
-security to work.</p>
+user has. Roles are hierarchical, and have a role_type of either “Allow” or
+“Block”. Roles consist of 3 mandatory components and one optional:</p>
 <p><strong>Format:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">app</span><span class="o">&gt;&lt;</span><span class="n">model</span><span class="o">&gt;.&lt;</span><span class="n">optional</span> <span class="n">further</span> <span class="n">divisions</span><span class="o">&gt;.&lt;</span><span class="n">action</span><span class="o">&gt;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">app</span><span class="o">&gt;.&lt;</span><span class="n">model</span><span class="o">&gt;.&lt;</span><span class="n">optional</span> <span class="n">model_id</span><span class="o">&gt;.&lt;</span><span class="n">action</span><span class="o">&gt;</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li><p><em>app</em>: is the Cobalt application name</p></li>
+<li><p><em>model</em>: is the model within the application</p></li>
+<li><p><em>model_id</em>: is the instance of the model (optional, if not supplied then this applies to all instances)</p></li>
+<li><p><em>action</em>: what this rules allows you to do, application specific</p></li>
+</ul>
 <p>For example:</p>
 <ol class="arabic simple">
-<li><p>forums.forum.moderate “Allow”</p></li>
-<li><p>forums.post.5.edit “Block”</p></li>
-<li><p>organisations.organisation.7.admin “Allow”</p></li>
+<li><p>“forums.forum.moderate” “Allow”</p></li>
+<li><p>“forums.post.5.edit” “Block”</p></li>
+<li><p>“organisations.organisation.7.admin” “Allow”</p></li>
 </ol>
 <p>Example 1 says that this user is allowed to moderate all forums (RBAC doesn’t know
 what moderating is, it just handles the rules, it is up to each application
@@ -228,40 +237,199 @@ never reused.</p>
 </pre></div>
 </div>
 <p>Then a request for <em>payments.stripetransaction.27.view</em> will return Block.</p>
-<p><strong>Allow is the default behaviour. If no match is found then Allow will be returned</strong></p>
+<div class="section" id="default-behaviour">
+<h2>Default Behaviour<a class="headerlink" href="#default-behaviour" title="Permalink to this headline">¶</a></h2>
+<p>Each application and model must define its own default behaviour in the model
+<code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACModelDefault</span></code>. The options are <em>Allow</em> or <em>Block</em>.</p>
+<p>e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac</span> <span class="kn">import</span> <span class="n">RBACModelDefault</span>
+
+<span class="n">r</span><span class="o">=</span><span class="n">RBACModelDefault</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">default_behaviour</span><span class="o">=</span><span class="s2">&quot;Allow&quot;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Default behaviour is important because some applications are by default going
+to want to prevent access (e.g. being a director for a club), and some are
+by default going to want to allow access (e.g. forums).</p>
+</div>
+<div class="section" id="actions">
+<h2>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h2>
+<p>The action attribute of RBAC roles is application specific and the valid options
+need to be defined in <code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACAppModelAction</span></code>. This is the
+responsibility of the application.</p>
+<p>e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.models</span> <span class="kn">import</span> <span class="n">RBACAppModelAction</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">valid_action</span><span class="o">=</span><span class="s2">&quot;create&quot;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For consistency across applications, all <em>valid_actions</em> should be lowercase
+and unless there is good reason, the basic CRUD types should be named:</p>
+<ul class="simple">
+<li><p>create</p></li>
+<li><p>edit</p></li>
+<li><p>view</p></li>
+<li><p>delete</p></li>
+</ul>
+<p>In addition to what is defined by the application, RBAC adds two built-in
+actions:</p>
+<ul class="simple">
+<li><p><strong>all</strong> - will match any action attribute. You do not need to add all, it is done
+automatically.</p></li>
+<li><p><strong>admin</strong> - gives the group the ability to change the settings for any other user.</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="groups">
 <h1>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h1>
+<p>Roles are never granted to users, they are only granted to Groups and users
+can be members of Groups. This is the most fundamental principle of Role
+Based Access Control.</p>
+<div class="section" id="everyone">
+<h2>Everyone<a class="headerlink" href="#everyone" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes you want to flip the default behaviour within an app.model. For
+example, if the default behaviour is <em>block</em> you may wish to <em>allow</em> access
+but to put in specific restrictions. There are many other situation where
+you need to have a global ability to change things. For this reason RBAC
+has the concept of <strong>everyone</strong>.</p>
+<p>Probably the easiest way to explain this is to consider the case where we do
+not have <strong>everyone</strong>. Imagine that you wish to block people from accessing
+forum id=15, with description “World Domination”, given than the default
+behaviour for forums.forum is “Allow”. You can easily add a rule that says:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mf">15.</span><span class="n">view</span> <span class="n">block</span>
+</pre></div>
 </div>
-<div class="section" id="priorities">
-<h1>Priorities<a class="headerlink" href="#priorities" title="Permalink to this headline">¶</a></h1>
+<p>And associate this with group</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Hide secret group away&quot;</span>
+</pre></div>
 </div>
-<div class="section" id="creating-a-role">
-<h1>Creating A Role<a class="headerlink" href="#creating-a-role" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">some_function</span><span class="p">():</span>
-    <span class="n">interesting</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="nb">print</span> <span class="s1">&#39;This line is highlighted.&#39;</span>
-    <span class="nb">print</span> <span class="s1">&#39;This one is not...&#39;</span>
-    <span class="nb">print</span> <span class="s1">&#39;...but this one is.&#39;</span>
+<p>Then you can add every member of the site to this group, except for the people
+that you want to be able to see it. However, every time
+a new user is created you would need to add them to the same group. It won’t work.</p>
+<p>A better option is to create a rule that blocks this for everyone, and then
+to add specific exceptions.</p>
+<p>This can be done by using the user <strong>everyone</strong>. This is set to a specific user
+defined in <code class="file docutils literal notranslate"><span class="pre">cobalt/settings.py</span></code> called RBAC_EVERYONE. By default this is the
+first user created, id=1, which is usually an admin account that should be
+disabled anyway.</p>
+<p>So in this example, the rules to create would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Block all</span>
+
+<span class="n">RBACGroup</span><span class="p">:</span> <span class="s2">&quot;Hide secret group away&quot;</span>
+<span class="n">RBACGroupRole</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mf">15.</span><span class="n">view</span> <span class="n">Block</span>
+<span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">everyone</span>
+
+<span class="c1"># Allow specific</span>
+
+<span class="n">RBACGroup</span><span class="p">:</span> <span class="s2">&quot;Let special people in&quot;</span>
+<span class="n">RBACGroupRole</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mf">15.</span><span class="n">view</span> <span class="n">Allow</span>
+<span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Fred</span><span class="p">,</span> <span class="n">Wilma</span><span class="p">,</span> <span class="n">Bam</span><span class="o">-</span><span class="n">Bam</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="accessing-a-role">
-<h1>Accessing A Role<a class="headerlink" href="#accessing-a-role" title="Permalink to this headline">¶</a></h1>
-<p>The following example shows how to check for a role.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forum</span> <span class="o">=</span> <span class="mi">6</span>
+</div>
+<div class="section" id="api-functions">
+<h1>API Functions<a class="headerlink" href="#api-functions" title="Permalink to this headline">¶</a></h1>
+<p>Granting access is generally done by administrators of various levels through
+the user interface, so checking access is the most common function. However,
+access can be granted through the API.</p>
+<div class="section" id="checking-user-access">
+<h2>Checking User Access<a class="headerlink" href="#checking-user-access" title="Permalink to this headline">¶</a></h2>
+<p>There are several ways to check access. The choice depends mainly upon
+whether you are building a list or checking at the instance level, also
+whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
+<p>To check access at the instance level you can use the following example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_has_role</span>
+
+<span class="n">forum</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="k">if</span> <span class="n">rbac</span><span class="o">.</span><span class="n">user_has_role</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;forums.forum.</span><span class="se">{{</span><span class="s2">forum</span><span class="se">}}</span><span class="s2">.create&quot;</span><span class="p">):</span>
   <span class="c1"># allow user to continue</span>
 <span class="k">else</span><span class="p">:</span>
   <span class="c1"># show user an error screen</span>
 </pre></div>
 </div>
+<p>For a default of <em>Allow</em> you can use the following code snippet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_blocked_for_model</span>
+
+<span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                      <span class="n">app</span><span class="o">=</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span>
+                                      <span class="n">model</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
+                                      <span class="n">action</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+
+<span class="c1"># Now use the list like this</span>
+<span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="checking-on-a-role">
-<h1>Checking on A Role<a class="headerlink" href="#checking-on-a-role" title="Permalink to this headline">¶</a></h1>
+<p>For a default of <em>Block</em> you can use the following code snippet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_allowed_for_model</span>
+
+<span class="n">allowed</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                      <span class="n">app</span><span class="o">=</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span>
+                                      <span class="n">model</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
+                                      <span class="n">action</span><span class="o">=</span><span class="s1">&#39;edit&#39;</span><span class="p">)</span>
+
+<span class="c1"># Now use the list like this</span>
+<span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">allowed</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="deleting-a-role">
-<h1>Deleting A Role<a class="headerlink" href="#deleting-a-role" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="creating-a-group">
+<h2>Creating A Group<a class="headerlink" href="#creating-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To create a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_create_group</span>
+
+<span class="nb">id</span> <span class="o">=</span> <span class="n">rbac_create_group</span><span class="p">(</span><span class="s2">&quot;New Group for Something&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-a-group">
+<h2>Deleting A Group<a class="headerlink" href="#deleting-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To delete a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_delete_group</span>
+
+<span class="n">rbac_delete_group</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will also delete all users from the group by removing the entries from
+RBACUserGroup (Django does this for us as a CASCADE).</p>
+</div>
+<div class="section" id="adding-a-member-to-a-group">
+<h2>Adding a Member to a Group<a class="headerlink" href="#adding-a-member-to-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To add a member to a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_add_user_to_group</span>
+
+<span class="n">rbac_add_user_to_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="removing-a-member-from-a-group">
+<h2>Removing a Member from a Group<a class="headerlink" href="#removing-a-member-from-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To remove a member from a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_remove_user_from_group</span>
+
+<span class="n">rbac_remove_user_from_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-role-to-a-group">
+<h2>Adding a Role to a Group<a class="headerlink" href="#adding-a-role-to-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To add a role to a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_add_role_to_group</span>
+
+<span class="n">rbac_add_role_to_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="removing-a-role-from-a-group">
+<h2>Removing a Role from a Group<a class="headerlink" href="#removing-a-role-from-a-group" title="Permalink to this headline">¶</a></h2>
+<p>To remove a role to a group through the API:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_remove_role_from_group</span>
+
+<span class="n">rbac_remove_role_from_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 

@@ -8,12 +8,12 @@
        ./rbac_overview.html
 """
 from django.db import models
-from django.contrib.contenttypes import fields
-from django.contrib.contenttypes.models import ContentType
+#from django.contrib.contenttypes import fields
+#from django.contrib.contenttypes.models import ContentType
 from accounts.models import User
-from forums.models import Forum, Post, Comment1, Comment2
-from organisations.models import Organisation
-from django.apps import apps
+#from forums.models import Forum, Post, Comment1, Comment2
+#from organisations.models import Organisation
+#from django.apps import apps
 
 RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Block User Access")]
 
@@ -97,3 +97,15 @@ class RBACModelDefault(models.Model):
 
     def __str__(self):
         return "%s.%s %s" % (self.app, self.model, self.default_behaviour)
+
+class RBACAppModelAction(models.Model):
+    """ Valid Actions for an App and Model combination """
+
+    app = models.CharField(max_length=15)
+    """ Application level hierarchy """
+
+    model = models.CharField(max_length=15)
+    """ model level hierarchy """
+
+    valid_action = models.CharField(max_length=15)
+    """ valid actions for this combination """

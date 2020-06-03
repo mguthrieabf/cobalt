@@ -15,10 +15,10 @@ a simple member of Club C. It allows us to define moderators for Forums at the
 individual forum level rather than having a binary control of being a moderator
 or not being a moderator that applies for all forums.
 
-One of the key features of RBAC is the use of Groups to define the level of
-access and to encourage users never being given direct security access, but
-rather being part of a group that has that access. This makes it easy to give
-a new user "Fred" access to the same stuff as "Bob" for his job at Club A
+One of the key features of RBAC is the use of **Groups** to define the level of
+access and to prevent users being given direct security access.
+This makes it easy to give
+a new user *Fred* access to the same stuff as *Bob* for his job at Club A,
 without accidentally also giving him Bob's special access at Club B that he
 shouldn't have.
 
@@ -42,7 +42,7 @@ Django Options
 
 *Django already provides this, so why are we not using that here?*
 
-Django only provides authorisation at a relatively high level.
+Django only provides authorisation at the model level.
 
 Basically, with Django, we can control if someone should be able to create
 a forum post,
@@ -52,29 +52,40 @@ our security to be at the next level down, which Django doesn't support.
 Third Party Options
 -------------------
 
-Short answer, couldn't find one that works, is supported and isn't massively
+Short answer, we couldn't find one that works, is supported and isn't massively
 more complicated to learn than writing our own. The code here is not difficult so
 if a better third part option appears then we should use it.
+
+RBAC Model Overview
+===================
+
+.. image:: images/rbac.png
+ :width: 800
+ :alt: Cobalt Chemical Symbol
 
 RBAC Roles
 ==========
 
 When you interact with RBAC you either create, delete or check upon the roles that a
-user has. Roles are simple strings, with a role_type of either "Allow" or
-"Block". The strings are arbitrary but important to get right if you want the
-security to work.
+user has. Roles are hierarchical, and have a role_type of either "Allow" or
+"Block". Roles consist of 3 mandatory components and one optional:
 
 **Format:**
 
 .. code-block:: python
 
-  <app><model>.<optional model_id>.<action>
+  <app>.<model>.<optional model_id>.<action>
+
+- *app*: is the Cobalt application name
+- *model*: is the model within the application
+- *model_id*: is the instance of the model (optional, if not supplied then this applies to all instances)
+- *action*: what this rules allows you to do, application specific
 
 For example:
 
-1. forums.forum.moderate "Allow"
-2. forums.post.5.edit "Block"
-3. organisations.organisation.7.admin "Allow"
+1. "forums.forum.moderate" "Allow"
+2. "forums.post.5.edit" "Block"
+3. "organisations.organisation.7.admin" "Allow"
 
 Example 1 says that this user is allowed to moderate all forums (RBAC doesn't know
 what moderating is, it just handles the rules, it is up to each application
@@ -102,37 +113,169 @@ If there are two rules in place as follows:
 
 Then a request for *payments.stripetransaction.27.view* will return Block.
 
-**Allow is the default behaviour. If no match is found then Allow will be returned**
+Default Behaviour
+-----------------
+
+Each application and model must define its own default behaviour in the model
+:class:`rbac.models.RBACModelDefault`. The options are *Allow* or *Block*.
+
+e.g.
+
+.. code-block:: python
+
+  from rbac import RBACModelDefault
+
+  r=RBACModelDefault(app="forums", model="forum", default_behaviour="Allow")
+  r.save()
+
+Default behaviour is important because some applications are by default going
+to want to prevent access (e.g. being a director for a club), and some are
+by default going to want to allow access (e.g. forums).
+
+Actions
+-------
+
+The action attribute of RBAC roles is application specific and the valid options
+need to be defined in :class:`rbac.models.RBACAppModelAction`. This is the
+responsibility of the application.
+
+e.g.
+
+.. code-block:: python
+
+  from rbac.models import RBACAppModelAction
+
+  r = RBACAppModelAction(app="forums", model="forum", valid_action="create")
+  r.save()
+
+For consistency across applications, all *valid_actions* should be lowercase
+and unless there is good reason, the basic CRUD types should be named:
+
+- create
+- edit
+- view
+- delete
+
+In addition to what is defined by the application, RBAC adds two built-in
+actions:
+
+- **all** - will match any action attribute. You do not need to add all, it is done
+  automatically.
+- **admin** - gives the group the ability to change the settings for any other user.
 
 Groups
 ======
 
 Roles are never granted to users, they are only granted to Groups and users
-can be members of Groups.
+can be members of Groups. This is the most fundamental principle of Role
+Based Access Control.
+
+Everyone
+--------
+
+Sometimes you want to flip the default behaviour within an app.model. For
+example, if the default behaviour is *block* you may wish to *allow* access
+but to put in specific restrictions. There are many other situation where
+you need to have a global ability to change things. For this reason RBAC
+has the concept of **everyone**.
+
+Probably the easiest way to explain this is to consider the case where we do
+not have **everyone**. Imagine that you wish to block people from accessing
+forum id=15, with description "World Domination", given than the default
+behaviour for forums.forum is "Allow". You can easily add a rule that says:
+
+.. code-block:: python
+
+  forums.forum.15.view block
+
+And associate this with group
+
+.. code-block:: python
+
+  "Hide secret group away"
+
+Then you can add every member of the site to this group, except for the people
+that you want to be able to see it. However, every time
+a new user is created you would need to add them to the same group. It won't work.
+
+A better option is to create a rule that blocks this for everyone, and then
+to add specific exceptions.
+
+This can be done by using the user **everyone**. This is set to a specific user
+defined in :file:`cobalt/settings.py` called RBAC_EVERYONE. By default this is the
+first user created, id=1, which is usually an admin account that should be
+disabled anyway.
+
+So in this example, the rules to create would be:
+
+.. code-block:: python
+
+  # Block all
+
+  RBACGroup: "Hide secret group away"
+  RBACGroupRole: forums.forum.15.view Block
+  RBACUserGroup: everyone
+
+  # Allow specific
+
+  RBACGroup: "Let special people in"
+  RBACGroupRole: forums.forum.15.view Allow
+  RBACUserGroup: Fred, Wilma, Bam-Bam
 
 API Functions
 =============
 
-Mostly, granting access is done by administrators of various levels through
-the user interface, so checking access is the most common function.
-
-Note - there is no validation through the API that this action is allowed.
-The calling application is responsible for checking this.
+Granting access is generally done by administrators of various levels through
+the user interface, so checking access is the most common function. However,
+access can be granted through the API.
 
 Checking User Access
 --------------------
 
-To check access you can use the following:
+There are several ways to check access. The choice depends mainly upon
+whether you are building a list or checking at the instance level, also
+whether your default settings are *Allow* or *Block*.
+
+To check access at the instance level you can use the following example:
 
 .. code-block:: python
 
-  from rbac.views import rbac_user_has_role
+  from rbac.core import rbac_user_has_role
 
   forum = 6
   if rbac.user_has_role(f"forums.forum.{{forum}}.create"):
     # allow user to continue
   else:
     # show user an error screen
+
+For a default of *Allow* you can use the following code snippet:
+
+.. code-block:: python
+
+  from rbac.core import rbac_user_blocked_for_model
+
+  blocked = rbac_user_blocked_for_model(user=request.user,
+                                        app='forums',
+                                        model='forum',
+                                        action='view')
+
+  # Now use the list like this
+  posts_list = Post.objects.exclude(forum__in=blocked)
+
+For a default of *Block* you can use the following code snippet:
+
+.. code-block:: python
+
+  from rbac.core import rbac_user_allowed_for_model
+
+  allowed = rbac_user_allowed_for_model(user=request.user,
+                                        app='forums',
+                                        model='forum',
+                                        action='edit')
+
+  # Now use the list like this
+  posts_list = Post.objects.filter(forum__in=allowed)
+
 
 Creating A Group
 ----------------
@@ -141,7 +284,7 @@ To create a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_create_group
+  from rbac.core import rbac_create_group
 
   id = rbac_create_group("New Group for Something")
 
@@ -152,7 +295,7 @@ To delete a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_delete_group
+  from rbac.core import rbac_delete_group
 
   rbac_delete_group(id)
 
@@ -166,7 +309,7 @@ To add a member to a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_add_user_to_group
+  from rbac.core import rbac_add_user_to_group
 
   rbac_add_user_to_group(member, group)
 
@@ -177,7 +320,7 @@ To remove a member from a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_remove_user_from_group
+  from rbac.core import rbac_remove_user_from_group
 
   rbac_remove_user_from_group(member, group)
 
@@ -188,17 +331,17 @@ To add a role to a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_add_role_to_group
+  from rbac.core import rbac_add_role_to_group
 
   rbac_add_role_to_group(group, role)
 
 Removing a Role from a Group
 ----------------------------
 
-To add a role to a group through the API:
+To remove a role to a group through the API:
 
 .. code-block:: python
 
-  from rbac.views import rbac_remove_role_from_group
+  from rbac.core import rbac_remove_role_from_group
 
   rbac_remove_role_from_group(group, role)

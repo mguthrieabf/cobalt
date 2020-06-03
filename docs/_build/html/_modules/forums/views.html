@@ -152,10 +152,26 @@
 <span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">PostForm</span><span class="p">,</span> <span class="n">CommentForm</span><span class="p">,</span> <span class="n">Comment2Form</span>
 <span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">notify_happening</span><span class="p">,</span> <span class="n">create_user_notification</span>
 <span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_blocked_for_model</span>
 
 <div class="viewcode-block" id="post_list"><a class="viewcode-back" href="../../forums.html#forums.views.post_list">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Summary view showing a list of posts.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): page with list of posts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="c1"># get list of forums user cannot access</span>
+    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                          <span class="n">app</span><span class="o">=</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span>
+                                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
+                                          <span class="n">action</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+
+    <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)</span>
     <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">posts_list</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -167,8 +183,8 @@
 
     <span class="n">posts_new</span><span class="o">=</span><span class="p">[]</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span> <span class="o">=</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span> <span class="o">=</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
         <span class="n">posts_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;forums/post_list.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;posts&#39;</span> <span class="p">:</span> <span class="n">posts_new</span><span class="p">})</span></div>
@@ -178,8 +194,8 @@
     <span class="n">posts</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
     <span class="n">posts_new</span><span class="o">=</span><span class="p">[]</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span> <span class="o">=</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span> <span class="o">=</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
         <span class="n">posts_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">posts_new</span></div>
