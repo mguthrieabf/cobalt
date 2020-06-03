@@ -64,11 +64,18 @@
       var groupid = this.value;
       $.getJSON("group-to-user/" + groupid + "/")
         .done(response => {
-        $("#" + userlist).html(response['data']);
-        $.getJSON("group-to-action/" + groupid + "/")
-          .done(response => {
-          $("#" + actionlist).html(response['data']);
-        });
+        console.log("User call returned");
+        // using .html() causes delays (up to 30 seconds!) for Chrome. Changed to replaceWith()
+        var new_select =  "<select id='" + userlist + "' size='10'>" + response['data'] + "</select>"
+        $("#" + userlist).replaceWith(new_select);
+        console.log("User call update field complete");
+      });
+      $.getJSON("group-to-action/" + groupid + "/")
+        .done(response => {
+        console.log("Action call returned");
+        var new_select =  "<select id='" + actionlist + "' size='10'>" + response['data'] + "</select>"
+        $("#" + actionlist).replaceWith(new_select);
+        console.log("Action call update field complete");
       });
     });
   });

@@ -15,6 +15,8 @@ from forums.models import Forum, Post, Comment1, Comment2
 from organisations.models import Organisation
 from django.apps import apps
 
+RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Block User Access")]
+
 class RBACGroup(models.Model):
     """ Group definitions """
 
@@ -54,13 +56,12 @@ class RBACGroupRole(models.Model):
     model = models.CharField(max_length=15)
     """ model level hierarchy """
 
-    model_id = models.CharField(max_length=15, default=None)
+    model_id = models.IntegerField(blank=True, null=True)
     """ Instance of model level hierarchy """
 
     action = models.CharField(max_length=15)
     """ What this role allows you to do here """
 
-    RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Blcok User Access")]
     rule_type = models.CharField(max_length=5,
         choices=RULE_TYPES,
         default="Allow"
@@ -77,3 +78,22 @@ class RBACGroupRole(models.Model):
             return '%s.%s.%s.%s' % (self.app, self.model, self.model_id, self.action)
         else:
             return '%s.%s.%s' % (self.app, self.model, self.action)
+
+class RBACModelDefault(models.Model):
+    """ Default behaviour for a model. Some models (e.g. forums.forum) need a
+    default of allowing users access unless explicitly blocked. Other models
+    (e.g. organisations.Organisation) need a default behaviour of blocking unless
+    explicitly allowed. """
+    app = models.CharField(max_length=15)
+    """ Application level hierarchy """
+
+    model = models.CharField(max_length=15)
+    """ model level hierarchy """
+
+    default_behaviour = models.CharField(max_length=5,
+        choices=RULE_TYPES,
+        default="Allow"
+    )
+
+    def __str__(self):
+        return "%s.%s %s" % (self.app, self.model, self.default_behaviour)

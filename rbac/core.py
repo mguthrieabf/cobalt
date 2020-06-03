@@ -7,7 +7,7 @@
     .. _RBAC Overview:
        ./rbac_overview.html
 """
-from .models import RBACGroup, RBACUserGroup, RBACGroupRole
+from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACModelDefault
 
 def rbac_create_group(group_name):
     """ Create an RBAC group
@@ -136,20 +136,7 @@ def user_has_role(member, role):
     """
 
 # breakdown role into parts
-    parts = role.split(".")
-    app = parts[0]
-    model = parts[1]
-    action = parts[-1]
-
-    if len(parts) == 4:
-        model_instance = parts[2]
-    else:
-        model_instance = None
-
-    print("app: %s" % app)
-    print("model: %s" % model)
-    print("model instance: %s" % model_instance)
-    print("action: %s" % action)
+    (app, model, model_instance, action) = role_to_parts(role)
 
     groups = RBACUserGroup.objects.filter(member=member).values_list('group')
     print("Looked up groups for %s:" % member)
@@ -188,3 +175,60 @@ def user_has_role(member, role):
                 return False
 
     return True
+
+def role_to_parts(role):
+    """ take a role string and return it in parts
+    Args:
+        role(str):  string in format e.g. forums.forum.5.view
+
+    Returns:
+        tuple:  (app, model, model_instance, action)
+    """
+
+    parts = role.split(".")
+    app = parts[0]
+    model = parts[1]
+    action = parts[-1]
+
+    if len(parts) == 4:
+        model_instance = parts[2]
+    else:
+        model_instance = None
+
+    print("app: %s" % app)
+    print("model: %s" % model)
+    print("model instance: %s" % model_instance)
+    print("action: %s" % action)
+
+    return (app, model, model_instance, action)
+
+def rbac_user_blocked_for_model(user, app, model, action):
+    """ returns a list of model instances which the user cannot view
+    Args:
+        user(User): standard user object
+        app(str):   application name
+        model(str): model name
+        action(str):    action required
+
+    Returns:
+        list:   list of model_instances explicitly block
+    """
+
+    default = RBACModelDefault.objects.filter(app=app, model=model).first()
+
+    if not default:
+        raise ReferenceError("%s.%s not set up in RBACModelDefault" % (app, model))
+
+    if default.default_behaviour == "Block":
+        raise ReferenceError("Only supported for default Allow models")
+
+    groups = RBACUserGroup.objects.filter(member__in=[user.id, 1]).values_list('group')
+    print("Looked up groups for %s:" % user)
+    for g in groups:
+        print(g)
+    matches = RBACGroupRole.objects.filter(group__in=groups, rule_type="Block", action=action).values_list("model_id")
+    print("Looked up roles for groups:")
+    ret = []
+    for m in matches:
+        ret.append(m[0])
+    return ret

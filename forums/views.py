@@ -6,10 +6,26 @@ from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeCommen
 from .forms import PostForm, CommentForm, Comment2Form
 from notifications.views import notify_happening, create_user_notification
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from rbac.core import rbac_user_blocked_for_model
 
 @login_required()
 def post_list(request):
-    posts_list = Post.objects.all().order_by('-created_date')
+    """ Summary view showing a list of posts.
+
+    Args:
+        request(HTTPRequest): standard user request
+
+    Returns:
+        page(HTTPResponse): page with list of posts
+    """
+
+# get list of forums user cannot access
+    blocked = rbac_user_blocked_for_model(user=request.user,
+                                          app='forums',
+                                          model='forum',
+                                          action='view')
+
+    posts_list = Post.objects.exclude(forum__in=blocked).order_by('-created_date')
     page = request.GET.get('page', 1)
     paginator = Paginator(posts_list, 10)
     try:
@@ -21,8 +37,8 @@ def post_list(request):
 
     posts_new=[]
     for p in posts:
-        p.post_comments = Comment1.objects.filter(post = p).count()
-        p.post_comments += Comment2.objects.filter(post = p).count()
+        p.post_comments = Comment1.objects.filter(post=p).count()
+        p.post_comments += Comment2.objects.filter(post=p).count()
         posts_new.append(p)
 
     return render(request, 'forums/post_list.html', {'posts' : posts_new})
@@ -32,8 +48,8 @@ def post_list_dashboard(request):
     posts = Post.objects.all().order_by('-created_date')[:20]
     posts_new=[]
     for p in posts:
-        p.post_comments = Comment1.objects.filter(post = p).count()
-        p.post_comments += Comment2.objects.filter(post = p).count()
+        p.post_comments = Comment1.objects.filter(post=p).count()
+        p.post_comments += Comment2.objects.filter(post=p).count()
         posts_new.append(p)
 
     return posts_new
