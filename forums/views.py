@@ -72,60 +72,58 @@ def post_list_dashboard(request):
 @login_required()
 def post_detail(request, pk):
 
+# Check access
     post = get_object_or_404(Post, pk=pk)
-
     if not rbac_user_has_role(request.user, "forums.forum.%s.view" %
-                     post.forum.id):
+                              post.forum.id):
         return HttpResponseForbidden()
-    else:  # access okay, continue...
 
-
-        if request.method == "POST":
-            if rbac_user_has_role(request.user, "forums.forum.%s.view" %
-                             form.cleaned_data['forum'].id):
+    if request.method == "POST":
 # identify which form submitted this - comments1 or comments2
-                if 'submit-c1' in request.POST:
-                    form = CommentForm(request.POST)
-                elif 'submit-c2' in request.POST:
-                    form = Comment2Form(request.POST)
-                if form.is_valid():
-                    post = form.save(commit=False)
-                    post.author = request.user
-                    post.save()
+        if 'submit-c1' in request.POST:
+            form = CommentForm(request.POST)
+        elif 'submit-c2' in request.POST:
+            form = Comment2Form(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
 # Tell people
-                    notify_happening(application_name="Forums",
-                                     event_type="forums.post.comment",
-                                     msg="%s commented on post: %s" % (request.user, post.post.title),
-                                     topic=post.post.id)
+            notify_happening(application_name="Forums",
+                             event_type="forums.post.comment",
+                             msg="%s commented on your post: %s" % (request.user, post.post.title),
+                             topic=post.post.id)
+        else:
+            print(form.errors)
+    form = CommentForm()
+    form2 = Comment2Form()
+    post = get_object_or_404(Post, pk=pk)
+    post_likes = LikePost.objects.filter(post = post)
+    comments1 = Comment1.objects.filter(post = post)
 
-        form = CommentForm()
-        form2 = Comment2Form()
-        post_likes = LikePost.objects.filter(post = post)
-        comments1 = Comment1.objects.filter(post = post)
+    total_comments = 0
+    comments1_new = [] # comments1 is immutable - make a copy
+    for c1 in comments1:
+# add related c2 objects to c1
+        c2 = Comment2.objects.filter(comment1 = c1)
+        c2_new = []
+        for i in c2:
+            i.c2_likes = LikeComment2.objects.filter(comment2 = i).count()
+            c2_new.append(i)
+        c1.c2 = c2_new
+# number of comments
+        total_comments += 1
+        total_comments += len(c1.c2)
+# number of likes
+        c1.c1_likes = LikeComment1.objects.filter(comment1 = c1).count()
+        comments1_new.append(c1)
 
-        total_comments = 0
-        comments1_new = [] # comments1 is immutable - make a copy
-        for c1 in comments1:
-    # add related c2 objects to c1
-            c2 = Comment2.objects.filter(comment1 = c1)
-            c2_new = []
-            for i in c2:
-                i.c2_likes = LikeComment2.objects.filter(comment2 = i).count()
-                c2_new.append(i)
-            c1.c2 = c2_new
-    # number of comments
-            total_comments += 1
-            total_comments += len(c1.c2)
-    # number of likes
-            c1.c1_likes = LikeComment1.objects.filter(comment1 = c1).count()
-            comments1_new.append(c1)
-
-        return render(request, 'forums/post_detail.html', {'form': form,
-                                                           'form2': form2,
-                                                           'post': post,
-                                                           'comments1' : comments1_new,
-                                                           'post_likes' : post_likes,
-                                                           'total_comments' : total_comments})
+    return render(request, 'forums/post_detail.html', {'form': form,
+                                                       'form2': form2,
+                                                       'post': post,
+                                                       'comments1' : comments1_new,
+                                                       'post_likes' : post_likes,
+                                                       'total_comments' : total_comments})
 
 @login_required()
 def post_new(request):
@@ -149,7 +147,7 @@ def post_new(request):
                                  event_type="forums.post.new",
                                  msg=notifymsg,
                                  topic=post.forum.id)
-                                 
+
 # notify user of comments
                 create_user_notification(member=post.author,
                                          application_name="Forums",
