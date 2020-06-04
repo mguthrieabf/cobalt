@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from .models import RBACGroup, RBACUserGroup, RBACGroupRole
+from .core import rbac_add_user_to_group
+from accounts.models import User
 
 @login_required
 def admin_screen(request):
@@ -93,3 +95,14 @@ def group_to_action_ajax(request, group_id):
     )
     data_dict = {"data": html}
     return JsonResponse(data=data_dict, safe=False)
+
+@login_required()
+def rbac_add_user_to_group_ajax(request):
+    if request.method == "GET":
+        member_id = request.GET['member_id']
+        group_id = request.GET['group_id']
+        member = User.objects.get(pk=member_id)
+        group = RBACGroup.objects.get(pk=group_id)
+        rbac_add_user_to_group(member, group)
+
+    return HttpResponse("Successful")

@@ -144,8 +144,8 @@ def change_password(request):
     return render(request, 'accounts/change_password.html', {'form': form})
 
 @login_required()
-def member_detail_ajax(request):
-    """ Returns basic public info on a member
+def member_detail_M2M_ajax(request):
+    """ Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.
 
     Ajax call to get basic info on a member. Will return an empty json array
     if the member number is invalid.
@@ -171,10 +171,39 @@ def member_detail_ajax(request):
                 data_dict = {"data": html}
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={'error': 'Invalid request'})
+@login_required()
+
+def member_details_ajax(request):
+    """ Returns basic public info on a member for the generic member search.
+
+    Ajax call to get basic info on a member. Will return an empty json array
+    if the member number is invalid.
+
+    Args:
+        member_id - member number
+
+    Returns:
+        Json array: member, clubs,  global org name.
+    """
+
+    if request.method == "GET":
+        if 'member_id' in request.GET:
+            member_id = request.GET.get("member_id")
+            member = get_object_or_404(User, pk=member_id)
+            clubs = MemberOrganisation.objects.filter(member=member)
+            if request.is_ajax:
+                global_org = settings.GLOBAL_ORG
+                html = render_to_string(
+                    template_name="accounts/member_details_ajax.html",
+                    context={"member": member, 'clubs': clubs, 'global_org': global_org}
+                )
+                data_dict = {"data": html}
+                return JsonResponse(data=data_dict, safe=False)
+    return JsonResponse(data={'error': 'Invalid request'})
 
 @login_required()
 def search_ajax(request):
-    """ Ajax member search function.
+    """ Ajax member search function. ONLY USED MEMBER TRANSFER. REPLACE.
 
     Used to search for members by the Member to Member transfer part of Payments.
     Currently very specific to payments. Could be made more generic if other
@@ -226,6 +255,61 @@ def search_ajax(request):
             return JsonResponse(data=data_dict, safe=False)
 
     return render(request, "accounts/search_results.html", context={'members': members, 'msg': msg})
+
+@login_required()
+def member_search_ajax(request):
+    """ Ajax member search function. Used by the generic member search.
+
+    Used to search for members by the Member to Member transfer part of Payments.
+    Currently very specific to payments. Could be made more generic if other
+    parts of the system need a search function.
+
+    Args:
+        lastname - partial lastname to search for. Wild cards the ending.
+        firstname - partial firstname to search for. Wild cards the ending.
+
+    Returns:
+        HttpResponse - either a message or a list of users in HTML format.
+    """
+
+    msg = ""
+
+    if request.method == "GET":
+
+        if 'lastname' in request.GET:
+            search_last_name = request.GET.get("lastname")
+        else:
+            search_last_name = None
+
+        if 'firstname' in request.GET:
+            search_first_name = request.GET.get("firstname")
+        else:
+            search_first_name = None
+
+        if search_first_name and search_last_name:
+            members = User.objects.filter(first_name__istartswith=search_first_name,
+                                          last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+        elif search_last_name:
+            members = User.objects.filter(last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+        else:
+            members = User.objects.filter(first_name__istartswith=search_first_name).exclude(pk=request.user.id)
+
+        if request.is_ajax:
+            if members.count() > 30:
+                msg = "Too many results (%s)" % members.count()
+                members = None
+            elif members.count() == 0:
+                msg = "No matches found"
+            html = render_to_string(
+                template_name="accounts/search_results_ajax.html",
+                context={"members": members, "msg": msg}
+            )
+
+            data_dict = {"data": html}
+
+            return JsonResponse(data=data_dict, safe=False)
+
+    return render(request, "accounts/search_results_ajax.html", context={'members': members, 'msg': msg})
 
 @login_required
 def profile(request):

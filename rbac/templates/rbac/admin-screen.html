@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 
+{% block header %}
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+{% endblock %}
 {% block content %}
 
 <h1>Administration</h1>
@@ -34,9 +37,54 @@
             <h3>Users</h3>
             <select id="{{ key }}-cobaltusers" size="10">
             </select><br>
-            <button class="btn btn-success btn-sm">Add</button>
+
+
+<!-- Generic Member Search -->
+            <div class="modal fade" id="cobalt_general_member_search" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Member Lookup</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body mx-3">
+                    <div class="container">
+                      <div id="cobalt-search" class="row justify-content-center">
+                        <div class="col-12 form-group">
+                          <label for="lastname" class="bmd-label-floating">Last Name</label>
+                          <input type="text" class="form-control dynamic-search" id="id_lastname" name="lastname" value="">
+                        </div>
+
+                        <div class="col-12 form-group">
+                          <label for="" class="bmd-label-floating">First Name</label>
+                          <input type="text" class="form-control dynamic-search" id="id_firstname" name="firstname" value="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="cobalt-member">
+                  </div>
+                  <div class="row justify-content-center"
+                      <span id="search-results"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+<!-- End Generic Member Search -->
+
+
+
+            <a href="" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cobalt_general_member_search">Add</a>
             <button class="btn btn-primary btn-sm">Delete</button>
           </div>
+
+
+
+
+
 
           <div class="col">
             <h3>Actions</h3>
@@ -53,31 +101,111 @@
 <br>
 {% endfor %}
 
+
+
+
+
 {% endblock %}
 
 {% block footer %}
 <script>
+  // Code for user search dialog
+
+      const lastname = $("#id_lastname")
+      const firstname = $("#id_firstname")
+      const search_results = $('#search-results')
+      const search_panel = $('#cobalt-search')
+      const member_display = $('#cobalt-member')
+      const member_search = '{% url "accounts:member_search_ajax" %}'
+      const member_detail = '{% url "accounts:member_details_ajax" %}'
+
+      var member_id = 0;
+      var group_id;
+
   jQuery(document).ready(function() {
+
+// When a user selects a group, get the Users and Role actions
     $('.cobalt-group-select').on('change', function() {
       var userlist = event.target.id.replace("cobaltgroups", "cobaltusers");
       var actionlist = event.target.id.replace("cobaltgroups", "cobaltactions");
-      var groupid = this.value;
-      $.getJSON("group-to-user/" + groupid + "/")
+      group_id = this.value;
+
+      $.getJSON("group-to-user/" + group_id + "/")
         .done(response => {
-        console.log("User call returned");
         // using .html() causes delays (up to 30 seconds!) for Chrome. Changed to replaceWith()
         var new_select =  "<select id='" + userlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + userlist).replaceWith(new_select);
-        console.log("User call update field complete");
       });
-      $.getJSON("group-to-action/" + groupid + "/")
+
+      $.getJSON("group-to-action/" + group_id + "/")
         .done(response => {
-        console.log("Action call returned");
         var new_select =  "<select id='" + actionlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + actionlist).replaceWith(new_select);
-        console.log("Action call update field complete");
       });
     });
+
+// fill in single person hide other fields
+    function showSingleMember(id) {
+      $.getJSON(member_detail + "?member_id=" + id)
+        .done(response => {
+        //  search_panel.hide();
+          search_results.html("");
+          // show the member
+          member_display.html(response['data']);
+          // set member_id
+          member_id = id;
+//          $("#cobalt-hidden-member").html("<input type='hidden' id='id_transfer_to' name='transfer_to' value='" + id + "'>");
+        })
+     }
+
+// dynamic search
+    $(".dynamic-search").on('keyup', function(event){
+
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      var ln = lastname.val();
+      var fn = firstname.val();
+
+      search_results.html("");
+
+      if (ln.length + fn.length > 3) {
+        $.getJSON(member_search + "?lastname=" + ln + "&firstname=" + fn)
+            .done(response => {
+              // update screen with results
+                search_results.html(response['data']);
+              // watch for user selecting member and change screen again
+                $(".cobalt-names").change(function(event){
+                  var id=$(this).val();
+                  showSingleMember(id);
+                });
+            })
+      }
+    });
+
+
+
   });
+
+// Clear and hide generic member search popup
+  function clearModal(){
+    search_results.html("");
+    lastname.val("");
+    firstname.val("");
+    member_display.html("");
+    $('#cobalt_general_member_search').modal('hide');
+  }
+
+// Generic member search popup ok button pressed
+  function cobaltMemberSearchOk() {
+    clearModal();
+
+
+
+    $.getJSON("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + group_id)
+        .done(response => {
+        });
+  }
+
 </script>
 {% endblock %}
