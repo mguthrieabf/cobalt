@@ -1,11 +1,22 @@
 from django import forms
 from .models import Post, Comment1, Comment2
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
+from .models import Forum
 
 class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        # Hide the crispy labels
+
+# Get valid forums as parameter
+        valid_forums = kwargs.pop('valid_forums', None)
+#
+# Call super()
         super(PostForm, self).__init__(*args, **kwargs)
+#
+# Modify valid forums if they were passed
+        if valid_forums:
+            self.fields['forum'].queryset = valid_forums
+
+# Hide the crispy labels
         self.fields['forum'].label = False
         self.fields['title'].label = False
         self.fields['summary'].label = False

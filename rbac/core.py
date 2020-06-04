@@ -8,6 +8,7 @@
        ./rbac_overview.html
 """
 from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACModelDefault
+from cobalt.settings import RBAC_EVERYONE
 
 def rbac_create_group(group_name):
     """ Create an RBAC group
@@ -124,7 +125,7 @@ def rbac_remove_role_from_group(group, role):
     except DoesNotExist:
         return False
 
-def user_has_role(member, role):
+def rbac_user_has_role(member, role):
     """ check if a user has a specific role
 
     Args:
@@ -134,46 +135,58 @@ def user_has_role(member, role):
     Returns:
         bool: True of False for user role
     """
-
+    print("-->user_has_role: User is: %s. Role is: %s" % (member.full_name, role))
 # breakdown role into parts
     (app, model, model_instance, action) = role_to_parts(role)
+# we also match against an action of all. e.g. if the role is:
+#  forums.forum.5.create then we will also accept finding:
+#  forums.forum.5.all.
+    if model_instance:
+        all_role = "%s.%s.%s.all" % (app, model, model_instance)
+    else:
+        all_role = "%s.%s.all" % (app, model)
 
-    groups = RBACUserGroup.objects.filter(member=member).values_list('group')
-    print("Looked up groups for %s:" % member)
+    groups = RBACUserGroup.objects.filter(member__in=[member, RBAC_EVERYONE]).values_list('group')
+    print("-->user_has_role: Looked up groups for %s:" % member)
     for g in groups:
-        print(g)
+        print("  -->>user_has_group: Found %s" % g)
     matches = RBACGroupRole.objects.filter(group__in=groups)
-    print("Looked up roles for groups:")
+    print("-->user_has_role: Looked up roles for groups:")
     for m in matches:
-        print(m)
+        print("  -->user_has_role: %s" % m)
 
 # look for specific rule
     for m in matches:
-        print("rol is   #%s#" % role)
-        print("Checking #%s#" % m.role)
-        if m.role == role:
-            print ("Matched with %s" % m)
+        print("-->user_has_role: role is: %s" % role)
+        print("-->user_has_role: Checking %s" % m.role)
+        if m.role == role or m.role == all_role:
+            print ("  -->user_has_role: Matched with %s" % m)
             if m.rule_type == "Allow":
-                print("Rule is allow - return True")
+                print("-->user_has_role: Rule is allow - return True")
                 return True
             else:
-                print("Rule is block - return False")
+                print("-->user_has_role: Rule is block - return False")
                 return False
 
 # look for general rule
-    print("General")
+    print("-->user_has_role: No specific match found, next try general")
+    print("-->user_has_role: General")
     for m in matches:
-        print("rol is   #%s#" % role)
-        print("Checking #%s#" % m.role)
-        if m.role == "%s.%s.%s" % (app, model, action):
-            print ("Matched with %s" % m)
+        print("-->user_has_role: role is: %s" % role)
+        print("-->user_has_role: Checking: %s" % m.role)
+        if m.role == "%s.%s.%s" % (app, model, action) or m.role == "%s.%s.all" % (app, model):
+            print ("-->user_has_role: Matched with %s" % m)
             if m.rule_type == "Allow":
-                print("Rule is allow - return True")
+                print("-->user_has_role: Rule is allow - return True")
                 return True
             else:
-                print("Rule is block - return False")
+                print("-->user_has_role: Rule is block - return False")
                 return False
 
+# No match - use default
+    print("-->user_has_role: No general match found, using app.model default")
+    default = RBACModelDefault.objects.filter(app=app, model=model).values_list('default_behaviour').first()[0]
+    print("-->user_has_role: Default for %s.%s is %s" % (app, model, default))
     return True
 
 def role_to_parts(role):
@@ -213,6 +226,7 @@ def rbac_user_blocked_for_model(user, app, model, action):
     Returns:
         list:   list of model_instances explicitly block
     """
+    print("--> user_blocked_for_model: User: %s App: %s Model: %s Action: %s" % (user, app, model, action))
 
     default = RBACModelDefault.objects.filter(app=app, model=model).first()
 
@@ -222,13 +236,47 @@ def rbac_user_blocked_for_model(user, app, model, action):
     if default.default_behaviour == "Block":
         raise ReferenceError("Only supported for default Allow models")
 
-    groups = RBACUserGroup.objects.filter(member__in=[user.id, 1]).values_list('group')
-    print("Looked up groups for %s:" % user)
+    groups = RBACUserGroup.objects.filter(member__in=[user.id, RBAC_EVERYONE]).values_list('group')
+    print("--> user_blocked_for_model: Looked up groups for %s:" % user)
     for g in groups:
-        print(g)
+        print("  --> user_blocked_for_model: %s" % g)
     matches = RBACGroupRole.objects.filter(group__in=groups, rule_type="Block", action=action).values_list("model_id")
-    print("Looked up roles for groups:")
+    print("--> user_blocked_for_model: Looked up roles for groups:")
     ret = []
     for m in matches:
         ret.append(m[0])
+        print("--> user_blocked_for_model: returning %s" % ret)
+    return ret
+
+def rbac_user_allowed_for_model(user, app, model, action):
+    """ returns a list of model instances which the user can view
+    Args:
+        user(User): standard user object
+        app(str):   application name
+        model(str): model name
+        action(str):    action required
+
+    Returns:
+        list:   list of model_instances explicitly block
+    """
+    print("--> user_allowed_for_model: User: %s App: %s Model: %s Action: %s" % (user, app, mdeol, action))
+
+    default = RBACModelDefault.objects.filter(app=app, model=model).first()
+
+    if not default:
+        raise ReferenceError("%s.%s not set up in RBACModelDefault" % (app, model))
+
+    if default.default_behaviour == "Allow":
+        raise ReferenceError("Only supported for default Block models")
+
+    groups = RBACUserGroup.objects.filter(member__in=[user.id, RBAC_EVERYONE]).values_list('group')
+    print("--> user_allowed_for_model: Looked up groups for %s:" % user)
+    for g in groups:
+        print("  --> user_allowed_for_model: %s" % g)
+    matches = RBACGroupRole.objects.filter(group__in=groups, rule_type="Allow", action=action).values_list("model_id")
+    print("--> user_allowed_for_model: Looked up roles for groups:")
+    ret = []
+    for m in matches:
+        ret.append(m[0])
+        print("--> user_allowed_for_model: returning %s" % ret)
     return ret

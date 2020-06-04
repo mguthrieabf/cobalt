@@ -22,6 +22,18 @@ a new user *Fred* access to the same stuff as *Bob* for his job at Club A,
 without accidentally also giving him Bob's special access at Club B that he
 shouldn't have.
 
+One further feature of RBAC within Cobalt is the ability to grant admin
+functions at different levels. Cobalt will become an unworkable mess if central
+"uber-administrators" have to do all of the admin. This will either create a
+situation where everyone has to wait for the administrator before they can do
+anything (and likely argue with them about why they are doing it), or everyone
+who does any admin will be an "uber-administrator". Or maybe even both.
+
+This is one of the key principles of Cobalt - **Devolved Administration**. An
+administrator for a club or congress should be able to appoint other
+administrators, or directors or any other role, themselves without needing the
+permission of anyone else. RBAC is the mechanism for achieving this.
+
 Security Basics
 ===============
 
@@ -161,7 +173,8 @@ actions:
 
 - **all** - will match any action attribute. You do not need to add all, it is done
   automatically.
-- **admin** - gives the group the ability to change the settings for any other user.
+- **admin** - gives the group (and ultimately a user) the ability to change the
+settings for any other user.
 
 Groups
 ======
@@ -243,7 +256,7 @@ To check access at the instance level you can use the following example:
   from rbac.core import rbac_user_has_role
 
   forum = 6
-  if rbac.user_has_role(f"forums.forum.{{forum}}.create"):
+  if user_has_role(user, f"forums.forum.{{forum}}.create"):
     # allow user to continue
   else:
     # show user an error screen

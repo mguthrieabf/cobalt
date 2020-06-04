@@ -253,6 +253,9 @@ SUMMERNOTE_CONFIG = {
     'attachment_absolute_uri': False,
 }
 
+# Default user to be the everyone user for RBAC
+RBAC_EVERYONE = 1
+
 # Bring in Elastic Beanstalk config if present.
 #with open("/opt/elasticbeanstalk/deployment/env") as env:
 # with open("/tmp/env") as env:

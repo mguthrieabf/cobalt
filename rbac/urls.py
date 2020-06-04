@@ -7,6 +7,7 @@ app_name = 'rbac' # pylint: disable=invalid-name
 
 urlpatterns = [
     path('', views.admin_screen, name='admin_screen'),
+    path('all', views.all_screen, name='all_screen'),
     path('group-to-user/<int:group_id>/', views.group_to_user_ajax, name='group_to_user_ajax'),
     path('group-to-action/<int:group_id>/', views.group_to_action_ajax, name='group_to_action_ajax'),
 ]

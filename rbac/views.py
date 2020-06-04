@@ -29,6 +29,23 @@ def admin_screen(request):
 
     return render(request, 'rbac/admin-screen.html', {'groups': data})
 
+def all_screen(request):
+    """ temp for development purposes """
+# Get groups
+    groups = RBACGroup.objects.all().order_by('group_name')
+
+# split by type
+    data={}
+    for group in groups:
+        admin_type = group.group_name.split(".")[0].title()  # forums.1 becomes Forums
+        if admin_type in data:
+            data[admin_type].append(group)
+        else:
+            data[admin_type] = [group]
+
+
+    return render(request, 'rbac/admin-screen.html', {'groups': data})
+
 @login_required
 def group_to_user_ajax(request, group_id):
     """ Called by the admin page when a user selects a group.
