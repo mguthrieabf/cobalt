@@ -1,5 +1,5 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)  [![Documentation Status](https://readthedocs.org/projects/cobalt-bridge/badge/?version=latest)](https://cobalt-bridge.readthedocs.io/en/latest/?badge=latest)
-[![GPL license](https://img.shields.io/badge/License-GPL-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+[![GPL license](https://img.shields.io/badge/License-GPL-blue.svg)](https://github.com/mguthrieabf/cobalt/blob/master/LICENSE)
 
 # Cobalt - Work in Progress
 
