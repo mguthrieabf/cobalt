@@ -2,15 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from django.utils import timezone
-from .models import (
-    Post,
-    Comment1,
-    Comment2,
-    LikePost,
-    LikeComment1,
-    LikeComment2,
-    Forum,
-)
+from .models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2, Forum
 from .forms import PostForm, CommentForm, Comment2Form
 from notifications.views import notify_happening, create_user_notification
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -28,13 +20,14 @@ def post_list(request):
         page(HTTPResponse): page with list of posts
     """
 
-    # get list of forums user cannot access
-    blocked = rbac_user_blocked_for_model(
-        user=request.user, app="forums", model="forum", action="view"
-    )
+# get list of forums user cannot access
+    blocked = rbac_user_blocked_for_model(user=request.user,
+                                          app='forums',
+                                          model='forum',
+                                          action='view')
 
-    posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
-    page = request.GET.get("page", 1)
+    posts_list = Post.objects.exclude(forum__in=blocked).order_by('-created_date')
+    page = request.GET.get('page', 1)
     paginator = Paginator(posts_list, 10)
     try:
         posts = paginator.page(page)
@@ -49,8 +42,7 @@ def post_list(request):
         p.post_comments += Comment2.objects.filter(post=p).count()
         posts_new.append(p)
 
-    return render(request, "forums/post_list.html", {"posts": posts_new})
-
+    return render(request, 'forums/post_list.html', {'posts': posts_new})
 
 @login_required()
 def post_list_dashboard(request):
@@ -63,12 +55,13 @@ def post_list_dashboard(request):
         list:   list of Post objects
     """
 
-    # get list of forums user cannot access
-    blocked = rbac_user_blocked_for_model(
-        user=request.user, app="forums", model="forum", action="view"
-    )
+# get list of forums user cannot access
+    blocked = rbac_user_blocked_for_model(user=request.user,
+                                          app='forums',
+                                          model='forum',
+                                          action='view')
 
-    posts = Post.objects.exclude(forum__in=blocked).order_by("-created_date")[:20]
+    posts = Post.objects.exclude(forum__in=blocked).order_by('-created_date')[:20]
     posts_new = []
     for p in posts:
         p.post_comments = Comment1.objects.filter(post=p).count()
@@ -77,32 +70,30 @@ def post_list_dashboard(request):
 
     return posts_new
 
-
 @login_required()
 def post_detail(request, pk):
 
-    # Check access
+# Check access
     post = get_object_or_404(Post, pk=pk)
-    if not rbac_user_has_role(request.user, "forums.forum.%s.view" % post.forum.id):
+    if not rbac_user_has_role(request.user, "forums.forum.%s.view" %
+                              post.forum.id):
         return HttpResponseForbidden()
 
     if request.method == "POST":
-        # identify which form submitted this - comments1 or comments2
-        if "submit-c1" in request.POST:
+# identify which form submitted this - comments1 or comments2
+        if 'submit-c1' in request.POST:
             form = CommentForm(request.POST)
-        elif "submit-c2" in request.POST:
+        elif 'submit-c2' in request.POST:
             form = Comment2Form(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            # Tell people
-            notify_happening(
-                application_name="Forums",
-                event_type="forums.post.comment",
-                msg="%s commented on your post: %s" % (request.user, post.post.title),
-                topic=post.post.id,
-            )
+# Tell people
+            notify_happening(application_name="Forums",
+                             event_type="forums.post.comment",
+                             msg="%s commented on your post: %s" % (request.user, post.post.title),
+                             topic=post.post.id)
         else:
             print(form.errors)
     form = CommentForm()
@@ -112,35 +103,28 @@ def post_detail(request, pk):
     comments1 = Comment1.objects.filter(post=post)
 
     total_comments = 0
-    comments1_new = []  # comments1 is immutable - make a copy
+    comments1_new = [] # comments1 is immutable - make a copy
     for c1 in comments1:
-        # add related c2 objects to c1
+# add related c2 objects to c1
         c2 = Comment2.objects.filter(comment1=c1)
         c2_new = []
         for i in c2:
             i.c2_likes = LikeComment2.objects.filter(comment2=i).count()
             c2_new.append(i)
         c1.c2 = c2_new
-        # number of comments
+# number of comments
         total_comments += 1
         total_comments += len(c1.c2)
-        # number of likes
+# number of likes
         c1.c1_likes = LikeComment1.objects.filter(comment1=c1).count()
         comments1_new.append(c1)
 
-    return render(
-        request,
-        "forums/post_detail.html",
-        {
-            "form": form,
-            "form2": form2,
-            "post": post,
-            "comments1": comments1_new,
-            "post_likes": post_likes,
-            "total_comments": total_comments,
-        },
-    )
-
+    return render(request, 'forums/post_detail.html', {'form': form,
+                                                       'form2': form2,
+                                                       'post': post,
+                                                       'comments1' : comments1_new,
+                                                       'post_likes' : post_likes,
+                                                       'total_comments' : total_comments})
 
 @login_required()
 def post_new(request):
@@ -149,50 +133,43 @@ def post_new(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            if rbac_user_has_role(
-                request.user, "forums.forum.%s.create" % form.cleaned_data["forum"].id
-            ):
+            if rbac_user_has_role(request.user, "forums.forum.%s.create" %
+                                  form.cleaned_data['forum'].id):
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
                 post.save()
-                notifymsg = "New post to Forum %s by %s Titled %s" % (
-                    post.forum,
-                    post.author,
-                    post.title,
-                )
+                notifymsg = "New post to Forum %s by %s Titled %s" % (post.forum,
+                                                                      post.author,
+                                                                      post.title)
 
-                # Tell people
-                notify_happening(
-                    application_name="Forums",
-                    event_type="forums.post.new",
-                    msg=notifymsg,
-                    topic=post.forum.id,
-                )
+# Tell people
+                notify_happening(application_name="Forums",
+                                 event_type="forums.post.new",
+                                 msg=notifymsg,
+                                 topic=post.forum.id)
 
-                # notify user of comments
-                create_user_notification(
-                    member=post.author,
-                    application_name="Forums",
-                    event_type="forums.post.comment",
-                    topic=post.id,
-                    notification_type="Email",
-                )
+# notify user of comments
+                create_user_notification(member=post.author,
+                                         application_name="Forums",
+                                         event_type="forums.post.comment",
+                                         topic=post.id,
+                                         notification_type="Email")
 
-                return redirect("forums:post_detail", pk=post.pk)
+                return redirect('forums:post_detail', pk=post.pk)
             else:
                 return HttpResponseForbidden()
 
     else:
-        # see which forums are blocked for this user - load a list of the others
-        blocked_forums = rbac_user_blocked_for_model(
-            user=request.user, app="forums", model="forum", action="create"
-        )
+# see which forums are blocked for this user - load a list of the others
+        blocked_forums = rbac_user_blocked_for_model(user=request.user,
+                                                     app="forums",
+                                                     model="forum",
+                                                     action="create")
         valid_forums = Forum.objects.exclude(id__in=blocked_forums)
         form = PostForm(valid_forums=valid_forums)
 
-    return render(request, "forums/post_edit.html", {"form": form, "request": request})
-
+    return render(request, 'forums/post_edit.html', {'form': form, 'request': request})
 
 @login_required()
 def like_post(request, pk):
@@ -207,7 +184,6 @@ def like_post(request, pk):
         else:
             return HttpResponse("already liked")
 
-
 @login_required()
 def like_comment1(request, pk):
     if request.method == "POST":
@@ -220,7 +196,6 @@ def like_comment1(request, pk):
             return HttpResponse("ok")
         else:
             return HttpResponse("already liked")
-
 
 @login_required()
 def like_comment2(request, pk):

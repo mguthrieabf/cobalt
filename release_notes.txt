@@ -1,2 +1,6 @@
-me = User.objects.filter(username="Mark").first()
-UserApplication.create_cobalt_rbac_mapping(member=me, model_name="Forum", model_id=1, role="a.b.c")
+pip install black
+
+black --target-version=py37 .\forums\views.py
+black --check --target-version=py37 .\forums\views.py
+
+pylint 
