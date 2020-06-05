@@ -1,3 +1,5 @@
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 # Cobalt - Work in Progress
 
 Cobalt is a web-based platform for the administration and running of [the game of bridge](https://en.wikipedia.org/wiki/Contract_bridge). It is expected to be complete in 2021.
