@@ -6,21 +6,24 @@ from .models import RBACGroup, RBACUserGroup, RBACGroupRole
 from .core import rbac_add_user_to_group
 from accounts.models import User
 
+
 @login_required
 def admin_screen(request):
 
-# TODO: work out how to do this more efficiently using select_related
-# Get groups with this user
-    groups1 = RBACUserGroup.objects.filter(member=request.user).values_list('group')
+    # TODO: work out how to do this more efficiently using select_related
+    # Get groups with this user
+    groups1 = RBACUserGroup.objects.filter(member=request.user).values_list("group")
 
-# Get roles from groups where action is admin
-    matches = RBACGroupRole.objects.filter(group__in=groups1, action="admin").values_list('group')
+    # Get roles from groups where action is admin
+    matches = RBACGroupRole.objects.filter(
+        group__in=groups1, action="admin"
+    ).values_list("group")
 
-# Get groups
-    groups = RBACGroup.objects.filter(id__in=matches).order_by('group_name')
+    # Get groups
+    groups = RBACGroup.objects.filter(id__in=matches).order_by("group_name")
 
-# split by type
-    data={}
+    # split by type
+    data = {}
     for group in groups:
         admin_type = group.group_name.split(".")[0].title()  # forums.1 becomes Forums
         if admin_type in data:
@@ -28,16 +31,16 @@ def admin_screen(request):
         else:
             data[admin_type] = [group]
 
+    return render(request, "rbac/admin-screen.html", {"groups": data})
 
-    return render(request, 'rbac/admin-screen.html', {'groups': data})
 
 def all_screen(request):
     """ temp for development purposes """
-# Get groups
-    groups = RBACGroup.objects.all().order_by('group_name')
+    # Get groups
+    groups = RBACGroup.objects.all().order_by("group_name")
 
-# split by type
-    data={}
+    # split by type
+    data = {}
     for group in groups:
         admin_type = group.group_name.split(".")[0].title()  # forums.1 becomes Forums
         if admin_type in data:
@@ -45,8 +48,8 @@ def all_screen(request):
         else:
             data[admin_type] = [group]
 
+    return render(request, "rbac/admin-screen.html", {"groups": data})
 
-    return render(request, 'rbac/admin-screen.html', {'groups': data})
 
 @login_required
 def group_to_user_ajax(request, group_id):
@@ -66,11 +69,11 @@ def group_to_user_ajax(request, group_id):
     usergroups = RBACUserGroup.objects.filter(group=group)
 
     html = render_to_string(
-        template_name="rbac/group-to-user.html",
-        context={'usergroups': usergroups}
+        template_name="rbac/group-to-user.html", context={"usergroups": usergroups}
     )
     data_dict = {"data": html}
     return JsonResponse(data=data_dict, safe=False)
+
 
 @login_required
 def group_to_action_ajax(request, group_id):
@@ -90,17 +93,17 @@ def group_to_action_ajax(request, group_id):
     roles = RBACGroupRole.objects.filter(group=group)
 
     html = render_to_string(
-        template_name="rbac/group-to-action.html",
-        context={'roles': roles}
+        template_name="rbac/group-to-action.html", context={"roles": roles}
     )
     data_dict = {"data": html}
     return JsonResponse(data=data_dict, safe=False)
 
+
 @login_required()
 def rbac_add_user_to_group_ajax(request):
     if request.method == "GET":
-        member_id = request.GET['member_id']
-        group_id = request.GET['group_id']
+        member_id = request.GET["member_id"]
+        group_id = request.GET["group_id"]
         member = User.objects.get(pk=member_id)
         group = RBACGroup.objects.get(pk=group_id)
         rbac_add_user_to_group(member, group)
