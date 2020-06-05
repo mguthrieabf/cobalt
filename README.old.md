@@ -1,5 +1,11 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+[![Documentation Status](https://readthedocs.org/projects/ansicolortags/badge/?version=latest)](http://ansicolortags.readthedocs.io/?badge=latest)
+
+[![Documentation Status](https://readthedocs.org/projects/cobalt-bridge/badge/?version=latest)](https://cobalt-bridge.readthedocs.io/en/latest/?badge=latest)
+
+https://cobalt-bridge.readthedocs.io/en/latest/
+
 |build-status| |docs| |coverage|
 
 # Cobalt - Work in Progress
