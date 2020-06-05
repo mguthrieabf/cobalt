@@ -168,13 +168,12 @@ and unless there is good reason, the basic CRUD types should be named:
 - view
 - delete
 
-In addition to what is defined by the application, RBAC adds two built-in
-actions:
+The All Action
+--------------
 
-- **all** - will match any action attribute. You do not need to add all, it is done
-  automatically.
-- **admin** - gives the group (and ultimately a user) the ability to change the
-settings for any other user.
+In addition to what is defined by the application, RBAC adds on **all**.
+You do not need to add all, it is done automatically. Any request for an action
+will automatically match if the group has **all** defined.
 
 Groups
 ======
@@ -234,6 +233,14 @@ So in this example, the rules to create would be:
   RBACGroup: "Let special people in"
   RBACGroupRole: forums.forum.15.view Allow
   RBACUserGroup: Fred, Wilma, Bam-Bam
+
+Admin
+=====
+
+TBA.
+
+Administration functions have a different set of rules. It is possible for
+someone to be an administrator of a group without being a member.
 
 API Functions
 =============

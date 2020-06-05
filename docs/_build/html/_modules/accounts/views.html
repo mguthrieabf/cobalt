@@ -289,9 +289,9 @@
         <span class="n">form</span> <span class="o">=</span> <span class="n">PasswordChangeForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/change_password.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
 
-<div class="viewcode-block" id="member_detail_ajax"><a class="viewcode-back" href="../../accounts.html#accounts.views.member_detail_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">member_detail_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns basic public info on a member</span>
+<div class="viewcode-block" id="member_detail_M2M_ajax"><a class="viewcode-back" href="../../accounts.html#accounts.views.member_detail_M2M_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">member_detail_M2M_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.</span>
 
 <span class="sd">    Ajax call to get basic info on a member. Will return an empty json array</span>
 <span class="sd">    if the member number is invalid.</span>
@@ -317,10 +317,39 @@
                 <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
                 <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Invalid request&#39;</span><span class="p">})</span></div>
+<div class="viewcode-block" id="member_details_ajax"><a class="viewcode-back" href="../../accounts.html#accounts.views.member_details_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">member_details_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns basic public info on a member for the generic member search.</span>
+
+<span class="sd">    Ajax call to get basic info on a member. Will return an empty json array</span>
+<span class="sd">    if the member number is invalid.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        member_id - member number</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Json array: member, clubs,  global org name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;member_id&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+            <span class="n">member_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;member_id&quot;</span><span class="p">)</span>
+            <span class="n">member</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
+            <span class="n">clubs</span> <span class="o">=</span> <span class="n">MemberOrganisation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">:</span>
+                <span class="n">global_org</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_ORG</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
+                    <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;accounts/member_details_ajax.html&quot;</span><span class="p">,</span>
+                    <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;member&quot;</span><span class="p">:</span> <span class="n">member</span><span class="p">,</span> <span class="s1">&#39;clubs&#39;</span><span class="p">:</span> <span class="n">clubs</span><span class="p">,</span> <span class="s1">&#39;global_org&#39;</span><span class="p">:</span> <span class="n">global_org</span><span class="p">}</span>
+                <span class="p">)</span>
+                <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Invalid request&#39;</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="search_ajax"><a class="viewcode-back" href="../../accounts.html#accounts.views.search_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">search_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax member search function.</span>
+    <span class="sd">&quot;&quot;&quot; Ajax member search function. ONLY USED MEMBER TRANSFER. REPLACE.</span>
 
 <span class="sd">    Used to search for members by the Member to Member transfer part of Payments.</span>
 <span class="sd">    Currently very specific to payments. Could be made more generic if other</span>
@@ -372,6 +401,61 @@
             <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;accounts/search_results.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="n">members</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="member_search_ajax"><a class="viewcode-back" href="../../accounts.html#accounts.views.member_search_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">member_search_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax member search function. Used by the generic member search.</span>
+
+<span class="sd">    Used to search for members by the Member to Member transfer part of Payments.</span>
+<span class="sd">    Currently very specific to payments. Could be made more generic if other</span>
+<span class="sd">    parts of the system need a search function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lastname - partial lastname to search for. Wild cards the ending.</span>
+<span class="sd">        firstname - partial firstname to search for. Wild cards the ending.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse - either a message or a list of users in HTML format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="s1">&#39;lastname&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+            <span class="n">search_last_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lastname&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">search_last_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="s1">&#39;firstname&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+            <span class="n">search_first_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;firstname&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">search_first_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">search_first_name</span> <span class="ow">and</span> <span class="n">search_last_name</span><span class="p">:</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">first_name__istartswith</span><span class="o">=</span><span class="n">search_first_name</span><span class="p">,</span>
+                                          <span class="n">last_name__istartswith</span><span class="o">=</span><span class="n">search_last_name</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">search_last_name</span><span class="p">:</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">last_name__istartswith</span><span class="o">=</span><span class="n">search_last_name</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">first_name__istartswith</span><span class="o">=</span><span class="n">search_first_name</span><span class="p">)</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">is_ajax</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">members</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Too many results (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">members</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+                <span class="n">members</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">members</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No matches found&quot;</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
+                <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;accounts/search_results_ajax.html&quot;</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;members&quot;</span><span class="p">:</span> <span class="n">members</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
+
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;accounts/search_results_ajax.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="n">members</span><span class="p">,</span> <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="profile"><a class="viewcode-back" href="../../accounts.html#accounts.views.profile">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>

@@ -35,7 +35,7 @@ def post_list(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
-    posts_new=[]
+    posts_new = []
     for p in posts:
         p.post_comments = Comment1.objects.filter(post=p).count()
         p.post_comments += Comment2.objects.filter(post=p).count()
@@ -61,7 +61,7 @@ def post_list_dashboard(request):
                                           action='view')
 
     posts = Post.objects.exclude(forum__in=blocked).order_by('-created_date')[:20]
-    posts_new=[]
+    posts_new = []
     for p in posts:
         p.post_comments = Comment1.objects.filter(post=p).count()
         p.post_comments += Comment2.objects.filter(post=p).count()
@@ -98,24 +98,24 @@ def post_detail(request, pk):
     form = CommentForm()
     form2 = Comment2Form()
     post = get_object_or_404(Post, pk=pk)
-    post_likes = LikePost.objects.filter(post = post)
-    comments1 = Comment1.objects.filter(post = post)
+    post_likes = LikePost.objects.filter(post=post)
+    comments1 = Comment1.objects.filter(post=post)
 
     total_comments = 0
     comments1_new = [] # comments1 is immutable - make a copy
     for c1 in comments1:
 # add related c2 objects to c1
-        c2 = Comment2.objects.filter(comment1 = c1)
+        c2 = Comment2.objects.filter(comment1=c1)
         c2_new = []
         for i in c2:
-            i.c2_likes = LikeComment2.objects.filter(comment2 = i).count()
+            i.c2_likes = LikeComment2.objects.filter(comment2=i).count()
             c2_new.append(i)
         c1.c2 = c2_new
 # number of comments
         total_comments += 1
         total_comments += len(c1.c2)
 # number of likes
-        c1.c1_likes = LikeComment1.objects.filter(comment1 = c1).count()
+        c1.c1_likes = LikeComment1.objects.filter(comment1=c1).count()
         comments1_new.append(c1)
 
     return render(request, 'forums/post_detail.html', {'form': form,
@@ -133,14 +133,14 @@ def post_new(request):
         form = PostForm(request.POST)
         if form.is_valid():
             if rbac_user_has_role(request.user, "forums.forum.%s.create" %
-                             form.cleaned_data['forum'].id):
+                                  form.cleaned_data['forum'].id):
                 post = form.save(commit=False)
                 post.author = request.user
                 post.published_date = timezone.now()
                 post.save()
                 notifymsg = "New post to Forum %s by %s Titled %s" % (post.forum,
-                                                                   post.author,
-                                                                   post.title)
+                                                                      post.author,
+                                                                      post.title)
 
 # Tell people
                 notify_happening(application_name="Forums",
@@ -163,8 +163,8 @@ def post_new(request):
 # see which forums are blocked for this user - load a list of the others
         blocked_forums = rbac_user_blocked_for_model(user=request.user,
                                                      app="forums",
-                                                    model="forum",
-                                                    action="create")
+                                                     model="forum",
+                                                     action="create")
         valid_forums = Forum.objects.exclude(id__in=blocked_forums)
         form = PostForm(valid_forums=valid_forums)
 
@@ -175,9 +175,9 @@ def like_post(request, pk):
     if request.method == "POST":
         already_liked = LikePost.objects.filter(post=pk, liker=request.user)
         if not already_liked:
-            like=LikePost()
-            like.liker=request.user
-            like.post=Post.objects.get(pk=pk)
+            like = LikePost()
+            like.liker = request.user
+            like.post = Post.objects.get(pk=pk)
             like.save()
             return HttpResponse("ok")
         else:
@@ -188,9 +188,9 @@ def like_comment1(request, pk):
     if request.method == "POST":
         already_liked = LikeComment1.objects.filter(comment1=pk, liker=request.user)
         if not already_liked:
-            like=LikeComment1()
-            like.liker=request.user
-            like.comment1=Comment1.objects.get(pk=pk)
+            like = LikeComment1()
+            like.liker = request.user
+            like.comment1 = Comment1.objects.get(pk=pk)
             like.save()
             return HttpResponse("ok")
         else:
@@ -201,9 +201,9 @@ def like_comment2(request, pk):
     if request.method == "POST":
         already_liked = LikeComment2.objects.filter(comment2=pk, liker=request.user)
         if not already_liked:
-            like=LikeComment2()
-            like.liker=request.user
-            like.comment2=Comment2.objects.get(pk=pk)
+            like = LikeComment2()
+            like.liker = request.user
+            like.comment2 = Comment2.objects.get(pk=pk)
             like.save()
             return HttpResponse("ok")
         else:

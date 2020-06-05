@@ -23,6 +23,7 @@ These are links to documents that describe each module.
 * :doc:`payments_overview`
 * :doc:`notifications_overview`
 * :doc:`rbac_overview`
+* :doc:`forums_overview`
 
 
 .. toctree::

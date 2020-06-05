@@ -160,6 +160,16 @@ This makes it easy to give
 a new user <em>Fred</em> access to the same stuff as <em>Bob</em> for his job at Club A,
 without accidentally also giving him Bob’s special access at Club B that he
 shouldn’t have.</p>
+<p>One further feature of RBAC within Cobalt is the ability to grant admin
+functions at different levels. Cobalt will become an unworkable mess if central
+“uber-administrators” have to do all of the admin. This will either create a
+situation where everyone has to wait for the administrator before they can do
+anything (and likely argue with them about why they are doing it), or everyone
+who does any admin will be an “uber-administrator”. Or maybe even both.</p>
+<p>This is one of the key principles of Cobalt - <strong>Devolved Administration</strong>. An
+administrator for a club or congress should be able to appoint other
+administrators, or directors or any other role, themselves without needing the
+permission of anyone else. RBAC is the mechanism for achieving this.</p>
 </div>
 <div class="section" id="security-basics">
 <h1>Security Basics<a class="headerlink" href="#security-basics" title="Permalink to this headline">¶</a></h1>
@@ -272,13 +282,12 @@ and unless there is good reason, the basic CRUD types should be named:</p>
 <li><p>view</p></li>
 <li><p>delete</p></li>
 </ul>
-<p>In addition to what is defined by the application, RBAC adds two built-in
-actions:</p>
-<ul class="simple">
-<li><p><strong>all</strong> - will match any action attribute. You do not need to add all, it is done
-automatically.</p></li>
-<li><p><strong>admin</strong> - gives the group the ability to change the settings for any other user.</p></li>
-</ul>
+</div>
+<div class="section" id="the-all-action">
+<h2>The All Action<a class="headerlink" href="#the-all-action" title="Permalink to this headline">¶</a></h2>
+<p>In addition to what is defined by the application, RBAC adds on <strong>all</strong>.
+You do not need to add all, it is done automatically. Any request for an action
+will automatically match if the group has <strong>all</strong> defined.</p>
 </div>
 </div>
 <div class="section" id="groups">
@@ -329,6 +338,12 @@ disabled anyway.</p>
 </div>
 </div>
 </div>
+<div class="section" id="admin">
+<h1>Admin<a class="headerlink" href="#admin" title="Permalink to this headline">¶</a></h1>
+<p>TBA.</p>
+<p>Administration functions have a different set of rules. It is possible for
+someone to be an administrator of a group without being a member.</p>
+</div>
 <div class="section" id="api-functions">
 <h1>API Functions<a class="headerlink" href="#api-functions" title="Permalink to this headline">¶</a></h1>
 <p>Granting access is generally done by administrators of various levels through
@@ -343,7 +358,7 @@ whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_has_role</span>
 
 <span class="n">forum</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="k">if</span> <span class="n">rbac</span><span class="o">.</span><span class="n">user_has_role</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;forums.forum.</span><span class="se">{{</span><span class="s2">forum</span><span class="se">}}</span><span class="s2">.create&quot;</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">user_has_role</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;forums.forum.</span><span class="se">{{</span><span class="s2">forum</span><span class="se">}}</span><span class="s2">.create&quot;</span><span class="p">):</span>
   <span class="c1"># allow user to continue</span>
 <span class="k">else</span><span class="p">:</span>
   <span class="c1"># show user an error screen</span>

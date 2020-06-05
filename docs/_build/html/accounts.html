@@ -860,9 +860,9 @@ valid.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="accounts.views.member_detail_ajax">
-<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">member_detail_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#member_detail_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.member_detail_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns basic public info on a member</p>
+<dt id="accounts.views.member_detail_M2M_ajax">
+<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">member_detail_M2M_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#member_detail_M2M_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.member_detail_M2M_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.</p>
 <p>Ajax call to get basic info on a member. Will return an empty json array
 if the member number is invalid.</p>
 <dl class="field-list simple">
@@ -874,6 +874,45 @@ if the member number is invalid.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Json array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="accounts.views.member_details_ajax">
+<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">member_details_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#member_details_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.member_details_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns basic public info on a member for the generic member search.</p>
+<p>Ajax call to get basic info on a member. Will return an empty json array
+if the member number is invalid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- member number</strong> (<em>member_id</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>member, clubs,  global org name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Json array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="accounts.views.member_search_ajax">
+<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">member_search_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#member_search_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.member_search_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax member search function. Used by the generic member search.</p>
+<p>Used to search for members by the Member to Member transfer part of Payments.
+Currently very specific to payments. Could be made more generic if other
+parts of the system need a search function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- partial lastname to search for. Wild cards the ending.</strong> (<em>lastname</em>) – </p></li>
+<li><p><strong>- partial firstname to search for. Wild cards the ending.</strong> (<em>firstname</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse - either a message or a list of users in HTML format.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -932,7 +971,7 @@ is valid.</p>
 <dl class="py function">
 <dt id="accounts.views.search_ajax">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">search_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#search_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.search_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ajax member search function.</p>
+<dd><p>Ajax member search function. ONLY USED MEMBER TRANSFER. REPLACE.</p>
 <p>Used to search for members by the Member to Member transfer part of Payments.
 Currently very specific to payments. Could be made more generic if other
 parts of the system need a search function.</p>
