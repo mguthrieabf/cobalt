@@ -3,4 +3,9 @@ pip install black
 black --target-version=py37 .\forums\views.py
 black --check --target-version=py37 .\forums\views.py
 
-pylint 
+pylint
+
+message = render_to_string('notifications/email.html', {'title': "New comment on your post 'What to bid here?'", "email_body": "Fre
+    ...: d commented on your post.", "link": "http://127.0.0.1:8000", "link_text": "See what he said" })
+
+    send_cobalt_email("m@rkguthrie.com", "New Comment on Post - What to bid?", message)       
