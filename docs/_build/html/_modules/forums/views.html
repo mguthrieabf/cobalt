@@ -148,11 +148,20 @@
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseForbidden</span>
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Post</span><span class="p">,</span> <span class="n">Comment1</span><span class="p">,</span> <span class="n">Comment2</span><span class="p">,</span> <span class="n">LikePost</span><span class="p">,</span> <span class="n">LikeComment1</span><span class="p">,</span> <span class="n">LikeComment2</span><span class="p">,</span> <span class="n">Forum</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Post</span><span class="p">,</span>
+    <span class="n">Comment1</span><span class="p">,</span>
+    <span class="n">Comment2</span><span class="p">,</span>
+    <span class="n">LikePost</span><span class="p">,</span>
+    <span class="n">LikeComment1</span><span class="p">,</span>
+    <span class="n">LikeComment2</span><span class="p">,</span>
+    <span class="n">Forum</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">PostForm</span><span class="p">,</span> <span class="n">CommentForm</span><span class="p">,</span> <span class="n">Comment2Form</span>
 <span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">notify_happening</span><span class="p">,</span> <span class="n">create_user_notification</span>
 <span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
 <span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">,</span> <span class="n">rbac_user_has_role</span>
+
 
 <div class="viewcode-block" id="post_list"><a class="viewcode-back" href="../../forums.html#forums.views.post_list">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -165,14 +174,13 @@
 <span class="sd">        page(HTTPResponse): page with list of posts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1"># get list of forums user cannot access</span>
-    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                                          <span class="n">app</span><span class="o">=</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span>
-                                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
-                                          <span class="n">action</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+    <span class="c1"># get list of forums user cannot access</span>
+    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;view&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)</span>
-    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">posts_list</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">posts</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
@@ -187,7 +195,8 @@
         <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
         <span class="n">posts_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;forums/post_list.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;posts&#39;</span> <span class="p">:</span> <span class="n">posts_new</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;forums/post_list.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts_new</span><span class="p">})</span></div>
+
 
 <div class="viewcode-block" id="post_list_dashboard"><a class="viewcode-back" href="../../forums.html#forums.views.post_list_dashboard">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_list_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -200,13 +209,12 @@
 <span class="sd">        list:   list of Post objects</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1"># get list of forums user cannot access</span>
-    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                                          <span class="n">app</span><span class="o">=</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span>
-                                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
-                                          <span class="n">action</span><span class="o">=</span><span class="s1">&#39;view&#39;</span><span class="p">)</span>
+    <span class="c1"># get list of forums user cannot access</span>
+    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;view&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">posts</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_date&#39;</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
     <span class="n">posts_new</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
         <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
@@ -215,30 +223,32 @@
 
     <span class="k">return</span> <span class="n">posts_new</span></div>
 
+
 <div class="viewcode-block" id="post_detail"><a class="viewcode-back" href="../../forums.html#forums.views.post_detail">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
 
-<span class="c1"># Check access</span>
+    <span class="c1"># Check access</span>
     <span class="n">post</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.forum.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span>
-                              <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.forum.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">HttpResponseForbidden</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-<span class="c1"># identify which form submitted this - comments1 or comments2</span>
-        <span class="k">if</span> <span class="s1">&#39;submit-c1&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="c1"># identify which form submitted this - comments1 or comments2</span>
+        <span class="k">if</span> <span class="s2">&quot;submit-c1&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
             <span class="n">form</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;submit-c2&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="s2">&quot;submit-c2&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
             <span class="n">form</span> <span class="o">=</span> <span class="n">Comment2Form</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="n">post</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">post</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
             <span class="n">post</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-<span class="c1"># Tell people</span>
-            <span class="n">notify_happening</span><span class="p">(</span><span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
-                             <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.comment&quot;</span><span class="p">,</span>
-                             <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> commented on your post: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
-                             <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="c1"># Tell people</span>
+            <span class="n">notify_happening</span><span class="p">(</span>
+                <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.comment&quot;</span><span class="p">,</span>
+                <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> commented on your post: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+                <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
     <span class="n">form</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">()</span>
@@ -248,28 +258,35 @@
     <span class="n">comments1</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">post</span><span class="p">)</span>
 
     <span class="n">total_comments</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">comments1_new</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># comments1 is immutable - make a copy</span>
+    <span class="n">comments1_new</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># comments1 is immutable - make a copy</span>
     <span class="k">for</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">comments1</span><span class="p">:</span>
-<span class="c1"># add related c2 objects to c1</span>
+        <span class="c1"># add related c2 objects to c1</span>
         <span class="n">c2</span> <span class="o">=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">comment1</span><span class="o">=</span><span class="n">c1</span><span class="p">)</span>
         <span class="n">c2_new</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c2</span><span class="p">:</span>
             <span class="n">i</span><span class="o">.</span><span class="n">c2_likes</span> <span class="o">=</span> <span class="n">LikeComment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">comment2</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
             <span class="n">c2_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="n">c1</span><span class="o">.</span><span class="n">c2</span> <span class="o">=</span> <span class="n">c2_new</span>
-<span class="c1"># number of comments</span>
+        <span class="c1"># number of comments</span>
         <span class="n">total_comments</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">total_comments</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">c2</span><span class="p">)</span>
-<span class="c1"># number of likes</span>
+        <span class="c1"># number of likes</span>
         <span class="n">c1</span><span class="o">.</span><span class="n">c1_likes</span> <span class="o">=</span> <span class="n">LikeComment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">comment1</span><span class="o">=</span><span class="n">c1</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
         <span class="n">comments1_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;forums/post_detail.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
-                                                       <span class="s1">&#39;form2&#39;</span><span class="p">:</span> <span class="n">form2</span><span class="p">,</span>
-                                                       <span class="s1">&#39;post&#39;</span><span class="p">:</span> <span class="n">post</span><span class="p">,</span>
-                                                       <span class="s1">&#39;comments1&#39;</span> <span class="p">:</span> <span class="n">comments1_new</span><span class="p">,</span>
-                                                       <span class="s1">&#39;post_likes&#39;</span> <span class="p">:</span> <span class="n">post_likes</span><span class="p">,</span>
-                                                       <span class="s1">&#39;total_comments&#39;</span> <span class="p">:</span> <span class="n">total_comments</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;forums/post_detail.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+            <span class="s2">&quot;form2&quot;</span><span class="p">:</span> <span class="n">form2</span><span class="p">,</span>
+            <span class="s2">&quot;post&quot;</span><span class="p">:</span> <span class="n">post</span><span class="p">,</span>
+            <span class="s2">&quot;comments1&quot;</span><span class="p">:</span> <span class="n">comments1_new</span><span class="p">,</span>
+            <span class="s2">&quot;post_likes&quot;</span><span class="p">:</span> <span class="n">post_likes</span><span class="p">,</span>
+            <span class="s2">&quot;total_comments&quot;</span><span class="p">:</span> <span class="n">total_comments</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="post_new"><a class="viewcode-back" href="../../forums.html#forums.views.post_new">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_new</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -278,43 +295,50 @@
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">PostForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.forum.</span><span class="si">%s</span><span class="s2">.create&quot;</span> <span class="o">%</span>
-                                  <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;forum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rbac_user_has_role</span><span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.forum.</span><span class="si">%s</span><span class="s2">.create&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;forum&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">):</span>
                 <span class="n">post</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">post</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
                 <span class="n">post</span><span class="o">.</span><span class="n">published_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
                 <span class="n">post</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-                <span class="n">notifymsg</span> <span class="o">=</span> <span class="s2">&quot;New post to Forum </span><span class="si">%s</span><span class="s2"> by </span><span class="si">%s</span><span class="s2"> Titled </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="p">,</span>
-                                                                      <span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
-                                                                      <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+                <span class="n">notifymsg</span> <span class="o">=</span> <span class="s2">&quot;New post to Forum </span><span class="si">%s</span><span class="s2"> by </span><span class="si">%s</span><span class="s2"> Titled </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="p">,</span>
+                    <span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
+                    <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="p">)</span>
 
-<span class="c1"># Tell people</span>
-                <span class="n">notify_happening</span><span class="p">(</span><span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
-                                 <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.new&quot;</span><span class="p">,</span>
-                                 <span class="n">msg</span><span class="o">=</span><span class="n">notifymsg</span><span class="p">,</span>
-                                 <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="c1"># Tell people</span>
+                <span class="n">notify_happening</span><span class="p">(</span>
+                    <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.new&quot;</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="n">notifymsg</span><span class="p">,</span>
+                    <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="p">)</span>
 
-<span class="c1"># notify user of comments</span>
-                <span class="n">create_user_notification</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
-                                         <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
-                                         <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.comment&quot;</span><span class="p">,</span>
-                                         <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                                         <span class="n">notification_type</span><span class="o">=</span><span class="s2">&quot;Email&quot;</span><span class="p">)</span>
+                <span class="c1"># notify user of comments</span>
+                <span class="n">create_user_notification</span><span class="p">(</span>
+                    <span class="n">member</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
+                    <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.comment&quot;</span><span class="p">,</span>
+                    <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">notification_type</span><span class="o">=</span><span class="s2">&quot;Email&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
 
-                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;forums:post_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;forums:post_detail&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">HttpResponseForbidden</span><span class="p">()</span>
 
     <span class="k">else</span><span class="p">:</span>
-<span class="c1"># see which forums are blocked for this user - load a list of the others</span>
-        <span class="n">blocked_forums</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-                                                     <span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span>
-                                                     <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span>
-                                                     <span class="n">action</span><span class="o">=</span><span class="s2">&quot;create&quot;</span><span class="p">)</span>
+        <span class="c1"># see which forums are blocked for this user - load a list of the others</span>
+        <span class="n">blocked_forums</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span>
+            <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;create&quot;</span>
+        <span class="p">)</span>
         <span class="n">valid_forums</span> <span class="o">=</span> <span class="n">Forum</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">blocked_forums</span><span class="p">)</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">PostForm</span><span class="p">(</span><span class="n">valid_forums</span><span class="o">=</span><span class="n">valid_forums</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;forums/post_edit.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s1">&#39;request&#39;</span><span class="p">:</span> <span class="n">request</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;forums/post_edit.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="n">request</span><span class="p">})</span></div>
+
 
 <div class="viewcode-block" id="like_post"><a class="viewcode-back" href="../../forums.html#forums.views.like_post">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">like_post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
@@ -329,6 +353,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;already liked&quot;</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="like_comment1"><a class="viewcode-back" href="../../forums.html#forums.views.like_comment1">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">like_comment1</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
@@ -341,6 +366,7 @@
             <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;already liked&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="like_comment2"><a class="viewcode-back" href="../../forums.html#forums.views.like_comment2">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">like_comment2</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>

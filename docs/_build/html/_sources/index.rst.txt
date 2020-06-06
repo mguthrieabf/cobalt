@@ -20,6 +20,7 @@ User Guides
 
 These are links to documents that describe each module.
 
+* :doc:`development_overview`
 * :doc:`payments_overview`
 * :doc:`notifications_overview`
 * :doc:`rbac_overview`
