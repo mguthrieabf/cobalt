@@ -12,9 +12,11 @@ from .models import (
     Forum,
 )
 from .forms import PostForm, CommentForm, Comment2Form
-from notifications.views import notify_happening, create_user_notification
+from notifications.views import notify_happening
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
+from django.template.loader import render_to_string
+from django.urls import reverse
 
 
 @login_required()
@@ -156,28 +158,52 @@ def post_new(request):
                 post.author = request.user
                 post.published_date = timezone.now()
                 post.save()
-                notifymsg = "New post to Forum %s by %s Titled %s" % (
-                    post.forum,
+
+                link = reverse("forums:post_detail", args=[post.id])
+                host = request.get_host()
+                absolute_link = "http://%s%s" % (host, link)
+
+                email_body = "%s created a new post in %s called '%s.'" % (
                     post.author,
+                    post.forum.title,
                     post.title,
                 )
+
+                context = {
+                    "title": "New Post: %s" % post.title,
+                    "email_body": email_body,
+                    "absolute_link": absolute_link,
+                    "host": host,
+                    "link_text": "See Post",
+                }
+
+                html_msg = render_to_string(
+                    "notifications/email-notification.html", context
+                )
+
+                msg = "New Post %s by %s" % (post.title, post.author)
+
+                email_subject = "New Post in Forum: %s" % post.forum.title
 
                 # Tell people
                 notify_happening(
                     application_name="Forums",
-                    event_type="forums.post.new",
-                    msg=notifymsg,
+                    event_type="forums.post.create",
+                    msg=msg,
+                    html_msg=html_msg,
                     topic=post.forum.id,
+                    link=link,
+                    email_subject=email_subject,
                 )
 
                 # notify user of comments
-                create_user_notification(
-                    member=post.author,
-                    application_name="Forums",
-                    event_type="forums.post.comment",
-                    topic=post.id,
-                    notification_type="Email",
-                )
+                # create_user_notification(
+                #     member=post.author,
+                #     application_name="Forums",
+                #     event_type="forums.post.comment",
+                #     topic=post.id,
+                #     notification_type="Email",
+                # )
 
                 return redirect("forums:post_detail", pk=post.pk)
             else:

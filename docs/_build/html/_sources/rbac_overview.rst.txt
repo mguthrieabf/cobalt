@@ -237,10 +237,81 @@ So in this example, the rules to create would be:
 Admin
 =====
 
-TBA.
+Ironically, administration for RBAC is quite a tough problem to solve. While
+we want to devolve administration as much as possible, we also have to ensure
+that administrators can only do things they are supposed to do.
 
-Administration functions have a different set of rules. It is possible for
+Lets start with a simple example.
+
+.. code-block:: python
+
+  RBACGroup: "Springfield Bridge Club Directors"
+  RBACUserGroup: Bob
+  RBACUserGroup: Jane
+  RBACUserGroup: Alice
+  RBACGroupRole: forums.forum.37.all
+
+This defines a group of directors for a club. There are 3 users, Bob, Jane and
+Alice, and there is one role: *forums.forum.37.all*.
+
+Now lets add two administrators:
+
+.. code-block:: python
+
+  RBACAdminGroup: "Springfield Bridge Club Admins"
+  RBACAdminUserGroup: Bob
+  RBACAdminGroupRole: forums.forum.37
+
+  RBACAdminGroup: "Global Forum Admins"
+  RBACAdminUserGroup: Fred
+  RBACAdminGroupRole: forums.forum
+
+So here Bob, as well as being a member of the group "Springfield Bridge Club
+Directors", is also an administrator. Fred has access at a higher level and is
+an administrator for all forums.
+
+Both Bob and Fred can add or remove users from the group "Springfield Bridge
+Club Directors". However, using these rules, Fred could also add the role
+*forums.forum.6.view* to this group, while Bob could not.
+
+Lets keep this in place and add one further admin group into the mix:
+
+.. code-block:: python
+
+  RBACAdminGroup: "Springfield Bridge Club Admins - More Access"
+  RBACAdminUserGroup: Bob
+  RBACAdminGroupRole: organisations.organisation.142
+
+This rule gives Bob admin rights over organisation 142.
+
+Now Bob can also update our original group "Springfield Bridge Club Directors"
+to add the role *organisations.organisation.143.view*, however, based upon the
+rules we have shown here, Fred could not. Equally, if Bob does add this role,
+then Fred could not remove it.
+
+So, in summary:
+
+- Administrator access applies at the role level, not directly to groups.
+- If an administrator has rights to a group through any admin role,
+  then they can change the membership of that group (add or remove users).
+- An administrator can only change the roles within a group that they have
+  explicit rights to. They cannot change any other roles.
+
+One additional point to make is that it is possible for
 someone to be an administrator of a group without being a member.
+
+Administration of Administrators
+--------------------------------
+
+Any admin can create or delete administrators within their sphere of
+administration. So if they want an easy life then Bob can give Fred access to
+"Springfield Bridge Club Admins - More Access" and Fred can give Bob access to
+"Global Forum Admins".
+
+We will need some sort of a review of access but nobody can ever give another
+user more access than they already have. The roles such as *forums.forum* are
+the ones that need education so that admins at this level give admin rights to
+specific forums for other users and not global admin rights.
 
 API Functions
 =============

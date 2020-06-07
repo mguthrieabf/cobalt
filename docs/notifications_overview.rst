@@ -27,14 +27,14 @@ what it is they are being notified about.
 Notification Types
 ==================
 
-There are three broad categories of notification:
+There are five broad categories of notification:
 
-System Broadcasts
+System Broadcasts (*Not yet implemented*)
   Users will receive these regardless of preference. These are rare.
-Broadcasts
+Broadcasts (*Not yet implemented*)
   These are typically emails from the National Body, Clubs, State
   Bodies etc. Users may opt out of these through their settings.
-Named Specific
+Named Specific (*Not yet implemented*)
    The calling module will provide a list of names. Users can
    choose how they are notified or choose to opt out. For example, Results tells
    Notifications that the results for an event are available and who played in the
@@ -88,14 +88,14 @@ Creating User Listens
 =====================
 
 Sometimes you don't want to immediately notify a user but you do want to
-set them up for later notifications. For example, if a user posts a an
+set them up for later notifications. For example, if a user posts an
 article in a Forum, they may want to be notified when someone comments on it.
 
-In this case you should call :func:`notifications.cviews.create_user_notification`.
+In this case you should call :func:`notifications.views.create_user_notification`.
 
 This will set up a rule to listen for the events that you request. If you no
 longer want this (for example, if the post is deleted), then you should call
-:func:`notifications.cviews.delete_user_notification`.
+:func:`notifications.views.delete_user_notification`.
 
 Event Types
 -----------

@@ -161,6 +161,8 @@
 <span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">notify_happening</span><span class="p">,</span> <span class="n">create_user_notification</span>
 <span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
 <span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">,</span> <span class="n">rbac_user_has_role</span>
+<span class="kn">from</span> <span class="nn">django.template.loader</span> <span class="kn">import</span> <span class="n">render_to_string</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">reverse</span>
 
 
 <div class="viewcode-block" id="post_list"><a class="viewcode-back" href="../../forums.html#forums.views.post_list">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
@@ -302,28 +304,44 @@
                 <span class="n">post</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
                 <span class="n">post</span><span class="o">.</span><span class="n">published_date</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
                 <span class="n">post</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-                <span class="n">notifymsg</span> <span class="o">=</span> <span class="s2">&quot;New post to Forum </span><span class="si">%s</span><span class="s2"> by </span><span class="si">%s</span><span class="s2"> Titled </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="p">,</span>
-                    <span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
-                    <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
-                <span class="p">)</span>
+
+                <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;forums:post_detail&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()</span>
+                <span class="n">absolute_link</span> <span class="o">=</span> <span class="s2">&quot;http://</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+
+                <span class="n">email_body</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> created a new post in </span><span class="si">%s</span><span class="s2"> called &#39;</span><span class="si">%s</span><span class="s2">.&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+
+                <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s2">&quot;New Post: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="s2">&quot;email_body&quot;</span><span class="p">:</span> <span class="n">email_body</span><span class="p">,</span>
+                 <span class="s2">&quot;absolute_link&quot;</span><span class="p">:</span> <span class="n">absolute_link</span><span class="p">,</span>
+                 <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="n">host</span><span class="p">,</span>
+                 <span class="s2">&quot;link_text&quot;</span><span class="p">:</span> <span class="s2">&quot;See Post&quot;</span> <span class="p">}</span>
+
+                <span class="n">html_msg</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s1">&#39;notifications/email-notification.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;New Post </span><span class="si">%s</span><span class="s2"> by </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">)</span>
+
+                <span class="n">email_subject</span> <span class="o">=</span> <span class="s2">&quot;New Post in Forum: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">title</span>
 
                 <span class="c1"># Tell people</span>
                 <span class="n">notify_happening</span><span class="p">(</span>
                     <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
-                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.new&quot;</span><span class="p">,</span>
-                    <span class="n">msg</span><span class="o">=</span><span class="n">notifymsg</span><span class="p">,</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.create&quot;</span><span class="p">,</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
+                    <span class="n">html_msg</span><span class="o">=</span><span class="n">html_msg</span><span class="p">,</span>
                     <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">,</span>
+                    <span class="n">email_subject</span><span class="o">=</span><span class="n">email_subject</span>
                 <span class="p">)</span>
 
                 <span class="c1"># notify user of comments</span>
-                <span class="n">create_user_notification</span><span class="p">(</span>
-                    <span class="n">member</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
-                    <span class="n">application_name</span><span class="o">=</span><span class="s2">&quot;Forums&quot;</span><span class="p">,</span>
-                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;forums.post.comment&quot;</span><span class="p">,</span>
-                    <span class="n">topic</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                    <span class="n">notification_type</span><span class="o">=</span><span class="s2">&quot;Email&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="c1"># create_user_notification(</span>
+                <span class="c1">#     member=post.author,</span>
+                <span class="c1">#     application_name=&quot;Forums&quot;,</span>
+                <span class="c1">#     event_type=&quot;forums.post.comment&quot;,</span>
+                <span class="c1">#     topic=post.id,</span>
+                <span class="c1">#     notification_type=&quot;Email&quot;,</span>
+                <span class="c1"># )</span>
 
                 <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;forums:post_detail&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">post</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>

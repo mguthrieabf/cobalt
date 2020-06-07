@@ -164,14 +164,14 @@ what it is they are being notified about.</p>
 </div>
 <div class="section" id="notification-types">
 <h1>Notification Types<a class="headerlink" href="#notification-types" title="Permalink to this headline">¶</a></h1>
-<p>There are three broad categories of notification:</p>
+<p>There are five broad categories of notification:</p>
 <dl class="simple">
-<dt>System Broadcasts</dt><dd><p>Users will receive these regardless of preference. These are rare.</p>
+<dt>System Broadcasts (<em>Not yet implemented</em>)</dt><dd><p>Users will receive these regardless of preference. These are rare.</p>
 </dd>
-<dt>Broadcasts</dt><dd><p>These are typically emails from the National Body, Clubs, State
+<dt>Broadcasts (<em>Not yet implemented</em>)</dt><dd><p>These are typically emails from the National Body, Clubs, State
 Bodies etc. Users may opt out of these through their settings.</p>
 </dd>
-<dt>Named Specific</dt><dd><p>The calling module will provide a list of names. Users can
+<dt>Named Specific (<em>Not yet implemented</em>)</dt><dd><p>The calling module will provide a list of names. Users can
 choose how they are notified or choose to opt out. For example, Results tells
 Notifications that the results for an event are available and who played in the
 event. Notifications passes this information on to the member (or not, if the
@@ -221,12 +221,12 @@ so we can have a single point to maintain.</p>
 <div class="section" id="creating-user-listens">
 <h1>Creating User Listens<a class="headerlink" href="#creating-user-listens" title="Permalink to this headline">¶</a></h1>
 <p>Sometimes you don’t want to immediately notify a user but you do want to
-set them up for later notifications. For example, if a user posts a an
+set them up for later notifications. For example, if a user posts an
 article in a Forum, they may want to be notified when someone comments on it.</p>
-<p>In this case you should call <code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.create_user_notification()</span></code>.</p>
+<p>In this case you should call <a class="reference internal" href="notifications.html#notifications.views.create_user_notification" title="notifications.views.create_user_notification"><code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.views.create_user_notification()</span></code></a>.</p>
 <p>This will set up a rule to listen for the events that you request. If you no
 longer want this (for example, if the post is deleted), then you should call
-<code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.cviews.delete_user_notification()</span></code>.</p>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">notifications.views.delete_user_notification()</span></code>.</p>
 <div class="section" id="event-types">
 <h2>Event Types<a class="headerlink" href="#event-types" title="Permalink to this headline">¶</a></h2>
 <p>The applications control their own event types, but the format of the string

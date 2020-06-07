@@ -464,11 +464,12 @@ will call this to register a notification for comments on a users post.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>- standard User object</strong> (<em>member</em>) – </p></li>
-<li><p><strong>- name of the Cobalt application to follow</strong> (<em>application_name</em>) – </p></li>
-<li><p><strong>- event e.g. forums.post.comment</strong> (<em>event_type</em>) – </p></li>
-<li><p><strong>- specific to the application</strong> (<em>topic</em>) – </p></li>
-<li><p><strong>type - email</strong><strong> or </strong><strong>SMS</strong> (<em>notification</em>) – </p></li>
+<li><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard User object</p></li>
+<li><p><strong>application_name</strong> (<em>str</em>) – name of the Cobalt application to follow</p></li>
+<li><p><strong>event_type</strong> (<em>str</em>) – event e.g. forums.post.create</p></li>
+<li><p><strong>topic</strong> (<em>str</em>) – specific to the application. e.g. 5 to follow forum with pk=5</p></li>
+<li><p><strong>subtopic</strong> (<em>str</em>) – application specific (optional)</p></li>
+<li><p><strong>notification_type</strong> (<em>str</em>) – email or SMS</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -504,7 +505,7 @@ unacknowledged.</p>
 
 <dl class="py function">
 <dt id="notifications.views.notify_happening">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by Cobalt applications to tell notify they have done something.</p>
 <p>Main entry point for general notifications of events within the system.
 Applications publish an event through this call and Notifications tells
@@ -512,12 +513,14 @@ any member who has registered an interest in this event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>- name of the calling app</strong> (<em>application_name</em>) – </p></li>
-<li><p><strong>- specific to the application</strong><strong>, </strong><strong>high level event</strong> (<em>topic</em>) – </p></li>
-<li><p><strong>- specific to the application</strong><strong>, </strong><strong>next level event</strong> (<em>subtopic</em>) – </p></li>
-<li><p><strong>- a brief description of the event</strong> (<em>msg</em>) – </p></li>
-<li><p><strong>- an HTML relative link to the event</strong> (<em>link</em>) – </p></li>
-<li><p><strong>- a long description of the event</strong> (<em>html_msg</em>) – </p></li>
+<li><p><strong>application_name</strong> (<em>str</em>) – name of the calling app</p></li>
+<li><p><strong>event_type</strong> (<em>str</em>) – </p></li>
+<li><p><strong>topic</strong> (<em>str</em>) – specific to the application, high level event</p></li>
+<li><p><strong>subtopic</strong> (<em>str</em>) – specific to the application, next level event</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – a brief description of the event</p></li>
+<li><p><strong>link</strong> (<em>str</em>) – an HTML relative link to the event (Optional)</p></li>
+<li><p><strong>html_msg</strong> (<em>str</em>) – a long description of the event (Optional)</p></li>
+<li><p><strong>email_subject</strong> (<em>str</em>) – subject line for email (Optional)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -528,7 +531,7 @@ any member who has registered an interest in this event.</p>
 
 <dl class="py function">
 <dt id="notifications.views.notify_happening_forums">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening_forums</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening_forums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening_forums" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening_forums</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening_forums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening_forums" title="Permalink to this definition">¶</a></dt>
 <dd><p>sub function for notify_happening() - handles Forum events
 Might be able to make this generic</p>
 </dd></dl>

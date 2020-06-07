@@ -96,6 +96,15 @@ Before running manage.py you will need to set some environment variables::
 
 .. highlight:: default
 
+Management Commands
+-------------------
+
+In your development environment you will need to run some management
+commands to set up static data. In the ABF system these get run automatically
+as part of the deployment to AWS. The easiest way to identify what needs to be
+run is to look at the commands that are run in AWS. Look in the root project
+directly at .ebextensions/python.config.
+
 Coding Standards
 ================
 
