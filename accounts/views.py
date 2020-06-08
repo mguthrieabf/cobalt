@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
+from django.contrib.auth.views import PasswordResetView
 import ipinfo
 from notifications.views import send_cobalt_email
 from logs.views import get_client_ip, log_event
@@ -26,7 +27,6 @@ from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
 from .forms import UserUpdateForm, BlurbUpdateForm
-from django.contrib.auth.views import PasswordResetView
 
 
 def html_email_reset(request):
@@ -69,14 +69,11 @@ def register(request):
                     "user": user,
                     "domain": current_site.domain,
                     "org": settings.GLOBAL_ORG,
-                    #                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),     Django upgrade broke this
                     "uid": urlsafe_base64_encode(force_bytes(user.pk)),
                     "token": account_activation_token.make_token(user),
                 },
             )
             to_email = form.cleaned_data.get("email")
-
-            #            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
             send_cobalt_email(to_email, mail_subject, message)
             return render(
                 request, "accounts/register_complete.html", {"email_address": to_email}
