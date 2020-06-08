@@ -169,7 +169,7 @@ def change_password(request):
 
 
 @login_required()
-def member_detail_M2M_ajax(request):
+def member_detail_m2m_ajax(request):
     """ Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.
 
     Ajax call to get basic info on a member. Will return an empty json array
