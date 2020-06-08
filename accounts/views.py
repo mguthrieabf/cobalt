@@ -29,11 +29,13 @@ from .forms import UserUpdateForm, BlurbUpdateForm
 from django.contrib.auth.views import PasswordResetView
 
 
-def guthrie_password(request):
-    print("Guthrie password ")
+def html_email_reset(request):
+    """ This is necessary so that we can provide an HTML email template
+    for the password reset """
+
     return PasswordResetView.as_view(
         html_email_template_name="registration/html_password_reset_email.html"
-    )
+    )(request)
 
 
 def register(request):
