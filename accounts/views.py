@@ -9,7 +9,6 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
@@ -20,7 +19,6 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
 import ipinfo
-from cobalt.settings import DEFAULT_FROM_EMAIL
 from notifications.views import send_cobalt_email
 from logs.views import get_client_ip, log_event
 from organisations.models import MemberOrganisation
@@ -28,6 +26,15 @@ from .models import User
 from .forms import UserRegisterForm
 from .tokens import account_activation_token
 from .forms import UserUpdateForm, BlurbUpdateForm
+from django.contrib.auth.views import PasswordResetView
+
+
+def guthrie_password(request):
+    print("Guthrie password ")
+    return PasswordResetView.as_view(
+        html_email_template_name="registration/html_password_reset_email.html"
+    )
+
 
 def register(request):
     """ User registration form
@@ -45,32 +52,38 @@ def register(request):
         HttpResponse
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False   # not active until email confirmed
+            user.is_active = False  # not active until email confirmed
             user.system_number = user.username
             user.save()
             current_site = get_current_site(request)
-            mail_subject = 'Activate your account.'
-            message = render_to_string('accounts/acc_active_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'org': settings.GLOBAL_ORG,
-#                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),     Django upgrade broke this
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-                'token':account_activation_token.make_token(user),
-            })
-            to_email = form.cleaned_data.get('email')
+            mail_subject = "Activate your account."
+            message = render_to_string(
+                "accounts/acc_active_email.html",
+                {
+                    "user": user,
+                    "domain": current_site.domain,
+                    "org": settings.GLOBAL_ORG,
+                    #                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),     Django upgrade broke this
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "token": account_activation_token.make_token(user),
+                },
+            )
+            to_email = form.cleaned_data.get("email")
 
-#            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
+            #            send_mail(mail_subject, message, DEFAULT_FROM_EMAIL, [to_email], fail_silently=False)
             send_cobalt_email(to_email, mail_subject, message)
-            return render(request, 'accounts/register_complete.html', {'email_address' : to_email})
+            return render(
+                request, "accounts/register_complete.html", {"email_address": to_email}
+            )
     else:
         form = UserRegisterForm()
 
-    return render(request, 'accounts/register.html', {'user_form': form})
+    return render(request, "accounts/register.html", {"user_form": form})
+
 
 def activate(request, uidb64, token):
     """ User activation form
@@ -90,19 +103,21 @@ def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return render(request, 'accounts/activate_complete.html', {'user' : user})
+        return render(request, "accounts/activate_complete.html", {"user": user})
     else:
-        return HttpResponse('Activation link is invalid or already used!')
+        return HttpResponse("Activation link is invalid or already used!")
+
 
 def loggedout(request):
     """ Should review if this is really needed. """
-    return render(request, 'accounts/loggedout.html')
+    return render(request, "accounts/loggedout.html")
+
 
 @login_required()
 def change_password(request):
@@ -116,32 +131,43 @@ def change_password(request):
     Returns:
         HttpResponse
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!',
-                             extra_tags='cobalt-message-success')
-            log_event(request=request,
-                      user=request.user.full_name,
-                      severity="INFO",
-                      source="Accounts",
-                      sub_source="change_password",
-                      message="Password change successful")
-            return render(request, 'accounts/change_password.html', {'form': form})
+            messages.success(
+                request,
+                "Your password was successfully updated!",
+                extra_tags="cobalt-message-success",
+            )
+            log_event(
+                request=request,
+                user=request.user.full_name,
+                severity="INFO",
+                source="Accounts",
+                sub_source="change_password",
+                message="Password change successful",
+            )
+            return render(request, "accounts/change_password.html", {"form": form})
         else:
-            log_event(request=request,
-                      user=request.user.full_name,
-                      severity="WARN",
-                      source="Accounts",
-                      sub_source="change_password",
-                      message="Password change failed")
-            messages.error(request, 'Please correct the error below.',
-                           extra_tags='cobalt-message-error')
+            log_event(
+                request=request,
+                user=request.user.full_name,
+                severity="WARN",
+                source="Accounts",
+                sub_source="change_password",
+                message="Password change failed",
+            )
+            messages.error(
+                request,
+                "Please correct the error below.",
+                extra_tags="cobalt-message-error",
+            )
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/change_password.html', {'form': form})
+    return render(request, "accounts/change_password.html", {"form": form})
+
 
 @login_required()
 def member_detail_M2M_ajax(request):
@@ -158,7 +184,7 @@ def member_detail_M2M_ajax(request):
     """
 
     if request.method == "GET":
-        if 'member_id' in request.GET:
+        if "member_id" in request.GET:
             member_id = request.GET.get("member_id")
             member = get_object_or_404(User, pk=member_id)
             clubs = MemberOrganisation.objects.filter(member=member)
@@ -166,13 +192,18 @@ def member_detail_M2M_ajax(request):
                 global_org = settings.GLOBAL_ORG
                 html = render_to_string(
                     template_name="accounts/member_ajax.html",
-                    context={"member": member, 'clubs': clubs, 'global_org': global_org}
+                    context={
+                        "member": member,
+                        "clubs": clubs,
+                        "global_org": global_org,
+                    },
                 )
                 data_dict = {"data": html}
                 return JsonResponse(data=data_dict, safe=False)
-    return JsonResponse(data={'error': 'Invalid request'})
-@login_required()
+    return JsonResponse(data={"error": "Invalid request"})
 
+
+@login_required()
 def member_details_ajax(request):
     """ Returns basic public info on a member for the generic member search.
 
@@ -187,7 +218,7 @@ def member_details_ajax(request):
     """
 
     if request.method == "GET":
-        if 'member_id' in request.GET:
+        if "member_id" in request.GET:
             member_id = request.GET.get("member_id")
             member = get_object_or_404(User, pk=member_id)
             clubs = MemberOrganisation.objects.filter(member=member)
@@ -195,11 +226,16 @@ def member_details_ajax(request):
                 global_org = settings.GLOBAL_ORG
                 html = render_to_string(
                     template_name="accounts/member_details_ajax.html",
-                    context={"member": member, 'clubs': clubs, 'global_org': global_org}
+                    context={
+                        "member": member,
+                        "clubs": clubs,
+                        "global_org": global_org,
+                    },
                 )
                 data_dict = {"data": html}
                 return JsonResponse(data=data_dict, safe=False)
-    return JsonResponse(data={'error': 'Invalid request'})
+    return JsonResponse(data={"error": "Invalid request"})
+
 
 @login_required()
 def search_ajax(request):
@@ -221,23 +257,29 @@ def search_ajax(request):
 
     if request.method == "GET":
 
-        if 'lastname' in request.GET:
+        if "lastname" in request.GET:
             search_last_name = request.GET.get("lastname")
         else:
             search_last_name = None
 
-        if 'firstname' in request.GET:
+        if "firstname" in request.GET:
             search_first_name = request.GET.get("firstname")
         else:
             search_first_name = None
 
         if search_first_name and search_last_name:
-            members = User.objects.filter(first_name__istartswith=search_first_name,
-                                          last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                first_name__istartswith=search_first_name,
+                last_name__istartswith=search_last_name,
+            ).exclude(pk=request.user.id)
         elif search_last_name:
-            members = User.objects.filter(last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                last_name__istartswith=search_last_name
+            ).exclude(pk=request.user.id)
         else:
-            members = User.objects.filter(first_name__istartswith=search_first_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                first_name__istartswith=search_first_name
+            ).exclude(pk=request.user.id)
 
         if request.is_ajax:
             if members.count() > 30:
@@ -247,14 +289,19 @@ def search_ajax(request):
                 msg = "No matches found"
             html = render_to_string(
                 template_name="accounts/search_results.html",
-                context={"members": members, "msg": msg}
+                context={"members": members, "msg": msg},
             )
 
             data_dict = {"data": html}
 
             return JsonResponse(data=data_dict, safe=False)
 
-    return render(request, "accounts/search_results.html", context={'members': members, 'msg': msg})
+    return render(
+        request,
+        "accounts/search_results.html",
+        context={"members": members, "msg": msg},
+    )
+
 
 @login_required()
 def member_search_ajax(request):
@@ -276,23 +323,29 @@ def member_search_ajax(request):
 
     if request.method == "GET":
 
-        if 'lastname' in request.GET:
+        if "lastname" in request.GET:
             search_last_name = request.GET.get("lastname")
         else:
             search_last_name = None
 
-        if 'firstname' in request.GET:
+        if "firstname" in request.GET:
             search_first_name = request.GET.get("firstname")
         else:
             search_first_name = None
 
         if search_first_name and search_last_name:
-            members = User.objects.filter(first_name__istartswith=search_first_name,
-                                          last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                first_name__istartswith=search_first_name,
+                last_name__istartswith=search_last_name,
+            ).exclude(pk=request.user.id)
         elif search_last_name:
-            members = User.objects.filter(last_name__istartswith=search_last_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                last_name__istartswith=search_last_name
+            ).exclude(pk=request.user.id)
         else:
-            members = User.objects.filter(first_name__istartswith=search_first_name).exclude(pk=request.user.id)
+            members = User.objects.filter(
+                first_name__istartswith=search_first_name
+            ).exclude(pk=request.user.id)
 
         if request.is_ajax:
             if members.count() > 30:
@@ -302,14 +355,19 @@ def member_search_ajax(request):
                 msg = "No matches found"
             html = render_to_string(
                 template_name="accounts/search_results_ajax.html",
-                context={"members": members, "msg": msg}
+                context={"members": members, "msg": msg},
             )
 
             data_dict = {"data": html}
 
             return JsonResponse(data=data_dict, safe=False)
 
-    return render(request, "accounts/search_results_ajax.html", context={'members': members, 'msg': msg})
+    return render(
+        request,
+        "accounts/search_results_ajax.html",
+        context={"members": members, "msg": msg},
+    )
+
 
 @login_required
 def profile(request):
@@ -324,33 +382,35 @@ def profile(request):
         HttpResponse
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserUpdateForm(data=request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             # auto top up select list needs to be refreshed
             form = UserUpdateForm(instance=request.user)
-            messages.success(request, "Profile Updated",
-                             extra_tags='cobalt-message-success')
+            messages.success(
+                request, "Profile Updated", extra_tags="cobalt-message-success"
+            )
     else:
-# Fix DOB format for browser - expects DD/MM/YYYY
+        # Fix DOB format for browser - expects DD/MM/YYYY
         if request.user.dob:
             request.user.dob = request.user.dob.strftime("%d/%m/%Y")
 
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
 
-    access_token = '70691e3380c3b2'
+    access_token = "70691e3380c3b2"
     handler = ipinfo.getHandler(access_token)
     ip_address = get_client_ip(request)
     ip_details = handler.getDetails(ip_address)
 
     context = {
-        'form': form,
-        'blurbform': blurbform,
-        'ip_details': ip_details,
+        "form": form,
+        "blurbform": blurbform,
+        "ip_details": ip_details,
     }
-    return render(request, 'accounts/profile.html', context)
+    return render(request, "accounts/profile.html", context)
+
 
 def blurb_form_upload(request):
     """ Profile update sub-form. Handles the picture and about fields.
@@ -364,21 +424,22 @@ def blurb_form_upload(request):
         HttpResponse
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         blurbform = BlurbUpdateForm(request.POST, request.FILES, instance=request.user)
         if blurbform.is_valid():
             blurbform.save()
-            messages.success(request, "Profile Updated",
-                             extra_tags='cobalt-message-success')
+            messages.success(
+                request, "Profile Updated", extra_tags="cobalt-message-success"
+            )
     else:
         blurbform = BlurbUpdateForm(data=request.POST, instance=request.user)
 
     form = UserUpdateForm(instance=request.user)
     context = {
-        'form': form,
-        'blurbform': blurbform,
+        "form": form,
+        "blurbform": blurbform,
     }
-    return render(request, 'accounts/profile.html', context)
+    return render(request, "accounts/profile.html", context)
 
 
 @login_required
@@ -395,4 +456,4 @@ def public_profile(request, pk):
         HttpResponse
     """
     pub_profile = get_object_or_404(User, pk=pk)
-    return render(request, 'accounts/public_profile.html', {'profile': pub_profile})
+    return render(request, "accounts/public_profile.html", {"profile": pub_profile})

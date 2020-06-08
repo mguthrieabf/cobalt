@@ -17,14 +17,24 @@ urlpatterns = [
     path("activate/<str:uidb64>/<str:token>/", views.activate, name="activate"),
     path("profile", views.profile, name="user_profile"),
     path("update-blurb", views.blurb_form_upload, name="user_blurb"),
+    #    path("guthrie-password", views.guthrie_password, name="guthrie1"),
+    #    path("password_reset/", views.guthrie_password, name="guthrie"),
     path("public-profile/<int:pk>/", views.public_profile, name="public_profile"),
+    # path(
+    #     "accounts/password_reset/",
+    #     PasswordResetView.as_view(extra_email_context={"html_email_template_name": "registration/html_password_reset_email.html"}),
+    #     name="password_reset",
+    # ),
+    #    path('accounts/password_reset/', PasswordResetView.as_view(extra_context={'html_email_template_name':'registration/html_password_reset_email.html'})),
+    #    path('password/reset/', password_reset, {'html_email_template_name':'registration/html_password_reset_email.html', name='password_reset'),
+    #    path('accounts/logout/', auth_views.LogoutView.as_view(
+    # extra_context={'foo':'bar'}
     path(
-        "accounts/password_reset/",
-        PasswordResetView.as_view(),
-        {"html_email_template_name": "registration/html_password_reset_email.html"},
-        name="password_reset",
+        "password_reset/html_email_template/",
+        PasswordResetView.as_view(
+            html_email_template_name="registration/html_password_reset_email2.html"
+        ),
     ),
-    #    path('password/reset/', password_reset, {'html_email_template_name':'registration/html_password_reset_email.html'}, name='password_reset'),
 ]
 
 
