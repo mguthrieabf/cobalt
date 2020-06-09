@@ -66,16 +66,18 @@
 
     // validate amount
         amount.blur(function(e) {
+          e.preventDefault();
           amount_err.html("");
           if (amount.val()<{{ AUTO_TOP_UP_MIN_AMT }}){
             amount_err.html("Insufficient amount. Minimum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.");
             amount.focus();
-            e.preventDefault();
+
+            return false;
           }
           if (amount.val()>{{ AUTO_TOP_UP_MAX_AMT }}){
             amount_err.html("Too large. Maximum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }}.");
             amount.focus();
-            e.preventDefault();
+
           }
 
         });

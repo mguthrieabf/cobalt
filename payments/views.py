@@ -34,14 +34,16 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
-from django.db import transaction
 from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
-from cobalt.settings import (STRIPE_SECRET_KEY,
-                             GLOBAL_MPSERVER, AUTO_TOP_UP_LOW_LIMIT,
-                             AUTO_TOP_UP_DEFAULT_AMT, GLOBAL_CURRENCY_SYMBOL)
+from cobalt.settings import (
+    STRIPE_SECRET_KEY,
+    GLOBAL_MPSERVER,
+    AUTO_TOP_UP_LOW_LIMIT,
+    AUTO_TOP_UP_DEFAULT_AMT,
+)
 from .forms import TestTransaction, MemberTransfer, ManualTopup
-from .core import payment_api, update_account, get_balance, auto_topup_member
+from .core import payment_api, get_balance, auto_topup_member
 from .models import MemberTransaction, StripeTransaction
 from accounts.models import User
 
@@ -60,7 +62,8 @@ def home(request):
 
     """
 
-    return render(request, 'payments/home.html')
+    return render(request, "payments/home.html")
+
 
 @login_required()
 #################################
@@ -71,26 +74,28 @@ def test_payment(request):
        a members account. This simulates them entering an event or paying a subscription.
 """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = TestTransaction(request.POST)
         if form.is_valid():
-            description = form.cleaned_data['description']
-            amount = form.cleaned_data['amount']
+            description = form.cleaned_data["description"]
+            amount = form.cleaned_data["amount"]
             member = request.user
-            organisation = form.cleaned_data['organisation']
-            url = form.cleaned_data['url']
-            payment_type = form.cleaned_data['type']
+            organisation = form.cleaned_data["organisation"]
+            url = form.cleaned_data["url"]
+            payment_type = form.cleaned_data["type"]
 
-            return payment_api(request=request,
-                               description=description,
-                               amount=amount,
-                               member=member,
-                               route_code="MAN",
-                               route_payload=None,
-                               organisation=organisation,
-                               log_msg=None,
-                               payment_type=payment_type,
-                               url=url)
+            return payment_api(
+                request=request,
+                description=description,
+                amount=amount,
+                member=member,
+                route_code="MAN",
+                route_payload=None,
+                organisation=organisation,
+                log_msg=None,
+                payment_type=payment_type,
+                url=url,
+            )
     else:
         form = TestTransaction()
 
@@ -101,10 +106,17 @@ def test_payment(request):
 
     balance = get_balance(request.user)
 
-    return render(request, 'payments/test_payment.html', {'form': form,
-                                                          'auto_amount' : auto_amount,
-                                                          'balance': balance,
-                                                          'lowbalance': AUTO_TOP_UP_LOW_LIMIT})
+    return render(
+        request,
+        "payments/test_payment.html",
+        {
+            "form": form,
+            "auto_amount": auto_amount,
+            "balance": balance,
+            "lowbalance": AUTO_TOP_UP_LOW_LIMIT,
+        },
+    )
+
 
 ####################
 # statement_common #
@@ -128,8 +140,8 @@ def statement_common(request):
 
     """
 
-# Get summary data
-    qry = '%s/mps/%s' % (GLOBAL_MPSERVER, request.user.system_number)
+    # Get summary data
+    qry = "%s/mps/%s" % (GLOBAL_MPSERVER, request.user.system_number)
     summary = requests.get(qry).json()[0]
 
     # Set active to a boolean
@@ -139,8 +151,8 @@ def statement_common(request):
         summary["IsActive"] = False
 
     # Get home club name
-    qry = '%s/club/%s' % (GLOBAL_MPSERVER, summary['HomeClubID'])
-    club = requests.get(qry).json()[0]['ClubName']
+    qry = "%s/club/%s" % (GLOBAL_MPSERVER, summary["HomeClubID"])
+    club = requests.get(qry).json()[0]["ClubName"]
 
     # get balance
     last_tran = MemberTransaction.objects.filter(member=request.user).last()
@@ -155,9 +167,12 @@ def statement_common(request):
     else:
         auto_button = False
 
-    events_list = MemberTransaction.objects.filter(member=request.user).order_by('-created_date')
+    events_list = MemberTransaction.objects.filter(member=request.user).order_by(
+        "-created_date"
+    )
 
-    return(summary, club, balance, auto_button, events_list)
+    return (summary, club, balance, auto_button, events_list)
+
 
 #####################
 # statement         #
@@ -177,7 +192,7 @@ def statement(request):
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request)
 
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
 
     paginator = Paginator(events_list, 30)
     try:
@@ -187,12 +202,19 @@ def statement(request):
     except EmptyPage:
         events = paginator.page(paginator.num_pages)
 
-    return render(request, 'payments/statement.html', {'events': events,
-                                                       'user': request.user,
-                                                       'summary': summary,
-                                                       'club': club,
-                                                       'balance': balance,
-                                                       'auto_button': auto_button})
+    return render(
+        request,
+        "payments/statement.html",
+        {
+            "events": events,
+            "user": request.user,
+            "summary": summary,
+            "club": club,
+            "balance": balance,
+            "auto_button": auto_button,
+        },
+    )
+
 
 #####################
 # statement_csv     #
@@ -210,16 +232,27 @@ def statement_csv(request):
         HTTPResponse: CSV headed response with CSV statement data
 
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
-    today = datetime.today().strftime('%-d %B %Y at %I:%H:%M')
+    (summary, club, balance, auto_button, events_list) = statement_common(
+        request
+    )  # pylint: disable=unused-variable
+    today = datetime.today().strftime("%-d %B %Y at %I:%H:%M")
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="statement.csv"'
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="statement.csv"'
 
     writer = csv.writer(response)
     writer.writerow([request.user.full_name, request.user.system_number, today])
-    writer.writerow(['Date', 'Counterparty', 'Reference', 'Type', 'Description',
-                    'Amount', 'Balance'])
+    writer.writerow(
+        [
+            "Date",
+            "Counterparty",
+            "Reference",
+            "Type",
+            "Description",
+            "Amount",
+            "Balance",
+        ]
+    )
 
     for row in events_list:
         counterparty = ""
@@ -227,10 +260,20 @@ def statement_csv(request):
             counterparty = row.other_member
         if row.organisation:
             counterparty = row.organisation
-        writer.writerow([row.created_date, counterparty, row.reference_no,
-                         row.type, row.description, row.amount, row.balance])
+        writer.writerow(
+            [
+                row.created_date,
+                counterparty,
+                row.reference_no,
+                row.type,
+                row.description,
+                row.amount,
+                row.balance,
+            ]
+        )
 
     return response
+
 
 #####################
 # statement_pdf     #
@@ -249,19 +292,26 @@ def statement_pdf(request):
 
 
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(request) # pylint: disable=unused-variable
+    (summary, club, balance, auto_button, events_list) = statement_common(
+        request
+    )  # pylint: disable=unused-variable
 
-    today = datetime.today().strftime('%-d %B %Y')
+    today = datetime.today().strftime("%-d %B %Y")
 
-    return render_to_pdf_response(request, 'payments/statement_pdf.html',
-                                  {
-                                      'events': events_list,
-                                      'user': request.user,
-                                      'summary': summary,
-                                      'club': club,
-                                      'balance': balance,
-                                      'today': today
-                                  })
+    return render_to_pdf_response(
+        request,
+        "payments/statement_pdf.html",
+        {
+            "events": events_list,
+            "user": request.user,
+            "summary": summary,
+            "club": club,
+            "balance": balance,
+            "today": today,
+        },
+    )
+
+
 ############################
 # Stripe_create_customer   #
 ############################
@@ -281,10 +331,11 @@ def stripe_create_customer(request):
     """
 
     stripe.api_key = STRIPE_SECRET_KEY
-    customer = stripe.Customer.create(metadata={'cobalt_tran_type': 'Auto'})
+    customer = stripe.Customer.create(metadata={"cobalt_tran_type": "Auto"})
     request.user.stripe_customer_id = customer.id
     request.user.auto_amount = AUTO_TOP_UP_DEFAULT_AMT
     request.user.save()
+
 
 #######################
 # setup_autotopup     #
@@ -306,49 +357,58 @@ def setup_autotopup(request):
     stripe.api_key = STRIPE_SECRET_KEY
     warn = ""
 
-# Already set up?
+    # Already set up?
     if request.user.stripe_auto_confirmed:
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id,
-                type="card",
+                customer=request.user.stripe_customer_id, type="card",
             )
         except stripe.error.InvalidRequestError as error:
-            log_event(user=request.user.full_name,
-                      severity="HIGH",
-                      source="Payments",
-                      sub_source="setup_autotopup",
-                      message="Stripe InvalidRequestError: %s" % error.error.message)
+            log_event(
+                user=request.user.full_name,
+                severity="HIGH",
+                source="Payments",
+                sub_source="setup_autotopup",
+                message="Stripe InvalidRequestError: %s" % error.error.message,
+            )
             stripe_create_customer(request)
             paylist = None
 
         except stripe.error.RateLimitError:
-            log_event(user=request.user.full_name,
-                      severity="HIGH",
-                      source="Payments",
-                      sub_source="setup_autotopup",
-                      message="Stripe RateLimitError")
+            log_event(
+                user=request.user.full_name,
+                severity="HIGH",
+                source="Payments",
+                sub_source="setup_autotopup",
+                message="Stripe RateLimitError",
+            )
 
         except stripe.error.AuthenticationError:
-            log_event(user=request.user.full_name,
-                      severity="CRITICAL",
-                      source="Payments",
-                      sub_source="setup_autotopup",
-                      message="Stripe AuthenticationError")
+            log_event(
+                user=request.user.full_name,
+                severity="CRITICAL",
+                source="Payments",
+                sub_source="setup_autotopup",
+                message="Stripe AuthenticationError",
+            )
 
         except stripe.error.APIConnectionError:
-            log_event(user=request.user.full_name,
-                      severity="HIGH",
-                      source="Payments",
-                      sub_source="setup_autotopup",
-                      message="Stripe APIConnectionError - likely network problems")
+            log_event(
+                user=request.user.full_name,
+                severity="HIGH",
+                source="Payments",
+                sub_source="setup_autotopup",
+                message="Stripe APIConnectionError - likely network problems",
+            )
 
         except stripe.error.StripeError:
-            log_event(user=request.user.full_name,
-                      severity="CRITICAL",
-                      source="Payments",
-                      sub_source="setup_autotopup",
-                      message="Stripe generic StripeError")
+            log_event(
+                user=request.user.full_name,
+                severity="CRITICAL",
+                source="Payments",
+                sub_source="setup_autotopup",
+                message="Stripe generic StripeError",
+            )
 
         if paylist:  # if customer has a card associated
             card = paylist.data[0].card
@@ -363,9 +423,13 @@ def setup_autotopup(request):
         stripe_create_customer(request)
 
     balance = get_balance(request.user)
+    topup = request.user.auto_amount
 
-    return render(request, 'payments/autotopup.html', {'warn': warn,
-                                                        'balance': balance})
+    return render(
+        request,
+        "payments/autotopup.html",
+        {"warn": warn, "topup": topup, "balance": balance},
+    )
 
 
 #######################
@@ -385,16 +449,18 @@ def member_transfer(request):
 
     """
 
-    msg = ""
-
-    if request.method == 'POST':
+    if request.method == "POST":
         form = MemberTransfer(request.POST, user=request.user)
         if form.is_valid():
             print("member_transfer - about to call")
-            return payment_api(request=request, description=form.cleaned_data['description'],
-                        amount=form.cleaned_data['amount'], member=request.user,
-                        other_member=form.cleaned_data['transfer_to'],
-                        payment_type="Pay a Friend")
+            return payment_api(
+                request=request,
+                description=form.cleaned_data["description"],
+                amount=form.cleaned_data["amount"],
+                member=request.user,
+                other_member=form.cleaned_data["transfer_to"],
+                payment_type="Pay a Friend",
+            )
         else:
             print(form.errors)
     else:
@@ -407,14 +473,22 @@ def member_transfer(request):
     else:
         balance = "Nil"
 
-    recents = MemberTransaction.objects.filter(member=request.user).exclude(other_member=None).values('other_member').distinct()
-    recent_transfer_to=[]
+    recents = (
+        MemberTransaction.objects.filter(member=request.user)
+        .exclude(other_member=None)
+        .values("other_member")
+        .distinct()
+    )
+    recent_transfer_to = []
     for r in recents:
-        member = User.objects.get(pk=r['other_member'])
+        member = User.objects.get(pk=r["other_member"])
         recent_transfer_to.append(member)
-    return render(request, 'payments/member_transfer.html', {'form': form,
-                                                             'recents': recent_transfer_to,
-                                                             'balance': balance})
+    return render(
+        request,
+        "payments/member_transfer.html",
+        {"form": form, "recents": recent_transfer_to, "balance": balance},
+    )
+
 
 ########################
 # update_auto_amount   #
@@ -433,11 +507,12 @@ def update_auto_amount(request):
 
     """
     if request.method == "GET":
-        amount = request.GET['amount']
+        amount = request.GET["amount"]
         request.user.auto_amount = amount
         request.user.save()
 
     return HttpResponse("Successful")
+
 
 ###################
 # manual_topup    #
@@ -456,29 +531,30 @@ def manual_topup(request):
 
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ManualTopup(request.POST)
         if form.is_valid():
-            if form.cleaned_data['card_choice'] == "Existing":  # Use Auto
-                (return_code, msg) = auto_topup_member(request.user,
-                                     topup_required=form.cleaned_data['amount'],
-                                     payment_type="Manual Top Up")
+            if form.cleaned_data["card_choice"] == "Existing":  # Use Auto
+                (return_code, msg) = auto_topup_member(
+                    request.user,
+                    topup_required=form.cleaned_data["amount"],
+                    payment_type="Manual Top Up",
+                )
                 if return_code:  # success
-                    messages.success(request, msg,
-                                     extra_tags='cobalt-message-success')
+                    messages.success(request, msg, extra_tags="cobalt-message-success")
                     return redirect("payments:payments")
-                else: # error
-                    messages.error(request, msg,
-                                   extra_tags='cobalt-message-error')
+                else:  # error
+                    messages.error(request, msg, extra_tags="cobalt-message-error")
             else:  # Use Manual
                 trans = StripeTransaction()
                 trans.description = "Manual Top Up"
-                trans.amount = form.cleaned_data['amount']
+                trans.amount = form.cleaned_data["amount"]
                 trans.member = request.user
                 trans.save()
                 msg = "Manual Top Up - Checkout"
-                return render(request, 'payments/checkout.html', {'trans': trans,
-                                                                  'msg': msg})
+                return render(
+                    request, "payments/checkout.html", {"trans": trans, "msg": msg}
+                )
         # else:
         #     print(form.errors)
 
@@ -487,8 +563,10 @@ def manual_topup(request):
 
     balance = get_balance(request.user)
 
-    return render(request, 'payments/manual_topup.html', {'form': form,
-                                                          'balance': balance})
+    return render(
+        request, "payments/manual_topup.html", {"form": form, "balance": balance}
+    )
+
 
 ######################
 # cancel_auto_top_up #
@@ -503,17 +581,19 @@ def cancel_auto_top_up(request):
         HTTPResponse
     """
 
-    if request.method == 'POST':
+    if request.method == "POST":
         if request.POST.get("stop_auto"):
             request.user.auto_amount = None
             request.user.stripe_auto_confirmed = None
             request.user.stripe_customer_id = None
             request.user.save()
 
-            messages.info(request, "Auto top up disabled",
-                          extra_tags='cobalt-message-success')
+            messages.info(
+                request, "Auto top up disabled", extra_tags="cobalt-message-success"
+            )
             return redirect("payments:payments")
         else:
             return redirect("payments:payments")
 
-    return render(request, 'payments/cancel_autotopup.html')
+    balance = get_balance(request.user)
+    return render(request, "payments/cancel_autotopup.html", {"balance": balance})

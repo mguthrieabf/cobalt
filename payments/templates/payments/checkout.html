@@ -37,7 +37,7 @@
             </button>
           </form>
           <div id="cobalt-cancel-button">
-           <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+            <button class="btn btn-info center-text" onclick="location.href = '{% url "payments:payments" %}'; return false;">Cancel</button>
           </div>
           <div class="sr-result hidden">
             <p>Payment completed<br /></p>

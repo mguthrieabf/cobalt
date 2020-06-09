@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block header %}
-<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 {% endblock %}
 {% block content %}
 
@@ -22,9 +24,9 @@
       <div class="container">
         <div class="row">
 
-          <div class="col">
+          <div class="col w-100">
             <h3>Groups</h3>
-            <select class="cobalt-group-select" id="{{ key }}-cobaltgroups" size="10">
+            <select class="w-100 cobalt-group-select" id="{{ key }}-cobaltgroups" size="10">
               {% for v in value %}
                 <option value="{{ v.id }}">{{ v.description }}</option>
               {% endfor %}
@@ -35,7 +37,7 @@
 
           <div class="col">
             <h3>Users</h3>
-            <select id="{{ key }}-cobaltusers" size="10">
+            <select class="w-100" id="{{ key }}-cobaltusers" size="10">
             </select><br>
 
 
@@ -88,7 +90,7 @@
 
           <div class="col">
             <h3>Actions</h3>
-            <select id="{{ key }}-cobaltactions" size="10">
+            <select class="w-100" id="{{ key }}-cobaltactions" size="10">
             </select><br>
             <button class="btn btn-success btn-sm">Add</button>
             <button class="btn btn-primary btn-sm">Delete</button>
@@ -131,13 +133,13 @@
       $.getJSON("group-to-user/" + group_id + "/")
         .done(response => {
         // using .html() causes delays (up to 30 seconds!) for Chrome. Changed to replaceWith()
-        var new_select =  "<select id='" + userlist + "' size='10'>" + response['data'] + "</select>"
+        var new_select =  "<select  class='w-100' id='" + userlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + userlist).replaceWith(new_select);
       });
 
       $.getJSON("group-to-action/" + group_id + "/")
         .done(response => {
-        var new_select =  "<select id='" + actionlist + "' size='10'>" + response['data'] + "</select>"
+        var new_select =  "<select  class='w-100' id='" + actionlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + actionlist).replaceWith(new_select);
       });
     });
@@ -187,9 +189,6 @@
             })
       }
     });
-
-
-
   });
 
 // Clear and hide generic member search popup
@@ -206,13 +205,22 @@
 
   function cobaltMemberSearchOk() {
     clearModal();
-console.log("running");
-    $.getJSON("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + group_id)
-        .done(response => {
-          console.log("back");
 
+    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + group_id)
+        .done(response => {
+          msg = response['data']['message'];
+          if (msg == 'Success'){
+            swal.fire({ title:"User Added", html: "Success. User added to group.", icon: "success", buttonsStyling: false})
+            .then((result) => {
+              location.reload();
+            });
+          } else {
+            swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+          }
         });
   }
+
+
 
 </script>
 {% endblock %}

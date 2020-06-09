@@ -1,6 +1,8 @@
 
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% load widget_tweaks %}
 
 {% block content %}
@@ -12,7 +14,7 @@
       <div class="card-header card-header-primary">
         <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}</h3>
         <h5>Cancel Auto Top Up</h5>
-        <h5>Balance: ${{ balance }}</h5>
+        <h5>Balance: {{GLOBAL_CURRENCY_SYMBOL}}{{ balance|floatformat:2|intcomma }}</h5>
       </div>
       <div class="card-body">
         <div class="container">

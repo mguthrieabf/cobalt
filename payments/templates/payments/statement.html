@@ -30,6 +30,7 @@
           <div class="float-left">
 
               <b>Auto Top Up</b>
+              {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
               <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm"
               {% if auto_button %} checked {% endif %}
                >
@@ -37,35 +38,38 @@
                 &nbsp;<a href="{% url "payments:setup_autotopup" %}">Update Card Details</a>
               {% endif %}
               <div id="console-event"></div>
-
           </div>
 
     </div>
     <div class="card-body table-responsive">
       <div class="container">
         <div class="row">
-          <div class="col-sm text-left">
-            <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 180px">
+          <div class="col-6 col-md-6 col-lg-3 text-center">
+            <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 170px">
               <i class="material-icons">people_alt</i>&nbsp;Pay A Friend
             </button>
             </a>
-            <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 180px">
+          </div>
+          <div class="col-6 col-md-6 col-lg-3 text-center">
+            <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 170px">
               <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
             </button>
             </a>
-
           </div>
-          <div class="col-sm text-right">
-            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 180px">
+          <div class="col-6 col-md-6 col-lg-3 text-center">
+            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
               <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
-            </button>
+              </button>
             </a>
-            <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 180px">
+          </div>
+          <div class="col-6 col-md-6 col-lg-3 text-center">
+            <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
               <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
-            </button>
-            </a>
+              </button>
+          </a>
           </div>
         </div>
+
       </div>
 
       <hr>

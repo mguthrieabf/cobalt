@@ -11,7 +11,7 @@
       <div class="card-header card-header-primary">
         <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}</h3>
         <h5>Transfer funds online to another member</h5>
-        <h5>Balance: ${{ balance|floatformat:2|intcomma }}</h5>
+        <h5>Balance: {{GLOBAL}}{{ balance|floatformat:2|intcomma }}</h5>
       </div>
       <div class="card-body">
         <div class="container">
@@ -97,7 +97,7 @@
 
                <div class="d-flex">
                 <div>
-                  <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-success center-text" disabled>
+                  <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-danger center-text" disabled>
                 </div>
                 <div class="ml-auto">
                  <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>

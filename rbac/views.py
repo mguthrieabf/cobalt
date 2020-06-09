@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from .models import (
@@ -107,6 +107,14 @@ def group_to_action_ajax(request, group_id):
 
 @login_required()
 def rbac_add_user_to_group_ajax(request):
+    """ Ajax call to add a user to a group
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
 
     if request.method == "GET":
         member_id = request.GET["member_id"]
@@ -118,10 +126,14 @@ def rbac_add_user_to_group_ajax(request):
         if rbac_user_is_group_admin(request.user, group):
             rbac_add_user_to_group(member, group)
             print("User %s added to group %s" % (member, group))
-            return HttpResponse("Successful")
+            msg = "Success"
         else:
             print("Access Denied")
-            return HttpResponse("Access Denied")
+            msg = "Access Denied"
 
-    print("Invalid request")
-    return HttpResponse("Invalid request")
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})
