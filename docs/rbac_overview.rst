@@ -256,6 +256,8 @@ Alice, and there is one role: *forums.forum.37.all*.
 
 Now lets add two administrators:
 
+**Note that admin has a matching set of models with the word Admin added.**
+
 .. code-block:: python
 
   RBACAdminGroup: "Springfield Bridge Club Admins"
@@ -429,7 +431,7 @@ To add a role to a group through the API:
 Removing a Role from a Group
 ----------------------------
 
-To remove a role to a group through the API:
+To remove a role from a group through the API:
 
 .. code-block:: python
 
