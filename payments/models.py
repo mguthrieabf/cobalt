@@ -143,10 +143,13 @@ class StripeTransaction(models.Model):
     )
     """linked amount can be different to amount if the member had some money in their account already"""
 
-
-#    def __str__(self):
-# return "%s(%s %s) - %s" % (self.member.system_number, self.member.first_name,
-#                            self.member.last_name, self.stripe_reference)
+    def __str__(self):
+        return "%s(%s %s) - %s" % (
+            self.member.system_number,
+            self.member.first_name,
+            self.member.last_name,
+            self.stripe_reference,
+        )
 
 
 class AbstractTransaction(models.Model):
@@ -217,13 +220,13 @@ class MemberTransaction(AbstractTransaction):
             )
         super(MemberTransaction, self).save(*args, **kwargs)
 
-    # def __str__(self):
-    #     return "%s - %s %s %s" % (
-    #         self.member.system_number,
-    #         self.member.first_name,
-    #         self.member.last_name,
-    #         self.id,
-    #     )
+    def __str__(self):
+        return "%s - %s %s %s" % (
+            self.member.system_number,
+            self.member.first_name,
+            self.member.last_name,
+            self.id,
+        )
 
 
 class OrganisationTransaction(AbstractTransaction):
