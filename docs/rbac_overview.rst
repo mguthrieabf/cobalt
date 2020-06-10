@@ -34,6 +34,8 @@ administrator for a club or congress should be able to appoint other
 administrators, or directors or any other role, themselves without needing the
 permission of anyone else. RBAC is the mechanism for achieving this.
 
+.. image:: images/rbac_overview.png
+
 Security Basics
 ===============
 

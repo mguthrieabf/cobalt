@@ -34,6 +34,8 @@ administrator for a club or congress should be able to appoint other
 administrators, or directors or any other role, themselves without needing the
 permission of anyone else. RBAC is the mechanism for achieving this.
 
+.. image:: images/rbac_overview.png
+
 Security Basics
 ===============
 
@@ -304,7 +306,7 @@ Administration of Administrators
 --------------------------------
 
 Any admin can create or delete administrators within their sphere of
-administration. So if they want an easy life then Bob can give Fred access to
+administration. So if they want to then Bob can give Fred access to
 "Springfield Bridge Club Admins - More Access" and Fred can give Bob access to
 "Global Forum Admins".
 
