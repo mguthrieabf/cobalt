@@ -2,14 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
-from .models import (
-    RBACGroup,
-    RBACUserGroup,
-    RBACGroupRole,
-    RBACAdminUserGroup,
-    RBACAdminGroupRole,
-    RBACAdminGroup,
-)
+from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACAdminUserGroup
 from .core import rbac_add_user_to_group, rbac_user_is_group_admin
 from accounts.models import User
 
@@ -41,25 +34,15 @@ def access_screen(request):
 @login_required
 def admin_screen(request):
 
-    # TODO: work out how to do this more efficiently using select_related
-    # Get groups with this user
-    groups1 = RBACAdminUserGroup.objects.filter(member=request.user).values_list(
-        "group"
-    )
-
-    # Get roles from groups where action is admin
-    matches = RBACAdminGroupRole.objects.filter(group__in=groups1).values_list("group")
-
-    # Get groups
-    groups = RBACAdminGroup.objects.filter(id__in=matches).order_by("name_qualifier")
+    user_groups = RBACAdminUserGroup.objects.filter(member=request.user)
 
     # split by type
     data = {}
-    for group in groups:
-        if group.group_type in data:
-            data[group.group_type].append(group)
+    for user_group in user_groups:
+        if user_group.group.group_type in data:
+            data[user_group.group.group_type].append(user_group.group)
         else:
-            data[group.group_type] = [group]
+            data[user_group.group.group_type] = [user_group.group]
 
     return render(request, "rbac/admin-screen.html", {"groups": data})
 
