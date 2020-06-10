@@ -135,12 +135,14 @@
         // using .html() causes delays (up to 30 seconds!) for Chrome. Changed to replaceWith()
         var new_select =  "<select  class='w-100' id='" + userlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + userlist).replaceWith(new_select);
+        console.log(response['data']);
       });
 
       $.getJSON("group-to-action/" + group_id + "/")
         .done(response => {
         var new_select =  "<select  class='w-100' id='" + actionlist + "' size='10'>" + response['data'] + "</select>"
         $("#" + actionlist).replaceWith(new_select);
+        console.log(response['data']);
       });
     });
 
