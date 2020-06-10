@@ -148,27 +148,46 @@
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.forms</span> <span class="kn">import</span> <span class="n">UserCreationForm</span>
 
+
 <div class="viewcode-block" id="UserRegisterForm"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserRegisterForm">[docs]</a><span class="k">class</span> <span class="nc">UserRegisterForm</span><span class="p">(</span><span class="n">UserCreationForm</span><span class="p">):</span>
     <span class="n">email</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
 
 <div class="viewcode-block" id="UserRegisterForm.Meta"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserRegisterForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;system_number&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="s1">&#39;password1&#39;</span><span class="p">,</span> <span class="s1">&#39;password2&#39;</span><span class="p">]</span></div></div>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;system_number&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mobile&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;password1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;password2&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div></div>
+
 
 <div class="viewcode-block" id="UserUpdateForm"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserUpdateForm">[docs]</a><span class="k">class</span> <span class="nc">UserUpdateForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
-
 <div class="viewcode-block" id="UserUpdateForm.Meta"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserUpdateForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;system_number&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;dob&#39;</span><span class="p">,</span> <span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="s1">&#39;headline&#39;</span><span class="p">,</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span> <span class="s1">&#39;pic&#39;</span><span class="p">,</span> <span class="s1">&#39;bbo_name&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;auto_amount&#39;</span><span class="p">,</span> <span class="s1">&#39;stripe_auto_confirmed&#39;</span><span class="p">]</span></div></div>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;system_number&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dob&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mobile&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;headline&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;about&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bbo_name&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div></div>
+
 
 <div class="viewcode-block" id="BlurbUpdateForm"><a class="viewcode-back" href="../../accounts.html#accounts.forms.BlurbUpdateForm">[docs]</a><span class="k">class</span> <span class="nc">BlurbUpdateForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
-
 <div class="viewcode-block" id="BlurbUpdateForm.Meta"><a class="viewcode-back" href="../../accounts.html#accounts.forms.BlurbUpdateForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;headline&#39;</span><span class="p">,</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span> <span class="s1">&#39;pic&#39;</span><span class="p">]</span></div></div>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;headline&quot;</span><span class="p">,</span> <span class="s2">&quot;about&quot;</span><span class="p">,</span> <span class="s2">&quot;pic&quot;</span><span class="p">]</span></div></div>
 </pre></div>
 
            </div>

@@ -8,30 +8,41 @@
        ./rbac_overview.html
 """
 from django.db import models
-
-# from django.contrib.contenttypes import fields
-# from django.contrib.contenttypes.models import ContentType
 from accounts.models import User
-
-# from forums.models import Forum, Post, Comment1, Comment2
-# from organisations.models import Organisation
-# from django.apps import apps
+from django.utils import timezone
 
 RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Block User Access")]
+GROUP_TYPES = [("Forum", "Forums"), ("Organisation", "Organisations")]
 
 
 class RBACGroup(models.Model):
     """ Group definitions """
 
-    group_name = models.CharField(max_length=50)
+    group_type = models.CharField(max_length=20, choices=GROUP_TYPES)
+
+    name_qualifier = models.CharField(max_length=50)
+    """ eg "organisations.trumps" """
+
+    name_item = models.CharField(max_length=50)
+    """ chosen by the admin. appends onto name_qualifier """
+
     description = models.CharField(max_length=50)
+    """ Free format decription """
+
+    created_date = models.DateTimeField("Create Date", default=timezone.now)
+    """ date created """
+
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    """ Standard User object """
 
     def __str__(self):
-        return self.group_id
+        return "%s.%s - %s" % (self.name_qualifier, self.name_item, self.description)
 
     @property
-    def group_id(self):
-        return "%s.%s - %s" % (self.group_name, self.id, self.description)
+    def name(self):
+        return "%s.%s" % (self.name_qualifier, self.name_item)
 
 
 class RBACUserGroup(models.Model):
@@ -116,15 +127,31 @@ class RBACAppModelAction(models.Model):
 class RBACAdminGroup(models.Model):
     """ Admin Group definitions """
 
-    group_name = models.CharField(max_length=50)
+    group_type = models.CharField(max_length=20, choices=GROUP_TYPES)
+
+    name_qualifier = models.CharField(max_length=50)
+    """ eg "organisations.trumps" """
+
+    name_item = models.CharField(max_length=50)
+    """ chosen by the admin. appends onto name_qualifier """
+
     description = models.CharField(max_length=50)
+    """ Free format decription """
+
+    created_date = models.DateTimeField("Create Date", default=timezone.now)
+    """ date created """
+
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    """ Standard User object """
 
     def __str__(self):
-        return self.group_id
+        return "%s.%s - %s" % (self.name_qualifier, self.name_item, self.description)
 
     @property
-    def group_id(self):
-        return "%s.%s - %s" % (self.group_name, self.id, self.description)
+    def name(self):
+        return "%s.%s" % (self.name_qualifier, self.name_item)
 
 
 class RBACAdminUserGroup(models.Model):

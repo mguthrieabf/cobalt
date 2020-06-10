@@ -8,9 +8,34 @@ from .models import (
     RBACGroupRole,
     RBACAdminUserGroup,
     RBACAdminGroupRole,
+    RBACAdminGroup,
 )
 from .core import rbac_add_user_to_group, rbac_user_is_group_admin
 from accounts.models import User
+
+
+@login_required
+def access_screen(request):
+
+    # TODO: work out how to do this more efficiently using select_related
+    # Get groups with this user
+    groups1 = RBACUserGroup.objects.filter(member=request.user).values_list("group")
+
+    # Get roles from groups where action is admin
+    matches = RBACGroupRole.objects.filter(group__in=groups1).values_list("group")
+
+    # Get groups
+    groups = RBACGroup.objects.filter(id__in=matches).order_by("name_qualifier")
+
+    # split by type
+    data = {}
+    for group in groups:
+        if group.group_type in data:
+            data[group.group_type].append(group)
+        else:
+            data[group.group_type] = [group]
+
+    return render(request, "rbac/admin-screen.html", {"groups": data})
 
 
 @login_required
@@ -26,16 +51,15 @@ def admin_screen(request):
     matches = RBACAdminGroupRole.objects.filter(group__in=groups1).values_list("group")
 
     # Get groups
-    groups = RBACGroup.objects.filter(id__in=matches).order_by("group_name")
+    groups = RBACAdminGroup.objects.filter(id__in=matches).order_by("name_qualifier")
 
     # split by type
     data = {}
     for group in groups:
-        admin_type = group.group_name.split(".")[0].title()  # forums.1 becomes Forums
-        if admin_type in data:
-            data[admin_type].append(group)
+        if group.group_type in data:
+            data[group.group_type].append(group)
         else:
-            data[admin_type] = [group]
+            data[group.group_type] = [group]
 
     return render(request, "rbac/admin-screen.html", {"groups": data})
 
@@ -43,16 +67,15 @@ def admin_screen(request):
 def all_screen(request):
     """ temp for development purposes """
     # Get groups
-    groups = RBACGroup.objects.all().order_by("group_name")
+    groups = RBACGroup.objects.all().order_by("name_qualifier")
 
     # split by type
     data = {}
     for group in groups:
-        admin_type = group.group_name.split(".")[0].title()  # forums.1 becomes Forums
-        if admin_type in data:
-            data[admin_type].append(group)
+        if group.group_type in data:
+            data[group.group_type].append(group)
         else:
-            data[admin_type] = [group]
+            data[group.group_type] = [group]
 
     return render(request, "rbac/admin-screen.html", {"groups": data})
 
