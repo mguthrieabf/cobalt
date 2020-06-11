@@ -1,34 +1,35 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACAdminUserGroup
-from .core import rbac_add_user_to_group, rbac_user_is_group_admin
+from .core import (
+    rbac_add_user_to_group,
+    rbac_user_is_group_admin,
+    rbac_access_in_english,
+)
 from accounts.models import User
+from .forms import AddGroup
 
 
 @login_required
-def access_screen(request):
+def view_screen(request):
 
-    # TODO: work out how to do this more efficiently using select_related
-    # Get groups with this user
-    groups1 = RBACUserGroup.objects.filter(member=request.user).values_list("group")
-
-    # Get roles from groups where action is admin
-    matches = RBACGroupRole.objects.filter(group__in=groups1).values_list("group")
-
-    # Get groups
-    groups = RBACGroup.objects.filter(id__in=matches).order_by("name_qualifier")
+    user_groups = RBACUserGroup.objects.filter(member=request.user)
 
     # split by type
     data = {}
-    for group in groups:
-        if group.group_type in data:
-            data[group.group_type].append(group)
+    for user_group in user_groups:
+        if user_group.group.group_type in data:
+            data[user_group.group.group_type].append(user_group.group)
         else:
-            data[group.group_type] = [group]
+            data[user_group.group.group_type] = [user_group.group]
 
-    return render(request, "rbac/admin-screen.html", {"groups": data})
+    english = rbac_access_in_english(request.user)
+
+    return render(
+        request, "rbac/view-screen.html", {"groups": data, "english": english}
+    )
 
 
 @login_required
@@ -61,6 +62,40 @@ def all_screen(request):
             data[group.group_type] = [group]
 
     return render(request, "rbac/admin-screen.html", {"groups": data})
+
+
+@login_required
+def group_view(request, group_id):
+    """ view to show details of a group """
+    group = get_object_or_404(RBACGroup, pk=group_id)
+    users = RBACUserGroup.objects.filter(group=group)
+    roles = RBACGroupRole.objects.filter(group=group)
+    return render(
+        request,
+        "rbac/group_view.html",
+        {"users": users, "roles": roles, "group": group},
+    )
+
+
+@login_required
+def group_create(request):
+    """ view to create a new group """
+
+    if request.method == "POST":
+        form = AddGroup(request.POST)
+        if form.is_valid():
+            group = RBACGroup(
+                name_item=form.cleaned_data["name_item"],
+                name_qualifier=form.cleaned_data["name_qualifier"],
+                description=form.cleaned_data["description"],
+                created_by=request.user,
+            )
+            group.save()
+            return render(request, "rbac/admin-screen.html")
+
+    else:
+        form = AddGroup(user=request.user)
+    return render(request, "rbac/group_create.html", {"form": form})
 
 
 @login_required

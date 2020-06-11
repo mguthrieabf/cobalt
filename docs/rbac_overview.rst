@@ -127,6 +127,32 @@ If there are two rules in place as follows:
 
 Then a request for *payments.stripetransaction.27.view* will return Block.
 
+Supported Roles
+---------------
+
+The following roles are currently supported:
+
+  +------------------------+-----------------------------------------+
+  | Role                   | Purpose                                 |
+  +========================+=========================================+
+  | forums.forum.x         | *Ability to do something in forum x*    |
+  +------------------------+-----------------------------------------+
+  | forums.forum           | *Ability to do something in all forums* |
+  +------------------------+-----------------------------------------+
+  | payments.view.x        | *View payments details for org x*       |
+  +------------------------+-----------------------------------------+
+  | payments.view          | *View payments details for any org*     |
+  +------------------------+-----------------------------------------+
+  | payments.manage.x      | *Make payments for org x*               |
+  +------------------------+-----------------------------------------+
+  | payments.manage        | *Make payments for any org*             |
+  +------------------------+-----------------------------------------+
+  | org.org.x              | *Management of org x*                   |
+  +------------------------+-----------------------------------------+
+  | org.org                | *Management of all orgs*                |
+  +------------------------+-----------------------------------------+
+
+
 Default Behaviour
 -----------------
 

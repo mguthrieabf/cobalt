@@ -404,3 +404,38 @@ def rbac_user_is_role_admin(member, role):
             return True
     # No match
     return False
+
+
+def rbac_access_in_english(user):
+    """ returns what access a user has in plain English
+
+    Args:
+        user(User): a standard User object
+
+    Returns:
+        list: list of strings with user access explained
+    """
+
+    groups = RBACUserGroup.objects.filter(member=user).values_list("group")
+    roles = RBACGroupRole.objects.filter(group__in=groups)
+    english = []
+    for role in roles:
+
+        if role.rule_type == "Allow":
+            verb = "can"
+        else:
+            verb = "cannot"
+
+        if role.action == "all":
+            action_word = "do everything"
+        else:
+            action_word = role.action
+
+        if role.model_id:
+            desc = f"{user.first_name} {verb} {action_word} in {role.model} no. {role.model_id} in the application '{role.app}'."
+        else:
+            desc = f"{user.first_name} {verb} {action_word} in every {role.model} in the application '{role.app}'."
+
+        english.append(desc)
+
+    return english

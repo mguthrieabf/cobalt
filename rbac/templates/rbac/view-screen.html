@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Role Based Access Controls</h1>
+<p>This shows the groups you are a member of. Groups control security within
+the system.</p>
+
+{% if not groups %}
+<h2>Sorry, you don't appear to be in any groups at this time.</h2>
+{% endif %}
+
+{% for key, value in groups.items %}
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-primary">
+      <h3 class="card-title">{{ key }} Access</h3>
+    </div>
+    <div class="card-body" style="text-align: center">
+
+      <div class="container">
+        <div class="row">
+          <table class="table table-hover">
+            <thead class="text-info">
+              <tr>
+                <th>Group Key</th>
+                <th>Group Type</th>
+                <th>Group Level</th>
+                <th>Group ID</th>
+                <th>Group Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in value %}
+                <tr>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</td>
+                  <td>{{ v.group_type }}</td>
+                  <td>{{ v.name_qualifier }}</td>
+                  <td>{{ v.name_item }}</td>
+                  <td>{{ v.description }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table><br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+{% endfor %}
+
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-success">
+      <h3 class="card-title">Explanation</h3>
+    </div>
+    <div class="card-body" style="text-align: left">
+      <p>This explains rules specific to you.</p>
+      <ul>
+      {% for e in english %}
+        <li>{{ e }}
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

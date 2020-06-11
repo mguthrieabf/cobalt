@@ -96,7 +96,7 @@ TEMPLATES = [
     },
 ]
 
-# CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 WSGI_APPLICATION = "cobalt.wsgi.application"
 
