@@ -17,7 +17,7 @@
           <form method="POST">
             {% csrf_token %}
             <table style="border-collapse: separate; border-spacing-left: 3em;">
-              {{ form|crispy }}
+              {{ form.as_table }}
             </table>
 
             <div class="d-flex">

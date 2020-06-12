@@ -7,6 +7,7 @@ class AddGroup(forms.Form):
 
     name_item = forms.CharField(label="Name", max_length=50)
     description = forms.CharField(label="Description", max_length=50)
+    add_self = forms.BooleanField(label="Add Yourself")
 
     # We need the logged in user to get the RBACTreeUser values, add a parameter to init
     def __init__(self, *args, **kwargs):
@@ -14,7 +15,16 @@ class AddGroup(forms.Form):
         self.user = kwargs.pop("user", None)
         # create form
         super(AddGroup, self).__init__(*args, **kwargs)
-        # add field
-        self.fields["name_qualifier"] = forms.ModelChoiceField(
-            label="Qualifier", queryset=RBACUserTree.objects.filter(member=self.user)
+        # add field - always include users home location as an option
+        choices = [
+            (
+                f"rbac.users.{self.user.system_number}",
+                f"rbac.users.{self.user.system_number}",
+            )
+        ]
+        queryset = RBACUserTree.objects.filter(member=self.user)
+        for item in queryset:
+            choices.append((item, item))
+        self.fields["name_qualifier"] = forms.ChoiceField(
+            label="Qualifier", choices=choices
         )

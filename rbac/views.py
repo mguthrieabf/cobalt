@@ -20,10 +20,10 @@ def view_screen(request):
     # split by type
     data = {}
     for user_group in user_groups:
-        if user_group.group.group_type in data:
-            data[user_group.group.group_type].append(user_group.group)
+        if user_group.group.name_qualifier in data:
+            data[user_group.group.name_qualifier].append(user_group.group)
         else:
-            data[user_group.group.group_type] = [user_group.group]
+            data[user_group.group.name_qualifier] = [user_group.group]
 
     english = rbac_access_in_english(request.user)
 
@@ -40,10 +40,12 @@ def admin_screen(request):
     # split by type
     data = {}
     for user_group in user_groups:
-        if user_group.group.group_type in data:
-            data[user_group.group.group_type].append(user_group.group)
+        if user_group.group.name_qualifier in data:
+            data[user_group.group.name_qualifier].append(user_group.group)
         else:
-            data[user_group.group.group_type] = [user_group.group]
+            data[user_group.group.name_qualifier] = [user_group.group]
+    print(user_groups)
+    print(data)
 
     return render(request, "rbac/admin-screen.html", {"groups": data})
 
@@ -82,7 +84,7 @@ def group_create(request):
     """ view to create a new group """
 
     if request.method == "POST":
-        form = AddGroup(request.POST)
+        form = AddGroup(request.POST, user=request.user)
         if form.is_valid():
             group = RBACGroup(
                 name_item=form.cleaned_data["name_item"],
@@ -91,6 +93,8 @@ def group_create(request):
                 created_by=request.user,
             )
             group.save()
+            if form.cleaned_data["add_self"]:
+                rbac_add_user_to_group(request.user, group)
             return render(request, "rbac/admin-screen.html")
 
     else:

@@ -130,8 +130,6 @@ class RBACAppModelAction(models.Model):
 class RBACAdminGroup(models.Model):
     """ Admin Group definitions """
 
-    group_type = models.CharField(max_length=20, choices=GROUP_TYPES)
-
     name_qualifier = models.CharField(max_length=50)
     """ eg "organisations.trumps" """
 

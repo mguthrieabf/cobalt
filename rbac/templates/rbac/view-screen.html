@@ -6,9 +6,7 @@
 <p>This shows the groups you are a member of. Groups control security within
 the system.</p>
 
-{% if not groups %}
-<h2>Sorry, you don't appear to be in any groups at this time.</h2>
-{% endif %}
+{% if groups %}
 
 {% for key, value in groups.items %}
 <div>
@@ -23,21 +21,21 @@ the system.</p>
           <table class="table table-hover">
             <thead class="text-info">
               <tr>
-                <th>Group Key</th>
-                <th>Group Type</th>
-                <th>Group Level</th>
                 <th>Group ID</th>
+                <th>Group Full Name</th>
+                <th>Group Qualifier</th>
+                <th>Group Name</th>
                 <th>Group Description</th>
               </tr>
             </thead>
             <tbody>
               {% for v in value %}
                 <tr>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</td>
-                  <td>{{ v.group_type }}</td>
-                  <td>{{ v.name_qualifier }}</td>
-                  <td>{{ v.name_item }}</td>
-                  <td>{{ v.description }}</td>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
+                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -65,4 +63,9 @@ the system.</p>
     </div>
   </div>
 </div>
+
+{% else %}
+<h2>Sorry, you don't appear to be in any groups at this time.</h2>
+{% endif %}
+
 {% endblock %}
