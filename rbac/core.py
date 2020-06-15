@@ -105,40 +105,52 @@ def rbac_remove_user_from_group(member, group):
         return False
 
 
-def rbac_add_role_to_group(group, role):
-    """ Adds a user to an RBAC group
+def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
+
+    """ Adds a role to an RBAC group
 
     Args:
         group(RBACGroup): group
-        role(str): role to add to group
+        app(str):   name of the app
+        model(str): name of the model
+        action(str):    action
+        rule_type(str): Allow of Block
+        model_id(int):  model instance (Optional)
 
     Returns:
         RBACGroupRole
     """
 
-    group_role = RBACGroupRole(group=group, role=role)
+    group_role = RBACGroupRole()
+    group_role.group = group
+    group_role.app = app
+    group_role.model = model
+    group_role.action = action
+    group_role.rule_type = rule_type
+    group_role.model_id = model_id
     group_role.save()
 
     return group_role
 
 
-def rbac_remove_role_from_group(group, role):
-    """ Removes a user from an RBAC group
-
-    Args:
-        group(RBACGroup): group
-        role(str): role to remove from group
-
-    Returns:
-        bool
-    """
-
-    try:
-        group_role = RBACGroupRole.objects.filter(group=group, role=role)
-        group_role.delete()
-        return True
-    except RBACGroupRole.DoesNotExist:
-        return False
+#
+# def rbac_remove_role_from_group(group, role):
+#     """ Removes a role from an RBAC group
+#
+#     Args:
+#         group(RBACGroup): group
+#         role(str): role to remove from group
+#
+#     Returns:
+#         bool
+#     """
+#
+#     try:
+#         group_role = RBACGroupRole.objects.filter(group=group, role=role)
+#         group_role.delete()
+#         return True
+#     except RBACGroupRole.DoesNotExist:
+#         return False
 
 
 def rbac_user_has_role_exact(member, role):

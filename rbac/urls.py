@@ -28,6 +28,16 @@ urlpatterns = [
         name="rbac_delete_user_from_group_ajax",
     ),
     path(
+        "rbac-delete-role-from-group-ajax",
+        views.rbac_delete_role_from_group_ajax,
+        name="rbac_delete_role_from_group_ajax",
+    ),
+    path(
+        "rbac-add-role-to-group-ajax",
+        views.rbac_add_role_to_group_ajax,
+        name="rbac_add_role_to_group_ajax",
+    ),
+    path(
         "group-to-user/<int:group_id>/",
         views.group_to_user_ajax,
         name="group_to_user_ajax",

@@ -15,6 +15,8 @@ from .core import (
     rbac_access_in_english,
     rbac_remove_user_from_group,
     rbac_admin_all_rights,
+    rbac_user_is_role_admin,
+    rbac_add_role_to_group,
 )
 from accounts.models import User
 from .forms import AddGroup
@@ -155,10 +157,18 @@ def group_edit(request, group_id):
 
         users = RBACUserGroup.objects.filter(group=group)
         admin_roles = rbac_admin_all_rights(request.user)
+        roles = RBACGroupRole.objects.filter(group=group)
+        print(admin_roles)
         return render(
             request,
             "rbac/group_edit.html",
-            {"form": form, "group": group, "users": users, "admin_roles": admin_roles},
+            {
+                "form": form,
+                "group": group,
+                "users": users,
+                "roles": roles,
+                "admin_roles": admin_roles,
+            },
         )
 
 
@@ -245,6 +255,58 @@ def rbac_add_user_to_group_ajax(request):
 
 
 @login_required()
+def rbac_add_role_to_group_ajax(request):
+    """ Ajax call to add a role to a group
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        group_id = request.GET["group_id"]
+        app = request.GET["app"]
+        model = request.GET["model"]
+        model_id = request.GET["model_id"]
+        action = request.GET["action"]
+        rule_type = request.GET["rule_type"]
+
+        group = RBACGroup.objects.get(pk=group_id)
+
+        role = RBACGroupRole.objects.get(group=group)
+
+        # rbac_user_is_role_admin expects an action at the end of the string
+        if role.model_id:
+            role_str = "%s.%s.%s.action" % (role.app, role.model, role.model_id)
+        else:
+            role_str = "%s.%s.action" % (role.app, role.model)
+
+        if rbac_user_is_role_admin(request.user, role_str):
+
+            rbac_add_role_to_group(
+                group=group,
+                app=app,
+                model=model,
+                model_id=model_id,
+                action=action,
+                rule_type=rule_type,
+            )
+            msg = "Success"
+        else:
+            print("Access Denied")
+            msg = "Access Denied"
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
 def rbac_get_action_for_model_ajax(request):
     """ Ajax call to get the action types for a given app and model
 
@@ -299,6 +361,42 @@ def rbac_delete_user_from_group_ajax(request):
         if rbac_user_is_group_admin(request.user, group):
             rbac_remove_user_from_group(member, group)
             print("User %s delete from group %s" % (member, group))
+            msg = "Success"
+        else:
+            print("Access Denied")
+            msg = "Access Denied"
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def rbac_delete_role_from_group_ajax(request):
+    """ Ajax call to delete a role from a group
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        role_id = request.GET["role_id"]
+
+        role = RBACGroupRole.objects.get(pk=role_id)
+
+        if role.model_id:
+            role_str = "%s.%s.%s" % (role.app, role.model, role.model_id)
+        else:
+            role_str = "%s.%s" % (role.app, role.model)
+
+        if rbac_user_is_role_admin(request.user, role_str):
+            role.delete()
             msg = "Success"
         else:
             print("Access Denied")
