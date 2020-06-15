@@ -68,6 +68,7 @@ Environment Variables
 ---------------------
 
 .. highlight:: none
+
 Before running manage.py you will need to set some environment variables::
 
     # Postgres - use your own settings

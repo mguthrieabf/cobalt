@@ -16,5 +16,6 @@ cobalt
    notifications
    organisations
    payments
+   rbac
    results
    support
