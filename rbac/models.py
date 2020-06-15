@@ -188,7 +188,7 @@ class RBACAdminGroupRole(models.Model):
 
     @property
     def role(self):
-        "Returns the role in dotted format."
+        """Returns the role in dotted format."""
         if self.model_id:
             return "%s.%s.%s" % (self.app, self.model, self.model_id)
         else:
@@ -202,6 +202,7 @@ class RBACUserTree(models.Model):
     """ Standard User object """
 
     tree = models.CharField(max_length=100)
+    """ tree is an allowed entry point for a user. e.g. rbac.org.org """
 
     def __str__(self):
         return self.tree

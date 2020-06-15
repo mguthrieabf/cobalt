@@ -347,8 +347,8 @@ def rbac_user_is_group_admin(member, group):
         print("  -->admin_has_role: %s" % m)
 
     for m in matches:
-        print("-->admin_has_role: group is: %s" % group)
-        print("-->admin_has_role: Checking %s" % m.role)
+        print("-->admin_has_role: group is: #%s#" % group)
+        print("-->admin_has_role: Checking #%s#" % m.role)
 
         if rbac_user_is_role_admin(member, m.role):
             print("  -->admin_has_role: Matched with %s" % m)
@@ -369,9 +369,8 @@ def rbac_user_is_role_admin(member, role):
     Returns:
         bool: True of False for user role
     """
+
     print("-->user_is_role_admin: User is: %s. Role is: %s" % (member.full_name, role))
-    # breakdown role into parts
-    #    (app, model, model_instance, action) = role_to_parts(role)
 
     # Remove action from role: e.g. org.org.15.create --> org.org.15
     parts = role.split(".")
@@ -388,19 +387,32 @@ def rbac_user_is_role_admin(member, role):
 
     # look for specific rule
     for m in matches:
-        print("-->user_is_role_admin: role is: %s" % role)
-        print("-->user_is_role_admin: Checking %s" % m.role)
-        if "%s.%s.%s" % (m.app, m.model, m.model_id) == role:
+        # compare strings not objects
+        role_str = "%s" % role
+        if m.model_id:
+            m_str = "%s.%s.%s" % (m.app, m.model, m.model_id)
+        else:
+            m_str = "%s.%s" % (m.app, m.model)
+        print("-->user_is_role_admin: role is: #%s#" % role_str)
+        print("-->user_is_role_admin: Checking #%s#" % m_str)
+        if m_str == role_str:
             print("  -->user_is_role_admin: Matched with %s" % m)
             return True
+
+    # change role org.org.15 --> org.org
+    role = ".".join(parts[:-2])
 
     # look for general rule
     print("-->user_is_role_admin: No specific match found, next try general")
     print("-->user_is_role_admin: General")
     for m in matches:
-        print("-->user_is_role_admin: role is: %s" % role)
-        print("-->user_is_role_admin: Checking: %s" % m.role)
-        if m.role == role:
+        # compare strings not objects
+        role_str = "%s" % role
+        m_str = "%s.%s" % (m.app, m.model)
+        print("-->user_is_role_admin: role is: #%s#" % role_str)
+        print("-->user_is_role_admin: Checking #%s#" % m_str)
+
+        if m_str == role_str:
             print("-->user_is_role_admin: Matched with %s" % m)
             return True
     # No match

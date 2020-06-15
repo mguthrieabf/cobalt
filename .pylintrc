@@ -1,5 +1,5 @@
 [MASTER]
 [MESSAGES CONTROL]
-disable=no-else-return,no-member,too-many-arguments
+disable=no-else-return,no-member,too-many-arguments,bad-continuation
 [DESIGN]
 max-attributes=30

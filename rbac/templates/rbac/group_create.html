@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load widget_tweaks %}
 
 {% block content %}
 
@@ -13,12 +14,50 @@
     </div>
     <div class="card-body" style="text-align: center">
       <div class="container">
-        <div class="row">
+
           <form method="POST">
             {% csrf_token %}
-            <table style="border-collapse: separate; border-spacing-left: 3em;">
-              {{ form.as_table }}
-            </table>
+            <div class="row">
+              <div class="col-12">
+                <div class="form-group">
+                  <label  class="bmd-label-static">Location in Tree</label>
+                  <span class="cobalt-form-error" id="id_name_qualifier_errors">{{ form.name_qualifier.errors|striptags }}</span>
+                  {% render_field form.name_qualifier class+="form-control" %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span class="cobalt-form-error" id="id_name_item_errors">{{ form.name_item.errors|striptags }}</span>
+                  <label for="id_name_item" class="bmd-label-floating">Name</label>
+                  {% render_field form.name_item class+="form-control" %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+
+                <div class="form-group">
+                  <span class="cobalt-form-error" id="id_description_errors">{{ form.description.errors|striptags }}</span>
+                  <label for="id_description" class="bmd-label-floating">Description</label>
+                  {% render_field form.description class+="form-control" %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+
+                <div class="form-group">
+                  <span class="cobalt-form-error" id="id_add_self_errors">{{ form.add_self.errors|striptags }}</span>
+                  {% render_field form.add_self  %}
+                  <label for="id_add_self" class="bmd-label-floating">Add Yourself to Group</label>
+                </div>
+              </div>
+            </div>
 
             <div class="d-flex">
               <div>

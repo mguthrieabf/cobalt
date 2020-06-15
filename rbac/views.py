@@ -1,5 +1,5 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACAdminUserGroup
@@ -7,13 +7,16 @@ from .core import (
     rbac_add_user_to_group,
     rbac_user_is_group_admin,
     rbac_access_in_english,
+    rbac_remove_user_from_group,
 )
 from accounts.models import User
 from .forms import AddGroup
+from django.contrib import messages
 
 
 @login_required
 def view_screen(request):
+    """ Shows the user what roles they have in RBAC """
 
     user_groups = RBACUserGroup.objects.filter(member=request.user)
 
@@ -34,6 +37,8 @@ def view_screen(request):
 
 @login_required
 def admin_screen(request):
+    """ Allows an administrator to control who is in a group and to create
+    roles """
 
     user_groups = RBACAdminUserGroup.objects.filter(member=request.user)
 
@@ -50,25 +55,19 @@ def admin_screen(request):
     return render(request, "rbac/admin-screen.html", {"groups": data})
 
 
-def all_screen(request):
-    """ temp for development purposes """
+@login_required
+def tree_screen(request):
+    """ Show full RBAC Tree """
     # Get groups
     groups = RBACGroup.objects.all().order_by("name_qualifier")
 
-    # split by type
-    data = {}
-    for group in groups:
-        if group.group_type in data:
-            data[group.group_type].append(group)
-        else:
-            data[group.group_type] = [group]
-
-    return render(request, "rbac/admin-screen.html", {"groups": data})
+    return render(request, "rbac/tree-screen.html", {"groups": groups})
 
 
 @login_required
 def group_view(request, group_id):
     """ view to show details of a group """
+
     group = get_object_or_404(RBACGroup, pk=group_id)
     users = RBACUserGroup.objects.filter(group=group)
     roles = RBACGroupRole.objects.filter(group=group)
@@ -77,6 +76,25 @@ def group_view(request, group_id):
         "rbac/group_view.html",
         {"users": users, "roles": roles, "group": group},
     )
+
+
+@login_required
+def group_delete(request, group_id):
+    """ view to delete a group """
+
+    group = get_object_or_404(RBACGroup, pk=group_id)
+    if not rbac_user_is_group_admin(request.user, group):
+        return HttpResponse("You are not an admin for this group")
+    else:
+        if request.method == "POST":
+            group.delete()
+            messages.success(
+                request,
+                "Group successfully deleted.",
+                extra_tags="cobalt-message-success",
+            )
+            return redirect("rbac:access_screen")
+        return render(request, "rbac/group_delete.html", {"group": group})
 
 
 @login_required
@@ -100,6 +118,40 @@ def group_create(request):
     else:
         form = AddGroup(user=request.user)
     return render(request, "rbac/group_create.html", {"form": form})
+
+
+@login_required
+def group_edit(request, group_id):
+    """ view to edit a group """
+
+    group = get_object_or_404(RBACGroup, pk=group_id)
+    if not rbac_user_is_group_admin(request.user, group):
+        return HttpResponse("You are not an admin for this group")
+    else:
+        if request.method == "POST":
+            form = AddGroup(request.POST, user=request.user)
+            if form.is_valid():
+                group.name_item = form.cleaned_data["name_item"]
+                group.description = form.cleaned_data["description"]
+                group.save()
+                messages.success(
+                    request,
+                    "Group successfully updated.",
+                    extra_tags="cobalt-message-success",
+                )
+            else:
+                print(form.errors)
+        else:
+            form = AddGroup(user=request.user)
+            form.fields["name_item"].initial = group.name_item
+            form.fields["description"].initial = group.description
+
+        users = RBACUserGroup.objects.filter(group=group)
+        return render(
+            request,
+            "rbac/group_edit.html",
+            {"form": form, "group": group, "users": users},
+        )
 
 
 @login_required
@@ -171,6 +223,40 @@ def rbac_add_user_to_group_ajax(request):
         if rbac_user_is_group_admin(request.user, group):
             rbac_add_user_to_group(member, group)
             print("User %s added to group %s" % (member, group))
+            msg = "Success"
+        else:
+            print("Access Denied")
+            msg = "Access Denied"
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def rbac_delete_user_from_group_ajax(request):
+    """ Ajax call to delete a user from a group
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        group_id = request.GET["group_id"]
+
+        member = User.objects.get(pk=member_id)
+        group = RBACGroup.objects.get(pk=group_id)
+
+        if rbac_user_is_group_admin(request.user, group):
+            rbac_remove_user_from_group(member, group)
+            print("User %s delete from group %s" % (member, group))
             msg = "Success"
         else:
             print("Access Denied")

@@ -148,12 +148,14 @@
 <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
 
+
 <div class="viewcode-block" id="Forum"><a class="viewcode-back" href="../../forums.html#forums.forms.Forum">[docs]</a><span class="k">class</span> <span class="nc">Forum</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Forum Short Title&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Forum Description&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
+
 
 <div class="viewcode-block" id="AbstractForum"><a class="viewcode-back" href="../../forums.html#forums.forms.AbstractForum">[docs]</a><span class="k">class</span> <span class="nc">AbstractForum</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
@@ -162,6 +164,7 @@
 
 <div class="viewcode-block" id="AbstractForum.Meta"><a class="viewcode-back" href="../../forums.html#forums.forms.AbstractForum.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+
 
 <div class="viewcode-block" id="Post"><a class="viewcode-back" href="../../forums.html#forums.forms.Post">[docs]</a><span class="k">class</span> <span class="nc">Post</span><span class="p">(</span><span class="n">AbstractForum</span><span class="p">):</span>
     <span class="n">forum</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Forum</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
@@ -173,6 +176,7 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
 
+
 <div class="viewcode-block" id="Comment1"><a class="viewcode-back" href="../../forums.html#forums.forms.Comment1">[docs]</a><span class="k">class</span> <span class="nc">Comment1</span><span class="p">(</span><span class="n">AbstractForum</span><span class="p">):</span>
     <span class="n">post</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
@@ -180,10 +184,12 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - comment by </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">full_name</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="Comment2"><a class="viewcode-back" href="../../forums.html#forums.forms.Comment2">[docs]</a><span class="k">class</span> <span class="nc">Comment2</span><span class="p">(</span><span class="n">AbstractForum</span><span class="p">):</span>
     <span class="n">post</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">comment1</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Comment1</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="AbstractLike"><a class="viewcode-back" href="../../forums.html#forums.forms.AbstractLike">[docs]</a><span class="k">class</span> <span class="nc">AbstractLike</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="n">liker</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
@@ -191,33 +197,37 @@
 <div class="viewcode-block" id="AbstractLike.Meta"><a class="viewcode-back" href="../../forums.html#forums.forms.AbstractLike.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 
+
 <div class="viewcode-block" id="LikePost"><a class="viewcode-back" href="../../forums.html#forums.forms.LikePost">[docs]</a><span class="k">class</span> <span class="nc">LikePost</span><span class="p">(</span><span class="n">AbstractLike</span><span class="p">):</span>
     <span class="n">post</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="LikeComment1"><a class="viewcode-back" href="../../forums.html#forums.forms.LikeComment1">[docs]</a><span class="k">class</span> <span class="nc">LikeComment1</span><span class="p">(</span><span class="n">AbstractLike</span><span class="p">):</span>
     <span class="n">comment1</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Comment1</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span></div>
 
+
 <div class="viewcode-block" id="LikeComment2"><a class="viewcode-back" href="../../forums.html#forums.forms.LikeComment2">[docs]</a><span class="k">class</span> <span class="nc">LikeComment2</span><span class="p">(</span><span class="n">AbstractLike</span><span class="p">):</span>
     <span class="n">comment2</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Comment2</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UserForumRole"><a class="viewcode-back" href="../../forums.html#forums.forms.UserForumRole">[docs]</a><span class="k">class</span> <span class="nc">UserForumRole</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">ROLE_TYPE</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;Poster&#39;</span><span class="p">,</span> <span class="s1">&#39;Poster - can create a new post&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Responder&#39;</span><span class="p">,</span> <span class="s1">&#39;Responder - can reply to a post&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Moderator&#39;</span><span class="p">,</span> <span class="s1">&#39;Moderator - can manage the forum&#39;</span><span class="p">),</span>
-    <span class="p">]</span>
-    <span class="n">RULE_TYPE</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;Allow&#39;</span><span class="p">,</span> <span class="s1">&#39;Allows a user to perform a role&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">,</span> <span class="s1">&#39;Blocks a user from performing a role&#39;</span><span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
-    <span class="n">forum</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Forum</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
-    <span class="n">role</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;User role in forum&quot;</span><span class="p">,</span> <span class="n">choices</span> <span class="o">=</span> <span class="n">ROLE_TYPE</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-    <span class="n">rule</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Type of Rule&quot;</span><span class="p">,</span> <span class="n">choices</span> <span class="o">=</span> <span class="n">RULE_TYPE</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-<div class="viewcode-block" id="UserForumRole.get_forums_post_allowed"><a class="viewcode-back" href="../../forums.html#forums.forms.UserForumRole.get_forums_post_allowed">[docs]</a>    <span class="k">def</span> <span class="nf">get_forums_post_allowed</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
-        <span class="n">ufr</span> <span class="o">=</span> <span class="n">UserForumRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s1">&#39;Poster&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">rule</span><span class="o">=</span><span class="s1">&#39;Allow&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;forum&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ufr</span></div></div>
+<span class="c1"># class UserForumRole(models.Model):</span>
+<span class="c1">#     ROLE_TYPE = [</span>
+<span class="c1">#         (&#39;Poster&#39;, &#39;Poster - can create a new post&#39;),</span>
+<span class="c1">#         (&#39;Responder&#39;, &#39;Responder - can reply to a post&#39;),</span>
+<span class="c1">#         (&#39;Moderator&#39;, &#39;Moderator - can manage the forum&#39;),</span>
+<span class="c1">#     ]</span>
+<span class="c1">#     RULE_TYPE = [</span>
+<span class="c1">#         (&#39;Allow&#39;, &#39;Allows a user to perform a role&#39;),</span>
+<span class="c1">#         (&#39;Block&#39;, &#39;Blocks a user from performing a role&#39;)</span>
+<span class="c1">#     ]</span>
+<span class="c1">#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)</span>
+<span class="c1">#     forum = models.ForeignKey(Forum, on_delete=models.CASCADE)</span>
+<span class="c1">#     role = models.CharField(&quot;User role in forum&quot;, choices = ROLE_TYPE, max_length=20)</span>
+<span class="c1">#     rule = models.CharField(&quot;Type of Rule&quot;, choices = RULE_TYPE, max_length=5)</span>
+<span class="c1">#</span>
+<span class="c1">#     def get_forums_post_allowed(user):</span>
+<span class="c1">#         ufr = UserForumRole.objects.filter(user=user).filter(role=&#39;Poster&#39;).filter(rule=&#39;Allow&#39;).values(&#39;forum&#39;)</span>
+<span class="c1">#         return ufr</span>
 </pre></div>
 
            </div>

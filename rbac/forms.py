@@ -7,9 +7,10 @@ class AddGroup(forms.Form):
 
     name_item = forms.CharField(label="Name", max_length=50)
     description = forms.CharField(label="Description", max_length=50)
-    add_self = forms.BooleanField(label="Add Yourself")
+    add_self = forms.BooleanField(label="Add Yourself", required=False)
 
     # We need the logged in user to get the RBACTreeUser values, add a parameter to init
+    # This is so we can build the drop down list dynamically
     def __init__(self, *args, **kwargs):
         # get user
         self.user = kwargs.pop("user", None)
@@ -26,5 +27,5 @@ class AddGroup(forms.Form):
         for item in queryset:
             choices.append((item, item))
         self.fields["name_qualifier"] = forms.ChoiceField(
-            label="Qualifier", choices=choices
+            label="Qualifier", choices=choices, required=False
         )

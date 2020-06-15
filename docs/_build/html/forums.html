@@ -751,21 +751,6 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 object the first time, the query is executed.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="forums.models.Forum.userforumrole_set">
-<code class="sig-name descname">userforumrole_set</code><a class="headerlink" href="#forums.models.Forum.userforumrole_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -1107,115 +1092,6 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="forums.models.Post.title">
 <code class="sig-name descname">title</code><a class="headerlink" href="#forums.models.Post.title" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="forums.models.UserForumRole">
-<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">UserForumRole</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">forum</span></em>, <em class="sig-param"><span class="n">role</span></em>, <em class="sig-param"><span class="n">rule</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#UserForumRole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.UserForumRole" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
-<dl class="py exception">
-<dt id="forums.models.UserForumRole.DoesNotExist">
-<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#forums.models.UserForumRole.DoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="forums.models.UserForumRole.MultipleObjectsReturned">
-<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#forums.models.UserForumRole.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.ROLE_TYPE">
-<code class="sig-name descname">ROLE_TYPE</code><em class="property"> = [('Poster', 'Poster - can create a new post'), ('Responder', 'Responder - can reply to a post'), ('Moderator', 'Moderator - can manage the forum')]</em><a class="headerlink" href="#forums.models.UserForumRole.ROLE_TYPE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.RULE_TYPE">
-<code class="sig-name descname">RULE_TYPE</code><em class="property"> = [('Allow', 'Allows a user to perform a role'), ('Block', 'Blocks a user from performing a role')]</em><a class="headerlink" href="#forums.models.UserForumRole.RULE_TYPE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.forum">
-<code class="sig-name descname">forum</code><a class="headerlink" href="#forums.models.UserForumRole.forum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.forum_id">
-<code class="sig-name descname">forum_id</code><a class="headerlink" href="#forums.models.UserForumRole.forum_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="forums.models.UserForumRole.get_forums_post_allowed">
-<code class="sig-name descname">get_forums_post_allowed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#UserForumRole.get_forums_post_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.UserForumRole.get_forums_post_allowed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="forums.models.UserForumRole.get_role_display">
-<code class="sig-name descname">get_role_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: role&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.UserForumRole.get_role_display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="forums.models.UserForumRole.get_rule_display">
-<code class="sig-name descname">get_rule_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: rule&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#forums.models.UserForumRole.get_rule_display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.id">
-<code class="sig-name descname">id</code><a class="headerlink" href="#forums.models.UserForumRole.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.objects">
-<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#forums.models.UserForumRole.objects" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.role">
-<code class="sig-name descname">role</code><a class="headerlink" href="#forums.models.UserForumRole.role" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.rule">
-<code class="sig-name descname">rule</code><a class="headerlink" href="#forums.models.UserForumRole.rule" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.user">
-<code class="sig-name descname">user</code><a class="headerlink" href="#forums.models.UserForumRole.user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.UserForumRole.user_id">
-<code class="sig-name descname">user_id</code><a class="headerlink" href="#forums.models.UserForumRole.user_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>

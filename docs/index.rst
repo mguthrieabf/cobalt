@@ -25,6 +25,7 @@ These are links to documents that describe each module.
 * :doc:`notifications_overview`
 * :doc:`rbac_overview`
 * :doc:`forums_overview`
+* :doc:`utilities_overview`
 
 
 .. toctree::
