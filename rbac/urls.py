@@ -13,6 +13,11 @@ urlpatterns = [
     path("group/delete/<int:group_id>/", views.group_delete, name="group_delete"),
     path("group/create", views.group_create, name="group_create"),
     path(
+        "group/rbac-get-action-for-model-ajax",
+        views.rbac_get_action_for_model_ajax,
+        name="rbac_get_action_for_model_ajax",
+    ),
+    path(
         "rbac-add-user-to-group-ajax",
         views.rbac_add_user_to_group_ajax,
         name="rbac_add_user_to_group_ajax",

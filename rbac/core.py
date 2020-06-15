@@ -325,6 +325,30 @@ def rbac_user_allowed_for_model(user, app, model, action):
     return ret
 
 
+def rbac_admin_all_rights(user):
+    """ returns a list of which apps, models and model_ids a user is an admin for`
+
+    Args:
+        user(User): standard user object
+
+    Returns:
+        list:   list of App, model, model_id
+    """
+
+    groups = RBACAdminUserGroup.objects.filter(member=user).values_list("group")
+
+    matches = RBACAdminGroupRole.objects.filter(group__in=groups)
+
+    ret = []
+    for m in matches:
+        if m.model_id:
+            ret_str = "%s.%s.%s" % (m.app, m.model, m.model_id)
+        else:
+            ret_str = "%s.%s" % (m.app, m.model)
+        ret.append(ret_str)
+    return ret
+
+
 def rbac_user_is_group_admin(member, group):
     """ check if a user has admin rights to a group.
 

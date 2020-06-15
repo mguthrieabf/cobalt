@@ -2,12 +2,19 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
-from .models import RBACGroup, RBACUserGroup, RBACGroupRole, RBACAdminUserGroup
+from .models import (
+    RBACGroup,
+    RBACUserGroup,
+    RBACGroupRole,
+    RBACAdminUserGroup,
+    RBACAppModelAction,
+)
 from .core import (
     rbac_add_user_to_group,
     rbac_user_is_group_admin,
     rbac_access_in_english,
     rbac_remove_user_from_group,
+    rbac_admin_all_rights,
 )
 from accounts.models import User
 from .forms import AddGroup
@@ -147,10 +154,11 @@ def group_edit(request, group_id):
             form.fields["description"].initial = group.description
 
         users = RBACUserGroup.objects.filter(group=group)
+        admin_roles = rbac_admin_all_rights(request.user)
         return render(
             request,
             "rbac/group_edit.html",
-            {"form": form, "group": group, "users": users},
+            {"form": form, "group": group, "users": users, "admin_roles": admin_roles},
         )
 
 
@@ -234,6 +242,40 @@ def rbac_add_user_to_group_ajax(request):
     response_data = {}
     response_data["message"] = msg
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def rbac_get_action_for_model_ajax(request):
+    """ Ajax call to get the action types for a given app and model
+
+    Args:
+        request(HTTPRequest): standard request - needs to include "app" and "model"
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        app = request.GET["app"]
+        model = request.GET["model"]
+
+        actions = RBACAppModelAction.objects.filter(app=app, model=model).values_list(
+            "valid_action"
+        )
+        print(actions)
+        print(app)
+        print(model)
+    else:
+        msg = "Invalid request"
+        response_data = {}
+        response_data["message"] = msg
+        return JsonResponse({"data": response_data})
+
+    html = render_to_string(
+        template_name="rbac/app-model-actions.html", context={"actions": actions}
+    )
+    data_dict = {"data": html}
+    return JsonResponse(data=data_dict, safe=False)
 
 
 @login_required()

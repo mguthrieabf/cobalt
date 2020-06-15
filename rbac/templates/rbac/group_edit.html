@@ -98,45 +98,94 @@
   </div>
   <br>
 
-
-
   <div>
     <div class="card col-lg-9">
-      <div class="card-header card-header-success">
+      <div class="card-header card-header-warning">
         <h3 class="card-title">Roles</h3>
       </div>
       <div class="card-body" style="text-align: center">
         <div class="container">
-          <div class="row">
-            <table class="table table-hover">
-              <thead class="text-info">
-                <tr>
-                  <th>Role Key</th>
-                  <th>Application</th>
-                  <th>Model</th>
-                  <th>Model ID</th>
-                  <th>Action</th>
-                  <th>Role Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for role in roles %}
-                  <tr>
-                    <td>{{ role.id }}</td>
-                    <td>{{ role.app }}</td>
-                    <td>{{ role.model }}</td>
-                    <td>{{ role.model_id }}</td>
-                    <td>{{ role.action }}</td>
-                    <td>{{ role.rule_type }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table><br>
+          <select class="w-100" size="10" id="user_list">
+          {% for role in roles %}
+            <option value="{{ role.member.id }}">{{ role.app }}.{{ role.model }}.{{ role.model_id }} - {{ role.action }} {{ role.rule_type }}</option>
+          {% endfor %}
+
+
+          </select>
+        </div>
+
+
+
+ <!-- Roles popup dialog -->
+        <div class="modal fade" id="cobalt_add_roles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold"><i class="material-icons">how_to_reg</i>&nbsp;&nbsp;Add Role</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body mx-3">
+                <div class="container">
+                  <div class="row justify-content-center">
+
+                    <div class="col-12 form-group">
+                      <label for="id-app-model" class="bmd-label-floating">Application-Model</label>
+                      <select class="form-control" id="id-app-model">
+                        <option selected>---Select---</option>
+                        {% for admin_role in admin_roles %}
+                        <option value="{{ admin_role }}">{{ admin_role }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <div class="col-12 form-group" style="display: none;" id="model-instance-div">
+                      <label for="lastname" class="bmd-label-floating">Model Instance</label>
+                      <input type="text" class="form-control" id="id_model_id" name="model_id" value="">
+                    </div>
+
+                    <div class="col-12 form-group" style="display: none;" id="action-div">
+                      <label for="id_action" class="bmd-label-floating">Action</label>
+                      <select class="form-control" id="id_action">
+                        <option>-----</option>
+                      </select>
+                    </div>
+
+                    <div class="col-12 form-group" style="display: none;" id="type-div">
+                      <label for="lastname" class="bmd-label-floating">Type</label>
+                      <select class="form-control" id="id_type">
+                        <option>Allow</option>
+                        <option>Block</option>
+                      </select>
+                    </div>
+
+                  </div>
+                  <button class="btn btn-success" style="display: none;" id="role-button">Ok</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<!-- End roles popup dialog  -->
+
+
+
+
+        <div class="d-flex">
+          <div>
+            <a href="" class="btn btn-success" data-toggle="modal" id="cobalt_user" data-target="#cobalt_add_roles">Add</a>
+          </div>
+          <div class="ml-auto">
+            <button class="btn btn-info center-text" onclick="deleteRole();">Delete</button>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <br>
+
 </div>
 {% endblock %}
 
@@ -190,6 +239,46 @@
           }
       })
     }
+
+
+
+    // Code for role add dialog
+
+        // const search_results = $('#search-results')
+        // const search_panel = $('#cobalt-search')
+        // const member_display = $('#cobalt-member')
+        // const member_search = '{% url "accounts:member_search_ajax" %}'
+        // const member_detail = '{% url "accounts:member_details_ajax" %}'
+        //
+        // var member_id = 0;
+        // var group_id;
+
+    jQuery(document).ready(function() {
+      $("#id-app-model").change(function(){
+
+        var fields = $(this).val().split(".");
+        var app = fields[0];
+        var model = fields[1];
+
+        $.get("{% url "rbac:rbac_get_action_for_model_ajax" %}?app=" + app + "&model=" + model)
+            .done(response => {
+              var new_select =  "<select  class='form-control' id='id_action'>" + response['data'] + "</select>"
+              $("#id_action").replaceWith(new_select);
+              $("#action-div").show();
+              $("#role-button").show();
+              $("#type-div").show();
+              if (fields.length==2){
+                $("#model-instance-div").show();
+              }
+              else{
+                $("#model-instance-div").hide();
+              }
+            });
+
+      });
+      });
+
+
 
 
 </script>
