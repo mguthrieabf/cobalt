@@ -129,7 +129,14 @@ def rbac_add_role_to_group_ajax(request):
 
         # must be both an admin for this group (able to edit this part of the tree)
         # and have rights to this role.
-        if rbac_user_is_group_admin(request.user, group):
+        if model_id:
+            role_str = f"{app}.{model}.{model_id}"
+        else:
+            role_str = f"{app}.{model}"
+
+        role_ok = rbac_user_is_role_admin(request.user, role_str)
+        group_ok = rbac_user_is_group_admin(request.user, group)
+        if role_ok and group_ok:
 
             rbac_add_role_to_group(
                 group=group,
@@ -236,7 +243,13 @@ def rbac_delete_role_from_group_ajax(request):
 
         role = RBACGroupRole.objects.get(pk=role_id)
 
-        if rbac_user_is_role_admin(request.user, role.path):
+        # must be both an admin for this group (able to edit this part of the tree)
+        # and have rights to this role.
+
+        role_ok = rbac_user_is_role_admin(request.user, role.role)
+        group_ok = rbac_user_is_group_admin(request.user, role.group)
+        if role_ok and group_ok:
+
             role.delete()
             msg = "Success"
         else:

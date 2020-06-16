@@ -121,7 +121,6 @@ def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
     Returns:
         RBACGroupRole
     """
-    print("-----%s" % rule_type)
 
     group_role = RBACGroupRole()
     group_role.group = group
