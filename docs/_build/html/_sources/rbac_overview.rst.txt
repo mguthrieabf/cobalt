@@ -397,72 +397,115 @@ For a default of *Block* you can use the following code snippet:
   # Now use the list like this
   posts_list = Post.objects.filter(forum__in=allowed)
 
+List of Functions
+=================
 
-Creating A Group
-----------------
+Functions are split across 3 files:
 
-To create a group through the API:
+* **core.py** handles the central functions.
+* **views.py** handles the views for users and admin
+* **ajax.py** handles the dynamic calls from the webpages
 
-.. code-block:: python
+Operating – Checking User Access
+--------------------------------
 
-  from rbac.core import rbac_create_group
+:func:`rbac.core.rbac_user_has_role`
 
-  id = rbac_create_group("New Group for Something")
+:func:`rbac.core.rbac_user_has_role_exact` - internal
 
-Deleting A Group
-----------------
+:func:`rbac.core.rbac_user_blocked_for_model`
 
-To delete a group through the API:
+:func:`rbac.core.rbac_user_allowed_for_model`
 
-.. code-block:: python
+Operating – Checking Admin Access
+---------------------------------
 
-  from rbac.core import rbac_delete_group
+:func:`rbac.core.rbac_get_admins_for_group
 
-  rbac_delete_group(id)
+Operating – Explaining Access
+-----------------------------
 
-This will also delete all users from the group by removing the entries from
-RBACUserGroup (Django does this for us as a CASCADE).
+:func:`rbac.core.rbac_access_in_english`
 
-Adding a Member to a Group
---------------------------
 
-To add a member to a group through the API:
+Admin - Creating and Deleting Groups
+------------------------------------
 
-.. code-block:: python
+:func:`rbac.core.rbac_create_group`
 
-  from rbac.core import rbac_add_user_to_group
+:func:`rbac.core.rbac_delete_group`
 
-  rbac_add_user_to_group(member, group)
+:func:`rbac.core.rbac_delete_group_by_name`
 
-Removing a Member from a Group
-------------------------------
+Admin – Adding and Removing Users
+---------------------------------
 
-To remove a member from a group through the API:
+:func:`rbac.core.rbac_add_user_to_group`
 
-.. code-block:: python
+:func:`rbac.core.rbac_remove_user_from_group`
 
-  from rbac.core import rbac_remove_user_from_group
+Admin – Adding and Removing Roles
+---------------------------------
 
-  rbac_remove_user_from_group(member, group)
+:func:`rbac.core.rbac_add_role_to_group`
 
-Adding a Role to a Group
-------------------------
 
-To add a role to a group through the API:
+Admin – Checking Admin Access
+-----------------------------
 
-.. code-block:: python
+:func:`rbac.core.rbac_admin_all_rights`
 
-  from rbac.core import rbac_add_role_to_group
+:func:`rbac.core.rbac_user_is_group_admin`
 
-  rbac_add_role_to_group(group, role)
+:func:`rbac.core.rbac_user_is_role_admin`
 
-Removing a Role from a Group
-----------------------------
 
-To remove a role from a group through the API:
+Views for Users
+---------------
 
-.. code-block:: python
+:func:`rbac.views.view_screen`
 
-  from rbac.core import rbac_remove_role_from_group
+:func:`rbac.views.tree_screen`
 
-  rbac_remove_role_from_group(group, role)
+:func:`rbac.views.group_view`
+
+Views for Admins to Manage User Groups
+--------------------------------------
+
+:func:`rbac.views.group_delete`
+
+:func:`rbac.views.group_create`
+
+:func:`rbac.views.group_edit`
+
+Views for Admins to See Their Access
+------------------------------------
+
+:func:`rbac.views.rbac_admin`
+
+Views for Admins to Manage Admins
+---------------------------------
+
+:func:`rbac.views.admin_tree_screen`
+
+:func:`rbac.views.admin_group_view`
+
+:func:`rbac.views.admin_group_create`
+
+
+Ajax calls
+----------
+
+:func:`rbac.ajax.group_to_user_ajax`
+
+:func:`rbac.ajax.group_to_action_ajax`
+
+:func:`rbac.ajax.rbac_add_user_to_group_ajax`
+
+:func:`rbac.ajax.rbac_add_role_to_group_ajax`
+
+:func:`rbac.ajax.rbac_get_action_for_model_ajax`
+
+:func:`rbac.ajax.rbac_delete_user_from_group_ajax`
+
+:func:`rbac.ajax.rbac_delete_role_from_group_ajax`

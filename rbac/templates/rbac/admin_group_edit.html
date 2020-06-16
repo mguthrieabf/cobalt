@@ -87,8 +87,7 @@
 
         <div class="d-flex">
           <div>
-            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search">Add User</a>
-            <button class="btn btn-success" id="cobalt_everyone" onclick="addEveryone();">Add Everyone</button>
+            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search">Add</a>
           </div>
           <div class="ml-auto">
             <button class="btn btn-info center-text" onclick="deleteUser();">Delete</button>
@@ -187,7 +186,11 @@
 <script>
 {% include 'generic_user_search_footer.html' %}
 
-  function addUser(member_id){
+// Generic member search popup ok button pressed
+
+  function cobaltMemberSearchOk() {
+    clearModal();
+
     $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
         .done(response => {
           msg = response['data']['message'];
@@ -200,18 +203,6 @@
             swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
           }
         });
-    }
-
-
-// Generic member search popup ok button pressed
-
-    function cobaltMemberSearchOk() {
-      clearModal();
-      addUser(member_id);
-    }
-
-    function addEveryone() {
-      addUser({{ RBAC_EVERYONE }});
     }
 
     function deleteUser() {
@@ -283,11 +274,13 @@
       } else {
         var model_id = $("#id_model_id").val();
       }
+      console.log("model_id " + model_id);
+      console.log("model_id isNaN " + isNaN(model_id));
       // check value
-      if (model_id==""){
+      if (isNaN(model_id)){
         model_id = "None";
       }
-
+      alert(model_id);
       var action = $("#id_action").val();
       var rule_type = $("#id_type").val();
 

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Admin</h1>
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-primary">
+      <h3 class="card-title">General</h3>
+    </div>
+    <div class="card-body">
+      <ul>
+      <li><a href="/admin">Django Admin Pages</a>
+      </ul>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-primary">
+      <h3 class="card-title">Role Based Access Control - User</h3>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><a href="{% url "rbac:access_screen" %}">View Your Access</a>
+        <li><a href="{% url "rbac:tree_screen" %}">View The Whole Tree</a>
+      </ul>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-primary">
+      <h3 class="card-title">Role Based Access Control - Admin</h3>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><a href="{% url "rbac:rbac_admin" %}">View Your Admin Access</a>
+        <li><a href="{% url "rbac:admin_tree_screen" %}">View The Whole Admin Tree</a>
+        <li><a href="{% url "rbac:group_create" %}">Create A New Group</a>
+      </ul>
+    </div>
+  </div>
+</div>
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-primary">
+      <h3 class="card-title">Role Based Access Control - Admin of Admin</h3>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><a href="{% url "rbac:admin_group_create" %}">Create A New Admin Group</a>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

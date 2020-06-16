@@ -12,7 +12,7 @@ the system.</p>
 <div>
   <div class="card col-lg-9">
     <div class="card-header card-header-primary">
-      <h3 class="card-title">{{ key }} Access</h3>
+      <h3 class="card-title">Groups in {{ key }}</h3>
     </div>
     <div class="card-body" style="text-align: center">
 
@@ -47,6 +47,42 @@ the system.</p>
 </div>
 <br>
 {% endfor %}
+
+<div>
+  <div class="card col-lg-9">
+    <div class="card-header card-header-warning">
+      <h3 class="card-title">Roles</h3>
+    </div>
+    <div class="card-body" style="text-align: center">
+
+      <div class="container">
+        <div class="row">
+          <table class="table table-hover">
+            <thead class="text-info">
+              <tr>
+                <th class="text-left">Role ID</th>
+                <th class="text-left">Group Full Name</th>
+                <th class="text-left">Role</th>
+                <th class="text-left">Rule Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for role in roles %}
+                <tr>
+                  <td class="text-left">{{ role.id }}</td>
+                  <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
+                  <td class="text-left">{{ role.role }}</td>
+                  <td class="text-left">{{ role.rule_type }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table><br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
 
 <div>
   <div class="card col-lg-9">

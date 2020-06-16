@@ -8,7 +8,7 @@ from .models import (
     RBACAdminGroupRole,
     RBACModelDefault,
     RBACAppModelAction,
-    RBACUserTree,
+    RBACAdminTree,
 )
 
 admin.site.register(RBACGroup)
@@ -19,4 +19,4 @@ admin.site.register(RBACAdminUserGroup)
 admin.site.register(RBACAdminGroupRole)
 admin.site.register(RBACModelDefault)
 admin.site.register(RBACAppModelAction)
-admin.site.register(RBACUserTree)
+admin.site.register(RBACAdminTree)

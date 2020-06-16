@@ -294,7 +294,7 @@ never reused.</p>
 <div class="section" id="default-behaviour">
 <h2>Default Behaviour<a class="headerlink" href="#default-behaviour" title="Permalink to this headline">¶</a></h2>
 <p>Each application and model must define its own default behaviour in the model
-<code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACModelDefault</span></code>. The options are <em>Allow</em> or <em>Block</em>.</p>
+<a class="reference internal" href="rbac.html#rbac.models.RBACModelDefault" title="rbac.models.RBACModelDefault"><code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACModelDefault</span></code></a>. The options are <em>Allow</em> or <em>Block</em>.</p>
 <p>e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac</span> <span class="kn">import</span> <span class="n">RBACModelDefault</span>
 
@@ -309,7 +309,7 @@ by default going to want to allow access (e.g. forums).</p>
 <div class="section" id="actions">
 <h2>Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h2>
 <p>The action attribute of RBAC roles is application specific and the valid options
-need to be defined in <code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACAppModelAction</span></code>. This is the
+need to be defined in <a class="reference internal" href="rbac.html#rbac.models.RBACAppModelAction" title="rbac.models.RBACAppModelAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">rbac.models.RBACAppModelAction</span></code></a>. This is the
 responsibility of the application.</p>
 <p>e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.models</span> <span class="kn">import</span> <span class="n">RBACAppModelAction</span>
@@ -492,61 +492,82 @@ whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="creating-a-group">
-<h2>Creating A Group<a class="headerlink" href="#creating-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To create a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_create_group</span>
-
-<span class="nb">id</span> <span class="o">=</span> <span class="n">rbac_create_group</span><span class="p">(</span><span class="s2">&quot;New Group for Something&quot;</span><span class="p">)</span>
-</pre></div>
 </div>
+<div class="section" id="list-of-functions">
+<h1>List of Functions<a class="headerlink" href="#list-of-functions" title="Permalink to this headline">¶</a></h1>
+<p>Functions are split across 3 files:</p>
+<ul class="simple">
+<li><p><strong>core.py</strong> handles the central functions.</p></li>
+<li><p><strong>views.py</strong> handles the views for users and admin</p></li>
+<li><p><strong>ajax.py</strong> handles the dynamic calls from the webpages</p></li>
+</ul>
+<div class="section" id="operating-checking-user-access">
+<h2>Operating – Checking User Access<a class="headerlink" href="#operating-checking-user-access" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_has_role" title="rbac.core.rbac_user_has_role"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_has_role()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_has_role_exact" title="rbac.core.rbac_user_has_role_exact"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_has_role_exact()</span></code></a> - internal</p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_blocked_for_model" title="rbac.core.rbac_user_blocked_for_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_blocked_for_model()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_allowed_for_model" title="rbac.core.rbac_user_allowed_for_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_allowed_for_model()</span></code></a></p>
 </div>
-<div class="section" id="deleting-a-group">
-<h2>Deleting A Group<a class="headerlink" href="#deleting-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To delete a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_delete_group</span>
-
-<span class="n">rbac_delete_group</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="operating-checking-admin-access">
+<h2>Operating – Checking Admin Access<a class="headerlink" href="#operating-checking-admin-access" title="Permalink to this headline">¶</a></h2>
+<p>:func:<a href="#id1"><span class="problematic" id="id2">`</span></a>rbac.core.rbac_get_admins_for_group</p>
 </div>
-<p>This will also delete all users from the group by removing the entries from
-RBACUserGroup (Django does this for us as a CASCADE).</p>
+<div class="section" id="operating-explaining-access">
+<h2>Operating – Explaining Access<a class="headerlink" href="#operating-explaining-access" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_access_in_english" title="rbac.core.rbac_access_in_english"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_access_in_english()</span></code></a></p>
 </div>
-<div class="section" id="adding-a-member-to-a-group">
-<h2>Adding a Member to a Group<a class="headerlink" href="#adding-a-member-to-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To add a member to a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_add_user_to_group</span>
-
-<span class="n">rbac_add_user_to_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="admin-creating-and-deleting-groups">
+<h2>Admin - Creating and Deleting Groups<a class="headerlink" href="#admin-creating-and-deleting-groups" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_create_group" title="rbac.core.rbac_create_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_create_group()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_delete_group" title="rbac.core.rbac_delete_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_delete_group()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_delete_group_by_name" title="rbac.core.rbac_delete_group_by_name"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_delete_group_by_name()</span></code></a></p>
 </div>
+<div class="section" id="admin-adding-and-removing-users">
+<h2>Admin – Adding and Removing Users<a class="headerlink" href="#admin-adding-and-removing-users" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_add_user_to_group" title="rbac.core.rbac_add_user_to_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_add_user_to_group()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_remove_user_from_group" title="rbac.core.rbac_remove_user_from_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_remove_user_from_group()</span></code></a></p>
 </div>
-<div class="section" id="removing-a-member-from-a-group">
-<h2>Removing a Member from a Group<a class="headerlink" href="#removing-a-member-from-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To remove a member from a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_remove_user_from_group</span>
-
-<span class="n">rbac_remove_user_from_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="admin-adding-and-removing-roles">
+<h2>Admin – Adding and Removing Roles<a class="headerlink" href="#admin-adding-and-removing-roles" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_add_role_to_group" title="rbac.core.rbac_add_role_to_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_add_role_to_group()</span></code></a></p>
 </div>
+<div class="section" id="admin-checking-admin-access">
+<h2>Admin – Checking Admin Access<a class="headerlink" href="#admin-checking-admin-access" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_admin_all_rights" title="rbac.core.rbac_admin_all_rights"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_admin_all_rights()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_is_group_admin" title="rbac.core.rbac_user_is_group_admin"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_is_group_admin()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_is_role_admin" title="rbac.core.rbac_user_is_role_admin"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_is_role_admin()</span></code></a></p>
 </div>
-<div class="section" id="adding-a-role-to-a-group">
-<h2>Adding a Role to a Group<a class="headerlink" href="#adding-a-role-to-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To add a role to a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_add_role_to_group</span>
-
-<span class="n">rbac_add_role_to_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="views-for-users">
+<h2>Views for Users<a class="headerlink" href="#views-for-users" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.views.view_screen" title="rbac.views.view_screen"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.view_screen()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.tree_screen" title="rbac.views.tree_screen"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.tree_screen()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.group_view" title="rbac.views.group_view"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.group_view()</span></code></a></p>
 </div>
+<div class="section" id="views-for-admins-to-manage-user-groups">
+<h2>Views for Admins to Manage User Groups<a class="headerlink" href="#views-for-admins-to-manage-user-groups" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.views.group_delete" title="rbac.views.group_delete"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.group_delete()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.group_create" title="rbac.views.group_create"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.group_create()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.group_edit" title="rbac.views.group_edit"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.group_edit()</span></code></a></p>
 </div>
-<div class="section" id="removing-a-role-from-a-group">
-<h2>Removing a Role from a Group<a class="headerlink" href="#removing-a-role-from-a-group" title="Permalink to this headline">¶</a></h2>
-<p>To remove a role from a group through the API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_remove_role_from_group</span>
-
-<span class="n">rbac_remove_role_from_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
-</pre></div>
+<div class="section" id="views-for-admins-to-see-their-access">
+<h2>Views for Admins to See Their Access<a class="headerlink" href="#views-for-admins-to-see-their-access" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.views.rbac_admin" title="rbac.views.rbac_admin"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.rbac_admin()</span></code></a></p>
 </div>
+<div class="section" id="views-for-admins-to-manage-admins">
+<h2>Views for Admins to Manage Admins<a class="headerlink" href="#views-for-admins-to-manage-admins" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="rbac.html#rbac.views.admin_tree_screen" title="rbac.views.admin_tree_screen"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.admin_tree_screen()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.admin_group_view" title="rbac.views.admin_group_view"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.admin_group_view()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.views.admin_group_create" title="rbac.views.admin_group_create"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.views.admin_group_create()</span></code></a></p>
+</div>
+<div class="section" id="ajax-calls">
+<h2>Ajax calls<a class="headerlink" href="#ajax-calls" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_user_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_action_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_user_to_group_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_role_to_group_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_get_action_for_model_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_user_from_group_ajax()</span></code></p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_role_from_group_ajax()</span></code></p>
 </div>
 </div>
 

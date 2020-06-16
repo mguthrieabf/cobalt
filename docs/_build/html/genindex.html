@@ -410,7 +410,13 @@
 </li>
       <li><a href="organisations.html#organisations.models.Organisation.address2">address2 (organisations.models.Organisation attribute)</a>
 </li>
-      <li><a href="rbac.html#rbac.views.admin_screen">admin_screen() (in module rbac.views)</a>
+      <li><a href="rbac.html#rbac.views.admin_group_create">admin_group_create() (in module rbac.views)</a>
+</li>
+      <li><a href="rbac.html#rbac.views.admin_group_delete">admin_group_delete() (in module rbac.views)</a>
+</li>
+      <li><a href="rbac.html#rbac.views.admin_group_view">admin_group_view() (in module rbac.views)</a>
+</li>
+      <li><a href="rbac.html#rbac.views.admin_tree_screen">admin_tree_screen() (in module rbac.views)</a>
 </li>
       <li><a href="rbac.html#rbac.core.allow_to_boolean">allow_to_boolean() (in module rbac.core)</a>
 </li>
@@ -1394,10 +1400,6 @@
         <li><a href="rbac.html#rbac.models.RBACUserGroup.group_id">(rbac.models.RBACUserGroup attribute)</a>
 </li>
       </ul></li>
-      <li><a href="rbac.html#rbac.views.group_to_action_ajax">group_to_action_ajax() (in module rbac.views)</a>
-</li>
-      <li><a href="rbac.html#rbac.views.group_to_user_ajax">group_to_user_ajax() (in module rbac.views)</a>
-</li>
       <li><a href="rbac.html#rbac.views.group_view">group_view() (in module rbac.views)</a>
 </li>
       <li><a href="accounts.html#accounts.models.User.groups">groups (accounts.models.User attribute)</a>
@@ -1475,6 +1477,8 @@
 </li>
         <li><a href="rbac.html#rbac.models.RBACAdminGroupRole.id">(rbac.models.RBACAdminGroupRole attribute)</a>
 </li>
+        <li><a href="rbac.html#rbac.models.RBACAdminTree.id">(rbac.models.RBACAdminTree attribute)</a>
+</li>
         <li><a href="rbac.html#rbac.models.RBACAdminUserGroup.id">(rbac.models.RBACAdminUserGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACAppModelAction.id">(rbac.models.RBACAppModelAction attribute)</a>
@@ -1486,8 +1490,6 @@
         <li><a href="rbac.html#rbac.models.RBACModelDefault.id">(rbac.models.RBACModelDefault attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACUserGroup.id">(rbac.models.RBACUserGroup attribute)</a>
-</li>
-        <li><a href="rbac.html#rbac.models.RBACUserTree.id">(rbac.models.RBACUserTree attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1714,6 +1716,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rbac.html#rbac.views.main_admin_screen">main_admin_screen() (in module rbac.views)</a>
+</li>
       <li><a href="accounts.html#accounts.models.User.main_member">main_member (accounts.models.User attribute)</a>
 </li>
       <li>
@@ -1854,11 +1858,11 @@
 </li>
         <li><a href="payments.html#payments.models.StripeTransaction.member">(payments.models.StripeTransaction attribute)</a>
 </li>
+        <li><a href="rbac.html#rbac.models.RBACAdminTree.member">(rbac.models.RBACAdminTree attribute)</a>
+</li>
         <li><a href="rbac.html#rbac.models.RBACAdminUserGroup.member">(rbac.models.RBACAdminUserGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACUserGroup.member">(rbac.models.RBACUserGroup attribute)</a>
-</li>
-        <li><a href="rbac.html#rbac.models.RBACUserTree.member">(rbac.models.RBACUserTree attribute)</a>
 </li>
       </ul></li>
       <li><a href="accounts.html#accounts.views.member_detail_m2m_ajax">member_detail_m2m_ajax() (in module accounts.views)</a>
@@ -1878,11 +1882,11 @@
 </li>
         <li><a href="payments.html#payments.models.StripeTransaction.member_id">(payments.models.StripeTransaction attribute)</a>
 </li>
+        <li><a href="rbac.html#rbac.models.RBACAdminTree.member_id">(rbac.models.RBACAdminTree attribute)</a>
+</li>
         <li><a href="rbac.html#rbac.models.RBACAdminUserGroup.member_id">(rbac.models.RBACAdminUserGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACUserGroup.member_id">(rbac.models.RBACUserGroup attribute)</a>
-</li>
-        <li><a href="rbac.html#rbac.models.RBACUserTree.member_id">(rbac.models.RBACUserTree attribute)</a>
 </li>
       </ul></li>
       <li><a href="accounts.html#accounts.views.member_search_ajax">member_search_ajax() (in module accounts.views)</a>
@@ -2796,6 +2800,8 @@
 </li>
         <li><a href="rbac.html#rbac.models.RBACAdminGroupRole.objects">(rbac.models.RBACAdminGroupRole attribute)</a>
 </li>
+        <li><a href="rbac.html#rbac.models.RBACAdminTree.objects">(rbac.models.RBACAdminTree attribute)</a>
+</li>
         <li><a href="rbac.html#rbac.models.RBACAdminUserGroup.objects">(rbac.models.RBACAdminUserGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACAppModelAction.objects">(rbac.models.RBACAppModelAction attribute)</a>
@@ -2807,8 +2813,6 @@
         <li><a href="rbac.html#rbac.models.RBACModelDefault.objects">(rbac.models.RBACModelDefault attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACUserGroup.objects">(rbac.models.RBACUserGroup attribute)</a>
-</li>
-        <li><a href="rbac.html#rbac.models.RBACUserTree.objects">(rbac.models.RBACUserTree attribute)</a>
 </li>
       </ul></li>
       <li><a href="accounts.migrations.html#accounts.migrations.0001_initial.Migration.operations">operations (accounts.migrations.0001_initial.Migration attribute)</a>
@@ -3155,6 +3159,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rbac.html#rbac.models.RBACGroupRole.path">path() (rbac.models.RBACGroupRole property)</a>
+</li>
       <li><a href="payments.html#payments.core.payment_api">payment_api() (in module payments.core)</a>
 </li>
       <li>
@@ -3750,29 +3756,25 @@
       </ul></li>
       <li><a href="rbac.html#rbac.core.rbac_access_in_english">rbac_access_in_english() (in module rbac.core)</a>
 </li>
-      <li><a href="rbac.html#rbac.core.rbac_add_role_to_group">rbac_add_role_to_group() (in module rbac.core)</a>
+      <li><a href="rbac.html#rbac.core.rbac_access_in_english_sub">rbac_access_in_english_sub() (in module rbac.core)</a>
 </li>
-      <li><a href="rbac.html#rbac.views.rbac_add_role_to_group_ajax">rbac_add_role_to_group_ajax() (in module rbac.views)</a>
+      <li><a href="rbac.html#rbac.core.rbac_add_role_to_group">rbac_add_role_to_group() (in module rbac.core)</a>
 </li>
       <li><a href="rbac.html#rbac.core.rbac_add_user_to_group">rbac_add_user_to_group() (in module rbac.core)</a>
 </li>
-      <li><a href="rbac.html#rbac.views.rbac_add_user_to_group_ajax">rbac_add_user_to_group_ajax() (in module rbac.views)</a>
+      <li><a href="rbac.html#rbac.views.rbac_admin">rbac_admin() (in module rbac.views)</a>
 </li>
       <li><a href="rbac.html#rbac.core.rbac_admin_all_rights">rbac_admin_all_rights() (in module rbac.core)</a>
 </li>
-      <li><a href="rbac.html#rbac.core.rbac_create_group">rbac_create_group() (in module rbac.core)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rbac.html#rbac.core.rbac_create_group">rbac_create_group() (in module rbac.core)</a>
+</li>
       <li><a href="rbac.html#rbac.core.rbac_delete_group">rbac_delete_group() (in module rbac.core)</a>
 </li>
       <li><a href="rbac.html#rbac.core.rbac_delete_group_by_name">rbac_delete_group_by_name() (in module rbac.core)</a>
 </li>
-      <li><a href="rbac.html#rbac.views.rbac_delete_role_from_group_ajax">rbac_delete_role_from_group_ajax() (in module rbac.views)</a>
-</li>
-      <li><a href="rbac.html#rbac.views.rbac_delete_user_from_group_ajax">rbac_delete_user_from_group_ajax() (in module rbac.views)</a>
-</li>
-      <li><a href="rbac.html#rbac.views.rbac_get_action_for_model_ajax">rbac_get_action_for_model_ajax() (in module rbac.views)</a>
+      <li><a href="rbac.html#rbac.core.rbac_get_admins_for_group">rbac_get_admins_for_group() (in module rbac.core)</a>
 </li>
       <li><a href="rbac.html#rbac.core.rbac_remove_user_from_group">rbac_remove_user_from_group() (in module rbac.core)</a>
 </li>
@@ -3803,6 +3805,12 @@
       <li><a href="rbac.html#rbac.models.RBACAdminGroupRole.MultipleObjectsReturned">RBACAdminGroupRole.MultipleObjectsReturned</a>
 </li>
       <li><a href="rbac.html#rbac.models.RBACAdminGroup.rbacadmingrouprole_set">rbacadmingrouprole_set (rbac.models.RBACAdminGroup attribute)</a>
+</li>
+      <li><a href="rbac.html#rbac.models.RBACAdminTree">RBACAdminTree (class in rbac.models)</a>
+</li>
+      <li><a href="rbac.html#rbac.models.RBACAdminTree.DoesNotExist">RBACAdminTree.DoesNotExist</a>
+</li>
+      <li><a href="rbac.html#rbac.models.RBACAdminTree.MultipleObjectsReturned">RBACAdminTree.MultipleObjectsReturned</a>
 </li>
       <li><a href="rbac.html#rbac.models.RBACAdminUserGroup">RBACAdminUserGroup (class in rbac.models)</a>
 </li>
@@ -3858,12 +3866,6 @@
         <li><a href="rbac.html#rbac.models.RBACGroup.rbacusergroup_set">(rbac.models.RBACGroup attribute)</a>
 </li>
       </ul></li>
-      <li><a href="rbac.html#rbac.models.RBACUserTree">RBACUserTree (class in rbac.models)</a>
-</li>
-      <li><a href="rbac.html#rbac.models.RBACUserTree.DoesNotExist">RBACUserTree.DoesNotExist</a>
-</li>
-      <li><a href="rbac.html#rbac.models.RBACUserTree.MultipleObjectsReturned">RBACUserTree.MultipleObjectsReturned</a>
-</li>
       <li><a href="accounts.html#accounts.models.User.rbacusertree_set">rbacusertree_set (accounts.models.User attribute)</a>
 </li>
       <li><a href="payments.html#payments.models.AbstractTransaction.reference_no">reference_no (payments.models.AbstractTransaction attribute)</a>
@@ -4158,7 +4160,7 @@
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.TRANSACTION_STATUS">TRANSACTION_STATUS (payments.models.StripeTransaction attribute)</a>
 </li>
-      <li><a href="rbac.html#rbac.models.RBACUserTree.tree">tree (rbac.models.RBACUserTree attribute)</a>
+      <li><a href="rbac.html#rbac.models.RBACAdminTree.tree">tree (rbac.models.RBACAdminTree attribute)</a>
 </li>
       <li><a href="rbac.html#rbac.views.tree_screen">tree_screen() (in module rbac.views)</a>
 </li>

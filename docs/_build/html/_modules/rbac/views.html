@@ -153,7 +153,10 @@
     <span class="n">RBACUserGroup</span><span class="p">,</span>
     <span class="n">RBACGroupRole</span><span class="p">,</span>
     <span class="n">RBACAdminUserGroup</span><span class="p">,</span>
+    <span class="n">RBACAdminGroup</span><span class="p">,</span>
+    <span class="n">RBACAdminGroupRole</span><span class="p">,</span>
     <span class="n">RBACAppModelAction</span><span class="p">,</span>
+    <span class="n">RBACAdminTree</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">rbac_add_user_to_group</span><span class="p">,</span>
@@ -163,11 +166,18 @@
     <span class="n">rbac_admin_all_rights</span><span class="p">,</span>
     <span class="n">rbac_user_is_role_admin</span><span class="p">,</span>
     <span class="n">rbac_add_role_to_group</span><span class="p">,</span>
+    <span class="n">rbac_get_admins_for_group</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">AddGroup</span>
 <span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
 
+
+<div class="viewcode-block" id="main_admin_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.main_admin_screen">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">main_admin_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Shows the main admin screen - maybe shouldn&#39;t live in in RBAC &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/main-admin-screen.html&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="view_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.view_screen">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">view_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -183,31 +193,34 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span><span class="p">[</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name_qualifier</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="p">]</span>
 
+    <span class="n">group_list</span> <span class="o">=</span> <span class="n">user_groups</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
+
     <span class="n">english</span> <span class="o">=</span> <span class="n">rbac_access_in_english</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
-        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/view-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;english&quot;</span><span class="p">:</span> <span class="n">english</span><span class="p">}</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/view-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;english&quot;</span><span class="p">:</span> <span class="n">english</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">}</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="admin_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_screen">[docs]</a><span class="nd">@login_required</span>
-<span class="k">def</span> <span class="nf">admin_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Allows an administrator to control who is in a group and to create</span>
-<span class="sd">    roles &quot;&quot;&quot;</span>
-
-    <span class="n">user_groups</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
-
-    <span class="c1"># split by type</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">user_group</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name_qualifier</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name_qualifier</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name_qualifier</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">user_group</span><span class="o">.</span><span class="n">group</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">user_groups</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">})</span></div>
+<span class="c1"># @login_required</span>
+<span class="c1"># def admin_screen(request):</span>
+<span class="c1">#     &quot;&quot;&quot; Allows an administrator to control who is in a group and to create</span>
+<span class="c1">#     roles &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     user_groups = RBACAdminUserGroup.objects.filter(member=request.user)</span>
+<span class="c1">#</span>
+<span class="c1">#     # split by type</span>
+<span class="c1">#     data = {}</span>
+<span class="c1">#     for user_group in user_groups:</span>
+<span class="c1">#         if user_group.group.name_qualifier in data:</span>
+<span class="c1">#             data[user_group.group.name_qualifier].append(user_group.group)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             data[user_group.group.name_qualifier] = [user_group.group]</span>
+<span class="c1">#     print(user_groups)</span>
+<span class="c1">#     print(data)</span>
+<span class="c1">#</span>
+<span class="c1">#     return render(request, &quot;rbac/admin-screen.html&quot;, {&quot;groups&quot;: data})</span>
 
 
 <div class="viewcode-block" id="tree_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.tree_screen">[docs]</a><span class="nd">@login_required</span>
@@ -218,6 +231,14 @@
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/tree-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">})</span></div>
 
+<div class="viewcode-block" id="admin_tree_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_tree_screen">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">admin_tree_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Show full RBAC Admin Tree &quot;&quot;&quot;</span>
+    <span class="c1"># Get groups</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin-tree-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">})</span></div>
+
 
 <div class="viewcode-block" id="group_view"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_view">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">group_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
@@ -226,9 +247,24 @@
     <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
     <span class="n">users</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
     <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">is_admin</span> <span class="o">=</span> <span class="n">rbac_user_is_group_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+    <span class="n">admins</span> <span class="o">=</span> <span class="n">rbac_get_admins_for_group</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
         <span class="s2">&quot;rbac/group_view.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s2">&quot;is_admin&quot;</span><span class="p">:</span> <span class="n">is_admin</span><span class="p">,</span> <span class="s2">&quot;admins&quot;</span><span class="p">:</span> <span class="n">admins</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="admin_group_view"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_group_view">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">admin_group_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; view to show details of an admin group &quot;&quot;&quot;</span>
+
+    <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACAdminGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;rbac/admin_group_view.html&quot;</span><span class="p">,</span>
         <span class="p">{</span><span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span>
     <span class="p">)</span></div>
 
@@ -251,6 +287,24 @@
             <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:access_screen&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/group_delete.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">})</span></div>
 
+<div class="viewcode-block" id="admin_group_delete"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_group_delete">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">admin_group_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; view to delete an admin group &quot;&quot;&quot;</span>
+
+    <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_is_group_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;You are not an admin for this group&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Admin Group successfully deleted.&quot;</span><span class="p">,</span>
+                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:access_screen&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin_group_delete.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">})</span></div>
+
 
 <div class="viewcode-block" id="group_create"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_create">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">group_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -268,11 +322,44 @@
             <span class="n">group</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;add_self&quot;</span><span class="p">]:</span>
                 <span class="n">rbac_add_user_to_group</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin-screen.html&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:group_edit&quot;</span><span class="p">,</span> <span class="n">group_id</span><span class="o">=</span><span class="n">group</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/group_create.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="admin_group_create"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_group_create">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">admin_group_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; view to create a new admin group &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="p">(</span>
+                <span class="n">name_item</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
+                <span class="n">name_qualifier</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">],</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">],</span>
+                <span class="n">created_by</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Admin Group successfully created.&quot;</span><span class="p">,</span>
+                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;add_self&quot;</span><span class="p">]:</span>
+                <span class="n">mapping</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="n">mapping</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span>
+                    <span class="s2">&quot;Added you to group </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">,</span>
+                    <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:rbac_admin&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin_group_create.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
 
 
 <div class="viewcode-block" id="group_edit"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_edit">[docs]</a><span class="nd">@login_required</span>
@@ -318,242 +405,19 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="group_to_user_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_to_user_ajax">[docs]</a><span class="nd">@login_required</span>
-<span class="k">def</span> <span class="nf">group_to_user_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Called by the admin page when a user selects a group.</span>
 
-<span class="sd">    Takes the RBACGroup id and return the matching records from RBACUserGroup</span>
+<div class="viewcode-block" id="rbac_admin"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_admin">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">rbac_admin</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; shows the admin groups a user is in &quot;&quot;&quot;</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request (HTTPRequest): standard request object.</span>
-<span class="sd">        group_id (int): RBACGroup id to use for queries</span>
+    <span class="n">group_list</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: Ajax JSON object</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACAdminGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
-    <span class="n">usergroups</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">trees</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
-    <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
-        <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;rbac/group-to-user.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;usergroups&quot;</span><span class="p">:</span> <span class="n">usergroups</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="group_to_action_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_to_action_ajax">[docs]</a><span class="nd">@login_required</span>
-<span class="k">def</span> <span class="nf">group_to_action_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Called by the admin page when a user selects a group.</span>
-
-<span class="sd">    Takes the RBACGroup id and return the matching records from RBACGroupRole</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request (HTTPRequest): standard request object.</span>
-<span class="sd">        group_id (int): RBACGroup id to use for queries</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: Ajax JSON object</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
-    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
-
-    <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
-        <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;rbac/group-to-action.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="rbac_add_user_to_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_add_user_to_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rbac_add_user_to_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax call to add a user to a group</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard request</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: success, failure or error</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
-        <span class="n">member_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;member_id&quot;</span><span class="p">]</span>
-        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
-
-        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rbac_user_is_group_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
-            <span class="n">rbac_add_user_to_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User </span><span class="si">%s</span><span class="s2"> added to group </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
-
-    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
-
-
-<div class="viewcode-block" id="rbac_add_role_to_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_add_role_to_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rbac_add_role_to_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax call to add a role to a group</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard request</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: success, failure or error</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
-        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
-        <span class="n">app</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
-        <span class="n">model_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;model_id&quot;</span><span class="p">]</span>
-        <span class="n">action</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span>
-        <span class="n">rule_type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;rule_type&quot;</span><span class="p">]</span>
-
-        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
-
-        <span class="n">role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
-
-        <span class="c1"># rbac_user_is_role_admin expects an action at the end of the string</span>
-        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="p">:</span>
-            <span class="n">role_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.action&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">role_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.action&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rbac_user_is_role_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role_str</span><span class="p">):</span>
-
-            <span class="n">rbac_add_role_to_group</span><span class="p">(</span>
-                <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
-                <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span>
-                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
-                <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
-                <span class="n">rule_type</span><span class="o">=</span><span class="n">rule_type</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
-
-    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
-
-
-<div class="viewcode-block" id="rbac_get_action_for_model_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_get_action_for_model_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rbac_get_action_for_model_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax call to get the action types for a given app and model</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard request - needs to include &quot;app&quot; and &quot;model&quot;</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: success, failure or error</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
-        <span class="n">app</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
-
-        <span class="n">actions</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span>
-            <span class="s2">&quot;valid_action&quot;</span>
-        <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
-        <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span>
-
-    <span class="n">html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
-        <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;rbac/app-model-actions.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="n">actions</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="rbac_delete_user_from_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_delete_user_from_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rbac_delete_user_from_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax call to delete a user from a group</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard request</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: success, failure or error</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
-        <span class="n">member_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;member_id&quot;</span><span class="p">]</span>
-        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
-
-        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
-        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rbac_user_is_group_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
-            <span class="n">rbac_remove_user_from_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User </span><span class="si">%s</span><span class="s2"> delete from group </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
-
-    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
-
-
-<div class="viewcode-block" id="rbac_delete_role_from_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_delete_role_from_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rbac_delete_role_from_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Ajax call to delete a role from a group</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard request</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        HTTPResponse: success, failure or error</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
-        <span class="n">role_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;role_id&quot;</span><span class="p">]</span>
-
-        <span class="n">role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">role_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="p">:</span>
-            <span class="n">role_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">role_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">rbac_user_is_role_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role_str</span><span class="p">):</span>
-            <span class="n">role</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
-
-    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;trees&quot;</span><span class="p">:</span> <span class="n">trees</span><span class="p">})</span></div>
 </pre></div>
 
            </div>

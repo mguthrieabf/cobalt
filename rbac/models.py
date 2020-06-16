@@ -87,11 +87,19 @@ class RBACGroupRole(models.Model):
 
     @property
     def role(self):
-        "Returns the role in dotted format."
+        "Returns the role in dotted format including the action."
         if self.model_id:
             return "%s.%s.%s.%s" % (self.app, self.model, self.model_id, self.action)
         else:
             return "%s.%s.%s" % (self.app, self.model, self.action)
+
+    @property
+    def path(self):
+        "Returns the role in dotted format excluding the action."
+        if self.model_id:
+            return "%s.%s.%s" % (self.app, self.model, self.model_id)
+        else:
+            return "%s.%s" % (self.app, self.model)
 
 
 class RBACModelDefault(models.Model):
@@ -195,7 +203,7 @@ class RBACAdminGroupRole(models.Model):
             return "%s.%s" % (self.app, self.model)
 
 
-class RBACUserTree(models.Model):
+class RBACAdminTree(models.Model):
     """ Control where in the tree a user can create groups """
 
     member = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -25,4 +25,5 @@ def global_settings(request):
         "AUTO_TOP_UP_MAX_AMT": settings.AUTO_TOP_UP_MAX_AMT,
         "AUTO_TOP_UP_MIN_AMT": settings.AUTO_TOP_UP_MIN_AMT,
         "AUTO_TOP_UP_LOW_LIMIT": settings.AUTO_TOP_UP_LOW_LIMIT,
+        "RBAC_EVERYONE": settings.RBAC_EVERYONE,
     }

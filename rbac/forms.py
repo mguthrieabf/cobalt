@@ -1,5 +1,5 @@
 from django import forms
-from .models import RBACUserTree
+from .models import RBACAdminTree
 
 
 class AddGroup(forms.Form):
@@ -23,7 +23,7 @@ class AddGroup(forms.Form):
                 f"rbac.users.{self.user.system_number}",
             )
         ]
-        queryset = RBACUserTree.objects.filter(member=self.user)
+        queryset = RBACAdminTree.objects.filter(member=self.user)
         for item in queryset:
             choices.append((item, item))
         self.fields["name_qualifier"] = forms.ChoiceField(
