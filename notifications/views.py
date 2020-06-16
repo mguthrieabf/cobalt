@@ -12,6 +12,10 @@ from .models import InAppNotification, NotificationMapping
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
+from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
 
 
 def send_cobalt_email(to_address, subject, msg):
@@ -63,20 +67,32 @@ def get_notifications_for_user(user):
     Returns a list of notifications for the user where the status is
     unacknowledged.
 
-    TODO: Limit the size of the list. Maybe add a home page to manage them.
+    If the list is over 10 then the last item is a link to the notifications
+    page to view them all.
 
     Args:
         user (User): standard User object
 
     Returns:
-        list: List of notifications which themselves are dictionaries
+        tuple: Count of notifications and List of notifications which themselves are tuples
     """
 
-    notifications = {}
-    notes = InAppNotification.objects.filter(member=user, acknowledged=False)
+    notifications = []
+    note_count = InAppNotification.objects.filter(
+        member=user, acknowledged=False
+    ).count()
+    notes = InAppNotification.objects.filter(member=user, acknowledged=False)[:10]
+
     for note in notes:
-        notifications[note.id] = (note.message, note.link)
-    return notifications
+        notifications.append(
+            (note.message, reverse("notifications:passthrough", kwargs={"id": note.id}))
+        )
+    if note_count > 10:
+        notifications.append(
+            ("See all notifications", reverse("notifications:homepage"))
+        )
+    #
+    return (note_count, notifications)
 
 
 def contact_member(member, msg, contact_type, link=None, html_msg=None, subject=None):
@@ -236,11 +252,53 @@ def add_in_app_notification(member, msg, link=None):
     note.save()
 
 
-def acknowledge__in_app_notification(id):
+def acknowledge_in_app_notification(id):
     note = InAppNotification.objects.get(id=id)
     note.acknowledged = True
     note.save()
+    return note
 
 
-def delete__in_app_notification(id):
+def delete_in_app_notification(id):
     InAppNotification.objects.filter(id=id).delete()
+
+
+def delete_all_in_app_notifications(member):
+    InAppNotification.objects.filter(member=member).delete()
+
+
+@login_required
+def homepage(request):
+    notes = InAppNotification.objects.filter(member=request.user)
+    page = request.GET.get("page", 1)
+
+    paginator = Paginator(notes, 10)
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        notes = paginator.page(1)
+    except EmptyPage:
+        notes = paginator.page(paginator.num_pages)
+
+    return render(request, "notifications/homepage.html", {"notes": notes})
+
+
+@login_required
+def delete(request, id):
+    """ when a user clicks on delete we come here. returns the homepage """
+    delete_in_app_notification(id)
+    return homepage(request)
+
+
+@login_required
+def deleteall(request):
+    """ when a user clicks on delete all we come here. returns the homepage """
+    delete_all_in_app_notifications(request.user)
+    return homepage(request)
+
+
+def passthrough(request, id):
+    """ passthrough function to acknowledge a message has been clicked on """
+
+    note = acknowledge_in_app_notification(id)
+    return redirect(note.link)

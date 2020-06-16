@@ -9,9 +9,10 @@ def global_settings(request):
     if request.user.is_anonymous:
         notifications = {}
     else:
-        notifications = get_notifications_for_user(request.user)
+        (notification_count, notifications) = get_notifications_for_user(request.user)
 
     return {
+        "notification_count": notification_count,
         "notifications": notifications,
         "GLOBAL_ORG": settings.GLOBAL_ORG,
         "GLOBAL_TITLE": settings.GLOBAL_TITLE,

@@ -150,12 +150,12 @@
                   <i class="material-icons">notifications</i>
 
                   <span class="notification">
-                    {{ notifications.items|length }}
+                    {{ notification_count }}
                   </span>
 
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
 
-                  {% for id, msg in notifications.items %}
+                  {% for msg in notifications %}
                        <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
 
