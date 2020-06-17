@@ -260,3 +260,22 @@ def like_comment2(request, pk):
             return HttpResponse("ok")
         else:
             return HttpResponse("already liked")
+
+
+@login_required
+def forum_list(request):
+    forums = Forum.objects.all()
+    forums_all = []
+    for forum in forums:
+        detail = {}
+        count = Post.objects.filter(forum=forum).count()
+        if count != 0:
+            latest_post = Post.objects.filter(forum=forum).latest("created_date")
+            latest = latest_post.author
+        else:
+            latest = "No posts yet"
+        detail["title"] = forum.title
+        detail["count"] = count
+        detail["latest"] = latest
+        forums_all.append(detail)
+    return render(request, "forums/forum_list.html", {"forums": forums_all})

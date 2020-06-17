@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+
+{% for forum in forums %}
+<div class="row">
+  <button class="btn btn-info cobalt-text-transform-off">
+    {{ forum.title }} {{ forum.count }} post{{ forum.count|pluralize}} {{ forum.latest }}
+  </button>
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
