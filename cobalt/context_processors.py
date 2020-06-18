@@ -8,6 +8,7 @@ def global_settings(request):
 
     if request.user.is_anonymous:
         notifications = {}
+        notification_count = 0
     else:
         (notification_count, notifications) = get_notifications_for_user(request.user)
 
