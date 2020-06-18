@@ -290,17 +290,27 @@ def rbac_user_blocked_for_model(user, app, model, action):
     if default.default_behaviour == "Block":
         raise ReferenceError("Only supported for default Allow models")
 
+    # get block rules first for both this user and everyone
     groups = RBACUserGroup.objects.filter(
         member__in=[user.id, RBAC_EVERYONE]
     ).values_list("group")
 
-    matches = RBACGroupRole.objects.filter(
-        group__in=groups, rule_type="Block", action=action
+    everyone_matches = RBACGroupRole.objects.filter(
+        group__in=groups, rule_type="Block", action__in=[action, "all"]
     ).values_list("model_id")
 
+    # get rules for this user that allow
+    user_groups = RBACUserGroup.objects.filter(member=user).values_list("group")
+
+    user_matches = RBACGroupRole.objects.filter(
+        group__in=user_groups, rule_type="Allow", action__in=[action, "all"]
+    ).values_list("model_id")
+
+    # allow rules for this user override block rules for everyone
     ret = []
-    for m in matches:
-        ret.append(m[0])
+    for m in everyone_matches:
+        if m not in user_matches:
+            ret.append(m[0])
     return ret
 
 
@@ -325,17 +335,27 @@ def rbac_user_allowed_for_model(user, app, model, action):
     if default.default_behaviour == "Allow":
         raise ReferenceError("Only supported for default Block models")
 
+    # get all rules first for both this user and everyone
     groups = RBACUserGroup.objects.filter(
         member__in=[user.id, RBAC_EVERYONE]
     ).values_list("group")
 
-    matches = RBACGroupRole.objects.filter(
-        group__in=groups, rule_type="Allow", action=action
+    everyone_matches = RBACGroupRole.objects.filter(
+        group__in=groups, rule_type="Allow", action__in=[action, "all"]
     ).values_list("model_id")
 
+    # get rules for this user that block
+    user_groups = RBACUserGroup.objects.filter(member=user).values_list("group")
+
+    user_matches = RBACGroupRole.objects.filter(
+        group__in=user_groups, rule_type="Block", action__in=[action, "all"]
+    ).values_list("model_id")
+
+    # block rules for this user override block rules for everyone
     ret = []
-    for m in matches:
-        ret.append(m[0])
+    for m in everyone_matches:
+        if m not in user_matches:
+            ret.append(m[0])
     return ret
 
 
