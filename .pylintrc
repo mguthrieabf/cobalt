@@ -1,4 +1,5 @@
 [MASTER]
+ignore=migrations
 [MESSAGES CONTROL]
 disable=no-else-return,no-member,too-many-arguments,bad-continuation
 [DESIGN]
