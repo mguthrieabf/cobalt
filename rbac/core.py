@@ -326,6 +326,7 @@ def rbac_user_allowed_for_model(user, app, model, action):
     Returns:
         list:   list of model_instances explicitly allowed
     """
+    # TODO: This is not tested at all
 
     default = RBACModelDefault.objects.filter(app=app, model=model).first()
 
