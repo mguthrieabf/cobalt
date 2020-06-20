@@ -8,4 +8,19 @@ pylint
 message = render_to_string('notifications/email.html', {'title': "New comment on your post 'What to bid here?'", "email_body": "Fre
     ...: d commented on your post.", "link": "http://127.0.0.1:8000", "link_text": "See what he said" })
 
-    send_cobalt_email("m@rkguthrie.com", "New Comment on Post - What to bid?", message)       
+    send_cobalt_email("m@rkguthrie.com", "New Comment on Post - What to bid?", message)
+
+radon mi
+radon cc
+pygount --format=summary payments
+brew install cloc
+
+batch file
+git pull
+
+cloc --exclude-dir docs,migrations,static .
+
+find . -name "models.py" -type f -exec cat {} + | wc -l
+
+
+find . -type f -name "*.py" | xargs -I% basename % | sort -u
