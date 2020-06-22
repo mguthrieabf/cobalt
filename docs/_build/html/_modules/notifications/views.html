@@ -158,6 +158,10 @@
 <span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">send_mail</span>
 <span class="kn">from</span> <span class="nn">django.utils.html</span> <span class="kn">import</span> <span class="n">strip_tags</span>
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="n">GLOBAL_TITLE</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 
 
 <div class="viewcode-block" id="send_cobalt_email"><a class="viewcode-back" href="../../notifications.html#notifications.views.send_cobalt_email">[docs]</a><span class="k">def</span> <span class="nf">send_cobalt_email</span><span class="p">(</span><span class="n">to_address</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
@@ -209,20 +213,32 @@
 <span class="sd">    Returns a list of notifications for the user where the status is</span>
 <span class="sd">    unacknowledged.</span>
 
-<span class="sd">    TODO: Limit the size of the list. Maybe add a home page to manage them.</span>
+<span class="sd">    If the list is over 10 then the last item is a link to the notifications</span>
+<span class="sd">    page to view them all.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        user (User): standard User object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list: List of notifications which themselves are dictionaries</span>
+<span class="sd">        tuple: Count of notifications and List of notifications which themselves are tuples</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">notifications</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">notes</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">acknowledged</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">notifications</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">note_count</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">acknowledged</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">acknowledged</span><span class="o">=</span><span class="kc">False</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+
     <span class="k">for</span> <span class="n">note</span> <span class="ow">in</span> <span class="n">notes</span><span class="p">:</span>
-        <span class="n">notifications</span><span class="p">[</span><span class="n">note</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">note</span><span class="o">.</span><span class="n">link</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">notifications</span></div>
+        <span class="n">notifications</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;notifications:passthrough&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">note</span><span class="o">.</span><span class="n">id</span><span class="p">}))</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">note_count</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">notifications</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;See all notifications&quot;</span><span class="p">,</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;notifications:homepage&quot;</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">note_count</span><span class="p">,</span> <span class="n">notifications</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="contact_member"><a class="viewcode-back" href="../../notifications.html#notifications.views.contact_member">[docs]</a><span class="k">def</span> <span class="nf">contact_member</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">contact_type</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">html_msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -382,14 +398,56 @@
     <span class="n">note</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="acknowledge__in_app_notification"><a class="viewcode-back" href="../../notifications.html#notifications.views.acknowledge__in_app_notification">[docs]</a><span class="k">def</span> <span class="nf">acknowledge__in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="acknowledge_in_app_notification"><a class="viewcode-back" href="../../notifications.html#notifications.views.acknowledge_in_app_notification">[docs]</a><span class="k">def</span> <span class="nf">acknowledge_in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
     <span class="n">note</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
     <span class="n">note</span><span class="o">.</span><span class="n">acknowledged</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">note</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+    <span class="n">note</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">note</span></div>
 
 
-<div class="viewcode-block" id="delete__in_app_notification"><a class="viewcode-back" href="../../notifications.html#notifications.views.delete__in_app_notification">[docs]</a><span class="k">def</span> <span class="nf">delete__in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+<div class="viewcode-block" id="delete_in_app_notification"><a class="viewcode-back" href="../../notifications.html#notifications.views.delete_in_app_notification">[docs]</a><span class="k">def</span> <span class="nf">delete_in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
     <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="delete_all_in_app_notifications"><a class="viewcode-back" href="../../notifications.html#notifications.views.delete_all_in_app_notifications">[docs]</a><span class="k">def</span> <span class="nf">delete_all_in_app_notifications</span><span class="p">(</span><span class="n">member</span><span class="p">):</span>
+    <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="homepage"><a class="viewcode-back" href="../../notifications.html#notifications.views.homepage">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">homepage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">InAppNotification</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">notes</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PageNotAnInteger</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">EmptyPage</span><span class="p">:</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">paginator</span><span class="o">.</span><span class="n">num_pages</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;notifications/homepage.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="n">notes</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../notifications.html#notifications.views.delete">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; when a user clicks on delete we come here. returns the homepage &quot;&quot;&quot;</span>
+    <span class="n">delete_in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">homepage</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="deleteall"><a class="viewcode-back" href="../../notifications.html#notifications.views.deleteall">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">deleteall</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; when a user clicks on delete all we come here. returns the homepage &quot;&quot;&quot;</span>
+    <span class="n">delete_all_in_app_notifications</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">homepage</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="passthrough"><a class="viewcode-back" href="../../notifications.html#notifications.views.passthrough">[docs]</a><span class="k">def</span> <span class="nf">passthrough</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; passthrough function to acknowledge a message has been clicked on &quot;&quot;&quot;</span>
+
+    <span class="n">note</span> <span class="o">=</span> <span class="n">acknowledge_in_app_notification</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">note</span><span class="o">.</span><span class="n">link</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

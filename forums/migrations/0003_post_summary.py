@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forums', '0002_auto_20200331_0702'),
+        ("forums", "0002_auto_20200331_0702"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
-            name='summary',
-            field=models.TextField(default='unset'),
+            model_name="post",
+            name="summary",
+            field=models.TextField(default="unset"),
             preserve_default=False,
         ),
     ]

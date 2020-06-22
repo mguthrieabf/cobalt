@@ -144,14 +144,23 @@
            <div itemprop="articleBody">
             
   <h1>Source code for accounts.tokens</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.contrib.auth.tokens</span> <span class="kn">import</span> <span class="n">PasswordResetTokenGenerator</span>
+<span></span><span class="sd">&quot;&quot;&quot; handles generation of tokens &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib.auth.tokens</span> <span class="kn">import</span> <span class="n">PasswordResetTokenGenerator</span>
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">six</span>
+
+
 <div class="viewcode-block" id="TokenGenerator"><a class="viewcode-back" href="../../accounts.html#accounts.tokens.TokenGenerator">[docs]</a><span class="k">class</span> <span class="nc">TokenGenerator</span><span class="p">(</span><span class="n">PasswordResetTokenGenerator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; handles generation of tokens &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">_make_hash_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span> <span class="o">+</span> <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">)</span>
+            <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">)</span>
         <span class="p">)</span></div>
+
+
 <span class="n">account_activation_token</span> <span class="o">=</span> <span class="n">TokenGenerator</span><span class="p">()</span>
 </pre></div>
 

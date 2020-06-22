@@ -1,7 +1,15 @@
+""" Views for Forums """
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from django.utils import timezone
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
+from notifications.views import notify_happening
+from .forms import PostForm, CommentForm, Comment2Form
 from .models import (
     Post,
     Comment1,
@@ -11,12 +19,6 @@ from .models import (
     LikeComment2,
     Forum,
 )
-from .forms import PostForm, CommentForm, Comment2Form
-from notifications.views import notify_happening
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
-from django.template.loader import render_to_string
-from django.urls import reverse
 
 
 @login_required()
@@ -46,10 +48,10 @@ def post_list(request):
         posts = paginator.page(paginator.num_pages)
 
     posts_new = []
-    for p in posts:
-        p.post_comments = Comment1.objects.filter(post=p).count()
-        p.post_comments += Comment2.objects.filter(post=p).count()
-        posts_new.append(p)
+    for post in posts:
+        post.post_comments = Comment1.objects.filter(post=post).count()
+        post.post_comments += Comment2.objects.filter(post=post).count()
+        posts_new.append(post)
 
     return render(request, "forums/post_list.html", {"posts": posts_new})
 
@@ -72,16 +74,28 @@ def post_list_dashboard(request):
 
     posts = Post.objects.exclude(forum__in=blocked).order_by("-created_date")[:20]
     posts_new = []
-    for p in posts:
-        p.post_comments = Comment1.objects.filter(post=p).count()
-        p.post_comments += Comment2.objects.filter(post=p).count()
-        posts_new.append(p)
+    for post in posts:
+        post.post_comments = Comment1.objects.filter(post=post).count()
+        post.post_comments += Comment2.objects.filter(post=post).count()
+        posts_new.append(post)
 
     return posts_new
 
 
 @login_required()
 def post_detail(request, pk):
+    """ Main view for existing post.
+
+    Shows post and existing comments and allows the user to coment at either
+    level (Comment1 or Comment2).
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    primary key of post
+
+    Returns:
+        HTTPResponse
+    """
 
     # Check access
     post = get_object_or_404(Post, pk=pk)
@@ -222,6 +236,16 @@ def post_new(request):
 
 @login_required()
 def like_post(request, pk):
+    """ Function to like a post over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    Primary key of the post to like
+
+    Returns:
+        HttpResponse
+    """
+
     if request.method == "POST":
         already_liked = LikePost.objects.filter(post=pk, liker=request.user)
         if not already_liked:
@@ -232,10 +256,20 @@ def like_post(request, pk):
             return HttpResponse("ok")
         else:
             return HttpResponse("already liked")
+    return HttpResponse("Invalid request")
 
 
 @login_required()
 def like_comment1(request, pk):
+    """ Function to like a comment1 over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    Primary key of the comment1 to like
+
+    Returns:
+        HttpResponse
+    """
     if request.method == "POST":
         already_liked = LikeComment1.objects.filter(comment1=pk, liker=request.user)
         if not already_liked:
@@ -246,10 +280,20 @@ def like_comment1(request, pk):
             return HttpResponse("ok")
         else:
             return HttpResponse("already liked")
+    return HttpResponse("Invalid request")
 
 
 @login_required()
 def like_comment2(request, pk):
+    """ Function to like a comment2 over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    Primary key of the comment2 to like
+
+    Returns:
+        HttpResponse
+    """
     if request.method == "POST":
         already_liked = LikeComment2.objects.filter(comment2=pk, liker=request.user)
         if not already_liked:
@@ -260,10 +304,12 @@ def like_comment2(request, pk):
             return HttpResponse("ok")
         else:
             return HttpResponse("already liked")
+    return HttpResponse("Invalid request")
 
 
 @login_required
 def forum_list(request):
+    """ View to show a list of forums """
     forums = Forum.objects.all()
     forums_all = []
     for forum in forums:

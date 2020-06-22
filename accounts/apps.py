@@ -1,5 +1,8 @@
+""" Defines this application """
 from django.apps import AppConfig
 
 
 class AccountsConfig(AppConfig):
-    name = 'accounts'
+    """ Defines this application """
+
+    name = "accounts"

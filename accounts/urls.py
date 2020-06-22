@@ -1,8 +1,10 @@
+# pylint: disable=missing-module-docstring,missing-class-docstring
 from django.urls import path
-from django.http import HttpResponse
+
+# from django.http import HttpResponse
 from . import views
 
-app_name = "accounts"
+app_name = "accounts"  # pylint: disable=invalid-name
 
 urlpatterns = [
     path("register", views.register, name="register"),
@@ -20,9 +22,8 @@ urlpatterns = [
     path("public-profile/<int:pk>/", views.public_profile, name="public_profile"),
 ]
 
-
-def not_found_handler(request, exception=None):
-    return HttpResponse("Error handler content", status=403)
-
-
-handler404 = not_found_handler
+# def not_found_handler(request, exception=None):
+#     return HttpResponse("Error handler content", status=403)
+#
+#
+# handler404 = not_found_handler

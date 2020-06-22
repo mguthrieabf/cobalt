@@ -1,8 +1,8 @@
 from django.urls import path
 from . import views
 
-app_name ='calendar'
+app_name = "calendar"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path('', views.home, name='calendar'),
+    path("", views.home, name="calendar"),
 ]

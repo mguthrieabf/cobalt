@@ -384,9 +384,13 @@ disabled anyway.</p>
 </div>
 <div class="section" id="admin">
 <h1>Admin<a class="headerlink" href="#admin" title="Permalink to this headline">¶</a></h1>
-<p>Ironically, administration for RBAC is quite a tough problem to solve. While
+<p>Ironically, administration for RBAC is quite a tough problem to solve. In fact
+most of the code in RBAC is about admin, not execution of security. While
 we want to devolve administration as much as possible, we also have to ensure
 that administrators can only do things they are supposed to do.</p>
+<p>There are two key things to think about here, the tree and the admin rights.
+Every group is created with a location in the tree. The tree is similar to the
+roles, it is a hierarchical dot based model.</p>
 <p>Lets start with a simple example.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACGroup</span><span class="p">:</span> <span class="s2">&quot;Springfield Bridge Club Directors&quot;</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Bob</span>
@@ -510,7 +514,7 @@ whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
 </div>
 <div class="section" id="operating-checking-admin-access">
 <h2>Operating – Checking Admin Access<a class="headerlink" href="#operating-checking-admin-access" title="Permalink to this headline">¶</a></h2>
-<p>:func:<a href="#id1"><span class="problematic" id="id2">`</span></a>rbac.core.rbac_get_admins_for_group</p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_get_admins_for_group" title="rbac.core.rbac_get_admins_for_group"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_get_admins_for_group()</span></code></a></p>
 </div>
 <div class="section" id="operating-explaining-access">
 <h2>Operating – Explaining Access<a class="headerlink" href="#operating-explaining-access" title="Permalink to this headline">¶</a></h2>

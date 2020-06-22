@@ -1,12 +1,21 @@
 from django.contrib import admin
-from .models import Forum, Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2
 from django_summernote.admin import SummernoteModelAdmin
+from .models import (
+    Forum,
+    Post,
+    Comment1,
+    Comment2,
+    LikePost,
+    LikeComment1,
+    LikeComment2,
+)
+
 
 class PostAdmin(SummernoteModelAdmin):
-    summernote_fields = ('text',)
+    summernote_fields = ("text",)
+
 
 admin.site.register(Post, PostAdmin)
-
 admin.site.register(Forum)
 admin.site.register(Comment1)
 admin.site.register(Comment2)

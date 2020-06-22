@@ -144,7 +144,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for forums.views</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span></span><span class="sd">&quot;&quot;&quot; Views for Forums &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseForbidden</span>
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
@@ -192,9 +194,9 @@
         <span class="n">posts</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">paginator</span><span class="o">.</span><span class="n">num_pages</span><span class="p">)</span>
 
     <span class="n">posts_new</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">posts</span><span class="p">:</span>
+        <span class="n">post</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">post</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">post</span><span class="o">.</span><span class="n">post_comments</span> <span class="o">+=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">post</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
         <span class="n">posts_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;forums/post_list.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts_new</span><span class="p">})</span></div>
@@ -228,6 +230,18 @@
 
 <div class="viewcode-block" id="post_detail"><a class="viewcode-back" href="../../forums.html#forums.views.post_detail">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">post_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Main view for existing post.</span>
+
+<span class="sd">    Shows post and existing comments and allows the user to coment at either</span>
+<span class="sd">    level (Comment1 or Comment2).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request object</span>
+<span class="sd">        pk(int):    primary key of post</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Check access</span>
     <span class="n">post</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
@@ -368,6 +382,16 @@
 
 <div class="viewcode-block" id="like_post"><a class="viewcode-back" href="../../forums.html#forums.views.like_post">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">like_post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Function to like a post over ajax</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request object</span>
+<span class="sd">        pk(int):    Primary key of the post to like</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
         <span class="n">already_liked</span> <span class="o">=</span> <span class="n">LikePost</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">post</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">liker</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">already_liked</span><span class="p">:</span>
@@ -406,6 +430,25 @@
             <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;already liked&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="forum_list"><a class="viewcode-back" href="../../forums.html#forums.views.forum_list">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">forum_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">forums</span> <span class="o">=</span> <span class="n">Forum</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">forums_all</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">forum</span> <span class="ow">in</span> <span class="n">forums</span><span class="p">:</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum</span><span class="o">=</span><span class="n">forum</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">latest_post</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum</span><span class="o">=</span><span class="n">forum</span><span class="p">)</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s2">&quot;created_date&quot;</span><span class="p">)</span>
+            <span class="n">latest</span> <span class="o">=</span> <span class="n">latest_post</span><span class="o">.</span><span class="n">author</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">latest</span> <span class="o">=</span> <span class="s2">&quot;No posts yet&quot;</span>
+        <span class="n">detail</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forum</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">detail</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="n">detail</span><span class="p">[</span><span class="s2">&quot;latest&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">latest</span>
+        <span class="n">forums_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;forums/forum_list.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;forums&quot;</span><span class="p">:</span> <span class="n">forums_all</span><span class="p">})</span></div>
 </pre></div>
 
            </div>

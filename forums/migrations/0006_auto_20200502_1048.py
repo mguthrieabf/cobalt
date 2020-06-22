@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forums', '0005_post_comments_allowed'),
+        ("forums", "0005_post_comments_allowed"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='forum',
-            name='description',
-            field=models.CharField(max_length=200, verbose_name='Forum Description'),
+            model_name="forum",
+            name="description",
+            field=models.CharField(max_length=200, verbose_name="Forum Description"),
         ),
         migrations.AlterField(
-            model_name='forum',
-            name='title',
-            field=models.CharField(max_length=80, verbose_name='Forum Short Title'),
+            model_name="forum",
+            name="title",
+            field=models.CharField(max_length=80, verbose_name="Forum Short Title"),
         ),
     ]

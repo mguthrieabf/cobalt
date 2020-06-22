@@ -50,14 +50,6 @@ accounts.models module
    :undoc-members:
    :show-inheritance:
 
-accounts.tests module
----------------------
-
-.. automodule:: accounts.tests
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 accounts.tokens module
 ----------------------
 

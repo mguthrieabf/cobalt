@@ -6,13 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0013_user_stripe_auto_confirmed'),
+        ("accounts", "0013_user_stripe_auto_confirmed"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='mobile',
-            field=models.CharField(blank=True, max_length=15, null=True, unique=True, verbose_name='Mobile Number'),
+            model_name="user",
+            name="mobile",
+            field=models.CharField(
+                blank=True,
+                max_length=15,
+                null=True,
+                unique=True,
+                verbose_name="Mobile Number",
+            ),
         ),
     ]

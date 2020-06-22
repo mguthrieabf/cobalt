@@ -6,12 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0010_auto_20200505_1404'),
+        ("accounts", "0010_auto_20200505_1404"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='user',
-            name='autotopup_amount',
-        ),
+        migrations.RemoveField(model_name="user", name="autotopup_amount",),
     ]

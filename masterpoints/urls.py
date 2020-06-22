@@ -1,11 +1,17 @@
 from django.urls import path
 from . import views
 
-app_name ='masterpoints'
+app_name = "masterpoints"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path('', views.masterpoints_detail, name='masterpoints'),
-    path('view/<int:system_number>/', views.masterpoints_detail, name='masterpoints_detail'),
-    path('system_number_lookup', views.system_number_lookup, name='system_number_lookup'),
-    path('masterpoints_search', views.masterpoints_search, name='masterpoints_search'),
+    path("", views.masterpoints_detail, name="masterpoints"),
+    path(
+        "view/<int:system_number>/",
+        views.masterpoints_detail,
+        name="masterpoints_detail",
+    ),
+    path(
+        "system_number_lookup", views.system_number_lookup, name="system_number_lookup"
+    ),
+    path("masterpoints_search", views.masterpoints_search, name="masterpoints_search"),
 ]

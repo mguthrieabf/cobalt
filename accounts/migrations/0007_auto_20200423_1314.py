@@ -6,18 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0006_auto_20200422_1326'),
+        ("accounts", "0006_auto_20200422_1326"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='user',
-            name='abf_number',
-        ),
+        migrations.RemoveField(model_name="user", name="abf_number",),
         migrations.AddField(
-            model_name='user',
-            name='system_number',
-            field=models.IntegerField(blank='True', default=3, unique=True, verbose_name='System Number'),
+            model_name="user",
+            name="system_number",
+            field=models.IntegerField(
+                blank="True", default=3, unique=True, verbose_name="System Number"
+            ),
             preserve_default=False,
         ),
     ]

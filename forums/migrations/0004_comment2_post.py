@@ -7,14 +7,16 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forums', '0003_post_summary'),
+        ("forums", "0003_post_summary"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='comment2',
-            name='post',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='forums.Post'),
+            model_name="comment2",
+            name="post",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="forums.Post"
+            ),
             preserve_default=False,
         ),
     ]

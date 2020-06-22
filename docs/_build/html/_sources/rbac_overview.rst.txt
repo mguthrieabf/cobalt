@@ -265,9 +265,14 @@ So in this example, the rules to create would be:
 Admin
 =====
 
-Ironically, administration for RBAC is quite a tough problem to solve. While
+Ironically, administration for RBAC is quite a tough problem to solve. In fact
+most of the code in RBAC is about admin, not execution of security. While
 we want to devolve administration as much as possible, we also have to ensure
 that administrators can only do things they are supposed to do.
+
+There are two key things to think about here, the tree and the admin rights.
+Every group is created with a location in the tree. The tree is similar to the
+roles, it is a hierarchical dot based model.
 
 Lets start with a simple example.
 
@@ -420,7 +425,7 @@ Operating – Checking User Access
 Operating – Checking Admin Access
 ---------------------------------
 
-:func:`rbac.core.rbac_get_admins_for_group
+:func:`rbac.core.rbac_get_admins_for_group`
 
 Operating – Explaining Access
 -----------------------------

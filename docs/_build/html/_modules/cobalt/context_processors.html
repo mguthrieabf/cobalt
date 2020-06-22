@@ -154,10 +154,12 @@
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">:</span>
         <span class="n">notifications</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">notification_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">notifications</span> <span class="o">=</span> <span class="n">get_notifications_for_user</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">notification_count</span><span class="p">,</span> <span class="n">notifications</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_notifications_for_user</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;notification_count&quot;</span><span class="p">:</span> <span class="n">notification_count</span><span class="p">,</span>
         <span class="s2">&quot;notifications&quot;</span><span class="p">:</span> <span class="n">notifications</span><span class="p">,</span>
         <span class="s2">&quot;GLOBAL_ORG&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_ORG</span><span class="p">,</span>
         <span class="s2">&quot;GLOBAL_TITLE&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">GLOBAL_TITLE</span><span class="p">,</span>

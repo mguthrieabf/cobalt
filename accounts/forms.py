@@ -1,12 +1,18 @@
+""" Forms for Accounts App """
+
 from django import forms
-from .models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import User
 
 
 class UserRegisterForm(UserCreationForm):
+    """ User Registration """
+
     email = forms.EmailField()
 
     class Meta:
+        """ Meta data """
+
         model = User
         fields = [
             "username",
@@ -21,7 +27,11 @@ class UserRegisterForm(UserCreationForm):
 
 
 class UserUpdateForm(forms.ModelForm):
+    """ Used by Profile to update details """
+
     class Meta:
+        """ Meta data """
+
         model = User
         fields = [
             "username",
@@ -39,6 +49,10 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class BlurbUpdateForm(forms.ModelForm):
+    """ Handles the sub-form on profile for picture and wordage """
+
     class Meta:
+        """ Meta data """
+
         model = User
         fields = ["headline", "about", "pic"]

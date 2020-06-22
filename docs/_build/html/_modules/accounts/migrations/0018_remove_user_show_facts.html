@@ -152,14 +152,11 @@
 <div class="viewcode-block" id="Migration"><a class="viewcode-back" href="../../../accounts.migrations.html#accounts.migrations.0018_remove_user_show_facts.Migration">[docs]</a><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
 
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;accounts&#39;</span><span class="p">,</span> <span class="s1">&#39;0017_user_show_facts&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;accounts&quot;</span><span class="p">,</span> <span class="s2">&quot;0017_user_show_facts&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">migrations</span><span class="o">.</span><span class="n">RemoveField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;user&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;show_facts&#39;</span><span class="p">,</span>
-        <span class="p">),</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">RemoveField</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;show_facts&quot;</span><span class="p">,),</span>
     <span class="p">]</span></div>
 </pre></div>
 

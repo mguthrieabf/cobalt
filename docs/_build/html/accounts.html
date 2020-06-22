@@ -93,7 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.backend">accounts.backend module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.forms">accounts.forms module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.models">accounts.models module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-accounts.tests">accounts.tests module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#accounts-tests-module">accounts.tests module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.tokens">accounts.tokens module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.urls">accounts.urls module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.views">accounts.views module</a></li>
@@ -194,10 +194,12 @@
 </div>
 <div class="section" id="module-accounts.admin">
 <span id="accounts-admin-module"></span><h2>accounts.admin module<a class="headerlink" href="#module-accounts.admin" title="Permalink to this headline">¶</a></h2>
+<p>Admin definitions</p>
 <dl class="py class">
 <dt id="accounts.admin.UserAdmin">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.admin.</code><code class="sig-name descname">UserAdmin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">admin_site</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/admin.html#UserAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.admin.UserAdmin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.admin.options.ModelAdmin</span></code></p>
+<p>Controls the search fields in the Admin app</p>
 <dl class="py method">
 <dt id="accounts.admin.UserAdmin.media">
 <em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#accounts.admin.UserAdmin.media" title="Permalink to this definition">¶</a></dt>
@@ -213,10 +215,12 @@
 </div>
 <div class="section" id="module-accounts.apps">
 <span id="accounts-apps-module"></span><h2>accounts.apps module<a class="headerlink" href="#module-accounts.apps" title="Permalink to this headline">¶</a></h2>
+<p>Defines this application</p>
 <dl class="py class">
 <dt id="accounts.apps.AccountsConfig">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.apps.</code><code class="sig-name descname">AccountsConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app_name</span></em>, <em class="sig-param"><span class="n">app_module</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/apps.html#AccountsConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.apps.AccountsConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.apps.config.AppConfig</span></code></p>
+<p>Defines this application</p>
 <dl class="py attribute">
 <dt id="accounts.apps.AccountsConfig.name">
 <code class="sig-name descname">name</code><em class="property"> = 'accounts'</em><a class="headerlink" href="#accounts.apps.AccountsConfig.name" title="Permalink to this definition">¶</a></dt>
@@ -245,14 +249,17 @@ users to login using either their email address or system_number.</p>
 </div>
 <div class="section" id="module-accounts.forms">
 <span id="accounts-forms-module"></span><h2>accounts.forms module<a class="headerlink" href="#module-accounts.forms" title="Permalink to this headline">¶</a></h2>
+<p>Forms for Accounts App</p>
 <dl class="py class">
 <dt id="accounts.forms.BlurbUpdateForm">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.forms.</code><code class="sig-name descname">BlurbUpdateForm</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">instance=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#BlurbUpdateForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.BlurbUpdateForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<p>Handles the sub-form on profile for picture and wordage</p>
 <dl class="py class">
 <dt id="accounts.forms.BlurbUpdateForm.Meta">
 <em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/accounts/forms.html#BlurbUpdateForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.Meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta data</p>
 <dl class="py attribute">
 <dt id="accounts.forms.BlurbUpdateForm.Meta.fields">
 <code class="sig-name descname">fields</code><em class="property"> = ['headline', 'about', 'pic']</em><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
@@ -287,10 +294,12 @@ users to login using either their email address or system_number.</p>
 <dt id="accounts.forms.UserRegisterForm">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.forms.</code><code class="sig-name descname">UserRegisterForm</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#UserRegisterForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserRegisterForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.forms.UserCreationForm</span></code></p>
+<p>User Registration</p>
 <dl class="py class">
 <dt id="accounts.forms.UserRegisterForm.Meta">
 <em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/accounts/forms.html#UserRegisterForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserRegisterForm.Meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta data</p>
 <dl class="py attribute">
 <dt id="accounts.forms.UserRegisterForm.Meta.fields">
 <code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'mobile', 'password1', 'password2']</em><a class="headerlink" href="#accounts.forms.UserRegisterForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
@@ -325,10 +334,12 @@ users to login using either their email address or system_number.</p>
 <dt id="accounts.forms.UserUpdateForm">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.forms.</code><code class="sig-name descname">UserUpdateForm</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">instance=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#UserUpdateForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserUpdateForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<p>Used by Profile to update details</p>
 <dl class="py class">
 <dt id="accounts.forms.UserUpdateForm.Meta">
 <em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/accounts/forms.html#UserUpdateForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta data</p>
 <dl class="py attribute">
 <dt id="accounts.forms.UserUpdateForm.Meta.fields">
 <code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name']</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
@@ -719,6 +730,21 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.rbacadmintree_set">
+<code class="sig-name descname">rbacadmintree_set</code><a class="headerlink" href="#accounts.models.User.rbacadmintree_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.rbacadminusergroup_set">
 <code class="sig-name descname">rbacadminusergroup_set</code><a class="headerlink" href="#accounts.models.User.rbacadminusergroup_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
@@ -751,21 +777,6 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <dl class="py attribute">
 <dt id="accounts.models.User.rbacusergroup_set">
 <code class="sig-name descname">rbacusergroup_set</code><a class="headerlink" href="#accounts.models.User.rbacusergroup_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="accounts.models.User.rbacusertree_set">
-<code class="sig-name descname">rbacusertree_set</code><a class="headerlink" href="#accounts.models.User.rbacusertree_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -818,30 +829,22 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 </div>
-<div class="section" id="module-accounts.tests">
-<span id="accounts-tests-module"></span><h2>accounts.tests module<a class="headerlink" href="#module-accounts.tests" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="accounts-tests-module">
+<h2>accounts.tests module<a class="headerlink" href="#accounts-tests-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-accounts.tokens">
 <span id="accounts-tokens-module"></span><h2>accounts.tokens module<a class="headerlink" href="#module-accounts.tokens" title="Permalink to this headline">¶</a></h2>
+<p>handles generation of tokens</p>
 <dl class="py class">
 <dt id="accounts.tokens.TokenGenerator">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.tokens.</code><code class="sig-name descname">TokenGenerator</code><a class="reference internal" href="_modules/accounts/tokens.html#TokenGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.tokens.TokenGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.tokens.PasswordResetTokenGenerator</span></code></p>
+<p>handles generation of tokens</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-accounts.urls">
 <span id="accounts-urls-module"></span><h2>accounts.urls module<a class="headerlink" href="#module-accounts.urls" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="accounts.urls.handler404">
-<code class="sig-prename descclassname">accounts.urls.</code><code class="sig-name descname">handler404</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">exception</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.urls.handler404" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="accounts.urls.not_found_handler">
-<code class="sig-prename descclassname">accounts.urls.</code><code class="sig-name descname">not_found_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">exception</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/urls.html#not_found_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.urls.not_found_handler" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="module-accounts.views">
 <span id="accounts-views-module"></span><h2>accounts.views module<a class="headerlink" href="#module-accounts.views" title="Permalink to this headline">¶</a></h2>

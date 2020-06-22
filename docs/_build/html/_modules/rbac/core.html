@@ -267,7 +267,6 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        RBACGroupRole</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-----</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rule_type</span><span class="p">)</span>
 
     <span class="n">group_role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="p">()</span>
     <span class="n">group_role</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
@@ -437,17 +436,27 @@
     <span class="k">if</span> <span class="n">default</span><span class="o">.</span><span class="n">default_behaviour</span> <span class="o">==</span> <span class="s2">&quot;Block&quot;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ReferenceError</span><span class="p">(</span><span class="s2">&quot;Only supported for default Allow models&quot;</span><span class="p">)</span>
 
+    <span class="c1"># get block rules first for both this user and everyone</span>
     <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
         <span class="n">member__in</span><span class="o">=</span><span class="p">[</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">RBAC_EVERYONE</span><span class="p">]</span>
     <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
 
-    <span class="n">matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-        <span class="n">group__in</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span>
+    <span class="n">everyone_matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">group__in</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="n">action__in</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]</span>
     <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;model_id&quot;</span><span class="p">)</span>
 
+    <span class="c1"># get rules for this user that allow</span>
+    <span class="n">user_groups</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+
+    <span class="n">user_matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">group__in</span><span class="o">=</span><span class="n">user_groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span> <span class="n">action__in</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;model_id&quot;</span><span class="p">)</span>
+
+    <span class="c1"># allow rules for this user override block rules for everyone</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">everyone_matches</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_matches</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
@@ -463,6 +472,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        list:   list of model_instances explicitly allowed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: This is not tested at all</span>
 
     <span class="n">default</span> <span class="o">=</span> <span class="n">RBACModelDefault</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
 
@@ -472,17 +482,27 @@
     <span class="k">if</span> <span class="n">default</span><span class="o">.</span><span class="n">default_behaviour</span> <span class="o">==</span> <span class="s2">&quot;Allow&quot;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ReferenceError</span><span class="p">(</span><span class="s2">&quot;Only supported for default Block models&quot;</span><span class="p">)</span>
 
+    <span class="c1"># get all rules first for both this user and everyone</span>
     <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
         <span class="n">member__in</span><span class="o">=</span><span class="p">[</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">RBAC_EVERYONE</span><span class="p">]</span>
     <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
 
-    <span class="n">matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-        <span class="n">group__in</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">action</span>
+    <span class="n">everyone_matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">group__in</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span> <span class="n">action__in</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]</span>
     <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;model_id&quot;</span><span class="p">)</span>
 
+    <span class="c1"># get rules for this user that block</span>
+    <span class="n">user_groups</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+
+    <span class="n">user_matches</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">group__in</span><span class="o">=</span><span class="n">user_groups</span><span class="p">,</span> <span class="n">rule_type</span><span class="o">=</span><span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="n">action__in</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;model_id&quot;</span><span class="p">)</span>
+
+    <span class="c1"># block rules for this user override block rules for everyone</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
-        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">everyone_matches</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_matches</span><span class="p">:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
@@ -523,14 +543,19 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True of False for user role</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: User is: </span><span class="si">%s</span><span class="s2">. Group is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;--&gt;user_is_group_admin: User is: </span><span class="si">%s</span><span class="s2">. Group is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: Path is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="n">trees</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: Count of RBACAdminTree for this user is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">trees</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;--&gt;user_is_group_admin: Count of RBACAdminTree for this user is: </span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="o">%</span> <span class="n">trees</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: checking </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
@@ -541,7 +566,7 @@
         <span class="c1"># check for match on aaaaa.bbbbb.</span>
         <span class="n">partial</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">tree</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: checking patial match </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: returning true&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
 
@@ -585,7 +610,7 @@
 
     <span class="c1"># change role org.org.15 --&gt; org.org</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="n">role</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># look for general rule</span>
@@ -615,7 +640,10 @@
 <span class="sd">        list: list of strings with user access explained</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">rbac_access_in_english_sub</span><span class="p">(</span><span class="n">RBAC_EVERYONE</span><span class="p">,</span> <span class="s2">&quot;Everyone&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">rbac_access_in_english_sub</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">rbac_access_in_english_sub</span><span class="p">(</span>
+        <span class="n">RBAC_EVERYONE</span><span class="p">,</span> <span class="s2">&quot;Everyone&quot;</span>
+    <span class="p">)</span> <span class="o">+</span> <span class="n">rbac_access_in_english_sub</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="rbac_access_in_english_sub"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_access_in_english_sub">[docs]</a><span class="k">def</span> <span class="nf">rbac_access_in_english_sub</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">this_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; returns what access a user has in plain English</span>
@@ -650,6 +678,7 @@
         <span class="n">english</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">english</span></div>
+
 
 <div class="viewcode-block" id="rbac_get_admins_for_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_get_admins_for_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_get_admins_for_group</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; returns a queryset of admins for a given group &quot;&quot;&quot;</span>

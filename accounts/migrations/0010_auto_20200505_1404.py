@@ -6,38 +6,58 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0009_auto_20200428_1341'),
+        ("accounts", "0009_auto_20200428_1341"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='autotopup_amount',
-            field=models.IntegerField(blank=True, null=True, verbose_name='Auto Top Up Amount'),
+            model_name="user",
+            name="autotopup_amount",
+            field=models.IntegerField(
+                blank=True, null=True, verbose_name="Auto Top Up Amount"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='about',
-            field=models.TextField(blank=True, default='Not filled in', max_length=800, null=True, verbose_name='About Me'),
+            model_name="user",
+            name="about",
+            field=models.TextField(
+                blank=True,
+                default="Not filled in",
+                max_length=800,
+                null=True,
+                verbose_name="About Me",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='bbo_name',
-            field=models.CharField(blank=True, max_length=20, null=True, verbose_name='BBO Username'),
+            model_name="user",
+            name="bbo_name",
+            field=models.CharField(
+                blank=True, max_length=20, null=True, verbose_name="BBO Username"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='headline',
-            field=models.TextField(blank=True, default='Not filled in', max_length=100, null=True, verbose_name='Headline'),
+            model_name="user",
+            name="headline",
+            field=models.TextField(
+                blank=True,
+                default="Not filled in",
+                max_length=100,
+                null=True,
+                verbose_name="Headline",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='mobile',
-            field=models.IntegerField(blank=True, null=True, unique=True, verbose_name='Mobile Number'),
+            model_name="user",
+            name="mobile",
+            field=models.IntegerField(
+                blank=True, null=True, unique=True, verbose_name="Mobile Number"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='system_number',
-            field=models.IntegerField(blank=True, unique=True, verbose_name='ABF Number'),
+            model_name="user",
+            name="system_number",
+            field=models.IntegerField(
+                blank=True, unique=True, verbose_name="ABF Number"
+            ),
         ),
     ]

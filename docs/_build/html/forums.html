@@ -311,7 +311,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt id="forums.forms.PostForm.Meta.fields">
-<code class="sig-name descname">fields</code><em class="property"> = ('forum', 'title', 'comments_allowed', 'summary', 'text')</em><a class="headerlink" href="#forums.forms.PostForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fields</code><em class="property"> = ('forum', 'title', 'summary', 'text')</em><a class="headerlink" href="#forums.forms.PostForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -324,7 +324,7 @@
 
 <dl class="py attribute">
 <dt id="forums.forms.PostForm.base_fields">
-<code class="sig-name descname">base_fields</code><em class="property"> = {'comments_allowed': &lt;django.forms.fields.BooleanField object&gt;, 'forum': &lt;django.forms.models.ModelChoiceField object&gt;, 'summary': &lt;django.forms.fields.CharField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;, 'title': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.PostForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">base_fields</code><em class="property"> = {'forum': &lt;django.forms.models.ModelChoiceField object&gt;, 'summary': &lt;django.forms.fields.CharField object&gt;, 'text': &lt;django.forms.fields.CharField object&gt;, 'title': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#forums.forms.PostForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -945,7 +945,7 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt id="forums.models.Post">
-<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">author</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">forum</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">summary</span></em>, <em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">comments_allowed</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Post" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">forums.models.</code><code class="sig-name descname">Post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">author</span></em>, <em class="sig-param"><span class="n">created_date</span></em>, <em class="sig-param"><span class="n">last_change_date</span></em>, <em class="sig-param"><span class="n">forum</span></em>, <em class="sig-param"><span class="n">title</span></em>, <em class="sig-param"><span class="n">summary</span></em>, <em class="sig-param"><span class="n">text</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/models.html#Post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.models.Post" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#forums.models.AbstractForum" title="forums.models.AbstractForum"><code class="xref py py-class docutils literal notranslate"><span class="pre">forums.models.AbstractForum</span></code></a></p>
 <dl class="py exception">
 <dt id="forums.models.Post.DoesNotExist">
@@ -1000,13 +1000,6 @@ many-to-one relation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
 <p>Most of the implementation is delegated to a dynamically defined manager
 class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="forums.models.Post.comments_allowed">
-<code class="sig-name descname">comments_allowed</code><a class="headerlink" href="#forums.models.Post.comments_allowed" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1147,6 +1140,12 @@ file is a binary file so needs to be converted to a string for processing.</p>
 </div>
 <div class="section" id="module-forums.views">
 <span id="forums-views-module"></span><h2>forums.views module<a class="headerlink" href="#module-forums.views" title="Permalink to this headline">¶</a></h2>
+<p>Views for Forums</p>
+<dl class="py function">
+<dt id="forums.views.forum_list">
+<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">forum_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#forum_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.forum_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt id="forums.views.like_comment1">
 <code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">like_comment1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#like_comment1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.like_comment1" title="Permalink to this definition">¶</a></dt>
@@ -1160,12 +1159,38 @@ file is a binary file so needs to be converted to a string for processing.</p>
 <dl class="py function">
 <dt id="forums.views.like_post">
 <code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">like_post</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#like_post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.like_post" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function to like a post over ajax</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p></li>
+<li><p><strong>pk</strong> (<em>int</em>) – Primary key of the post to like</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="forums.views.post_detail">
 <code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">post_detail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">pk</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#post_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.post_detail" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Main view for existing post.</p>
+<p>Shows post and existing comments and allows the user to coment at either
+level (Comment1 or Comment2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request object</p></li>
+<li><p><strong>pk</strong> (<em>int</em>) – primary key of post</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="forums.views.post_list">

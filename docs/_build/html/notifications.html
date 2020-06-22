@@ -441,8 +441,8 @@ object the first time, the query is executed.</p>
 <div><p>See <a class="reference external" href="./notifications_overview.html">Notifications Overview</a> for more details.</p>
 </div></blockquote>
 <dl class="py function">
-<dt id="notifications.views.acknowledge__in_app_notification">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">acknowledge__in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#acknowledge__in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.acknowledge__in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dt id="notifications.views.acknowledge_in_app_notification">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">acknowledge_in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#acknowledge_in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.acknowledge_in_app_notification" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -480,9 +480,26 @@ will call this to register a notification for comments on a users post.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="notifications.views.delete__in_app_notification">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">delete__in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#delete__in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.delete__in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dt id="notifications.views.delete">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>when a user clicks on delete we come here. returns the homepage</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.delete_all_in_app_notifications">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">delete_all_in_app_notifications</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#delete_all_in_app_notifications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.delete_all_in_app_notifications" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.delete_in_app_notification">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">delete_in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#delete_in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.delete_in_app_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.deleteall">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">deleteall</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#deleteall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.deleteall" title="Permalink to this definition">¶</a></dt>
+<dd><p>when a user clicks on delete all we come here. returns the homepage</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="notifications.views.get_notifications_for_user">
@@ -490,19 +507,25 @@ will call this to register a notification for comments on a users post.</p>
 <dd><p>Get a list of all unacklowledged notifications for a user</p>
 <p>Returns a list of notifications for the user where the status is
 unacknowledged.</p>
-<p>TODO: Limit the size of the list. Maybe add a home page to manage them.</p>
+<p>If the list is over 10 then the last item is a link to the notifications
+page to view them all.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>user</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard User object</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List of notifications which themselves are dictionaries</p>
+<dd class="field-even"><p>Count of notifications and List of notifications which themselves are tuples</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.homepage">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">homepage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#homepage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.homepage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="notifications.views.notify_happening">
@@ -535,6 +558,12 @@ any member who has registered an interest in this event.</p>
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening_forums</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening_forums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening_forums" title="Permalink to this definition">¶</a></dt>
 <dd><p>sub function for notify_happening() - handles Forum events
 Might be able to make this generic</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.passthrough">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">passthrough</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#passthrough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.passthrough" title="Permalink to this definition">¶</a></dt>
+<dd><p>passthrough function to acknowledge a message has been clicked on</p>
 </dd></dl>
 
 <dl class="py function">

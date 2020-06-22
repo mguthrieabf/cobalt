@@ -7,6 +7,7 @@ exclude = '''
   | _build
   | buck-out
   | build
+  | migrations
   | dist
 )/
 '''

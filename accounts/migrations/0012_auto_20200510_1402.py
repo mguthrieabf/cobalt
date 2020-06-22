@@ -7,18 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0011_remove_user_autotopup_amount'),
+        ("accounts", "0011_remove_user_autotopup_amount"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='auto_amount',
-            field=models.PositiveIntegerField(blank=True, null=True, validators=[django.core.validators.MaxValueValidator(2000)], verbose_name='Auto Top Up Amount'),
+            model_name="user",
+            name="auto_amount",
+            field=models.PositiveIntegerField(
+                blank=True,
+                null=True,
+                validators=[django.core.validators.MaxValueValidator(2000)],
+                verbose_name="Auto Top Up Amount",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='stripe_customer_id',
-            field=models.CharField(blank=True, max_length=25, null=True, verbose_name='Stripe Customer Id'),
+            model_name="user",
+            name="stripe_customer_id",
+            field=models.CharField(
+                blank=True, max_length=25, null=True, verbose_name="Stripe Customer Id"
+            ),
         ),
     ]

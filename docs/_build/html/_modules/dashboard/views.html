@@ -144,22 +144,22 @@
            <div itemprop="articleBody">
             
   <h1>Source code for dashboard.views</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span></span><span class="sd">&quot;&quot;&quot; views for dashboard &quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
-<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
-<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
 <span class="kn">from</span> <span class="nn">masterpoints.views</span> <span class="kn">import</span> <span class="n">get_masterpoints</span>
 <span class="kn">from</span> <span class="nn">payments.core</span> <span class="kn">import</span> <span class="n">get_balance_detail</span>
-<span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">forums.views</span> <span class="kn">import</span> <span class="n">post_list_dashboard</span>
 
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Home page &quot;&quot;&quot;</span>
     <span class="n">system_number</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span>
-    <span class="n">mp</span> <span class="o">=</span> <span class="n">get_masterpoints</span><span class="p">(</span><span class="n">system_number</span><span class="p">)</span>
+    <span class="n">masterpoints</span> <span class="o">=</span> <span class="n">get_masterpoints</span><span class="p">(</span><span class="n">system_number</span><span class="p">)</span>
     <span class="n">payments</span> <span class="o">=</span> <span class="n">get_balance_detail</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="n">posts</span> <span class="o">=</span> <span class="n">post_list_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;dashboard/home.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;mp&#39;</span><span class="p">:</span> <span class="n">mp</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;dashboard/home.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;mp&#39;</span><span class="p">:</span> <span class="n">masterpoints</span><span class="p">,</span>
                                                    <span class="s1">&#39;payments&#39;</span><span class="p">:</span> <span class="n">payments</span><span class="p">,</span>
                                                    <span class="s1">&#39;posts&#39;</span><span class="p">:</span> <span class="n">posts</span><span class="p">})</span></div>
 </pre></div>
