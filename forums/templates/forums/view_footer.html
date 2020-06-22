@@ -1,0 +1,29 @@
+<script>
+
+jQuery(document).ready(function() {
+  // reload if back button used. Buttons are a mess otherwise
+  if(performance.navigation.type == 2){
+     location.reload(true);
+  }
+
+  // Change view if radio button clicked
+  $(".cobalt-radio").change(function(){
+
+    var val = $(this).val();
+    if (val == "forum-list"){
+      window.location.href = "{% url "forums:forum_list" %}";
+      return false;
+    }
+    if (val == "post-list"){
+      window.location.href = "{% url "forums:post_list_short_view" %}";
+      return false;
+    }
+    if (val == "post-preview"){
+      window.location.href = "{% url "forums:forums" %}";
+      return false;
+    }
+
+  });
+});
+
+</script>

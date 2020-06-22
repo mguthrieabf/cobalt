@@ -84,3 +84,10 @@ class LikeComment2(AbstractLike):
     """ Like for a comment2 """
 
     comment2 = models.ForeignKey(Comment2, on_delete=models.CASCADE)
+
+
+class ForumFollow(models.Model):
+    """ List of Forums that a user is subscribed to """
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)

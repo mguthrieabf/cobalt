@@ -16,7 +16,7 @@
    </div>
    <div class="form-check form-check-radio form-check-inline">
      <label class="form-check-label">
-       <input class="form-check-input cobalt-radio" type="radio" name="post_list" id="id_post_list" value="post-list"> Post List
+       <input class="form-check-input cobalt-radio" type="radio" name="post_list" id="id_post_list" value="post-list" checked> Post List
        <span class="circle">
            <span class="check"></span>
        </span>
@@ -24,7 +24,7 @@
    </div>
    <div class="form-check form-check-radio form-check-inline">
      <label class="form-check-label">
-       <input class="form-check-input cobalt-radio" type="radio" name="post_preview" id="id_post_preview" value="post-preview" checked> Post Preview
+       <input class="form-check-input cobalt-radio" type="radio" name="post_preview" id="id_post_preview" value="post-preview"> Post Preview
        <span class="circle">
            <span class="check"></span>
        </span>
@@ -37,31 +37,32 @@
 </div>
 
 {% for post in posts %}
-<div class="card card-nav-tabs">
-  <div class="card-header card-header-warning">
-    <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
-        <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
-        <h5 style="color:black">{{ post.author.full_name }}</h5>
-    </a>
-    <a href="{% url 'forums:post_detail' pk=post.pk %}">
-    <h3 style="color: white;">{{ post.title }}</h3>
-    </a>
-
-  </div>
-  <div class="card-body">
-    {{ post.summary|safe }}
-    <span class="float-right">
-      {{ post.post_comments }} comment{{ post.post_comments|pluralize}}
-    </span>
-    <div class="card-title d-flex justify-content-between">
-      <div>
-        {{ post.created_date }}
+<div class="container mt-2 bg-light">
+  <div class="row h-100">
+    <div class="col-2 my-auto">
+      <img width="100px" class="rounded-circle img-fluid  d-block mx-auto" src="/media/{{ post.author.pic }}" />
+    </div>
+    <div class="col-10">
+      <div class="container">
+        <div class="row">
+          <div class="col-10">
+            <h3 style="padding:0px; margin: 0px;"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
+            <h5 style="padding:0px; margin: 0px;">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
+            <h6 style="padding:0px; margin: 0px;">{{ post.created_date }}</h6>
+          </div>
+          <div class="col-2 my-auto">
+            <div class="text-center display-2">
+              {{ post.post_comments }}
+            </div>
+            <div class="text-center">
+              comment{{ post.post_comments|pluralize}}
+            </div>
+          </div>
+        </div>
       </div>
-     </div>
+    </div>
   </div>
 </div>
-<br>
-
 
 {% endfor %}
 

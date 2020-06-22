@@ -4,7 +4,7 @@
 {% block headerjs %}
 
 
-<!-- The js libraries are a problem for Summernote so we override thwm here -->
+<!-- The js libraries are a problem for Summernote so we override them here -->
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
@@ -68,6 +68,12 @@
 </div>
 
 <!-- End post -->
+
+{% if post.author == user %}
+
+<a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-info btn-sm">Edit Your Post</a><br>
+
+{% endif %}
 
 {% if total_comments == 0 %}
   <h4>Be the first to comment</h4>

@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib import messages
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
 from notifications.views import notify_happening
 from .forms import PostForm, CommentForm, Comment2Form
@@ -18,15 +19,18 @@ from .models import (
     LikeComment1,
     LikeComment2,
     Forum,
+    ForumFollow,
 )
 
 
 @login_required()
-def post_list(request):
+def post_list(request, forum_list=None, short_view=False):
     """ Summary view showing a list of posts.
 
     Args:
         request(HTTPRequest): standard user request
+        forum_list(list): list of forums to include (Optional)
+        short_view(Boolean): Flag for long or short view
 
     Returns:
         page(HTTPResponse): page with list of posts
@@ -37,7 +41,18 @@ def post_list(request):
         user=request.user, app="forums", model="forum", action="view"
     )
 
-    posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
+    # if we got a forum list then remove anything blocked
+    if forum_list:
+        forum_list_allowed = [item for item in forum_list if item not in blocked]
+        posts_list = Post.objects.filter(forum__in=forum_list_allowed).order_by(
+            "-created_date"
+        )
+
+    # Otherwise load everything not blocked
+    else:
+        posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
+
+    # handle pagination
     page = request.GET.get("page", 1)
     paginator = Paginator(posts_list, 10)
     try:
@@ -47,13 +62,48 @@ def post_list(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
 
+    #    print(posts)
+
+    # TODO: fix counts on paginated pages - doesn't work with posts_new
     posts_new = []
     for post in posts:
         post.post_comments = Comment1.objects.filter(post=post).count()
         post.post_comments += Comment2.objects.filter(post=post).count()
         posts_new.append(post)
 
-    return render(request, "forums/post_list.html", {"posts": posts_new})
+    #    print(posts_new)
+
+    if short_view:
+        return render(request, "forums/post_list_short.html", {"posts": posts})
+    else:
+        return render(request, "forums/post_list.html", {"posts": posts})
+
+
+def post_list_single_forum(request, forum_id):
+    """ Front for post_list provides single forum view
+
+    Args:
+        request(HTTPRequest): standard user request
+        forum_id(int): forum to view
+
+    Returns:
+        page(HTTPResponse): page with list of posts
+    """
+
+    return post_list(request, forum_list=[forum_id])
+
+
+def post_list_short_view(request):
+    """ Front for post_list provides compact listing
+
+    Args:
+        request(HTTPRequest): standard user request
+
+    Returns:
+        page(HTTPResponse): page with list of posts
+    """
+
+    return post_list(request, short_view=True)
 
 
 @login_required()
@@ -235,6 +285,60 @@ def post_new(request):
 
 
 @login_required()
+def post_edit(request, post_id):
+    """ Edit a post in a forum """
+
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.method == "POST":
+        if "publish" in request.POST:  # Publish
+            form = PostForm(request.POST, instance=post)
+            if form.is_valid():
+                if (
+                    rbac_user_has_role(
+                        request.user,
+                        "forums.forum.%s.create" % form.cleaned_data["forum"].id,
+                    )
+                    and post.author == request.user
+                ):
+                    post = form.save(commit=False)
+                    post.last_change_date = timezone.now()
+                    post.save()
+                    messages.success(
+                        request, "Post created", extra_tags="cobalt-message-success"
+                    )
+                    return redirect("forums:post_detail", pk=post.pk)
+                else:
+                    return HttpResponseForbidden()
+
+        elif "delete" in request.POST:  # Delete
+            post.delete()
+            messages.success(
+                request, "Post deleted", extra_tags="cobalt-message-success"
+            )
+            return redirect("forums:forums")
+
+        else:  # Maybe cancel hit or back button - reload page
+            return redirect("forums:post_edit", post_id=post_id)
+    else:
+        if request.user != post.author:
+            return HttpResponseForbidden()
+
+        # see which forums are blocked for this user - load a list of the others
+        blocked_forums = rbac_user_blocked_for_model(
+            user=request.user, app="forums", model="forum", action="create"
+        )
+        valid_forums = Forum.objects.exclude(id__in=blocked_forums)
+        form = PostForm(valid_forums=valid_forums, instance=post)
+
+    return render(
+        request,
+        "forums/post_edit.html",
+        {"form": form, "request": request, "edit": True},
+    )
+
+
+@login_required()
 def like_post(request, pk):
     """ Function to like a post over ajax
 
@@ -294,6 +398,7 @@ def like_comment2(request, pk):
     Returns:
         HttpResponse
     """
+
     if request.method == "POST":
         already_liked = LikeComment2.objects.filter(comment2=pk, liker=request.user)
         if not already_liked:
@@ -310,18 +415,40 @@ def like_comment2(request, pk):
 @login_required
 def forum_list(request):
     """ View to show a list of forums """
+
     forums = Forum.objects.all()
     forums_all = []
+
+    forum_follows = list(
+        ForumFollow.objects.filter(user=request.user).values_list("forum")
+    )
+
+    print(forum_follows)
+
     for forum in forums:
         detail = {}
         count = Post.objects.filter(forum=forum).count()
         if count != 0:
             latest_post = Post.objects.filter(forum=forum).latest("created_date")
-            latest = latest_post.author
+            latest_author = latest_post.author
+            latest_title = latest_post.title
+            latest_date = latest_post.created_date
         else:
-            latest = "No posts yet"
+            latest_author = ""
+            latest_title = "No posts yet"
+            latest_date = ""
+
+        detail["id"] = forum.id
         detail["title"] = forum.title
+        detail["description"] = forum.description
         detail["count"] = count
-        detail["latest"] = latest
+        detail["latest_author"] = latest_author
+        detail["latest_title"] = latest_title
+        detail["latest_date"] = latest_date
+        if (forum.id,) in forum_follows:  # there maybe a nicer way to unpack this
+            detail["follows"] = True
+        else:
+            detail["follows"] = False
         forums_all.append(detail)
+
     return render(request, "forums/forum_list.html", {"forums": forums_all})

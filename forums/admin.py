@@ -8,6 +8,7 @@ from .models import (
     LikePost,
     LikeComment1,
     LikeComment2,
+    ForumFollow,
 )
 
 
@@ -22,3 +23,4 @@ admin.site.register(Comment2)
 admin.site.register(LikePost)
 admin.site.register(LikeComment1)
 admin.site.register(LikeComment2)
+admin.site.register(ForumFollow)

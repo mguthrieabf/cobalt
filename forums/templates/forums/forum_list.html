@@ -5,14 +5,61 @@
 {% block content %}
 <div class="container">
 
-{% for forum in forums %}
-<div class="row">
-  <button class="btn btn-info cobalt-text-transform-off">
-    {{ forum.title }} {{ forum.count }} post{{ forum.count|pluralize}} {{ forum.latest }}
-  </button>
-</div>
-{% endfor %}
+  <div class="form-check form-check-radio form-check-inline">
+    <label class="form-check-label">
+      <input class="form-check-input cobalt-radio" type="radio" name="forum_list" id="id_forum_list" value="forum-list" checked> Forum List
+      <span class="circle">
+          <span class="check"></span>
+      </span>
+    </label>
+  </div>
+  <div class="form-check form-check-radio form-check-inline">
+    <label class="form-check-label">
+      <input class="form-check-input cobalt-radio" type="radio" name="post_list" id="id_post_list" value="post-list"> Post List
+      <span class="circle">
+          <span class="check"></span>
+      </span>
+    </label>
+  </div>
+  <div class="form-check form-check-radio form-check-inline">
+    <label class="form-check-label">
+      <input class="form-check-input cobalt-radio" type="radio" name="post_preview" id="id_post_preview" value="post-preview"> Post Preview
+      <span class="circle">
+          <span class="check"></span>
+      </span>
+    </label>
+  </div>
 
+  <div class="container">
+    {% for forum in forums %}
+    <div class="row">
+      <div class="col-md-8 align-self-center">
+        <div class="card card-block">
+          <div class="card-body">
+            <h4 class="card-title"><a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}">{{ forum.title }} ({{ forum.count }} post{{ forum.count|pluralize}})</a></h4>
+            <p class="category">{{ forum.description }}</p>
+            <h4>Latest Post</h4>
+             {{ forum.latest_title }} {{ forum.latest_author }} {{ forum.latest_date }}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 my-auto">
+        <button class="btn btn-sm btn-primary">View</button>
+        {% if forum.follows %}
+          <button class="btn btn-sm btn-info">Un-follow</button>
+        {% else %}
+          <button class="btn btn-sm btn-success">Follow</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
+
+{% endblock %}
+
+{% block footer %}
+
+{% include 'forums/view_footer.html' %}
 
 {% endblock %}
