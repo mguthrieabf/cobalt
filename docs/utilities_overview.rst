@@ -39,3 +39,26 @@ for another user. In order to implement this you need to do 4 things:
 
     </script>
     {% endblock %}
+
+Pagination Footer
+-----------------
+
+To use the same pagination footer (Next Page, Previous Page, etc at the bottom of a screen that is too big to show everything on one page.),
+you can use::
+
+  {% include 'pagination_footer.html' %}
+
+Your list must be called 'things' for this to work.
+
+If you are paginating over a search list you will need to supply your search string as well. e.g.::
+
+    user = request.GET.get("author")
+    title = request.GET.get("title")
+    forum = request.GET.get("forum")
+    searchparams = "author=%s&title=%s&forum=%s&" % (user, title, forum)
+
+    return render(
+        request,
+        "forums/post_search.html",
+        {"filter": post_filter, "things": response, "searchparams": searchparams},
+    )

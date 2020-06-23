@@ -3,32 +3,6 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-
-  <div class="form-check form-check-radio form-check-inline">
-    <label class="form-check-label">
-      <input class="form-check-input cobalt-radio" type="radio" name="forum_list" id="id_forum_list" value="forum-list" checked> Forum List
-      <span class="circle">
-          <span class="check"></span>
-      </span>
-    </label>
-  </div>
-  <div class="form-check form-check-radio form-check-inline">
-    <label class="form-check-label">
-      <input class="form-check-input cobalt-radio" type="radio" name="post_list" id="id_post_list" value="post-list"> Post List
-      <span class="circle">
-          <span class="check"></span>
-      </span>
-    </label>
-  </div>
-  <div class="form-check form-check-radio form-check-inline">
-    <label class="form-check-label">
-      <input class="form-check-input cobalt-radio" type="radio" name="post_preview" id="id_post_preview" value="post-preview"> Post Preview
-      <span class="circle">
-          <span class="check"></span>
-      </span>
-    </label>
-  </div>
 
   <div class="container">
     {% for forum in forums %}
@@ -44,22 +18,82 @@
         </div>
       </div>
       <div class="col-md-4 my-auto">
-        <button class="btn btn-sm btn-primary">View</button>
+        <a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}" class="btn btn-sm btn-primary">View</a>
         {% if forum.follows %}
-          <button class="btn btn-sm btn-info">Un-follow</button>
+          <button class="btn btn-sm btn-info cobalt-unfollow" id="unfollow-{{ forum.id }}">Un-follow</button>
         {% else %}
-          <button class="btn btn-sm btn-success">Follow</button>
+          <button class="btn btn-sm btn-success cobalt-follow" id="follow-{{ forum.id }}">Follow</button>
         {% endif %}
       </div>
     </div>
     {% endfor %}
   </div>
-</div>
 
 {% endblock %}
 
 {% block footer %}
 
-{% include 'forums/view_footer.html' %}
+<script>
+
+// handle follow and unfollow
+
+  function follow(id){
+    alert("Ive been called");
+    forum = id.split('-')[1];
+    var url = "/forums/forum/follow/" + forum +"/";
+
+    $.ajax({
+        url: url,
+        context: document.body,
+        success: function(txt){
+          alert("follow " + txt);
+
+        }
+    });
+  }
+
+  function unfollow(id){
+    forum = id.split('-')[1];
+    var url = "/forums/forum/unfollow/" + forum +"/";
+
+    $.ajax({
+        url: url,
+        context: document.body,
+        success: function(txt){
+          alert("unfollow");
+
+        }
+    });
+  }
+
+  $(document).ready(function () {
+
+// if a user clicks follow - follow this forum and set the button to be unfollow
+    $(".cobalt-follow").click(function () {
+        alert("Click function for follow");
+        follow(this.id);
+        $('#' + this.id).off('click');
+        $('#' + this.id).click(function () {
+          alert("inside");
+          unfollow(this.id);
+        })
+     });
+
+      $(".cobalt-unfollow").click(function () {
+           forum = this.id.split('-')[1];
+           var url = "/forums/forum/unfollow/" + forum +"/";
+
+           $.ajax({
+               url: url,
+               context: document.body,
+               success: function(txt){
+                 alert("done");
+               }
+           });
+       });
+    });
+
+
+</script>
 
 {% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<form method="get">
+  <div>
+    <div class="row">
+      <div class="col-3">
+        {{ filter.form.author.label_tag }}
+        <span class="cobalt-form-error">{{ filter.form.author.errors|striptags }}</span>
+        {% render_field filter.form.author class+="form-control" %}
+      </div>
+      <div class="col-3">
+        <label  class="bmd-label-static">{{ filter.form.forum.label_tag }}</label>
+        <span class="cobalt-form-error">{{ filter.form.forum.errors|striptags }}</span>
+        {% render_field filter.form.forum class+="form-control" %}
+      </div>
+      <div class="col-3">
+        <label  class="bmd-label-static">{{ filter.form.title.label_tag }}</label>
+        <span class="cobalt-form-error">{{ filter.form.title.errors|striptags }}</span>
+        {% render_field filter.form.title class+="form-control" %}
+      </div>
+
+    </div>
+    <button class="btn btn-info" type="submit">
+      <i class="material-icons">search</i> Search
+    </button>
+  </div>
+</form>
+
+
+
+  <table class="table table-hover">
+    <thead>
+      <th>Post</th>
+      <th>User</th>
+      <th>Forum</th>
+    </thead>
+{% for post in things %}
+  <tr><td><a href="{% url "forums:post_detail" pk=post.id %}">{{ post.title }}</a><td>{{ post.author }}<td>{{ post.forum }}</tr>
+{% empty %}
+  No Results
+{% endfor %}
+</table>
+
+
+{% if things.has_other_pages %}
+  <ul class="pagination">
+    {% if things.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?{{ searchparams }}page={{ things.previous_page_number }}">Previous</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Previous</span>
+      </li>
+    {% endif %}
+    {% for i in things.paginator.page_range %}
+      {% if things.number == i %}
+        <li class="page-item active">    <span class="page-link">
+              {{ i }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?{{ searchparams }}page={{ i }}">{{ i }}&nbsp;</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if things.has_next %}
+      <li class="page-item"><a class="page-link" href="?{{ searchparams }}page={{ things.next_page_number }}">Next</a></li>
+    {% else %}
+      <li class="page-item disabled"><span>Next</span></li>
+    {% endif %}
+  </ul>
+{% endif %}
+
+
+{% endblock %}

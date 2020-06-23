@@ -30,58 +30,31 @@
           </tr>
         </thead>
         <tbody>
-          {% for event in events %}
+          {% for thing in things %}
             <tr>
-              <td title="{{ event.event_date }}">{{ event.event_date|timesince }} ago</td>
-              <td>{{ event.ip }}</td>
+              <td title="{{ thing.event_date }}">{{ thing.event_date|timesince }} ago</td>
+              <td>{{ thing.ip }}</td>
               <td class="
 
-              {% if event.severity == "DEBUG" %}bg-white{% endif %}
-              {% if event.severity == "INFO" %}bg-light{% endif %}
-              {% if event.severity == "WARN" %}bg-info{% endif %}
-              {% if event.severity == "ERROR" %}bg-warning{% endif %}
-              {% if event.severity == "HIGH" %}bg-danger text-blue{% endif %}
-              {% if event.severity == "CRITICAL" %}bg-dark text-white font-weight-bold{% endif %}
+              {% if thing.severity == "DEBUG" %}bg-white{% endif %}
+              {% if thing.severity == "INFO" %}bg-light{% endif %}
+              {% if thing.severity == "WARN" %}bg-info{% endif %}
+              {% if thing.severity == "ERROR" %}bg-warning{% endif %}
+              {% if thing.severity == "HIGH" %}bg-danger text-blue{% endif %}
+              {% if thing.severity == "CRITICAL" %}bg-dark text-white font-weight-bold{% endif %}
 
-              ">{{ event.severity }}</td>
-              <td>{{ event.user }}</td>
-              <td>{{ event.source }}</td>
-              <td>{{ event.sub_source }}</td>
-              <td>{{ event.message }}</td>
+              ">{{ thing.severity }}</td>
+              <td>{{ thing.user }}</td>
+              <td>{{ thing.source }}</td>
+              <td>{{ thing.sub_source }}</td>
+              <td>{{ thing.message }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
 
-    {% if events.has_other_pages %}
-      <ul class="pagination">
-        {% if events.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ events.previous_page_number }}">Previous</a>
-          </li>
-        {% else %}
-          <li class="page-item disabled">
-            <span class="page-link">Previous</span>
-          </li>
-        {% endif %}
-        {% for i in events.paginator.page_range %}
-          {% if events.number == i %}
-            <li class="page-item active">    <span class="page-link">
-                  {{ i }}
-                  <span class="sr-only">(current)</span>
-                </span>
-              </li>
-          {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}&nbsp;</a></li>
-          {% endif %}
-        {% endfor %}
-        {% if events.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ events.next_page_number }}">Next</a></li>
-        {% else %}
-          <li class="page-item disabled"><span>Next</span></li>
-        {% endif %}
-      </ul>
-    {% endif %}
+      {% include 'pagination_footer.html' %}
+
     </div>
   </div>
 </div>

@@ -19,7 +19,7 @@ class AbstractForum(models.Model):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_date = models.DateTimeField(default=timezone.now)
-    last_change_date = models.DateTimeField(default=timezone.now)
+    last_change_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         """ We are abstract """

@@ -11,6 +11,7 @@ from django.contrib import messages
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
 from notifications.views import notify_happening
 from .forms import PostForm, CommentForm, Comment2Form
+from .filters import PostFilter
 from .models import (
     Post,
     Comment1,
@@ -24,13 +25,13 @@ from .models import (
 
 
 @login_required()
-def post_list(request, forum_list=None, short_view=False):
+def post_list(request, forum_list=None, preview_view=False):
     """ Summary view showing a list of posts.
 
     Args:
         request(HTTPRequest): standard user request
-        forum_list(list): list of forums to include (Optional)
-        short_view(Boolean): Flag for long or short view
+        forum_list(list): list of forums to include (Optional) - default is all
+        preview_view(Boolean): Flag for long or short view
 
     Returns:
         page(HTTPResponse): page with list of posts
@@ -47,10 +48,12 @@ def post_list(request, forum_list=None, short_view=False):
         posts_list = Post.objects.filter(forum__in=forum_list_allowed).order_by(
             "-created_date"
         )
+        all_forums = False
 
     # Otherwise load everything not blocked
     else:
         posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
+        all_forums = True
 
     # handle pagination
     page = request.GET.get("page", 1)
@@ -73,10 +76,18 @@ def post_list(request, forum_list=None, short_view=False):
 
     #    print(posts_new)
 
-    if short_view:
-        return render(request, "forums/post_list_short.html", {"posts": posts})
+    if preview_view:
+        return render(
+            request,
+            "forums/post_list.html",
+            {"things": posts, "all_forums": all_forums},
+        )
     else:
-        return render(request, "forums/post_list.html", {"posts": posts})
+        return render(
+            request,
+            "forums/post_list_short.html",
+            {"things": posts, "all_forums": all_forums},
+        )
 
 
 def post_list_single_forum(request, forum_id):
@@ -93,17 +104,38 @@ def post_list_single_forum(request, forum_id):
     return post_list(request, forum_list=[forum_id])
 
 
-def post_list_short_view(request):
-    """ Front for post_list provides compact listing
+def post_list_filter(request):
+    """ Front for post_list takes parameters and pre-processes
 
     Args:
         request(HTTPRequest): standard user request
+        short_view(int): inside Request. long or short view of forums
+        all_forums(int): inside Request. Show all or just the users forums
 
     Returns:
         page(HTTPResponse): page with list of posts
     """
 
-    return post_list(request, short_view=True)
+    preview_view = request.GET.get("preview_view")
+    all_forums = request.GET.get("all_forums")
+    if preview_view == "true":
+        preview_view = True
+    else:
+        preview_view = False
+    if all_forums == "true":
+        all_forums = True
+    else:
+        all_forums = False
+
+    if not all_forums:
+        forum_follows = list(
+            ForumFollow.objects.filter(user=request.user).values_list(
+                "forum", flat=True
+            )
+        )
+        return post_list(request, forum_list=forum_follows, preview_view=preview_view)
+
+    return post_list(request, preview_view=preview_view)
 
 
 @login_required()
@@ -116,6 +148,8 @@ def post_list_dashboard(request):
     Returns:
         list:   list of Post objects
     """
+
+    # TODO: decide if this should be filtered or not - currently not
 
     # get list of forums user cannot access
     blocked = rbac_user_blocked_for_model(
@@ -316,7 +350,7 @@ def post_edit(request, post_id):
             messages.success(
                 request, "Post deleted", extra_tags="cobalt-message-success"
             )
-            return redirect("forums:forums")
+            return redirect("forums:post_list_short_view")
 
         else:  # Maybe cancel hit or back button - reload page
             return redirect("forums:post_edit", post_id=post_id)
@@ -414,16 +448,26 @@ def like_comment2(request, pk):
 
 @login_required
 def forum_list(request):
-    """ View to show a list of forums """
+    """ View to show a list of all forums
 
-    forums = Forum.objects.all()
+    Args:
+        request(HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    # get allowed forum list
+    blocked_forums = rbac_user_blocked_for_model(
+        user=request.user, app="forums", model="forum", action="create"
+    )
+    forums = Forum.objects.exclude(id__in=blocked_forums)
+
     forums_all = []
 
     forum_follows = list(
-        ForumFollow.objects.filter(user=request.user).values_list("forum")
+        ForumFollow.objects.filter(user=request.user).values_list("forum", flat=True)
     )
-
-    print(forum_follows)
 
     for forum in forums:
         detail = {}
@@ -445,10 +489,80 @@ def forum_list(request):
         detail["latest_author"] = latest_author
         detail["latest_title"] = latest_title
         detail["latest_date"] = latest_date
-        if (forum.id,) in forum_follows:  # there maybe a nicer way to unpack this
+        if forum.id in forum_follows:
             detail["follows"] = True
         else:
             detail["follows"] = False
+
         forums_all.append(detail)
 
     return render(request, "forums/forum_list.html", {"forums": forums_all})
+
+
+@login_required
+def post_search(request):
+    post_list = Post.objects.all()
+    post_filter = PostFilter(request.GET, queryset=post_list)
+
+    filtered_qs = post_filter.qs
+
+    paginator = Paginator(filtered_qs, 10)
+
+    page = request.GET.get("page")
+    try:
+        response = paginator.page(page)
+    except PageNotAnInteger:
+        response = paginator.page(1)
+    except EmptyPage:
+        response = paginator.page(paginator.num_pages)
+
+    user = request.GET.get("author")
+    title = request.GET.get("title")
+    forum = request.GET.get("forum")
+    searchparams = "author=%s&title=%s&forum=%s&" % (user, title, forum)
+
+    return render(
+        request,
+        "forums/post_search.html",
+        {"filter": post_filter, "things": response, "searchparams": searchparams},
+    )
+
+
+@login_required()
+def follow_forum_ajax(request, forum_id):
+    """ Function to follow a forum over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    Primary key of the forum to follow
+
+    Returns:
+        HttpResponse
+    """
+
+    forum = get_object_or_404(Forum, pk=forum_id)
+    if ForumFollow.objects.filter(forum=forum, user=request.user).count() == 0:
+        follow = ForumFollow(forum=forum, user=request.user)
+        follow.save()
+        return HttpResponse("ok")
+    else:
+        return HttpResponse("already following")
+    return HttpResponse("Invalid request")
+
+
+@login_required()
+def unfollow_forum_ajax(request, forum_id):
+    """ Function to unfollow a forum over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        pk(int):    Primary key of the forum to unfollow
+
+    Returns:
+        HttpResponse
+    """
+
+    forum = get_object_or_404(Forum, pk=forum_id)
+    follow = ForumFollow.objects.filter(forum=forum, user=request.user)
+    follow.delete()
+    return HttpResponse("ok")

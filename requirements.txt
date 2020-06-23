@@ -15,3 +15,4 @@ django-extensions==2.2.9
 django-easy-pdf==0.1.1
 boto3==1.12.39
 botocore==1.15.39
+django-filter==2.3.0

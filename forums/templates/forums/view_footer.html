@@ -6,23 +6,11 @@ jQuery(document).ready(function() {
      location.reload(true);
   }
 
-  // Change view if radio button clicked
-  $(".cobalt-radio").change(function(){
-
-    var val = $(this).val();
-    if (val == "forum-list"){
-      window.location.href = "{% url "forums:forum_list" %}";
-      return false;
-    }
-    if (val == "post-list"){
-      window.location.href = "{% url "forums:post_list_short_view" %}";
-      return false;
-    }
-    if (val == "post-preview"){
-      window.location.href = "{% url "forums:forums" %}";
-      return false;
-    }
-
+// change view if checkbox changes
+  $(".cobalt-checkbox").change(function(){
+    var preview = $("#id_preview").is(":checked");
+    var all_forums = $("#id_all_forums").is(":checked");
+    window.location.href = "{% url "forums:post_list_filter" %}?preview_view=" + preview + "&all_forums=" + all_forums;
   });
 });
 

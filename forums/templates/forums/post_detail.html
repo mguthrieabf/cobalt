@@ -67,6 +67,9 @@
   </div>
 </div>
 
+{% if post.last_change_date %}
+<p style="font-size: 12px;"><i>{{ user.first_name }} edited this on {{ post.last_change_date }}</i></p>
+{% endif %}
 <!-- End post -->
 
 {% if post.author == user %}
@@ -74,7 +77,8 @@
 <a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-info btn-sm">Edit Your Post</a><br>
 
 {% endif %}
-
+<br>
+<br>
 {% if total_comments == 0 %}
   <h4>Be the first to comment</h4>
 {% else %}

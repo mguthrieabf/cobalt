@@ -4,58 +4,58 @@
 
 {% block content %}
 
+<h2>View Posts</h2>
+
 <div class="col-md-12 d-flex">
  <div>
    <div class="form-check form-check-radio form-check-inline">
      <label class="form-check-label">
-       <input class="form-check-input cobalt-radio" type="radio" name="forum_list" id="id_forum_list" value="forum-list"> Forum List
-       <span class="circle">
+       <input class="form-check-input cobalt-checkbox" type="checkbox" name="preview" id="id_preview" value=""> Show Preview
+       <span class="form-check-sign">
            <span class="check"></span>
        </span>
      </label>
    </div>
    <div class="form-check form-check-radio form-check-inline">
      <label class="form-check-label">
-       <input class="form-check-input cobalt-radio" type="radio" name="post_list" id="id_post_list" value="post-list" checked> Post List
-       <span class="circle">
+       <input class="form-check-input cobalt-checkbox" type="checkbox" name="all_forums" id="id_all_forums" value=""
+       {% if all_forums %}
+          checked
+       {% endif %}
+       > All Forums
+       <span class="form-check-sign">
            <span class="check"></span>
        </span>
      </label>
    </div>
-   <div class="form-check form-check-radio form-check-inline">
-     <label class="form-check-label">
-       <input class="form-check-input cobalt-radio" type="radio" name="post_preview" id="id_post_preview" value="post-preview"> Post Preview
-       <span class="circle">
-           <span class="check"></span>
-       </span>
-     </label>
-   </div>
+   <a href="{% url "forums:forum_list" %}" class="btn btn-danger btn-sm">Browse Forums</a>
+   <a href="{% url "forums:post_search" %}" class="btn btn-primary btn-sm"><i class="material-icons">search</i> Search</a>
  </div>
  <div class="ml-auto">
    <button class="btn btn-success btn-sm" onclick="location.reload();location.href='{% url "forums:post_new" %}'">Create New Post</button>
  </div>
 </div>
 
-{% for post in posts %}
+{% for thing in things %}
 <div class="container mt-2 bg-light">
   <div class="row h-100">
     <div class="col-2 my-auto">
-      <img width="100px" class="rounded-circle img-fluid  d-block mx-auto" src="/media/{{ post.author.pic }}" />
+      <img width="100px" class="rounded-circle img-fluid  d-block mx-auto" src="/media/{{ thing.author.pic }}" />
     </div>
     <div class="col-10">
       <div class="container">
         <div class="row">
           <div class="col-10">
-            <h3 style="padding:0px; margin: 0px;"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
-            <h5 style="padding:0px; margin: 0px;">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
-            <h6 style="padding:0px; margin: 0px;">{{ post.created_date }}</h6>
+            <h3 style="padding:0px; margin: 0px;"><a href="{% url 'forums:post_detail' pk=thing.pk %}">{{ thing.title }}</a></h3>
+            <h5 style="padding:0px; margin: 0px;">{{ thing.author.full_name }} posted in {{ thing.forum.title }}</h5>
+            <h6 style="padding:0px; margin: 0px;">{{ thing.created_date }}</h6>
           </div>
           <div class="col-2 my-auto">
             <div class="text-center display-2">
-              {{ post.post_comments }}
+              {{ thing.post_comments }}
             </div>
             <div class="text-center">
-              comment{{ post.post_comments|pluralize}}
+              comment{{ thing.post_comments|pluralize}}
             </div>
           </div>
         </div>
@@ -66,28 +66,8 @@
 
 {% endfor %}
 
-{% if posts.has_other_pages %}
+{% include 'pagination_footer.html' %}
 
-  <ul class="pagination">
-    {% if posts.has_previous %}
-      <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&laquo;&nbsp;</span></li>
-    {% endif %}
-    {% for i in posts.paginator.page_range %}
-      {% if posts.number == i %}
-        <li class="active"><span>{{ i }}&nbsp; <span class="sr-only">(current)</span></span></li>
-      {% else %}
-        <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
-      {% endif %}
-    {% endfor %}
-    {% if posts.has_next %}
-      <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&raquo;</span></li>
-    {% endif %}
-  </ul>
-{% endif %}
 
 {% endblock %}
 
