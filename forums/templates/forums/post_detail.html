@@ -45,7 +45,7 @@
   <div class="card-header card-header-warning">
     <h1>{{ post.title }}</h1>
       <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
-          <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+          <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" style="margin-right: 5px;" />
           <h4>{{ post.author.full_name }}</h4>
       </a>
     <div class="card-title d-flex justify-content-between">

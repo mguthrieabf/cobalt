@@ -118,6 +118,7 @@ def post_list_filter(request):
 
     preview_view = request.GET.get("preview_view")
     all_forums = request.GET.get("all_forums")
+
     if preview_view == "true":
         preview_view = True
     else:

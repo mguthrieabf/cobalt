@@ -33,16 +33,16 @@
    <button class="btn btn-success btn-sm" onclick="location.reload();location.href='{% url "forums:post_new" %}'">Create New Post</button>
  </div>
 </div>
-
+<br>
 {% for thing in things %}
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
     <a href="{% url 'accounts:public_profile' pk=thing.author.pk %}">
-        <img width="50px" class="rounded-circle float-left" src="/media/{{ thing.author.pic }}" />
+        <img width="50px" class="rounded-circle float-left" src="/media/{{ thing.author.pic }}" style="margin-right: 5px;"/>
         <h5 style="color:black">{{ thing.author.full_name }}</h5>
     </a>
     <a href="{% url 'forums:post_detail' pk=thing.pk %}">
-    <h3 style="color: white;">{{ thing.title }}</h3>
+    <h3 style="color: white; border: 0px; margin: 0px;">{{ thing.title }}</h3>
     </a>
 
   </div>
