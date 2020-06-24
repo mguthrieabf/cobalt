@@ -25,7 +25,14 @@ from .models import (
 
 
 @login_required()
-def post_list(request, forum_list=None, preview_view=False, all_forums=False, msg=None):
+def post_list(
+    request,
+    forum_list=None,
+    preview_view=False,
+    all_forums=False,
+    msg=None,
+    forum_id=None,
+):
     """ Summary view showing a list of posts.
 
     Args:
@@ -34,13 +41,31 @@ def post_list(request, forum_list=None, preview_view=False, all_forums=False, ms
         preview_view(Boolean): Flag for long or short view
         msg(str): message to go into title line explaining page
         all_forums(Boolean): True to show all allowed forums
+        forum(int): specific forum to view - only required for the searchparams
 
     Returns:
         page(HTTPResponse): page with list of posts
     """
-    # build parameter string so pagination includes the right params on later pages
-    #
+
+    # Interacting with JS requires a common language so we use 0 and 1 not
+    # True and False.
+
+    if preview_view:
+        preview_view = 1
+    else:
+        preview_view = 0
+
+    if all_forums:
+        all_forums = 1
+    else:
+        all_forums = 0
+
+    # build parameter string so pagination includes the right params on other pages
     searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
+
+    # add specific forum if requested
+    if forum_id:
+        searchparams = "%s/%s" % (forum_id, searchparams)
 
     # get list of forums user cannot access
     blocked = rbac_user_blocked_for_model(
@@ -116,7 +141,7 @@ def post_list_single_forum(request, forum_id):
         page(HTTPResponse): page with list of posts
     """
     forum = get_object_or_404(Forum, pk=forum_id)
-    return post_list(request, forum_list=[forum_id], msg=forum.title)
+    return post_list(request, forum_list=[forum_id], msg=forum.title, forum_id=forum_id)
 
 
 def post_list_filter(request):
@@ -131,6 +156,8 @@ def post_list_filter(request):
         page(HTTPResponse): page with list of posts
     """
 
+    # checkboxes come in as 0 or 1 for True or False. Sometimes they are empty = False
+    # 0 or 1 are False and True in Python, but if we get no value set to False
     try:
         preview_view = int(request.GET.get("preview_view"))
     except TypeError:
@@ -140,17 +167,6 @@ def post_list_filter(request):
         all_forums = int(request.GET.get("all_forums"))
     except TypeError:
         all_forums = False
-
-    # preview_view = False
-    # all_forums = False
-
-    # if preview_view_param:
-    #     if preview_view_param.lower() == "true":
-    #         preview_view = True
-    #
-    # if all_forums_param:
-    #     if all_forums.lower() == "true":
-    #         all_forums = True
 
     if not all_forums:
         forum_follows = list(
