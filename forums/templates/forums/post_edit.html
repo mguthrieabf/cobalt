@@ -46,7 +46,11 @@
         <div class="card">
           <div class="card-header card-header-success">
             <div class="card-title">
+              {% if edit %}
+              <h2>Edit Post by {{ request.user.full_name }}</h2>
+              {% else %}
               <h2>New Post by {{ request.user.full_name }}</h2>
+              {% endif %}
             </div>
           </div>
           <div class="card-body">
@@ -73,7 +77,9 @@
 
             <div class="form-group row">
               <button type="submit" class="save btn btn-default" name="publish">Publish</button>
+              {% if edit %}
               <button type="delete" class="save btn btn-danger" name="delete">Delete</button>
+              {% endif %}
               <button type="cancel" class="save btn btn-info" onclick="history.back();" name="cancel">Cancel</button>
             </div>
             </form>

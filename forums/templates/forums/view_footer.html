@@ -8,8 +8,21 @@ jQuery(document).ready(function() {
 
 // change view if checkbox changes
   $(".cobalt-checkbox").change(function(){
-    var preview = $("#id_preview").is(":checked");
-    var all_forums = $("#id_all_forums").is(":checked");
+    var preview_val = $("#id_preview").is(":checked");
+    var all_forums_val = $("#id_all_forums").is(":checked");
+// change true=>True and false => False
+    if (preview_val){
+      var preview = 1;
+    }  else {
+      var preview = 0;
+    }
+
+    if (all_forums_val){
+      var all_forums = 1;
+    }  else {
+      var all_forums = 0;
+    }
+
     window.location.href = "{% url "forums:post_list_filter" %}?preview_view=" + preview + "&all_forums=" + all_forums;
   });
 });

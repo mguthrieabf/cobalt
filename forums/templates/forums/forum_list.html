@@ -5,6 +5,7 @@
 {% block content %}
 
   <div class="container">
+    <h2>All Forums</h2>
     {% for forum in forums %}
     <div class="row">
       <div class="col-md-8 align-self-center">
@@ -19,11 +20,13 @@
       </div>
       <div class="col-md-4 my-auto">
         <a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}" class="btn btn-sm btn-primary">View</a>
+
         {% if forum.follows %}
-          <button class="btn btn-sm btn-info cobalt-unfollow" id="unfollow-{{ forum.id }}">Un-follow</button>
+          <button class="btn btn-sm btn-info cobalt-follow" id="button-{{ forum.id }}">Un-follow</button>
         {% else %}
-          <button class="btn btn-sm btn-success cobalt-follow" id="follow-{{ forum.id }}">Follow</button>
+          <button class="btn btn-sm btn-success cobalt-follow" id="button-{{ forum.id }}">Follow</button>
         {% endif %}
+
       </div>
     </div>
     {% endfor %}
@@ -35,63 +38,32 @@
 
 <script>
 
-// handle follow and unfollow
-
-  function follow(id){
-    alert("Ive been called");
-    forum = id.split('-')[1];
-    var url = "/forums/forum/follow/" + forum +"/";
-
-    $.ajax({
-        url: url,
-        context: document.body,
-        success: function(txt){
-          alert("follow " + txt);
-
-        }
-    });
-  }
-
-  function unfollow(id){
-    forum = id.split('-')[1];
-    var url = "/forums/forum/unfollow/" + forum +"/";
-
-    $.ajax({
-        url: url,
-        context: document.body,
-        success: function(txt){
-          alert("unfollow");
-
-        }
-    });
-  }
-
   $(document).ready(function () {
 
-// if a user clicks follow - follow this forum and set the button to be unfollow
+// Toggle following or not following a forum
+// set this initially by class
     $(".cobalt-follow").click(function () {
-        alert("Click function for follow");
-        follow(this.id);
-        $('#' + this.id).off('click');
-        $('#' + this.id).click(function () {
-          alert("inside");
-          unfollow(this.id);
-        })
+        forum = this.id.split('-')[1];
+        status = this.innerText;
+        if (status == "FOLLOW"){
+          var url = "/forums/forum/follow/" + forum +"/";
+          $("#button-" + forum).html("Un-Follow");
+          $("#button-" + forum).toggleClass('btn-success btn-info');
+        } else {
+          var url = "/forums/forum/unfollow/" + forum +"/";
+          $("#button-" + forum).html("Follow");
+          $("#button-" + forum).toggleClass('btn-info btn-success');
+
+        }
+        $.ajax({
+            url: url,
+            context: document.body,
+            success: function(txt){
+            }
+        });
      });
+  });
 
-      $(".cobalt-unfollow").click(function () {
-           forum = this.id.split('-')[1];
-           var url = "/forums/forum/unfollow/" + forum +"/";
-
-           $.ajax({
-               url: url,
-               context: document.body,
-               success: function(txt){
-                 alert("done");
-               }
-           });
-       });
-    });
 
 
 </script>

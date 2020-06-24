@@ -25,17 +25,22 @@ from .models import (
 
 
 @login_required()
-def post_list(request, forum_list=None, preview_view=False):
+def post_list(request, forum_list=None, preview_view=False, all_forums=False, msg=None):
     """ Summary view showing a list of posts.
 
     Args:
         request(HTTPRequest): standard user request
-        forum_list(list): list of forums to include (Optional) - default is all
+        forum_list(list): list of forums to include (Optional) - default is users preferences
         preview_view(Boolean): Flag for long or short view
+        msg(str): message to go into title line explaining page
+        all_forums(Boolean): True to show all allowed forums
 
     Returns:
         page(HTTPResponse): page with list of posts
     """
+    # build parameter string so pagination includes the right params on later pages
+    #
+    searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
 
     # get list of forums user cannot access
     blocked = rbac_user_blocked_for_model(
@@ -57,7 +62,7 @@ def post_list(request, forum_list=None, preview_view=False):
 
     # handle pagination
     page = request.GET.get("page", 1)
-    paginator = Paginator(posts_list, 10)
+    paginator = Paginator(posts_list, 4)
     try:
         posts = paginator.page(page)
     except PageNotAnInteger:
@@ -80,13 +85,23 @@ def post_list(request, forum_list=None, preview_view=False):
         return render(
             request,
             "forums/post_list.html",
-            {"things": posts, "all_forums": all_forums},
+            {
+                "things": posts,
+                "all_forums": all_forums,
+                "msg": msg,
+                "searchparams": searchparams,
+            },
         )
     else:
         return render(
             request,
             "forums/post_list_short.html",
-            {"things": posts, "all_forums": all_forums},
+            {
+                "things": posts,
+                "all_forums": all_forums,
+                "msg": msg,
+                "searchparams": searchparams,
+            },
         )
 
 
@@ -100,8 +115,8 @@ def post_list_single_forum(request, forum_id):
     Returns:
         page(HTTPResponse): page with list of posts
     """
-
-    return post_list(request, forum_list=[forum_id])
+    forum = get_object_or_404(Forum, pk=forum_id)
+    return post_list(request, forum_list=[forum_id], msg=forum.title)
 
 
 def post_list_filter(request):
@@ -116,17 +131,26 @@ def post_list_filter(request):
         page(HTTPResponse): page with list of posts
     """
 
-    preview_view = request.GET.get("preview_view")
-    all_forums = request.GET.get("all_forums")
-
-    if preview_view == "true":
-        preview_view = True
-    else:
+    try:
+        preview_view = int(request.GET.get("preview_view"))
+    except TypeError:
         preview_view = False
-    if all_forums == "true":
-        all_forums = True
-    else:
+
+    try:
+        all_forums = int(request.GET.get("all_forums"))
+    except TypeError:
         all_forums = False
+
+    # preview_view = False
+    # all_forums = False
+
+    # if preview_view_param:
+    #     if preview_view_param.lower() == "true":
+    #         preview_view = True
+    #
+    # if all_forums_param:
+    #     if all_forums.lower() == "true":
+    #         all_forums = True
 
     if not all_forums:
         forum_follows = list(
@@ -134,9 +158,17 @@ def post_list_filter(request):
                 "forum", flat=True
             )
         )
-        return post_list(request, forum_list=forum_follows, preview_view=preview_view)
+        return post_list(
+            request,
+            forum_list=forum_follows,
+            preview_view=preview_view,
+            msg="My Forums",
+            all_forums=all_forums,
+        )
 
-    return post_list(request, preview_view=preview_view)
+    return post_list(
+        request, preview_view=preview_view, msg="All Forums", all_forums=all_forums
+    )
 
 
 @login_required()
@@ -258,6 +290,10 @@ def post_new(request):
                 post.published_date = timezone.now()
                 post.save()
 
+                messages.success(
+                    request, "Post created", extra_tags="cobalt-message-success"
+                )
+
                 link = reverse("forums:post_detail", args=[post.id])
                 host = request.get_host()
                 absolute_link = "http://%s%s" % (host, link)
@@ -340,7 +376,7 @@ def post_edit(request, post_id):
                     post.last_change_date = timezone.now()
                     post.save()
                     messages.success(
-                        request, "Post created", extra_tags="cobalt-message-success"
+                        request, "Post edited", extra_tags="cobalt-message-success"
                     )
                     return redirect("forums:post_detail", pk=post.pk)
                 else:

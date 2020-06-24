@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h2>View Posts</h2>
+<h2>View Posts - {{ msg }}</h2>
 
 <div class="col-md-12 d-flex">
  <div>
@@ -64,6 +64,10 @@
   </div>
 </div>
 
+{% empty %}
+<br>
+<h2>Hmmm... There doesn't appear to be anything here.</h2>
+<p>Try following some forums or selecting "All Forums" above.</p>
 {% endfor %}
 <br>
 {% include 'pagination_footer.html' %}
