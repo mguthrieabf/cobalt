@@ -221,7 +221,7 @@ has the concept of **everyone**.
 
 Probably the easiest way to explain this is to consider the case where we do
 not have **everyone**. Imagine that you wish to block people from accessing
-forum id=15, with description "World Domination", given than the default
+forum id=15, with description "World Domination", given that the default
 behaviour for forums.forum is "Allow". You can easily add a rule that says:
 
 .. code-block:: python

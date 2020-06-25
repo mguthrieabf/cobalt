@@ -20,6 +20,14 @@ rbac.admin module
    :undoc-members:
    :show-inheritance:
 
+rbac.ajax module
+-----------------
+
+.. automodule:: rbac.ajax
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 rbac.apps module
 ----------------
 
