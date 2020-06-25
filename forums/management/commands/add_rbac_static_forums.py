@@ -41,3 +41,6 @@ class Command(BaseCommand):
         self.CreateRBACAction("forums", "forum", "view")
         self.CreateRBACAction("forums", "forum", "edit")
         self.CreateRBACAction("forums", "forum", "moderate")
+
+        self.CreateRBACDefault("forums", "forumadmin")
+        self.CreateRBACAction("forums", "forum", "change")
