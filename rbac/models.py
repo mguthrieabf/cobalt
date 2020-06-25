@@ -12,12 +12,6 @@ from accounts.models import User
 from django.utils import timezone
 
 RULE_TYPES = [("Allow", "Allow User Access"), ("Block", "Block User Access")]
-GROUP_TYPES = [
-    ("Forum", "Forums"),
-    ("Organisation", "Organisations"),
-    ("Payment", "Payments"),
-    ("Scoring", "Scoring"),
-]
 
 
 class RBACGroup(models.Model):
@@ -206,8 +200,8 @@ class RBACAdminGroupRole(models.Model):
 class RBACAdminTree(models.Model):
     """ Control where in the tree a user can create groups """
 
-    member = models.ForeignKey(User, on_delete=models.CASCADE)
-    """ Standard User object """
+    group = models.ForeignKey(RBACAdminGroup, on_delete=models.CASCADE)
+    """ RBACGroup for this Role """
 
     tree = models.CharField(max_length=100)
     """ tree is an allowed entry point for a user. e.g. rbac.org.org """

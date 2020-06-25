@@ -16,6 +16,7 @@ urlpatterns = [
     path("post/search/", views.post_search, name="post_search"),
     path("post/edit/<int:post_id>", views.post_edit, name="post_edit"),
     path("forum/list", views.forum_list, name="forum_list"),
+    path("forum/create", views.forum_create, name="forum_create"),
     path("post/like-post/<int:pk>/", views.like_post, name="like_post"),
     path("post/like-comment1/<int:pk>/", views.like_comment1, name="like_comment1"),
     path("post/like-comment2/<int:pk>/", views.like_comment2, name="like_comment2"),

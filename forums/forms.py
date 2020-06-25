@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment1, Comment2
+from .models import Post, Comment1, Comment2, Forum
 from django_summernote.widgets import SummernoteInplaceWidget
 
 
@@ -103,3 +103,9 @@ class Comment2Form(forms.ModelForm):
     class Meta:
         model = Comment2
         fields = ("text", "post", "comment1")
+
+
+class ForumForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ["title", "description"]

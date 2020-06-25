@@ -277,7 +277,10 @@ def rbac_admin(request):
 
     roles = RBACAdminGroupRole.objects.filter(group__in=group_list)
 
-    trees = RBACAdminTree.objects.filter(member=request.user)
+    group_list = RBACAdminUserGroup.objects.filter(member=request.user).values_list(
+        "group"
+    )
+    trees = RBACAdminTree.objects.filter(group__in=group_list)
 
     return render(
         request,

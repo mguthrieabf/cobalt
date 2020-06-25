@@ -10,7 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
 from notifications.views import notify_happening
-from .forms import PostForm, CommentForm, Comment2Form
+from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
     Post,
@@ -41,7 +41,7 @@ def post_list(
         preview_view(Boolean): Flag for long or short view
         msg(str): message to go into title line explaining page
         all_forums(Boolean): True to show all allowed forums
-        forum(int): specific forum to view - only required for the searchparams
+        forum_id(int): specific forum to view - only required for the searchparams
 
     Returns:
         page(HTTPResponse): page with list of posts
@@ -64,8 +64,8 @@ def post_list(
     searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
 
     # add specific forum if requested
-    if forum_id:
-        searchparams = "%s/%s" % (forum_id, searchparams)
+    # if forum_id:
+    #     searchparams = "%s/%s" % (forum_id, searchparams)
 
     # get list of forums user cannot access
     blocked = rbac_user_blocked_for_model(
@@ -140,8 +140,19 @@ def post_list_single_forum(request, forum_id):
     Returns:
         page(HTTPResponse): page with list of posts
     """
+    try:
+        preview_view = int(request.GET.get("preview_view"))
+    except TypeError:
+        preview_view = False
+
     forum = get_object_or_404(Forum, pk=forum_id)
-    return post_list(request, forum_list=[forum_id], msg=forum.title, forum_id=forum_id)
+    return post_list(
+        request,
+        forum_list=[forum_id],
+        msg=forum.title,
+        forum_id=forum_id,
+        preview_view=preview_view,
+    )
 
 
 def post_list_filter(request):
@@ -619,3 +630,35 @@ def unfollow_forum_ajax(request, forum_id):
     follow = ForumFollow.objects.filter(forum=forum, user=request.user)
     follow.delete()
     return HttpResponse("ok")
+
+
+@login_required()
+def forum_create(request):
+    """ view to create a new forum
+
+    Args: request(HTTPRequest): standard request object
+
+    Returns:
+        HttpResponse
+    """
+
+    if not rbac_user_has_role(request.user, "forums.forumadmin.change"):
+        return HttpResponseForbidden()
+
+    if request.method == "POST":
+        form = ForumForm(request.POST)
+        if form.is_valid():
+            forum = Forum()
+            forum.title = form.cleaned_data["title"]
+            forum.description = form.cleaned_data["description"]
+            forum.save()
+            messages.success(
+                request, "Forum created", extra_tags="cobalt-message-success"
+            )
+            return redirect("forums:post_list_single_forum", forum_id=forum.id)
+        else:
+            print(form.errors)
+    else:
+        form = ForumForm()
+
+    return render(request, "forums/forum_create.html", {"form": form})

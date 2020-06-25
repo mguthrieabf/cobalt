@@ -404,13 +404,15 @@ def rbac_user_is_group_admin(member, group):
     path = group.name
     print("-->user_is_group_admin: Path is: %s" % path)
 
-    trees = RBACAdminTree.objects.filter(member=member)
+    group_list = RBACAdminUserGroup.objects.filter(member=member).values_list("group")
+
+    trees = RBACAdminTree.objects.filter(group__in=group_list)
 
     print(
         "-->user_is_group_admin: Count of RBACAdminTree for this user is: %s"
         % trees.count()
     )
-
+    # TODO: Tree is deeper than 2 levels - need to decide if we recurse the whole tree
     for tree in trees:
         print("-->user_is_group_admin: checking %s = %s" % (tree.tree, path))
         if tree.tree == path:

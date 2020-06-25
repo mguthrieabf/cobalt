@@ -23,7 +23,12 @@ jQuery(document).ready(function() {
       var all_forums = 0;
     }
 
-    window.location.href = "{% url "forums:post_list_filter" %}?preview_view=" + preview + "&all_forums=" + all_forums;
+// keep page number if set. 
+    if (all_forums){
+      window.location.href = "{% url "forums:post_list_filter" %}?preview_view=" + preview + "&all_forums=" + all_forums;
+    } else {
+      window.location.href = location.origin + location.pathname + "?preview_view=" + preview + "&all_forums=" + all_forums;
+    }
   });
 });
 

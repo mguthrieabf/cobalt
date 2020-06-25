@@ -52,7 +52,7 @@ class StripeTransaction(models.Model):
         help_text="User object associated with this transaction",
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="main_member",
     )
     """ Link to the member(User object) that is associated with this transaction."""
@@ -125,7 +125,7 @@ class StripeTransaction(models.Model):
         settings.AUTH_USER_MODEL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="linked_member",
     )
     """ A stripe payment can be linked to a payment to an organisation or
@@ -184,14 +184,14 @@ class MemberTransaction(AbstractTransaction):
     member = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="primary_member",
     )
 
     # Each record with have one of the following 3 things
     # This is linked to a stripe transaction, so from our point of view this is money in
     stripe_transaction = models.ForeignKey(
-        StripeTransaction, blank=True, null=True, on_delete=models.SET_NULL
+        StripeTransaction, blank=True, null=True, on_delete=models.PROTECT
     )
     # It is linked to another member, so internal transfer to or from this member
     # This will not have a stripe_transaction or an organisation set
@@ -199,7 +199,7 @@ class MemberTransaction(AbstractTransaction):
         settings.AUTH_USER_MODEL,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="other_member",
     )
     # It is linked to an organisation so usually a payment to a club or congress
@@ -207,7 +207,7 @@ class MemberTransaction(AbstractTransaction):
     # Could also be a payment from the organisation for a refund for example.
     # Can have a stripe_transaction as well
     organisation = models.ForeignKey(
-        Organisation, blank=True, null=True, on_delete=models.SET_NULL
+        Organisation, blank=True, null=True, on_delete=models.PROTECT
     )
 
     def save(self, *args, **kwargs):
@@ -236,23 +236,23 @@ class OrganisationTransaction(AbstractTransaction):
         Organisation,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="primary_org",
     )
     # Organisation can have one and only one of the 3 following things
     member = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.PROTECT
     )
 
     stripe_transaction = models.ForeignKey(
-        StripeTransaction, blank=True, null=True, on_delete=models.SET_NULL
+        StripeTransaction, blank=True, null=True, on_delete=models.PROTECT
     )
 
     other_organisation = models.ForeignKey(
         Organisation,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="secondary_org",
     )
 

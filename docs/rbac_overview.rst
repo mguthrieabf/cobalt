@@ -99,7 +99,7 @@ For example:
 
 1. "forums.forum.moderate" "Allow"
 2. "forums.post.5.edit" "Block"
-3. "organisations.organisation.7.admin" "Allow"
+3. "organisations.organisation.7.view" "Allow"
 
 Example 1 says that this user is allowed to moderate all forums (RBAC doesn't know
 what moderating is, it just handles the rules, it is up to each application
@@ -139,17 +139,17 @@ The following roles are currently supported:
   +------------------------+-----------------------------------------+
   | forums.forum           | *Ability to do something in all forums* |
   +------------------------+-----------------------------------------+
-  | payments.view.x        | *View payments details for org x*       |
+  | payments.manage.x      | *Do things with payments for org x*     |
   +------------------------+-----------------------------------------+
-  | payments.view          | *View payments details for any org*     |
-  +------------------------+-----------------------------------------+
-  | payments.manage.x      | *Make payments for org x*               |
-  +------------------------+-----------------------------------------+
-  | payments.manage        | *Make payments for any org*             |
+  | payments.manage        | *Do things with payments for any org*   |
   +------------------------+-----------------------------------------+
   | org.org.x              | *Management of org x*                   |
   +------------------------+-----------------------------------------+
   | org.org                | *Management of all orgs*                |
+  +------------------------+-----------------------------------------+
+  | scoring.score.x        | *Scoring for org x*                     |
+  +------------------------+-----------------------------------------+
+  | scoring.score          | *Scoring for all orgs*                  |
   +------------------------+-----------------------------------------+
 
 
@@ -262,6 +262,32 @@ So in this example, the rules to create would be:
   RBACGroupRole: forums.forum.15.view Allow
   RBACUserGroup: Fred, Wilma, Bam-Bam
 
+The Tree
+--------
+
+From a security execution point of view the group name is largely irrelevant.
+Simplistically we get a list of groups for a user and a list of roles from those
+groups to decide whether or not to allow an action. However, with potentially
+lots of groups we need some kind of way to navigate around them. This also allows
+users who need access to be able to see where this access could come from and
+who could give it to them.
+
+The tree looks similar to the RBAC roles with words separated by full stops, but
+they are not related. The tree represents a logical way to divide things up. A
+lot of admin is done at the club level, some at the state level and some at the
+highest level (in our case the ABF), so it makes sense to use this as part of the
+tree. e.g.:
+
+  org.abf.nsw.north-shore-bridge-club (NSWBA's part of the tree)
+  org.abf.nsw.trumps (Trumps part of the tree)
+  org.abf.sa.saba (SABA's part of the tree)
+  org.abf.nsw.nswba (NSWBA's part of the tree)
+  org.abf.abf (The ABF's part of the tree)
+
+Note that there is nothing in the code to enforce this and the tree can
+evolve as we see fit.
+
+
 Admin
 =====
 
@@ -278,7 +304,7 @@ Lets start with a simple example.
 
 .. code-block:: python
 
-  RBACGroup: "Springfield Bridge Club Directors"
+  RBACGroup: org.abf.qld.surfers.directors
   RBACUserGroup: Bob
   RBACUserGroup: Jane
   RBACUserGroup: Alice
@@ -289,46 +315,35 @@ Alice, and there is one role: *forums.forum.37.all*.
 
 Now lets add two administrators:
 
-**Note that admin has a matching set of models with the word Admin added.**
-
 .. code-block:: python
 
-  RBACAdminGroup: "Springfield Bridge Club Admins"
+  RBACAdminGroup: forums.forum.37
   RBACAdminUserGroup: Bob
   RBACAdminGroupRole: forums.forum.37
 
-  RBACAdminGroup: "Global Forum Admins"
+  RBACAdminGroup: forums.forum
   RBACAdminUserGroup: Fred
   RBACAdminGroupRole: forums.forum
 
-So here Bob, as well as being a member of the group "Springfield Bridge Club
-Directors", is also an administrator. Fred has access at a higher level and is
+So here Bob, as well as being a member of the directors group at Surfers,
+is also an administrator. Fred has access at a higher level and is
 an administrator for all forums.
 
-Both Bob and Fred can add or remove users from the group "Springfield Bridge
-Club Directors". However, using these rules, Fred could also add the role
-*forums.forum.6.view* to this group, while Bob could not.
-
-Lets keep this in place and add one further admin group into the mix:
+There are two different kinds of admin rights within RBAC. There is **WHAT**
+you can change (as shown above for Bob and Fred), but also **WHERE** you can
+change it.
 
 .. code-block:: python
 
-  RBACAdminGroup: "Springfield Bridge Club Admins - More Access"
-  RBACAdminUserGroup: Bob
-  RBACAdminGroupRole: organisations.organisation.142
-
-This rule gives Bob admin rights over organisation 142.
-
-Now Bob can also update our original group "Springfield Bridge Club Directors"
-to add the role *organisations.organisation.143.view*, however, based upon the
-rules we have shown here, Fred could not. Equally, if Bob does add this role,
-then Fred could not remove it.
+  RBACAdminTree..tree: forums.forum.37   (Where in the tree you have rights)
+  RBACAdminTree..group: forums.forums.37  (Group above with Bob)
+  RBACAdminTree..group: forums.forums   (Group above with Fred)
 
 So, in summary:
 
 - Administrator access applies at the role level, not directly to groups.
-- If an administrator has rights to a group through any admin role,
-  then they can change the membership of that group (add or remove users).
+- Administrators need both admin access to the role and write access to the
+  tree in order to make changes.
 - An administrator can only change the roles within a group that they have
   explicit rights to. They cannot change any other roles.
 
@@ -339,9 +354,7 @@ Administration of Administrators
 --------------------------------
 
 Any admin can create or delete administrators within their sphere of
-administration. So if they want to then Bob can give Fred access to
-"Springfield Bridge Club Admins - More Access" and Fred can give Bob access to
-"Global Forum Admins".
+administration. 
 
 We will need some sort of a review of access but nobody can ever give another
 user more access than they already have. The roles such as *forums.forum* are
