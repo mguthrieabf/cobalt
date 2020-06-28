@@ -29,10 +29,9 @@ import csv
 from datetime import datetime
 import requests
 import stripe
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
@@ -44,8 +43,10 @@ from cobalt.settings import (
 )
 from .forms import TestTransaction, MemberTransfer, ManualTopup
 from .core import payment_api, get_balance, auto_topup_member
-from .models import MemberTransaction, StripeTransaction
+from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
 from accounts.models import User
+from cobalt.utils import cobalt_paginator
+from organisations.models import Organisation
 
 ####################
 # Home             #
@@ -195,27 +196,59 @@ def statement(request):
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request)
 
-    page = request.GET.get("page", 1)
-
-    paginator = Paginator(events_list, 30)
-    try:
-        events = paginator.page(page)
-    except PageNotAnInteger:
-        events = paginator.page(1)
-    except EmptyPage:
-        events = paginator.page(paginator.num_pages)
+    things = cobalt_paginator(request, events_list, 30)
 
     return render(
         request,
         "payments/statement.html",
         {
-            "events": events,
+            "things": things,
             "user": request.user,
             "summary": summary,
             "club": club,
             "balance": balance,
             "auto_button": auto_button,
         },
+    )
+
+
+#####################
+# statement_org     #
+#####################
+@login_required()
+def statement_org(request, org_id):
+    """ Organisation statement view.
+
+    Basic view of statement showing transactions in a web page.
+
+    Args:
+        request: standard request object
+        org_id: organisation to view
+
+    Returns:
+        HTTPResponse
+
+    """
+
+    organisation = get_object_or_404(Organisation, pk=org_id)
+
+    # get balance
+    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        balance = "Nil"
+
+    events_list = OrganisationTransaction.objects.filter(
+        organisation=organisation
+    ).order_by("-created_date")
+
+    things = cobalt_paginator(request, events_list, 30)
+
+    return render(
+        request,
+        "payments/statement_org.html",
+        {"things": things, "balance": balance, "org": organisation},
     )
 
 

@@ -62,3 +62,15 @@ If you are paginating over a search list you will need to supply your search str
         "forums/post_search.html",
         {"filter": post_filter, "things": response, "searchparams": searchparams},
     )
+
+Pagination Formatter
+--------------------
+
+Pagination in views is a common thing so we have a central utility for it::
+
+    from cobalt.utils import cobalt_paginator
+
+    my_list = ["some", "list", "to", "paginate"]
+    items_per_page = 20
+    things = cobalt_paginator(request, my_list, items_per_page)
+    return render(request, "mypage.html" {"things": things})

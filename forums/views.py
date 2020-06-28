@@ -6,10 +6,11 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
 from notifications.views import notify_happening
+from cobalt.utils import cobalt_paginator
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
@@ -86,14 +87,7 @@ def post_list(
         all_forums = True
 
     # handle pagination
-    page = request.GET.get("page", 1)
-    paginator = Paginator(posts_list, 4)
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+    posts = cobalt_paginator(request, posts_list, 30)
 
     #    print(posts)
 

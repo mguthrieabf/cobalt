@@ -21,55 +21,24 @@
           </tr>
         </thead>
         <tbody>
-          {% for note in notes %}
+          {% for thing in things %}
           <tr>
-          <td>{{note.created_date}}
-          {% if note.acknowledged %}
-            <td>{{ note.message }}
+          <td>{{thing.created_date}}
+          {% if thing.acknowledged %}
+            <td>{{ thing.message }}
           {% else %}
-            <td><b>{{ note.message }}</b>
+            <td><b>{{ thing.message }}</b>
             {% endif %}
-            {{ note.acknowledged }}
-          <td><a href="{% url "notifications:passthrough" id=note.id %}" class="btn btn-primary btn-sm">View</a>
-          <td><a href="{% url "notifications:delete" id=note.id %}" class="btn btn-danger btn-sm">Delete</a>
+            {{ thing.acknowledged }}
+          <td><a href="{% url "notifications:passthrough" id=thing.id %}" class="btn btn-primary btn-sm">View</a>
+          <td><a href="{% url "notifications:delete" id=thing.id %}" class="btn btn-danger btn-sm">Delete</a>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-
-  <!-- standard pagination footer -->
-  {% if notes.has_other_pages %}
-    <ul class="pagination">
-      {% if notes.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ notes.previous_page_number }}">Previous</a>
-        </li>
-      {% else %}
-        <li class="page-item disabled">
-          <span class="page-link">Previous</span>
-        </li>
-      {% endif %}
-      {% for i in notes.paginator.page_range %}
-        {% if notes.number == i %}
-          <li class="page-item active">    <span class="page-link">
-                {{ i }}
-                <span class="sr-only">(current)</span>
-              </span>
-            </li>
-        {% else %}
-          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}&nbsp;</a></li>
-        {% endif %}
-      {% endfor %}
-      {% if notes.has_next %}
-        <li class="page-item"><a class="page-link" href="?page={{ notes.next_page_number }}">Next</a></li>
-      {% else %}
-        <li class="page-item disabled"><span>Next</span></li>
-      {% endif %}
-    </ul>
-  {% endif %}
-  <!-- end of standard pagination footer  -->
+ {% include 'pagination_footer.html' %}
 </div>
 
 {% endblock %}

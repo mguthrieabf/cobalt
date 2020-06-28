@@ -14,8 +14,8 @@ from django.utils.html import strip_tags
 from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
 from django.urls import reverse
 from django.shortcuts import render, redirect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+from cobalt.utils import cobalt_paginator
 
 
 def send_cobalt_email(to_address, subject, msg):
@@ -269,18 +269,11 @@ def delete_all_in_app_notifications(member):
 
 @login_required
 def homepage(request):
+    """ homepage for notifications listings """
+
     notes = InAppNotification.objects.filter(member=request.user)
-    page = request.GET.get("page", 1)
-
-    paginator = Paginator(notes, 10)
-    try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
-
-    return render(request, "notifications/homepage.html", {"notes": notes})
+    things = cobalt_paginator(request, notes, 10)
+    return render(request, "notifications/homepage.html", {"things": things})
 
 
 @login_required

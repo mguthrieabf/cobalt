@@ -1086,7 +1086,7 @@ def update_organisation(
     act.member = member
     act.amount = amount
     act.other_organisation = other_organisation
-    act.balance = balance
+    act.balance = float(balance) + float(amount)
     act.description = description
     act.type = payment_type
 

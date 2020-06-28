@@ -23,23 +23,8 @@
 <div class="">
   <div class="card">
     <div class="card-header card-header-warning">
-      <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME}}s - {{ request.user.full_name }}</h1>
-      <h3>{% if summary.IsActive %}{{club}}{% else %}Inactive - Used to play at {{club}}{% endif %}</h3>
+      <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME}}s - {{ org }}</h1>
       <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}{{ balance|intcomma }}</h2>
-
-          <div class="float-left">
-
-              <b>Auto Top Up</b>
-              {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
-              <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm"
-              {% if auto_button %} checked {% endif %}
-               >
-              {% if auto_button %}
-                &nbsp;<a class="btn btn-sm" href="{% url "payments:setup_autotopup" %}">Update Card Details</a>
-              {% endif %}
-              <div id="console-event"></div>
-          </div>
-
     </div>
     <div class="card-body table-responsive">
       <div class="container">
