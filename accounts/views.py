@@ -386,6 +386,9 @@ def profile(request):
         if form.is_valid():
             form.save()
             # auto top up select list needs to be refreshed
+            # Fix DOB format for browser - expects DD/MM/YYYY
+            if request.user.dob:
+                request.user.dob = request.user.dob.strftime("%d/%m/%Y")
             form = UserUpdateForm(instance=request.user)
             messages.success(
                 request, "Profile Updated", extra_tags="cobalt-message-success"

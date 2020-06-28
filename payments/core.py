@@ -494,6 +494,7 @@ def payment_api(
             if return_code:  # success
                 update_account(
                     member=member,
+                    other_member=other_member,
                     amount=-amount,
                     organisation=organisation,
                     description=description,

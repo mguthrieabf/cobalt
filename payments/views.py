@@ -31,7 +31,7 @@ import requests
 import stripe
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from easy_pdf.rendering import render_to_pdf_response
@@ -142,7 +142,10 @@ def statement_common(request):
 
     # Get summary data
     qry = "%s/mps/%s" % (GLOBAL_MPSERVER, request.user.system_number)
-    summary = requests.get(qry).json()[0]
+    try:
+        summary = requests.get(qry).json()[0]
+    except IndexError:
+        raise Http404
 
     # Set active to a boolean
     if summary["IsActive"] == "Y":
