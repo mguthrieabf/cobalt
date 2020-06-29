@@ -16,16 +16,25 @@ from .core import (
     rbac_access_in_english,
     rbac_admin_all_rights,
     rbac_get_admins_for_group,
+    rbac_user_role_list,
 )
 from .forms import AddGroup
 from django.contrib import messages
+from organisations.models import Organisation
 
 
 @login_required
 def main_admin_screen(request):
     """ Shows the main admin screen - maybe shouldn't live in in RBAC """
 
-    return render(request, "rbac/main-admin-screen.html")
+    payments_admin = rbac_user_role_list(request.user, "payments", "manage")
+    org_list = []
+    for item in payments_admin:
+        org_list.append(item[0])
+
+    orgs = Organisation.objects.filter(pk__in=org_list)
+
+    return render(request, "rbac/main-admin-screen.html", {"payments_admin": orgs})
 
 
 @login_required

@@ -26,4 +26,9 @@ urlpatterns = [
     path("manual-topup", views.manual_topup, name="manual_topup"),
     path("cancel-autotopup", views.cancel_auto_top_up, name="cancel_autotopup"),
     path("statement-org/<int:org_id>/", views.statement_org, name="statement_org"),
+    path(
+        "statement-org-summary/<int:org_id>/<str:range>",
+        views.statement_org_summary_ajax,
+        name="statement_org_summary_ajax",
+    ),
 ]

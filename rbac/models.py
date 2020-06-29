@@ -135,10 +135,10 @@ class RBACAdminGroup(models.Model):
     name_qualifier = models.CharField(max_length=50)
     """ eg "organisations.trumps" """
 
-    name_item = models.CharField(max_length=50)
+    name_item = models.CharField(max_length=100)
     """ chosen by the admin. appends onto name_qualifier """
 
-    description = models.CharField(max_length=50)
+    description = models.CharField(max_length=100)
     """ Free format decription """
 
     created_date = models.DateTimeField("Create Date", default=timezone.now)

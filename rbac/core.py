@@ -235,7 +235,7 @@ def rbac_user_has_role(member, role):
         .values_list("default_behaviour")
         .first()[0]
     )
-    return default
+    return allow_to_boolean(default)
 
 
 def allow_to_boolean(test_string):
@@ -544,3 +544,50 @@ def rbac_get_admins_for_group(group):
     trees = RBACAdminTree.objects.filter(tree=path)
     print(trees)
     return trees
+
+
+def rbac_add_user_to_admin_group(group, user):
+    """ adds a user to an admin group """
+
+    if not RBACAdminUserGroup.objects.filter(group=group, member=user).exists():
+        item = RBACAdminUserGroup(group=group, member=user)
+        item.save()
+
+
+def rbac_add_role_to_admin_group(group, app, model, model_id=None):
+    """ adds a role to an admin group """
+
+    if not RBACAdminGroupRole.objects.filter(
+        group=group, app=app, model=model, model_id=model_id
+    ).exists():
+        item = RBACAdminGroupRole(group=group, app=app, model=model, model_id=model_id)
+        item.save()
+
+
+def rbac_user_role_list(user, app, model):
+    """ return list of roles a user has for part of the tree.
+
+    This takes in a user and and app/model combination and returns the list of
+    model_ids and actions that a user can perform. For example, if you provide::
+
+        app = "forums"
+        model = "forum"
+
+    This could return::
+
+        [(23, "edit"), (23, "delete"), (55, "edit")]
+
+    Only returns things with "Allow" so only works for Block default models.
+    """
+
+    groups = RBACUserGroup.objects.filter(member=user).values_list("group")
+    matches = RBACGroupRole.objects.filter(
+        group__in=groups, app=app, model=model, rule_type="Allow"
+    )
+
+    ret = []
+    for match in matches:
+        item = (match.model_id, match.action)
+        ret.append(item)
+
+    return ret

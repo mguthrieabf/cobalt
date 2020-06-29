@@ -66,5 +66,24 @@
     </div>
   </div>
 </div>
+{% if payments_admin %}
+  <div class="card col-lg-9">
+    <div class="card-header card-header-info">
+      <h3 class="card-title">Payments for Organisations</h3>
+    </div>
+    <div class="card-body" style="text-align: left">
+      <div class="container">
+        <div class="row">
+        <ul>
+          {% for org in payments_admin %}
+          <li><a href="{% url "payments:statement_org" org_id=org.id %}">{{org}}</a></li>
+          {% endfor %}
+        </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
 <div>
 {% endblock %}

@@ -26,12 +26,14 @@ Key Points:
 """
 
 import csv
-from datetime import datetime
+import datetime
 import requests
 import stripe
+from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
+from django.db.models import Sum
 from django.contrib import messages
 from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
@@ -47,6 +49,7 @@ from .models import MemberTransaction, StripeTransaction, OrganisationTransactio
 from accounts.models import User
 from cobalt.utils import cobalt_paginator
 from organisations.models import Organisation
+from rbac.core import rbac_user_has_role
 
 ####################
 # Home             #
@@ -232,6 +235,9 @@ def statement_org(request, org_id):
 
     organisation = get_object_or_404(Organisation, pk=org_id)
 
+    if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
+        return HttpResponse("Access Denied")
+
     # get balance
     last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
     if last_tran:
@@ -239,6 +245,23 @@ def statement_org(request, org_id):
     else:
         balance = "Nil"
 
+    # get summary
+    today = timezone.now()
+    ref_date = today - datetime.timedelta(days=30)
+    summary = (
+        OrganisationTransaction.objects.filter(
+            organisation=organisation, created_date__gte=ref_date
+        )
+        .values("type")
+        .annotate(total=Sum("amount"))
+        .order_by("-total")
+    )
+
+    total = 0.0
+    for item in summary:
+        total = total + float(item["total"])
+
+    # get details
     events_list = OrganisationTransaction.objects.filter(
         organisation=organisation
     ).order_by("-created_date")
@@ -248,7 +271,63 @@ def statement_org(request, org_id):
     return render(
         request,
         "payments/statement_org.html",
-        {"things": things, "balance": balance, "org": organisation},
+        {
+            "things": things,
+            "balance": balance,
+            "org": organisation,
+            "summary": summary,
+            "total": total,
+        },
+    )
+
+
+def statement_org_summary_ajax(request, org_id, range):
+    """ Called by the org statement when the summary date range changes
+
+    Args:
+        request (HTTPRequest): standard request object
+        org_id(int): pk of the org to query
+        range(str): range to include in summary
+
+    Returns:
+        HTTPResponse: data for table
+
+    """
+    if request.method == "GET":
+
+        organisation = get_object_or_404(Organisation, pk=org_id)
+
+        if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
+            return HttpResponse("Access Denied")
+
+        if range == "All":
+            summary = (
+                OrganisationTransaction.objects.filter(organisation=organisation)
+                .values("type")
+                .annotate(total=Sum("amount"))
+                .order_by("-total")
+            )
+        else:
+            days = int(range)
+            today = timezone.now()
+            ref_date = today - datetime.timedelta(days=days)
+            summary = (
+                OrganisationTransaction.objects.filter(
+                    organisation=organisation, created_date__gte=ref_date
+                )
+                .values("type")
+                .annotate(total=Sum("amount"))
+                .order_by("-total")
+            )
+
+    total = 0.0
+    for item in summary:
+        total = total + float(item["total"])
+
+    return render(
+        request,
+        "payments/statement_org_summary_ajax.html",
+        {"summary": summary, "total": total},
     )
 
 

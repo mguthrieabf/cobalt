@@ -24,34 +24,40 @@
   <div class="card">
     <div class="card-header card-header-warning">
       <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME}}s - {{ org }}</h1>
+      <h4 class="mb-0">{{ GLOBAL_ORG}} Club No. {{ org.org_id }}</h4>
+      <h4 class="mt-0 mb-0">{{ org.address1 }}</h4>
+      <h4 class="mt-0 mb-0">{{ org.address2 }}</h4>
+      <h4 class="mt-0 mb-0">{{ org.suburb }}</h4>
+      <h4 class="mt-0 mb-0">{{ org.state }} {{ org.postcode }}</h4>
       <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}{{ balance|intcomma }}</h2>
     </div>
     <div class="card-body table-responsive">
-      <div class="container">
+      <h2>Summary</h2>
+      <div class="row mb-2">
+        <div class="col-3">
+          <i class="material-icons" style="vertical-align: middle;">date_range</i>
+          <select class="btn btn-info btn-sm" name="summary" id="id_summary">
+            <option value="30">Last 30 Days</option>
+            <option value="90">Last 90 Days</option>
+            <option value="365">Last Year</option>
+            <option value="All">All Data</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div  id="summary_table">
+{% include 'payments/statement_org_summary_ajax.html' %}
+        </div>
+      </div>
+      <hr>
+      <h2>Transactions</h2>
+      <div class="container-flex">
         <div class="row">
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 170px">
-              <i class="material-icons">people_alt</i>&nbsp;Pay A Friend
-            </button>
-            </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 170px">
-              <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
-            </button>
-            </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
+          <div class="col-12">
+            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round float-right" style="width: 170px">
               <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
               </button>
             </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
-              <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
-              </button>
-          </a>
           </div>
         </div>
 
@@ -59,7 +65,7 @@
 
       <hr>
 
-{% include 'payments/statement_list.html' %}
+{% include 'payments/statement_org_list.html' %}
 {% include 'pagination_footer.html' %}
 
 
@@ -75,23 +81,25 @@
 
 <script>
 $( document ).ready(function() {
-  if(window.performance.navigation.type === 2) {
-     // the page was navigated to via the forward or back button
-     // refresh to make sure auto top up status is correct
-     location.reload();
-  }
-});
 
-// change to auto top up toggle
+
+// change to range
   $(function() {
-    $('#auto-button').change(function() {
-      if ($(this).prop('checked')) {
-        window.location.href = "{% url "payments:setup_autotopup" %}";
-      } else {
-        window.location.href = "{% url "payments:cancel_autotopup" %}";
-      }
-    })
-  })
+    $('#id_summary').change(function() {
+      var range = $('#id_summary').val();
+      // can't use url as we generate one value dynamically
+      var strURL = "/payments/statement-org-summary/{{ org.id }}/" + range;
+
+      $.ajax({
+          url: strURL,
+          context: document.body,
+          success: function(txt){
+            $("#summary_table").html(txt);
+          }
+      });
+    });
+  });
+});
 </script>
 
 {% endblock %}
