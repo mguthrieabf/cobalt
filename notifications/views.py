@@ -87,9 +87,9 @@ def get_notifications_for_user(user):
         notifications.append(
             (note.message, reverse("notifications:passthrough", kwargs={"id": note.id}))
         )
-    if note_count > 10:
+    if note_count > 0:
         notifications.append(
-            ("See all notifications", reverse("notifications:homepage"))
+            ("---- Show all notifications ----", reverse("notifications:homepage"))
         )
     #
     return (note_count, notifications)
