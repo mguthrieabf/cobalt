@@ -5,6 +5,6 @@ from rbac.management.commands.rbac_core import create_RBAC_action, create_RBAC_d
 class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Running add_rbac_static_payments")
-        create_RBAC_default(self, "payments", "manage", "Allow")
+        create_RBAC_default(self, "payments", "manage", "Block")
         create_RBAC_action(self, "payments", "manage", "view")
         create_RBAC_action(self, "payments", "manage", "edit")
