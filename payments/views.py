@@ -35,7 +35,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.db.models import Sum
 from django.contrib import messages
-from easy_pdf.rendering import render_to_pdf_response
+
+# from easy_pdf.rendering import render_to_pdf_response
 from logs.views import log_event
 from cobalt.settings import (
     STRIPE_SECRET_KEY,
@@ -407,24 +408,26 @@ def statement_pdf(request):
 
 
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(
-        request
-    )  # pylint: disable=unused-variable
+    #    (summary, club, balance, auto_button, events_list) = statement_common(
+    #        request
+    #    )  # pylint: disable=unused-variable
 
-    today = datetime.today().strftime("%-d %B %Y")
+    #    today = datetime.today().strftime("%-d %B %Y")
 
-    return render_to_pdf_response(
-        request,
-        "payments/statement_pdf.html",
-        {
-            "events": events_list,
-            "user": request.user,
-            "summary": summary,
-            "club": club,
-            "balance": balance,
-            "today": today,
-        },
-    )
+    # return render_to_pdf_response(
+    #     request,
+    #     "payments/statement_pdf.html",
+    #     {
+    #         "events": events_list,
+    #         "user": request.user,
+    #         "summary": summary,
+    #         "club": club,
+    #         "balance": balance,
+    #         "today": today,
+    #     },
+    # )
+
+    return
 
 
 ############################
