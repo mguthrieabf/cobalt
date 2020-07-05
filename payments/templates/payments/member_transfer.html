@@ -97,7 +97,7 @@
 
                <div class="d-flex">
                 <div>
-                  <input type="submit" value="Transfer" id="cobalt-button" class="btn btn-danger center-text" disabled>
+                  <input type="submit" value="Transfer" id="cobalt-button" onclick="this.disabled=true,this.form.submit();" class="btn btn-success center-text" disabled>
                 </div>
                 <div class="ml-auto">
                  <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>

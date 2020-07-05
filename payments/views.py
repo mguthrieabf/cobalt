@@ -534,7 +534,7 @@ def setup_autotopup(request):
             card_exp_month = card.exp_month
             card_exp_year = card.exp_year
             card_last4 = card.last4
-            warn = f"This will override your {card_type} card ending in {card_last4} \
+            warn = f"Changing card details will override your {card_type} card ending in {card_last4} \
                     with expiry {card_exp_month}/{card_exp_year}"
 
     else:
