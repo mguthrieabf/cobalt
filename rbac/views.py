@@ -17,6 +17,7 @@ from .core import (
     rbac_admin_all_rights,
     rbac_get_admins_for_group,
     rbac_user_role_list,
+    rbac_user_has_role,
 )
 from .forms import AddGroup
 from django.contrib import messages
@@ -34,7 +35,13 @@ def main_admin_screen(request):
 
     orgs = Organisation.objects.filter(pk__in=org_list)
 
-    return render(request, "rbac/main-admin-screen.html", {"payments_admin": orgs})
+    payments_site_admin = rbac_user_has_role(request.user, "payments.global.view")
+
+    return render(
+        request,
+        "rbac/main-admin-screen.html",
+        {"payments_admin": orgs, "payments_site_admin": payments_site_admin},
+    )
 
 
 @login_required

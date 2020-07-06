@@ -18,6 +18,11 @@ urlpatterns = [
         name="paymentsuperintent",
     ),
     path("statement", views.statement, name="statement"),
+    path(
+        "statement-admin-view/<int:member_id>",
+        views.statement_admin_view,
+        name="statement_admin_view",
+    ),
     path("statement-csv", views.statement_csv, name="statement_csv"),
     path("statement-pdf", views.statement_pdf, name="statement_pdf"),
     path("setup-autotopup", views.setup_autotopup, name="setup_autotopup"),
@@ -25,6 +30,11 @@ urlpatterns = [
     path("member-transfer", views.member_transfer, name="member_transfer"),
     path("manual-topup", views.manual_topup, name="manual_topup"),
     path("cancel-autotopup", views.cancel_auto_top_up, name="cancel_autotopup"),
+    path(
+        "statement-admin-summary",
+        views.statement_admin_summary,
+        name="statement_admin_summary",
+    ),
     path("statement-org/<int:org_id>/", views.statement_org, name="statement_org"),
     path(
         "statement-org-summary/<int:org_id>/<str:range>",

@@ -84,6 +84,22 @@
     </div>
   </div>
 {% endif %}
+{% if payments_site_admin %}
+  <div class="card col-lg-9">
+    <div class="card-header card-header-info">
+      <h3 class="card-title">Global Payments</h3>
+    </div>
+    <div class="card-body" style="text-align: left">
+      <div class="container">
+        <div class="row">
+        <ul>
+          <li><a href="{% url "payments:statement_admin_summary" %}">{{ GLOBAL_ORG}} Payments</a></li>
+        </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
 
 <div>
 {% endblock %}

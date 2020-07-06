@@ -126,14 +126,13 @@ def test_payment(request):
 ####################
 # statement_common #
 ####################
-@login_required()
-def statement_common(request):
+def statement_common(user):
     """ Member statement view - common part across online, pdf and csv
 
     Handles the non-formatting parts of statements.
 
     Args:
-        request (str): standard request object
+        user (User): standard user object
 
     Returns:
         5-element tuple containing
@@ -146,7 +145,7 @@ def statement_common(request):
     """
 
     # Get summary data
-    qry = "%s/mps/%s" % (GLOBAL_MPSERVER, request.user.system_number)
+    qry = "%s/mps/%s" % (GLOBAL_MPSERVER, user.system_number)
     try:
         summary = requests.get(qry).json()[0]
     except IndexError:
@@ -163,19 +162,19 @@ def statement_common(request):
     club = requests.get(qry).json()[0]["ClubName"]
 
     # get balance
-    last_tran = MemberTransaction.objects.filter(member=request.user).last()
+    last_tran = MemberTransaction.objects.filter(member=user).last()
     if last_tran:
         balance = last_tran.balance
     else:
         balance = "Nil"
 
     # get auto top up
-    if request.user.stripe_auto_confirmed:
+    if user.stripe_auto_confirmed:
         auto_button = True
     else:
         auto_button = False
 
-    events_list = MemberTransaction.objects.filter(member=request.user).order_by(
+    events_list = MemberTransaction.objects.filter(member=user).order_by(
         "-created_date"
     )
 
@@ -198,7 +197,7 @@ def statement(request):
         HTTPResponse
 
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(request)
+    (summary, club, balance, auto_button, events_list) = statement_common(request.user)
 
     things = cobalt_paginator(request, events_list, 30)
 
@@ -208,6 +207,45 @@ def statement(request):
         {
             "things": things,
             "user": request.user,
+            "summary": summary,
+            "club": club,
+            "balance": balance,
+            "auto_button": auto_button,
+        },
+    )
+
+
+################################
+# statement_admin_view         #
+################################
+@login_required()
+def statement_admin_view(request, member_id):
+    """ Member statement view for administrators.
+
+    Basic view of statement showing transactions in a web page. Used by an
+    administrator to view a members statement
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HTTPResponse
+
+    """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return HttpResponse("access denied")
+
+    user = get_object_or_404(User, pk=member_id)
+    (summary, club, balance, auto_button, events_list) = statement_common(user)
+
+    things = cobalt_paginator(request, events_list, 30)
+
+    return render(
+        request,
+        "payments/statement.html",
+        {
+            "things": things,
+            "user": user,
             "summary": summary,
             "club": club,
             "balance": balance,
@@ -237,7 +275,8 @@ def statement_org(request, org_id):
     organisation = get_object_or_404(Organisation, pk=org_id)
 
     if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
-        return HttpResponse("Access Denied")
+        if not rbac_user_has_role(request.user, "payments.global.view"):
+            return HttpResponse("Access Denied")
 
     # get balance
     last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
@@ -349,7 +388,7 @@ def statement_csv(request):
 
     """
     (summary, club, balance, auto_button, events_list) = statement_common(
-        request
+        request.user
     )  # pylint: disable=unused-variable
     today = datetime.today().strftime("%-d %B %Y at %I:%H:%M")
 
@@ -715,3 +754,48 @@ def cancel_auto_top_up(request):
 
     balance = get_balance(request.user)
     return render(request, "payments/cancel_autotopup.html", {"balance": balance})
+
+
+###########################
+# statement_admin_summary #
+###########################
+def statement_admin_summary(request):
+    """ Main statement page for system administrators
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return HttpResponse("Permission denied")
+
+    total_members = User.objects.count()
+    auto_top_up = User.objects.filter(stripe_auto_confirmed=True).count()
+    total_balance_members_list = MemberTransaction.objects.distinct("member")
+    total_balance_members = 0
+    for item in total_balance_members_list:
+        total_balance_members += item.balance
+
+    total_orgs = Organisation.objects.count()
+    total_balance_orgs_list = OrganisationTransaction.objects.distinct("organisation")
+    total_balance_orgs = 0
+    for item in total_balance_orgs_list:
+        total_balance_orgs += item.balance
+
+    return render(
+        request,
+        "payments/statement_admin_summary.html",
+        {
+            "total_members": total_members,
+            "auto_top_up": auto_top_up,
+            "total_balance_members": total_balance_members,
+            "total_orgs": total_orgs,
+            "total_balance_orgs": total_balance_orgs,
+            "members_with_balances": total_balance_members_list.count(),
+            "orgs_with_balances": total_balance_orgs_list.count(),
+            "balance": total_balance_orgs + total_balance_members,
+        },
+    )

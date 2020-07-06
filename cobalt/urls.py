@@ -23,6 +23,7 @@ urlpatterns = [
     path("payments/", include("payments.urls", namespace="payments")),
     path("rbac/", include("rbac.urls", namespace="rbac")),
     path("logs/", include("logs.urls", namespace="logs")),
+    path("organisations/", include("organisations.urls", namespace="organisations")),
     path("support", include("support.urls", namespace="support")),
     path("summernote/", include("django_summernote.urls")),
     path("health/", include("health_check.urls")),
