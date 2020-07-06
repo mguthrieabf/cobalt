@@ -577,7 +577,7 @@ def member_transfer(request):
                 amount=form.cleaned_data["amount"],
                 member=request.user,
                 other_member=form.cleaned_data["transfer_to"],
-                payment_type="Pay a Friend",
+                payment_type="Member Transfer",
             )
         else:
             print(form.errors)

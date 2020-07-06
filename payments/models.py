@@ -25,7 +25,7 @@ TRANSACTION_TYPE = [
     ("CC Payment", "Credit Card payment"),
     ("Club Payment", "Club game payment"),
     ("Club Membership", "Club membership payment"),
-    ("Pay a Friend", "Payment to another member"),
+    ("Member Transfer", "Payment to another member"),
     ("Miscellaneous", "Miscellaneous payment"),
 ]
 
