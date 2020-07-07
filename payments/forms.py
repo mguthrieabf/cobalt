@@ -8,7 +8,7 @@ from cobalt.settings import (
     AUTO_TOP_UP_MAX_AMT,
     GLOBAL_CURRENCY_SYMBOL,
 )
-from .models import TRANSACTION_TYPE
+from .models import TRANSACTION_TYPE, MemberTransaction, OrganisationTransaction
 
 
 class TestTransaction(forms.Form):
@@ -72,3 +72,45 @@ class ManualTopup(forms.Form):
             self._errors["amount"] = "Please enter a value"
 
         return self.cleaned_data
+
+
+class SettlementForm(forms.Form):
+    """ For payments to Orgs """
+
+    CARD_CHOICES = [
+        ("Dummy", "Dummy"),
+    ]
+
+    settle_list = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ dynamic override of checkbox list """
+        self.orgs = kwargs.pop("orgs", None)
+        super(SettlementForm, self).__init__(*args, **kwargs)
+        self.fields["settle_list"].choices = self.orgs
+
+
+class AdjustMemberForm(forms.ModelForm):
+    """ For dodgy changes to members """
+
+    class Meta:
+        model = MemberTransaction
+        fields = (
+            "member",
+            "description",
+            "amount",
+        )
+
+
+class AdjustOrgForm(forms.ModelForm):
+    """ For dodgy changes to orgs """
+
+    class Meta:
+        model = OrganisationTransaction
+        fields = (
+            "organisation",
+            "description",
+            "amount",
+        )

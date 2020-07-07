@@ -27,6 +27,8 @@ TRANSACTION_TYPE = [
     ("Club Membership", "Club membership payment"),
     ("Member Transfer", "Payment to another member"),
     ("Miscellaneous", "Miscellaneous payment"),
+    ("Settlement", "Settlement payment"),
+    ("Manual Adjustment", "Manual adjustment"),
 ]
 
 

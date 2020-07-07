@@ -12,7 +12,7 @@
     </div>
     <div class="card-body table-responsive">
       <div class="card">
-        <div class="card-header card-header-success">
+        <div class="card-header card-header-warning">
           <h2>Members</h2>
         </div>
         <div class="card-body">
@@ -36,6 +36,7 @@
           </table>
           {% include "generic_user_search_body.html" %}
           <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search" data-target="#cobalt_general_member_search"><span style="color: white;">Lookup Member Statement</span></a>
+          <a href="{% url "payments:manual_adjust_member" %}" class="btn btn-info btn-sm">Manual Adjustment</a>
         </div>
       </div>
       <br>
@@ -61,8 +62,26 @@
           </table>
           {% include "generic_org_search_body.html" %}
           <a class="cobalt_generic_org btn btn-warning btn-sm" data-toggle="modal" id="id_org_search" data-target="#cobalt_general_org_search"><span style="color: white;">Lookup Org Statement</span></a>
+          <a href="{% url "payments:manual_adjust_org" %}" class="btn btn-info btn-sm">Manual Adjustment</a>
+          <br>
+          <a href="{% url "payments:settlement" %}" class="btn btn-sm btn-danger">Settlement</a>
         </div>
       </div>
+      <br>
+      <div class="card">
+        <div class="card-header card-header-danger">
+          <h2>Stripe</h2>
+        </div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <td>Last 30 days:</td>
+              <td class="text-right px-2">{{ GLOBAL_CURRENCY_SYMBOL }}{{ stripe.amount__sum|floatformat:2|intcomma }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

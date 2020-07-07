@@ -67,6 +67,6 @@ def org_detail_ajax(request):
                     template_name="organisations/org_detail_ajax.html",
                     context={"org": org},
                 )
-                data_dict = {"data": html}
+                data_dict = {"data": html, "org": org.name}
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={"error": "Invalid request"})

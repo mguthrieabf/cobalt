@@ -43,9 +43,24 @@ from cobalt.settings import (
     GLOBAL_MPSERVER,
     AUTO_TOP_UP_LOW_LIMIT,
     AUTO_TOP_UP_DEFAULT_AMT,
+    GLOBAL_ORG,
+    GLOBAL_CURRENCY_SYMBOL,
 )
-from .forms import TestTransaction, MemberTransfer, ManualTopup
-from .core import payment_api, get_balance, auto_topup_member
+from .forms import (
+    TestTransaction,
+    MemberTransfer,
+    ManualTopup,
+    SettlementForm,
+    AdjustMemberForm,
+    AdjustOrgForm,
+)
+from .core import (
+    payment_api,
+    get_balance,
+    auto_topup_member,
+    update_organisation,
+    update_account,
+)
 from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
 from accounts.models import User
 from cobalt.utils import cobalt_paginator
@@ -338,7 +353,8 @@ def statement_org_summary_ajax(request, org_id, range):
         organisation = get_object_or_404(Organisation, pk=org_id)
 
         if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
-            return HttpResponse("Access Denied")
+            if not rbac_user_has_role(request.user, "payments.global.view"):
+                return HttpResponse("Access Denied")
 
         if range == "All":
             summary = (
@@ -650,6 +666,7 @@ def member_transfer(request):
 ########################
 # update_auto_amount   #
 ########################
+@login_required()
 def update_auto_amount(request):
     """ Called by the auto top up page when a user changes the amount of the auto top up.
 
@@ -674,6 +691,7 @@ def update_auto_amount(request):
 ###################
 # manual_topup    #
 ###################
+@login_required()
 def manual_topup(request):
     """ Page to allow credit card top up regardless of auto status.
 
@@ -728,6 +746,7 @@ def manual_topup(request):
 ######################
 # cancel_auto_top_up #
 ######################
+@login_required()
 def cancel_auto_top_up(request):
     """ Cancel auto top up.
 
@@ -759,6 +778,7 @@ def cancel_auto_top_up(request):
 ###########################
 # statement_admin_summary #
 ###########################
+@login_required()
 def statement_admin_summary(request):
     """ Main statement page for system administrators
 
@@ -772,18 +792,44 @@ def statement_admin_summary(request):
     if not rbac_user_has_role(request.user, "payments.global.view"):
         return HttpResponse("Permission denied")
 
+    # Member summary
     total_members = User.objects.count()
     auto_top_up = User.objects.filter(stripe_auto_confirmed=True).count()
-    total_balance_members_list = MemberTransaction.objects.distinct("member")
+    #    total_balance_members_list = MemberTransaction.objects.distinct("member")
+    total_balance_members_list = (
+        MemberTransaction.objects.all()
+        .order_by("member", "-created_date")
+        .distinct("member")
+    )
     total_balance_members = 0
+    members_with_balances = 0
     for item in total_balance_members_list:
         total_balance_members += item.balance
+        if item.balance != 0.0:
+            members_with_balances += 1
 
+    # Organisation summary
     total_orgs = Organisation.objects.count()
-    total_balance_orgs_list = OrganisationTransaction.objects.distinct("organisation")
+    #    total_balance_orgs_list = OrganisationTransaction.objects.distinct("organisation")
+    total_balance_orgs_list = (
+        OrganisationTransaction.objects.all()
+        .order_by("organisation", "-created_date")
+        .distinct("organisation")
+    )
+    orgs_with_balances = 0
     total_balance_orgs = 0
     for item in total_balance_orgs_list:
         total_balance_orgs += item.balance
+        if item.balance != 0.0:
+            orgs_with_balances += 1
+
+    # Stripe Summary
+    today = timezone.now()
+    ref_date = today - datetime.timedelta(days=30)
+    stripe = StripeTransaction.objects.filter(created_date__gte=ref_date).aggregate(
+        Sum("amount")
+    )
+    print(stripe)
 
     return render(
         request,
@@ -794,8 +840,188 @@ def statement_admin_summary(request):
             "total_balance_members": total_balance_members,
             "total_orgs": total_orgs,
             "total_balance_orgs": total_balance_orgs,
-            "members_with_balances": total_balance_members_list.count(),
-            "orgs_with_balances": total_balance_orgs_list.count(),
+            "members_with_balances": members_with_balances,
+            "orgs_with_balances": orgs_with_balances,
             "balance": total_balance_orgs + total_balance_members,
+            "stripe": stripe,
         },
     )
+
+
+##############
+# settlement #
+##############
+@login_required()
+def settlement(request):
+    """ process payments to organisations. This is expected to be a monthly
+        activity.
+
+    At certain points in time an administrator will clear out the balances of
+    the organisations accounts and transfer actual money to them through the
+    banking system. This is not currently possible to do electronically so this
+    is a manual process.
+
+    The administrator should use this list to match with the bank transactions and
+    then confirm through this view that the payments have been made.
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return HttpResponse("Permission denied")
+
+    # orgs with outstanding balances
+    # Django is a bit too clever here so we actually have to include balance=0.0 and filter
+    # it in the code, otherwise we get the most recent non-zero balance. There may be
+    # a way to do this but I couldn't figure it out.
+    orgs = OrganisationTransaction.objects.order_by(
+        "organisation", "-created_date"
+    ).distinct("organisation")
+    org_list = []
+
+    non_zero_orgs = []
+    for org in orgs:
+        if org.balance != 0.0:
+            print(org.balance)
+            org_list.append((org.id, org.organisation.name))
+            non_zero_orgs.append(org)
+
+    if request.method == "POST":
+        form = SettlementForm(request.POST, orgs=org_list)
+        if form.is_valid():
+
+            # load balances - Important! Do not get the current balance for an
+            # org as this may have changed. Use the list confirmed by the user.
+            settlement_ids = form.cleaned_data["settle_list"]
+            settlements = OrganisationTransaction.objects.filter(pk__in=settlement_ids)
+
+            trans_list = []
+            total = 0.0
+
+            # Remove money from org accounts
+            for item in settlements:
+                total += float(item.balance)
+                trans = update_organisation(
+                    organisation=item.organisation,
+                    amount=-item.balance,
+                    description=f"Settlement from {GLOBAL_ORG}",
+                    log_msg=f"Settlement from {GLOBAL_ORG} to {item.organisation}",
+                    source="payments",
+                    sub_source="settlements",
+                    payment_type="Settlement",
+                )
+                trans_list.append(trans)
+
+            messages.success(
+                request,
+                "Settlement processed successfully.",
+                extra_tags="cobalt-message-success",
+            )
+            return render(
+                request,
+                "payments/settlement-complete.html",
+                {"trans": trans_list, "total": total},
+            )
+
+    else:
+        form = SettlementForm(orgs=org_list)
+
+    return render(
+        request, "payments/settlement.html", {"orgs": non_zero_orgs, "form": form}
+    )
+
+
+########################
+# manual_adjust_member #
+########################
+@login_required()
+def manual_adjust_member(request):
+    """ make a manual adjustment on a member account
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return HttpResponse("Permission denied")
+
+    if request.method == "POST":
+        form = AdjustMemberForm(request.POST)
+        if form.is_valid():
+            member = form.cleaned_data["member"]
+            amount = form.cleaned_data["amount"]
+            description = form.cleaned_data["description"]
+            update_account(
+                member=member,
+                amount=amount,
+                description=description,
+                log_msg="Manual adjustment by %s %s %s"
+                % (request.user, member, amount),
+                source="payments",
+                sub_source="manual_adjust_member",
+                payment_type="Manual Adjustment",
+                other_member=request.user,
+            )
+            msg = "Manual adjustment successful. %s adjusted by %s%s" % (
+                member,
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+            )
+            messages.success(request, msg, extra_tags="cobalt-message-success")
+            return redirect("payments:statement_admin_summary")
+
+    else:
+        form = AdjustMemberForm()
+
+        return render(request, "payments/manual_adjust_member.html", {"form": form})
+
+
+########################
+# manual_adjust_org    #
+########################
+@login_required()
+def manual_adjust_org(request):
+    """ make a manual adjustment on an organisation account
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return HttpResponse("Permission denied")
+
+    if request.method == "POST":
+        form = AdjustOrgForm(request.POST)
+        if form.is_valid():
+            org = form.cleaned_data["organisation"]
+            amount = form.cleaned_data["amount"]
+            description = form.cleaned_data["description"]
+            update_organisation(
+                organisation=org,
+                amount=amount,
+                description=description,
+                log_msg=description,
+                source="payments",
+                sub_source="manual_adjustment_org",
+                payment_type="Manual Adjustment",
+                member=request.user,
+            )
+            msg = "Manual adjustment successful. %s adjusted by %s%s" % (
+                org,
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+            )
+            messages.success(request, msg, extra_tags="cobalt-message-success")
+            return redirect("payments:statement_admin_summary")
+
+    else:
+        form = AdjustOrgForm()
+
+        return render(request, "payments/manual_adjust_org.html", {"form": form})

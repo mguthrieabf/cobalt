@@ -231,7 +231,7 @@ def member_details_ajax(request):
                         "global_org": global_org,
                     },
                 )
-                data_dict = {"data": html}
+                data_dict = {"data": html, "member": member.full_name}
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={"error": "Invalid request"})
 

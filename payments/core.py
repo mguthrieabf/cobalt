@@ -1075,7 +1075,7 @@ def update_organisation(
 ):
     """ method to update an organisations account """
 
-    last_tran = OrganisationTransaction.objects.last()
+    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
     if last_tran:
         balance = last_tran.balance
     else:
@@ -1092,13 +1092,20 @@ def update_organisation(
 
     act.save()
 
+    if member:
+        user = member.full_name
+    else:
+        user = "Unknown"
+
     log_event(
-        user=member.full_name,
+        user=user,
         severity="INFO",
         source=source,
         sub_source=sub_source,
         message=log_msg + " Updated OrganisationTransaction table",
     )
+
+    return act
 
 
 ###########################

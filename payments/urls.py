@@ -18,6 +18,11 @@ urlpatterns = [
         name="paymentsuperintent",
     ),
     path("statement", views.statement, name="statement"),
+    path("settlement", views.settlement, name="settlement"),
+    path(
+        "manual-adjust-member", views.manual_adjust_member, name="manual_adjust_member"
+    ),
+    path("manual-adjust-org", views.manual_adjust_org, name="manual_adjust_org"),
     path(
         "statement-admin-view/<int:member_id>",
         views.statement_admin_view,

@@ -19,9 +19,9 @@
           search_results.html("");
           // show the member
           member_display.html(response['data']);
-          // set member_id
+          // set member_id and name
           member_id = id;
-//          $("#cobalt-hidden-member").html("<input type='hidden' id='id_transfer_to' name='transfer_to' value='" + id + "'>");
+          member_name = response['member'];
         })
      }
 
