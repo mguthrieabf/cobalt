@@ -20,18 +20,21 @@ from cobalt.settings import RBAC_EVERYONE
 from accounts.models import User
 
 
-def rbac_create_group(group_name):
+def rbac_create_group(name_qualifier, name_item, description):
     """ Create an RBAC group
 
     Args:
-        user(User): user making change
-        group_name(str): name of group to create
+        name_qualifier(str): where in the tree the group will go
+        name_item(str): name
+        description(str): free format description
 
     Returns:
         RBACGroup
     """
 
-    obj = RBACGroup(group_name=group_name)
+    obj = RBACGroup(
+        name_qualifier=name_qualifier, name_item=name_item, description=description
+    )
     obj.save()
     return obj
 

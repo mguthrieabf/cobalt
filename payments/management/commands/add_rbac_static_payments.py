@@ -5,7 +5,13 @@ from rbac.management.commands.rbac_core import (
     create_RBAC_admin_group,
     create_RBAC_admin_tree,
 )
-from rbac.core import rbac_add_user_to_admin_group, rbac_add_role_to_admin_group
+from rbac.core import (
+    rbac_add_user_to_admin_group,
+    rbac_add_role_to_admin_group,
+    rbac_create_group,
+    rbac_add_user_to_group,
+    rbac_add_role_to_group,
+)
 from accounts.models import User
 
 
@@ -30,3 +36,12 @@ class Command(BaseCommand):
         create_RBAC_admin_tree(self, group, "org.abf.abf.global-finance")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="payments", model="global")
+
+        # Create normal RBAC group for payments Global
+        group = rbac_create_group(
+            "org.abf.abf.global-finance", "admin", "Admin Group for ABF Finance"
+        )
+        rbac_add_user_to_group(user, group)
+        rbac_add_role_to_group(
+            group, app="payments", model="global", action="all", rule_type="Allow"
+        )
