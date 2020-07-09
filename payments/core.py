@@ -439,7 +439,7 @@ def payment_api(
 
         # check for auto top up required - if user not set for auto topup then ignore
 
-        if member.stripe_auto_confirmed:
+        if member.stripe_auto_confirmed == "On":
             if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
                 (return_code, msg) = auto_topup_member(member)
                 if return_code:  # Success
@@ -450,7 +450,7 @@ def payment_api(
         return redirect(url)
 
     else:  # insufficient funds
-        if member.stripe_auto_confirmed:
+        if member.stripe_auto_confirmed == "On":
 
             # calculate required top up amount
             # Generally top by the largest of amount and auto_amount, BUT if the
@@ -813,7 +813,7 @@ def stripe_webhook_autosetup(event):
         return HttpResponse(status=400)
 
     # confirm card set up
-    member.stripe_auto_confirmed = True
+    member.stripe_auto_confirmed = "On"
     member.save()
 
     # check if we should make an auto top up now
@@ -1136,7 +1136,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
 
     stripe.api_key = STRIPE_SECRET_KEY
 
-    if not member.stripe_auto_confirmed:
+    if not member.stripe_auto_confirmed == "On":
         return (False, "Member not set up for Auto Top Up")
 
     if not member.stripe_customer_id:

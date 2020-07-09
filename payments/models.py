@@ -43,6 +43,9 @@ class StripeTransaction(models.Model):
     TRANSACTION_STATUS = [
         # This means we have hit the checkout page and Stripe is waiting
         ("Intent", "Intent - received customer intent to pay from Stripe"),
+        # This means they have been confirmed with strip, but we haven't been notified yet
+        # Note - this is notified by client side code and cannot be trusted
+        ("Pending", "Pending - transaction approved by Stripe - awaiting confirmation"),
         # This means it worked and we have their cash
         ("Complete", "Success - payment completed successfully"),
         # This means we didn't get their cash

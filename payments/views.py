@@ -184,7 +184,7 @@ def statement_common(user):
         balance = "Nil"
 
     # get auto top up
-    if user.stripe_auto_confirmed:
+    if user.stripe_auto_confirmed == "On":
         auto_button = True
     else:
         auto_button = False
@@ -531,7 +531,7 @@ def setup_autotopup(request):
     warn = ""
 
     # Already set up?
-    if request.user.stripe_auto_confirmed:
+    if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
                 customer=request.user.stripe_customer_id, type="card",
@@ -760,7 +760,7 @@ def cancel_auto_top_up(request):
     if request.method == "POST":
         if request.POST.get("stop_auto"):
             request.user.auto_amount = None
-            request.user.stripe_auto_confirmed = None
+            request.user.stripe_auto_confirmed = "Off"
             request.user.stripe_customer_id = None
             request.user.save()
 
@@ -794,7 +794,7 @@ def statement_admin_summary(request):
 
     # Member summary
     total_members = User.objects.count()
-    auto_top_up = User.objects.filter(stripe_auto_confirmed=True).count()
+    auto_top_up = User.objects.filter(stripe_auto_confirmed="On").count()
     #    total_balance_members_list = MemberTransaction.objects.distinct("member")
     total_balance_members_list = (
         MemberTransaction.objects.all()
@@ -829,7 +829,6 @@ def statement_admin_summary(request):
     stripe = StripeTransaction.objects.filter(created_date__gte=ref_date).aggregate(
         Sum("amount")
     )
-    print(stripe)
 
     return render(
         request,
@@ -1025,3 +1024,123 @@ def manual_adjust_org(request):
         form = AdjustOrgForm()
 
         return render(request, "payments/manual_adjust_org.html", {"form": form})
+
+
+##########################
+# stripe_webpage_confirm #
+##########################
+@login_required()
+def stripe_webpage_confirm(request, stripe_id):
+    """ User has been told by Stripe that transaction went through.
+
+    This is called by the web page after Stripe confirms the transaction is approved.
+    Because this originates from the client we do not trust it, but we do move
+    the status to Pending unless it is already Confirmed (timing issues).
+
+    Args:
+        request(HTTPRequest): stasndard request object
+        stripe_id(int):  pk of stripe transaction
+
+    Returns:
+        Nothing.
+    """
+
+    stripe = get_object_or_404(StripeTransaction, pk=stripe_id)
+    if stripe.status == "Intent":
+        print("Stripe status is intend - updating")
+        stripe.status = "Pending"
+        stripe.save()
+
+    return HttpResponse("ok")
+
+
+############################
+# stripe_autotopup_confirm #
+############################
+@login_required()
+def stripe_autotopup_confirm(request):
+    """ User has been told by Stripe that auto top up went through.
+
+    This is called by the web page after Stripe confirms that auto top up is approved.
+    Because this originates from the client we do not trust it, but we do move
+    the status to Pending unless it is already Confirmed (timing issues).
+
+    For manual payments we update the transaction, but for auto top up there is
+    no transaction so we record this on the User object.
+
+    Args:
+        request(HTTPRequest): stasndard request object
+
+    Returns:
+        Nothing.
+    """
+
+    if request.user.stripe_auto_confirmed == "Off":
+        request.user.stripe_auto_confirmed = "Pending"
+        request.user.save()
+
+    return HttpResponse("ok")
+
+
+############################
+# stripe_autotopup_confirm #
+############################
+@login_required()
+def stripe_autotopup_off(request):
+    """ Switch off auto top up
+
+    This is called by the web page when a user submits new card details to
+    Stripe. This is the latest point that we can turn it off in case the
+    user aborts the change.
+
+    Args:
+        request(HTTPRequest): stasndard request object
+
+    Returns:
+        Nothing.
+    """
+
+    request.user.stripe_auto_confirmed = "Off"
+    request.user.save()
+
+    return HttpResponse("ok")
+
+
+######################
+# stripe_pending     #
+######################
+@login_required()
+def stripe_pending(request):
+    """ Shows any pending stripe transactions.
+
+    Stripe transactions should never really be in a pending state unless
+    there is a problem. They go from intent to success usually. The only time
+    they will sit in pending is if Stripe is slow to talk to us or there is an
+    error.
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    stripe_latest = StripeTransaction.objects.filter(status="Complete").latest(
+        "created_date"
+    )
+    stripe_manual_pending = StripeTransaction.objects.filter(status="Pending")
+    stripe_manual_intent = StripeTransaction.objects.filter(status="Intent").order_by(
+        "-created_date"
+    )[:20]
+    stripe_auto_pending = User.objects.filter(stripe_auto_confirmed="Pending")
+
+    return render(
+        request,
+        "payments/stripe_pending.html",
+        {
+            "stripe_manual_pending": stripe_manual_pending,
+            "stripe_manual_intent": stripe_manual_intent,
+            "stripe_latest": stripe_latest,
+            "stripe_auto_pending": stripe_auto_pending,
+        },
+    )

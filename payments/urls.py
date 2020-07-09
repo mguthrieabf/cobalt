@@ -17,6 +17,7 @@ urlpatterns = [
         core.stripe_auto_payment_intent,
         name="paymentsuperintent",
     ),
+    path("stripe-pending", views.stripe_pending, name="stripe_pending"),
     path("statement", views.statement, name="statement"),
     path("settlement", views.settlement, name="settlement"),
     path(
@@ -41,6 +42,19 @@ urlpatterns = [
         name="statement_admin_summary",
     ),
     path("statement-org/<int:org_id>/", views.statement_org, name="statement_org"),
+    path(
+        "stripe-webpage-confirm/<int:stripe_id>/",
+        views.stripe_webpage_confirm,
+        name="stripe_webpage_confirm",
+    ),
+    path(
+        "stripe-autotopup-confirm",
+        views.stripe_autotopup_confirm,
+        name="stripe_autotopup_confirm",
+    ),
+    path(
+        "stripe-autotopup-off", views.stripe_autotopup_off, name="stripe_autotopup_off"
+    ),
     path(
         "statement-org-summary/<int:org_id>/<str:range>",
         views.statement_org_summary_ajax,

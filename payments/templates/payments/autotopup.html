@@ -38,7 +38,7 @@
       <div class="card">
         <div class="card-header card-header-primary">
           <h3 class="card-title">{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}s</h3>
-          <h5>Auto Top <U></U>p</h5>
+          <h5>Auto Top Up</h5>
           <h5>Balance: ${{ balance|floatformat:2|intcomma }}</h5>
         </div>
         <div class="card-body">
@@ -86,9 +86,6 @@
               <div class="sr-main">
                 <h3 align="center">Card Details</h3>
                 <form id="payment-form" class="sr-payment-form">
-                  <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
-                  <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
-                  <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
                   <div class="sr-combo-inputs-row">
                     <div class="sr-input sr-card-element" id="card-element"></div>
                   </div>

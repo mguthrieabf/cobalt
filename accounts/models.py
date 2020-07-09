@@ -48,7 +48,16 @@ class User(AbstractUser):
     stripe_customer_id = models.CharField(
         "Stripe Customer Id", blank=True, null=True, max_length=25
     )
-    stripe_auto_confirmed = models.BooleanField(blank=True, null=True)
+
+    AUTO_STATUS = [
+        ("Off", "Off"),
+        ("Pending", "Pending"),
+        ("On", "On"),
+    ]
+
+    stripe_auto_confirmed = models.CharField(
+        "Stripe Auto Confirmed", max_length=9, choices=AUTO_STATUS, default="Off"
+    )
 
     REQUIRED_FIELDS = [
         "system_number",
