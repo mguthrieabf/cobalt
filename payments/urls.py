@@ -30,6 +30,7 @@ urlpatterns = [
         name="statement_admin_view",
     ),
     path("statement-csv", views.statement_csv, name="statement_csv"),
+    path("statement-csv/<int:member_id>", views.statement_csv, name="statement_csv"),
     path("statement-pdf", views.statement_pdf, name="statement_pdf"),
     path("setup-autotopup", views.setup_autotopup, name="setup_autotopup"),
     path("update-auto-amount", views.update_auto_amount, name="update_auto_amount"),
@@ -42,6 +43,11 @@ urlpatterns = [
         name="statement_admin_summary",
     ),
     path("statement-org/<int:org_id>/", views.statement_org, name="statement_org"),
+    path(
+        "statement-csv-org/<int:org_id>/",
+        views.statement_csv_org,
+        name="statement_csv_org",
+    ),
     path(
         "stripe-webpage-confirm/<int:stripe_id>/",
         views.stripe_webpage_confirm,

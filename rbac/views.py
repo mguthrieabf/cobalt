@@ -18,10 +18,21 @@ from .core import (
     rbac_get_admins_for_group,
     rbac_user_role_list,
     rbac_user_has_role,
+    rbac_get_groups_for_role,
 )
 from .forms import AddGroup
 from django.contrib import messages
 from organisations.models import Organisation
+
+
+@login_required
+def rbac_forbidden(request, role):
+    """ RBAC screen for fobidden access - gives the user more info than a
+    normal error screen """
+
+    groups = rbac_get_groups_for_role(role)
+
+    return render(request, "rbac/forbidden.html", {"role": role, "groups": groups})
 
 
 @login_required

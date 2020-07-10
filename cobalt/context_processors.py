@@ -15,6 +15,7 @@ def global_settings(request):
     return {
         "notification_count": notification_count,
         "notifications": notifications,
+        "COBALT_HOSTNAME": settings.COBALT_HOSTNAME,
         "GLOBAL_ORG": settings.GLOBAL_ORG,
         "GLOBAL_TITLE": settings.GLOBAL_TITLE,
         "GLOBAL_CONTACT": settings.GLOBAL_CONTACT,

@@ -42,34 +42,42 @@
 
     </div>
     <div class="card-body table-responsive">
-      <div class="container">
-        <div class="row">
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 170px">
-              <i class="material-icons">people_alt</i>&nbsp;Transfer
+      {% if admin_view %}
+        <div class="col-6 col-md-6 col-lg-4 text-center">
+          <a href="{% url 'payments:statement_csv' member_id=user.id %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
+            <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
             </button>
-            </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 170px">
-              <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
-            </button>
-            </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
-              <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
-              </button>
-            </a>
-          </div>
-          <div class="col-6 col-md-6 col-lg-3 text-center">
-            <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
-              <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
-              </button>
           </a>
-          </div>
         </div>
-
+      {% else %}
+        <div class="container">
+          <div class="row">
+            <div class="col-6 col-md-6 col-lg-4 text-center">
+              <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 170px">
+                <i class="material-icons">people_alt</i>&nbsp;Transfer
+              </button>
+              </a>
+            </div>
+            <div class="col-6 col-md-6 col-lg-4 text-center">
+              <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 170px">
+                <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
+              </button>
+              </a>
+            </div>
+            <div class="col-6 col-md-6 col-lg-4 text-center">
+              <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
+                <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
+                </button>
+              </a>
+            </div>
+            <!-- <div class="col-6 col-md-6 col-lg-3 text-center">
+              <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
+                <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
+                </button>
+            </a> -->
+            </div>
+          </div>
+        {% endif %}
       </div>
 
       <hr>

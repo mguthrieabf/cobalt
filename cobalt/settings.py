@@ -120,6 +120,10 @@ STRIPE_SECRET_KEY = "not-set"
 STRIPE_PUBLISHABLE_KEY = "not-set"
 AWS_ACCESS_KEY_ID = "not-set"
 AWS_SECRET_ACCESS_KEY = "not-set"
+COBALT_HOSTNAME = "127.0.0.1:8000"
+
+if "COBALT_HOSTNAME" in os.environ:
+    COBALT_HOSTNAME = os.environ["COBALT_HOSTNAME"]
 
 AWS_REGION_NAME = "ap-southeast-2"
 

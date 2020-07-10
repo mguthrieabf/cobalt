@@ -29,7 +29,8 @@ import csv
 import datetime
 import requests
 import stripe
-from django.utils import timezone
+import pytz
+from django.utils import timezone, dateformat
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
@@ -45,6 +46,7 @@ from cobalt.settings import (
     AUTO_TOP_UP_DEFAULT_AMT,
     GLOBAL_ORG,
     GLOBAL_CURRENCY_SYMBOL,
+    TIME_ZONE,
 )
 from .forms import (
     TestTransaction,
@@ -66,6 +68,7 @@ from accounts.models import User
 from cobalt.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
+from rbac.views import rbac_forbidden
 
 ####################
 # Home             #
@@ -248,7 +251,7 @@ def statement_admin_view(request, member_id):
 
     """
     if not rbac_user_has_role(request.user, "payments.global.view"):
-        return HttpResponse("access denied")
+        return rbac_forbidden(request, "payments.global.view")
 
     user = get_object_or_404(User, pk=member_id)
     (summary, club, balance, auto_button, events_list) = statement_common(user)
@@ -265,6 +268,7 @@ def statement_admin_view(request, member_id):
             "club": club,
             "balance": balance,
             "auto_button": auto_button,
+            "admin_view": True,
         },
     )
 
@@ -291,7 +295,7 @@ def statement_org(request, org_id):
 
     if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
         if not rbac_user_has_role(request.user, "payments.global.view"):
-            return HttpResponse("Access Denied")
+            return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
 
     # get balance
     last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
@@ -336,6 +340,78 @@ def statement_org(request, org_id):
     )
 
 
+#########################
+# statement_csv_org     #
+#########################
+@login_required()
+def statement_csv_org(request, org_id):
+    """ Organisation statement CSV.
+
+    Args:
+        request: standard request object
+        org_id: organisation to view
+
+    Returns:
+        HTTPResponse: CSV
+
+    """
+
+    organisation = get_object_or_404(Organisation, pk=org_id)
+
+    if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
+        if not rbac_user_has_role(request.user, "payments.global.view"):
+            return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
+
+    # get details
+    events_list = OrganisationTransaction.objects.filter(
+        organisation=organisation
+    ).order_by("-created_date")
+
+    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="statement.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [organisation.name, "Downloaded by %s" % request.user.full_name, today]
+    )
+    writer.writerow(
+        [
+            "Date",
+            "Counterparty",
+            "Reference",
+            "Type",
+            "Description",
+            "Amount",
+            "Balance",
+        ]
+    )
+
+    for row in events_list:
+        counterparty = ""
+        if row.member:
+            counterparty = row.member
+        if row.other_organisation:
+            counterparty = row.other_organisation
+
+        local_dt = timezone.localtime(row.created_date, pytz.timezone(TIME_ZONE))
+        writer.writerow(
+            [
+                dateformat.format(local_dt, "Y-m-d H:i:s"),
+                counterparty,
+                row.reference_no,
+                row.type,
+                row.description,
+                row.amount,
+                row.balance,
+            ]
+        )
+
+    return response
+
+
 def statement_org_summary_ajax(request, org_id, range):
     """ Called by the org statement when the summary date range changes
 
@@ -354,7 +430,7 @@ def statement_org_summary_ajax(request, org_id, range):
 
         if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
             if not rbac_user_has_role(request.user, "payments.global.view"):
-                return HttpResponse("Access Denied")
+                return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
 
         if range == "All":
             summary = (
@@ -391,28 +467,37 @@ def statement_org_summary_ajax(request, org_id, range):
 # statement_csv     #
 #####################
 @login_required()
-def statement_csv(request):
+def statement_csv(request, member_id=None):
     """ Member statement view - csv download
 
     Generates a CSV of the statement.
 
     Args:
         request (HTTPRequest): standard request object
+        member_id(int): id of member to view, defaults to logged in user
 
     Returns:
         HTTPResponse: CSV headed response with CSV statement data
 
     """
-    (summary, club, balance, auto_button, events_list) = statement_common(
-        request.user
-    )  # pylint: disable=unused-variable
-    today = datetime.today().strftime("%-d %B %Y at %I:%H:%M")
+
+    if member_id:
+        if not rbac_user_has_role(request.user, "payments.global.view"):
+            return rbac_forbidden(request, "payments.global.view")
+        member = get_object_or_404(User, pk=member_id)
+    else:
+        member = request.user
+
+    (summary, club, balance, auto_button, events_list) = statement_common(member)
+
+    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="statement.csv"'
 
     writer = csv.writer(response)
-    writer.writerow([request.user.full_name, request.user.system_number, today])
+    writer.writerow([member.full_name, member.system_number, today])
     writer.writerow(
         [
             "Date",
@@ -431,9 +516,10 @@ def statement_csv(request):
             counterparty = row.other_member
         if row.organisation:
             counterparty = row.organisation
+        local_dt = timezone.localtime(row.created_date, pytz.timezone(TIME_ZONE))
         writer.writerow(
             [
-                row.created_date,
+                dateformat.format(local_dt, "Y-m-d H:i:s"),
                 counterparty,
                 row.reference_no,
                 row.type,
@@ -790,7 +876,7 @@ def statement_admin_summary(request):
     """
 
     if not rbac_user_has_role(request.user, "payments.global.view"):
-        return HttpResponse("Permission denied")
+        return rbac_forbidden(request, "payments.global.view")
 
     # Member summary
     total_members = User.objects.count()
@@ -870,7 +956,7 @@ def settlement(request):
         HTTPResponse
     """
     if not rbac_user_has_role(request.user, "payments.global.edit"):
-        return HttpResponse("Permission denied")
+        return rbac_forbidden(request, "payments.global.view")
 
     # orgs with outstanding balances
     # Django is a bit too clever here so we actually have to include balance=0.0 and filter
@@ -947,7 +1033,7 @@ def manual_adjust_member(request):
         HTTPResponse
     """
     if not rbac_user_has_role(request.user, "payments.global.edit"):
-        return HttpResponse("Permission denied")
+        return rbac_forbidden(request, "payments.global.edit")
 
     if request.method == "POST":
         form = AdjustMemberForm(request.POST)
@@ -994,7 +1080,7 @@ def manual_adjust_org(request):
         HTTPResponse
     """
     if not rbac_user_has_role(request.user, "payments.global.edit"):
-        return HttpResponse("Permission denied")
+        return rbac_forbidden(request, "payments.global.edit")
 
     if request.method == "POST":
         form = AdjustOrgForm(request.POST)

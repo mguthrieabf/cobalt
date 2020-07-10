@@ -247,7 +247,7 @@ def notify_happening(
 def add_in_app_notification(member, msg, link=None):
     note = InAppNotification()
     note.member = member
-    note.message = msg
+    note.message = msg[:100]
     note.link = link
     note.save()
 

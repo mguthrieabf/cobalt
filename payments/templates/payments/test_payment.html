@@ -24,7 +24,7 @@
           <table>
           {{ form.as_table }}
           </table>
-  			   <input type="submit" value="Submit" class="btn btn-block">
+  			   <input type="submit" value="Submit" onclick="this.disabled=true,this.form.submit();" class="btn btn-block">
 
       </form>
 

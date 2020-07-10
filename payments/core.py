@@ -30,6 +30,7 @@ import json
 import stripe
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -37,6 +38,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from logs.views import log_event
 from accounts.models import User
 from cobalt.settings import (
@@ -44,8 +46,10 @@ from cobalt.settings import (
     STRIPE_PUBLISHABLE_KEY,
     AUTO_TOP_UP_LOW_LIMIT,
     GLOBAL_CURRENCY_SYMBOL,
+    COBALT_HOSTNAME,
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
+from notifications.views import contact_member
 
 
 #######################
@@ -1234,17 +1238,48 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
 
     except stripe.error.CardError as error:
         err = error.error
+        print("@@@@@@@@@@@@@@@@")
+        print(err.message)
         # Error code will be authentication_required if authentication is needed
         log_event(
             user=member.full_name,
             severity="WARN",
             source="Payments",
             sub_source="test_autotopup",
-            message="Error from stripe - see logs",
+            message="Error from stripe - %s" % err.message,
         )
 
-        print("Code is: %s" % err.code)
-        # payment_intent_id = err.payment_intent['id']
-        # payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
-        # TODO: handle auth required from Stripe
-        return (False, "FIX LATER - MAYBE AUTH required from Stripe")
+        msg = "%s Auto Top Up has been disabled." % err.message
+        email_body = """We tried to take a payment of $%.2f from your credit card
+        but we received this message:
+        %s
+        Auto Top Up has been disabled for the time being, but you can
+        enable it again by clicking below.
+        """ % (
+            amount,
+            err.message,
+        )
+
+        link = reverse("payments:setup_autotopup")
+        absolute_link = "%s%s" % (COBALT_HOSTNAME, link)
+
+        context = {
+            "name": member.first_name,
+            "title": "Auto Top Up Failed",
+            "email_body": email_body,
+            "absolute_link": absolute_link,
+            "host": COBALT_HOSTNAME,
+            "link_text": "Set Up Card",
+        }
+
+        html_msg = render_to_string("notifications/email-notification.html", context)
+        contact_member(
+            member=member,
+            msg=msg,
+            html_msg=html_msg,
+            contact_type="Email",
+            subject="Auto Top Up Failure",
+        )
+        member.stripe_auto_confirmed = "No"
+        member.save()
+        return (False, "%s Auto Top has been disabled." % err.message)

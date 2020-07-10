@@ -7,6 +7,7 @@
     .. _RBAC Overview:
        ./rbac_overview.html
 """
+from django.db.models import Q
 from .models import (
     RBACGroup,
     RBACUserGroup,
@@ -594,3 +595,17 @@ def rbac_user_role_list(user, app, model):
         ret.append(item)
 
     return ret
+
+
+def rbac_get_groups_for_role(role):
+    """ takes a role and lists the groups that can provide it.
+
+    Only works for allow rules with model ids  """
+
+    (app, model, model_instance, action) = role_to_parts(role)
+
+    groups = RBACGroupRole.objects.filter(
+        app=app, model=model, model_id=model_instance
+    ).filter(Q(action=action) | Q(action="All"))
+
+    return groups
