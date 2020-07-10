@@ -326,7 +326,7 @@ def post_new(request):
                 )
 
                 context = {
-                    "name": request.first_name,
+                    "name": request.user.first_name,
                     "title": "New Post: %s" % post.title,
                     "email_body": email_body,
                     "absolute_link": absolute_link,
