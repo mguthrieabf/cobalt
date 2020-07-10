@@ -409,7 +409,7 @@ def post_edit(request, post_id):
             messages.success(
                 request, "Post deleted", extra_tags="cobalt-message-success"
             )
-            return redirect("forums:post_list_short_view")
+            return redirect("forums:forums")
 
         else:  # Maybe cancel hit or back button - reload page
             return redirect("forums:post_edit", post_id=post_id)
