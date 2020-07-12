@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+  <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
+  <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="infinite-container">
+    {% for post in numbers %}
+    <div class="infinite-item">
+      <div class="card card-nav-tabs">
+        <div class="card-body">
+          <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
+              <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+              <h5>{{ post.author.full_name }}</h5>
+          </a>
+          <a href="{% url 'forums:post_detail' pk=post.pk %}">
+          <h3>{{ post.title }}</h3>
+          </a>
+          {{ post.summary|safe }}
+          <span class="float-right">
+            {{ post.post_comments }} comment{{ post.post_comments|pluralize}}
+          </span>
+          <div class="card-title d-flex justify-content-between">
+            <div>
+              {{ post.created_date }}
+            </div>
+           </div>
+        </div>
+      </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if numbers.has_next %}
+    <a class="infinite-more-link" href="?page={{ numbers.next_page_number }}">More</a>
+  {% endif %}
+
+  <div class="loading" style="display: none;">
+    Loading...
+  </div>
+
+  <script>
+    var infinite = new Waypoint.Infinite({
+      element: $('.infinite-container')[0],
+      onBeforePageLoad: function () {
+        $('.loading').show();
+      },
+      onAfterPageLoad: function ($items) {
+        $('.loading').hide();
+      }
+    });
+  </script>
+{% endblock %}

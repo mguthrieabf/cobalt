@@ -657,3 +657,9 @@ def forum_create(request):
         form = ForumForm()
 
     return render(request, "forums/forum_create.html", {"form": form})
+
+
+def frontpage(request):
+    posts_list = Post.objects.all().order_by("-created_date")
+    posts = cobalt_paginator(request, posts_list, 30)
+    return render(request, "forums/frontpage.html", {"posts": posts})

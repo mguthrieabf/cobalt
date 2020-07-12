@@ -6,6 +6,7 @@ app_name = "forums"  # pylint: disable=invalid-name
 urlpatterns = [
     path("", views.post_list_filter, name="forums"),
     path("post/list/", views.post_list_filter, name="post_list_filter"),
+    path("frontpage/", views.frontpage, name="frontpage"),
     path("post/<int:pk>/", views.post_detail, name="post_detail"),
     path(
         "forum/list/<int:forum_id>/",

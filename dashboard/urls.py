@@ -6,4 +6,5 @@ from . import views
 
 urlpatterns = [
     path("", views.home, name="dashboard"),
+    path("scroll", views.scroll, name="scroll"),
 ]
