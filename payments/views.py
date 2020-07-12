@@ -73,19 +73,19 @@ from rbac.views import rbac_forbidden
 ####################
 # Home             #
 ####################
-@login_required()
-def home(request):
-    """ Default page.
-
-        Args:
-            request (HTTPRequest): Standard request object
-
-        Returns:
-            httpResponse: webpage
-
-    """
-
-    return render(request, "payments/home.html")
+# @login_required()
+# def home(request):
+#     """ Default page.
+#
+#         Args:
+#             request (HTTPRequest): Standard request object
+#
+#         Returns:
+#             httpResponse: webpage
+#
+#     """
+#
+#     return render(request, "payments/home.html")
 
 
 @login_required()
