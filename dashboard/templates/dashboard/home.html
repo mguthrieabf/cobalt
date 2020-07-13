@@ -67,74 +67,131 @@
 </div>
 
 
-                    <div class="row">
-                      <div class="col-lg-6 col-md-12">
-                        <div class="card">
-                          <div class="card-header card-header-primary">
-                            <h4 class="card-title">Your Recent Results</h4>
-                          </div>
+<div class="row">
+  <div class="col-lg-6 col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Your Recent Results</h4>
+      </div>
+      <div class="card-body table-responsive">
+        Coming Soon!
+      </div>
+    </div>
+  </div>
 
-                          <div class="card-body table-responsive">
-                            Coming Soon!
-                          </div>
-
-
-                        </div>
-                      </div>
-
-
-
-
-
-                      <div class="col-lg-6 col-md-12">
-                        <div class="card">
-                          <div class="card-header card-header-warning">
-                            <h4 class="card-title">Your Upcoming Events</h4>
-                          </div>
+  <div class="col-lg-6 col-md-12">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h4 class="card-title">Your Upcoming Events</h4>
+      </div>
 
 
-                          <div class="card-body table-responsive">
-                            Coming Soon!
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-<!-- Forum posts -->
-<div class="infinite-container">
-{% for post in posts %}
-<div class="infinite-item">
-  <div class="card card-nav-tabs">
-    <div class="card-body">
-      <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
-          <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
-          <h5>{{ post.author.full_name }}</h5>
-      </a>
-      <a href="{% url 'forums:post_detail' pk=post.pk %}">
-      <h3>{{ post.title }}</h3>
-      </a>
-      {{ post.text|truncatewords_html:50|safe }}
-      <span class="float-right">
-        {{ post.post_comments }} comment{{ post.post_comments|pluralize}}
-      </span>
-      <div class="card-title d-flex justify-content-between">
-        <div>
-          {{ post.created_date }}
-        </div>
-       </div>
+      <div class="card-body table-responsive">
+        Coming Soon!
+      </div>
     </div>
   </div>
 </div>
-{% endfor %}
-</div>
+
+
+
+
+
+<!-- Forum posts -->
+<div class="row">
+
+  <div class="col-lg-6 col-md-12">
+
+
+    <div class="infinite-container">
+      {% for post in posts %}
+      <div class="infinite-item">
+        <div class="card card-nav-tabs">
+          <div class="card-body  bg-success">
+            <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
+                <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+                <h5>{{ post.author.full_name }}</h5>
+            </a>
+            <a href="{% url 'forums:post_detail' pk=post.pk %}">
+            <h3>{{ post.title }}</h3>
+            </a>
+            {{ post.text|truncatewords_html:50|safe }}
+            <span class="float-right">
+              {{ post.comment_count }} comment{{ post.comment_count|pluralize}}
+            </span>
+            <div class="card-title d-flex justify-content-between">
+              <div>
+                {{ post.created_date }}
+              </div>
+             </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
 
 {% if posts.has_next %}
-  <a class="infinite-more-link" href="scroll?page={{ posts.next_page_number }}">More</a>
+  <a class="infinite-more-link" href="scroll1?page={{ posts.next_page_number }}">More</a>
 {% endif %}
+  </div>
+
+  <div class="col-lg-6 col-md-12">
+
+
+    <div class="infinite-container2">
+      {% for post in posts2 %}
+      <div class="infinite-item2">
+        <div class="card card-nav-tabs">
+          <div class="card-body">
+            <a href="{% url 'accounts:public_profile' pk=post.author.pk %}">
+                <img width="50px" class="rounded-circle float-left" src="/media/{{ post.author.pic }}" />
+                <h5>{{ post.author.full_name }}</h5>
+            </a>
+            <a href="{% url 'forums:post_detail' pk=post.pk %}">
+            <h3 style="background-color:green">{{ post.title }}</h3>
+            </a>
+            {{ post.text|truncatewords_html:50|safe }}
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <span class="float-right">
+              {{ post.comment_count }} comment{{ post.comment_count|pluralize}}
+            </span>
+            <div class="card-title d-flex justify-content-between">
+              <div>
+                {{ post.created_date }}
+              </div>
+             </div>
+          </div>
+        </div>
+      </div>
+{% endfor %}
+    </div>
+
+{% if posts2.has_next %}
+  <a class="infinite-more-link2" href="scroll2?page={{ posts2.next_page_number }}">More</a>
+{% endif %}
+  </div>
+</div>
 
 <script>
   var infinite = new Waypoint.Infinite({
     element: $('.infinite-container')[0],
+    items: '.infinite-item',
+    onBeforePageLoad: function () {
+      $('.loading').show();
+    },
+    onAfterPageLoad: function ($items) {
+      $('.loading').hide();
+    }
+  });
+  var infinite2 = new Waypoint.Infinite({
+    element: $('.infinite-container2')[0],
+    items: '.infinite-item2',
+    more: '.infinite-more-link2',
     onBeforePageLoad: function () {
       $('.loading').show();
     },

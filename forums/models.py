@@ -3,12 +3,23 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+FORUM_TYPES = [
+    ("Discussion", "Discussion Forum"),
+    ("Announcement", "Announcement Forum"),
+    ("Club", "Club Forum"),
+]
+
 
 class Forum(models.Model):
     """ Forum is a list of valid places to create a Post """
 
     title = models.CharField("Forum Short Title", max_length=80)
     description = models.CharField("Forum Description", max_length=200)
+    forum_type = models.CharField(
+        "Forum Type", max_length=20, choices=FORUM_TYPES, default="Discussion"
+    )
+    bg_colour = models.CharField("Background Colour", max_length=20, default="white")
+    fg_colour = models.CharField("Foreground Colour", max_length=20, default="black")
 
     def __str__(self):
         return self.title
@@ -32,8 +43,8 @@ class Post(AbstractForum):
 
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
-    summary = models.TextField()
     text = models.TextField()
+    comment_count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -44,6 +55,7 @@ class Comment1(AbstractForum):
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     text = models.TextField()
+    comment1_count = models.IntegerField(default=0)
 
     def __str__(self):
         return "%s - comment by %s" % (self.post.title, self.author.full_name)

@@ -11,6 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
 from notifications.views import notify_happening
 from cobalt.utils import cobalt_paginator
+from rbac.views import rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
@@ -192,32 +193,32 @@ def post_list_filter(request):
     )
 
 
-@login_required()
-def post_list_dashboard(request):
-    """ Summary view showing a list of posts for use by the dashboard.
-
-    Args:
-        request(HTTPRequest): standard user request
-
-    Returns:
-        list:   list of Post objects
-    """
-
-    # TODO: decide if this should be filtered or not - currently not
-
-    # get list of forums user cannot access
-    blocked = rbac_user_blocked_for_model(
-        user=request.user, app="forums", model="forum", action="view"
-    )
-
-    posts = Post.objects.exclude(forum__in=blocked).order_by("-created_date")[:20]
-    posts_new = []
-    for post in posts:
-        post.post_comments = Comment1.objects.filter(post=post).count()
-        post.post_comments += Comment2.objects.filter(post=post).count()
-        posts_new.append(post)
-
-    return posts_new
+# @login_required()
+# def post_list_dashboard(request):
+#     """ Summary view showing a list of posts for use by the dashboard.
+#
+#     Args:
+#         request(HTTPRequest): standard user request
+#
+#     Returns:
+#         list:   list of Post objects
+#     """
+#
+#     # TODO: decide if this should be filtered or not - currently not
+#
+#     # get list of forums user cannot access
+#     blocked = rbac_user_blocked_for_model(
+#         user=request.user, app="forums", model="forum", action="view"
+#     )
+#
+#     posts = Post.objects.exclude(forum__in=blocked).order_by("-created_date")[:20]
+#     posts_new = []
+#     for post in posts:
+#         post.post_comments = Comment1.objects.filter(post=post).count()
+#         post.post_comments += Comment2.objects.filter(post=post).count()
+#         posts_new.append(post)
+#
+#     return posts_new
 
 
 @login_required()
@@ -238,7 +239,7 @@ def post_detail(request, pk):
     # Check access
     post = get_object_or_404(Post, pk=pk)
     if not rbac_user_has_role(request.user, "forums.forum.%s.view" % post.forum.id):
-        return HttpResponseForbidden()
+        return rbac_forbidden(request, "forums.forum.%s.view" % post.forum.id)
 
     if request.method == "POST":
         # identify which form submitted this - comments1 or comments2
@@ -250,6 +251,13 @@ def post_detail(request, pk):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            # update count on parent
+            post.post.comment_count += 1
+            post.post.save()
+            # if this is a c2 then update count on c1
+            if "submit-c2" in request.POST:
+                post.comment1.comment1_count += 1
+                post.comment1.save()
             # Tell people
             notify_happening(
                 application_name="Forums",
@@ -264,6 +272,9 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post_likes = LikePost.objects.filter(post=post)
     comments1 = Comment1.objects.filter(post=post)
+
+    # TODO: Now that we have counters for comments at the Post and Comment1 level
+    # this code could potentially be made more efficient.
 
     total_comments = 0
     comments1_new = []  # comments1 is immutable - make a copy
@@ -297,7 +308,7 @@ def post_detail(request, pk):
 
 
 @login_required()
-def post_new(request):
+def post_new(request, forum_id=None):
     """ Create a new post in a forum """
 
     if request.method == "POST":
@@ -364,7 +375,9 @@ def post_new(request):
 
                 return redirect("forums:post_detail", pk=post.pk)
             else:
-                return HttpResponseForbidden()
+                return rbac_forbidden(
+                    request, "forums.forum.%s.create" % form.cleaned_data["forum"].id
+                )
 
     else:
         # see which forums are blocked for this user - load a list of the others
@@ -373,8 +386,13 @@ def post_new(request):
         )
         valid_forums = Forum.objects.exclude(id__in=blocked_forums)
         form = PostForm(valid_forums=valid_forums)
+        if forum_id:
+            form.fields["forum"].initial = forum_id
+            forum = get_object_or_404(Forum, pk=forum_id)
+        else:
+            forum = None
 
-    return render(request, "forums/post_edit.html", {"form": form, "request": request})
+    return render(request, "forums/post_edit.html", {"form": form, "forum": forum})
 
 
 @login_required()
@@ -402,7 +420,10 @@ def post_edit(request, post_id):
                     )
                     return redirect("forums:post_detail", pk=post.pk)
                 else:
-                    return HttpResponseForbidden()
+                    return rbac_forbidden(
+                        request,
+                        "forums.forum.%s.create" % form.cleaned_data["forum"].id,
+                    )
 
         elif "delete" in request.POST:  # Delete
             post.delete()
@@ -659,7 +680,23 @@ def forum_create(request):
     return render(request, "forums/forum_create.html", {"form": form})
 
 
-def frontpage(request):
-    posts_list = Post.objects.all().order_by("-created_date")
-    posts = cobalt_paginator(request, posts_list, 30)
-    return render(request, "forums/frontpage.html", {"posts": posts})
+# def frontpage(request):
+#     posts_list = Post.objects.all().order_by("-created_date")
+#     posts = cobalt_paginator(request, posts_list, 30)
+#     return render(request, "forums/frontpage.html", {"posts": posts})
+
+
+@login_required()
+def forum_colours_ajax(request, forum_id):
+    """ Function to get the forum colours
+
+    Args:
+        request(HTTPRequest): standard request object
+        forum_id(int):    Primary key of the forum
+
+    Returns:
+        HttpResponse
+    """
+
+    forum = get_object_or_404(Forum, pk=forum_id)
+    return HttpResponse("%s %s" % (forum.bg_colour, forum.fg_colour))

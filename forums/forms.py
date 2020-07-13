@@ -19,22 +19,12 @@ class PostForm(forms.ModelForm):
         # Hide the crispy labels
         self.fields["forum"].label = False
         self.fields["title"].label = False
-        self.fields["summary"].label = False
         self.fields["text"].label = False
 
     title = forms.CharField(
         widget=forms.TextInput(attrs={"class": "cobalt-min-width-100"})
     )
-    summary = forms.CharField(
-        widget=SummernoteInplaceWidget(
-            attrs={
-                "summernote": {
-                    "placeholder": "<br>Enter a short description. Keep it punchy, this goes on the front page. Use it to tempt your reader.",
-                    "height": 200,
-                }
-            }
-        )
-    )
+
     text = forms.CharField(
         widget=SummernoteInplaceWidget(
             attrs={
@@ -50,7 +40,6 @@ class PostForm(forms.ModelForm):
         fields = (
             "forum",
             "title",
-            "summary",
             "text",
         )
 

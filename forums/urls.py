@@ -4,16 +4,21 @@ from . import views
 app_name = "forums"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path("", views.post_list_filter, name="forums"),
+    path("", views.forum_list, name="forums"),
     path("post/list/", views.post_list_filter, name="post_list_filter"),
-    path("frontpage/", views.frontpage, name="frontpage"),
     path("post/<int:pk>/", views.post_detail, name="post_detail"),
+    path(
+        "forum-colours/<int:forum_id>",
+        views.forum_colours_ajax,
+        name="forum_colours_ajax",
+    ),
     path(
         "forum/list/<int:forum_id>/",
         views.post_list_single_forum,
         name="post_list_single_forum",
     ),
     path("post/new/", views.post_new, name="post_new"),
+    path("post/new/<int:forum_id>", views.post_new, name="post_new_with_id"),
     path("post/search/", views.post_search, name="post_search"),
     path("post/edit/<int:post_id>", views.post_edit, name="post_edit"),
     path("forum/list", views.forum_list, name="forum_list"),

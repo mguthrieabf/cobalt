@@ -9,17 +9,17 @@
     {% for forum in forums %}
     <div class="row">
       <div class="col-md-8 align-self-center">
-        <div class="card card-block">
+        <div class="card card-block m-1">
           <div class="card-body">
             <h4 class="card-title"><a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}">{{ forum.title }} ({{ forum.count }} post{{ forum.count|pluralize}})</a></h4>
-            <p class="category">{{ forum.description }}</p>
+            <!-- <p class="category">{{ forum.description }}</p>
             <h4>Latest Post</h4>
-             {{ forum.latest_title }} {{ forum.latest_author }} {{ forum.latest_date }}
+             {{ forum.latest_title }} {{ forum.latest_author }} {{ forum.latest_date }} -->
           </div>
         </div>
       </div>
       <div class="col-md-4 my-auto">
-        <a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}" class="btn btn-sm btn-primary" style="width: 90px;">View</a>
+        <!-- <a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}" class="btn btn-sm btn-primary" style="width: 90px;">View</a> -->
 
         {% if forum.follows %}
           <button class="btn btn-sm btn-info cobalt-follow" id="button-{{ forum.id }}" style="width: 90px; border:0px; margin:0px">Unfollow</button>
