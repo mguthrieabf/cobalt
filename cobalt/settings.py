@@ -185,10 +185,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # External reference point to find static
 STATIC_URL = "/static/"
 
-STATICFILES_FINDERS = (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',    #causes verbose duplicate notifications in django 1.9
-)
+# STATICFILES_FINDERS = (
+#     "django.contrib.staticfiles.finders.FileSystemFinder",
+#     # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',    #causes verbose duplicate notifications in django 1.9
+# )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
