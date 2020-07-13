@@ -100,16 +100,21 @@ var orderComplete = function(clientSecret) {
   stripe.retrievePaymentIntent(clientSecret).then(function(result) {
     var paymentIntent = result.paymentIntent;
     var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
+    console.log(paymentIntentJson);
 
     document.querySelector(".sr-payment-form").classList.add("hidden");
 //    document.querySelector("pre").textContent = paymentIntentJson;
 
     document.querySelector(".sr-result").classList.remove("hidden");
-    // setTimeout(function() {
-    //   document.querySelector(".sr-result").classList.add("expand");
-    // }, 200);
+     setTimeout(function() {
+       document.querySelector(".sr-result").classList.add("expand");
+     }, 200);
 
     changeLoadingState(false);
+
+// notify backend to expect incoming event
+    $.getJSON("stripe-webpage-confirm/" + document.getElementById('transID').value + "/");
+
   });
 };
 
@@ -117,9 +122,9 @@ var showError = function(errorMsgText) {
   changeLoadingState(false);
   var errorMsg = document.querySelector(".sr-field-error");
   errorMsg.textContent = errorMsgText;
-  setTimeout(function() {
-    errorMsg.textContent = "";
-  }, 4000);
+  // setTimeout(function() {
+  //   errorMsg.textContent = "";
+  // }, 4000);
 };
 
 // Show a spinner on payment submission
