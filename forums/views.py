@@ -2,14 +2,23 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from rbac.core import rbac_user_blocked_for_model, rbac_user_has_role
-from notifications.views import notify_happening
+from rbac.core import (
+    rbac_user_blocked_for_model,
+    rbac_user_has_role,
+    rbac_user_has_role_exact,
+)
+from notifications.views import (
+    notify_happening,
+    add_listener,
+    remove_listener,
+    check_listener,
+)
 from cobalt.utils import cobalt_paginator
 from rbac.views import rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
@@ -26,107 +35,107 @@ from .models import (
 )
 
 
-@login_required()
-def post_list(
-    request,
-    forum_list=None,
-    preview_view=False,
-    all_forums=False,
-    msg=None,
-    forum_id=None,
-):
-    """ Summary view showing a list of posts.
-
-    Args:
-        request(HTTPRequest): standard user request
-        forum_list(list): list of forums to include (Optional) - default is users preferences
-        preview_view(Boolean): Flag for long or short view
-        msg(str): message to go into title line explaining page
-        all_forums(Boolean): True to show all allowed forums
-        forum_id(int): specific forum to view - only required for the searchparams
-
-    Returns:
-        page(HTTPResponse): page with list of posts
-    """
-
-    # Interacting with JS requires a common language so we use 0 and 1 not
-    # True and False.
-
-    if preview_view:
-        preview_view = 1
-    else:
-        preview_view = 0
-
-    if all_forums:
-        all_forums = 1
-    else:
-        all_forums = 0
-
-    # build parameter string so pagination includes the right params on other pages
-    searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
-
-    # add specific forum if requested
-    # if forum_id:
-    #     searchparams = "%s/%s" % (forum_id, searchparams)
-
-    # get list of forums user cannot access
-    blocked = rbac_user_blocked_for_model(
-        user=request.user, app="forums", model="forum", action="view"
-    )
-
-    # if we got a forum list then remove anything blocked
-    if forum_list:
-        forum_list_allowed = [item for item in forum_list if item not in blocked]
-        posts_list = Post.objects.filter(forum__in=forum_list_allowed).order_by(
-            "-created_date"
-        )
-        all_forums = False
-
-    # Otherwise load everything not blocked
-    else:
-        posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
-        all_forums = True
-
-    # handle pagination
-    posts = cobalt_paginator(request, posts_list, 30)
-
-    #    print(posts)
-
-    # TODO: fix counts on paginated pages - doesn't work with posts_new
-    posts_new = []
-    for post in posts:
-        post.post_comments = Comment1.objects.filter(post=post).count()
-        post.post_comments += Comment2.objects.filter(post=post).count()
-        posts_new.append(post)
-
-    #    print(posts_new)
-
-    if preview_view:
-        return render(
-            request,
-            "forums/post_list.html",
-            {
-                "things": posts,
-                "all_forums": all_forums,
-                "msg": msg,
-                "searchparams": searchparams,
-            },
-        )
-    else:
-        return render(
-            request,
-            "forums/post_list_short.html",
-            {
-                "things": posts,
-                "all_forums": all_forums,
-                "msg": msg,
-                "searchparams": searchparams,
-            },
-        )
+# @login_required()
+# def post_list(
+#     request,
+#     forum_list=None,
+#     preview_view=False,
+#     all_forums=False,
+#     msg=None,
+#     forum_id=None,
+# ):
+#     """ Summary view showing a list of posts.
+#
+#     Args:
+#         request(HTTPRequest): standard user request
+#         forum_list(list): list of forums to include (Optional) - default is users preferences
+#         preview_view(Boolean): Flag for long or short view
+#         msg(str): message to go into title line explaining page
+#         all_forums(Boolean): True to show all allowed forums
+#         forum_id(int): specific forum to view - only required for the searchparams
+#
+#     Returns:
+#         page(HTTPResponse): page with list of posts
+#     """
+#
+#     # Interacting with JS requires a common language so we use 0 and 1 not
+#     # True and False.
+#
+#     if preview_view:
+#         preview_view = 1
+#     else:
+#         preview_view = 0
+#
+#     if all_forums:
+#         all_forums = 1
+#     else:
+#         all_forums = 0
+#
+#     # build parameter string so pagination includes the right params on other pages
+#     searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
+#
+#     # add specific forum if requested
+#     # if forum_id:
+#     #     searchparams = "%s/%s" % (forum_id, searchparams)
+#
+#     # get list of forums user cannot access
+#     blocked = rbac_user_blocked_for_model(
+#         user=request.user, app="forums", model="forum", action="view"
+#     )
+#
+#     # if we got a forum list then remove anything blocked
+#     if forum_list:
+#         forum_list_allowed = [item for item in forum_list if item not in blocked]
+#         posts_list = Post.objects.filter(forum__in=forum_list_allowed).order_by(
+#             "-created_date"
+#         )
+#         all_forums = False
+#
+#     # Otherwise load everything not blocked
+#     else:
+#         posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
+#         all_forums = True
+#
+#     # handle pagination
+#     posts = cobalt_paginator(request, posts_list, 30)
+#
+#     #    print(posts)
+#
+#     # TODO: fix counts on paginated pages - doesn't work with posts_new
+#     posts_new = []
+#     for post in posts:
+#         post.post_comments = Comment1.objects.filter(post=post).count()
+#         post.post_comments += Comment2.objects.filter(post=post).count()
+#         posts_new.append(post)
+#
+#     #    print(posts_new)
+#
+#     if preview_view:
+#         return render(
+#             request,
+#             "forums/post_list.html",
+#             {
+#                 "things": posts,
+#                 "all_forums": all_forums,
+#                 "msg": msg,
+#                 "searchparams": searchparams,
+#             },
+#         )
+#     else:
+#         return render(
+#             request,
+#             "forums/post_list_short.html",
+#             {
+#                 "things": posts,
+#                 "all_forums": all_forums,
+#                 "msg": msg,
+#                 "searchparams": searchparams,
+#             },
+#         )
 
 
 def post_list_single_forum(request, forum_id):
-    """ Front for post_list provides single forum view
+    """ shows posts for a single forum
 
     Args:
         request(HTTPRequest): standard user request
@@ -135,62 +144,67 @@ def post_list_single_forum(request, forum_id):
     Returns:
         page(HTTPResponse): page with list of posts
     """
-    try:
-        preview_view = int(request.GET.get("preview_view"))
-    except TypeError:
-        preview_view = False
 
     forum = get_object_or_404(Forum, pk=forum_id)
-    return post_list(
-        request,
-        forum_list=[forum_id],
-        msg=forum.title,
-        forum_id=forum_id,
-        preview_view=preview_view,
+
+    # check access
+    blocked = rbac_user_blocked_for_model(
+        user=request.user, app="forums", model="forum", action="view"
+    )
+    if forum_id in blocked:
+        return rbac_forbidden(request, "forums.forum.%s.view" % forum_id)
+
+    posts_list = Post.objects.filter(forum=forum).order_by("-created_date")
+
+    # handle pagination
+    posts = cobalt_paginator(request, posts_list, 30)
+
+    return render(
+        request, "forums/post_list_short.html", {"things": posts, "forum": forum}
     )
 
 
-def post_list_filter(request):
-    """ Front for post_list takes parameters and pre-processes
-
-    Args:
-        request(HTTPRequest): standard user request
-        short_view(int): inside Request. long or short view of forums
-        all_forums(int): inside Request. Show all or just the users forums
-
-    Returns:
-        page(HTTPResponse): page with list of posts
-    """
-
-    # checkboxes come in as 0 or 1 for True or False. Sometimes they are empty = False
-    # 0 or 1 are False and True in Python, but if we get no value set to False
-    try:
-        preview_view = int(request.GET.get("preview_view"))
-    except TypeError:
-        preview_view = False
-
-    try:
-        all_forums = int(request.GET.get("all_forums"))
-    except TypeError:
-        all_forums = False
-
-    if not all_forums:
-        forum_follows = list(
-            ForumFollow.objects.filter(user=request.user).values_list(
-                "forum", flat=True
-            )
-        )
-        return post_list(
-            request,
-            forum_list=forum_follows,
-            preview_view=preview_view,
-            msg="My Forums",
-            all_forums=all_forums,
-        )
-
-    return post_list(
-        request, preview_view=preview_view, msg="All Forums", all_forums=all_forums
-    )
+# def post_list_filter(request):
+#     """ Front for post_list takes parameters and pre-processes
+#
+#     Args:
+#         request(HTTPRequest): standard user request
+#         short_view(int): inside Request. long or short view of forums
+#         all_forums(int): inside Request. Show all or just the users forums
+#
+#     Returns:
+#         page(HTTPResponse): page with list of posts
+#     """
+#
+#     # checkboxes come in as 0 or 1 for True or False. Sometimes they are empty = False
+#     # 0 or 1 are False and True in Python, but if we get no value set to False
+#     try:
+#         preview_view = int(request.GET.get("preview_view"))
+#     except TypeError:
+#         preview_view = False
+#
+#     try:
+#         all_forums = int(request.GET.get("all_forums"))
+#     except TypeError:
+#         all_forums = False
+#
+#     if not all_forums:
+#         forum_follows = list(
+#             ForumFollow.objects.filter(user=request.user).values_list(
+#                 "forum", flat=True
+#             )
+#         )
+#         return post_list(
+#             request,
+#             forum_list=forum_follows,
+#             preview_view=preview_view,
+#             msg="My Forums",
+#             all_forums=all_forums,
+#         )
+#
+#     return post_list(
+#         request, preview_view=preview_view, msg="All Forums", all_forums=all_forums
+#     )
 
 
 # @login_required()
@@ -258,13 +272,47 @@ def post_detail(request, pk):
             if "submit-c2" in request.POST:
                 post.comment1.comment1_count += 1
                 post.comment1.save()
+
             # Tell people
+            link = reverse("forums:post_detail", args=[post.post.id])
+            host = request.get_host()
+            absolute_link = "http://%s%s" % (host, link)
+
+            email_body = "%s commented on %s in Forum: '%s.'" % (
+                request.user,
+                post.post.title,
+                post.post.forum,
+            )
+
+            context = {
+                "name": request.user.first_name,
+                "title": "New Comment on: %s" % post.post.title,
+                "email_body": email_body,
+                "absolute_link": absolute_link,
+                "host": host,
+                "link_text": "See Comment",
+            }
+
+            html_msg = render_to_string(
+                "notifications/email-notification.html", context
+            )
+
+            msg = "New Comment by %s on %s" % (request.user, post.post.title)
+
+            email_subject = "New Comment on Post: %s" % post.post.title
+
+            # call notifications
             notify_happening(
                 application_name="Forums",
                 event_type="forums.post.comment",
-                msg="%s commented on your post: %s" % (request.user, post.post.title),
+                msg=msg,
+                html_msg=html_msg,
                 topic=post.post.id,
+                link=link,
+                email_subject=email_subject,
+                user=request.user,
             )
+
         else:
             print(form.errors)
     form = CommentForm()
@@ -293,6 +341,16 @@ def post_detail(request, pk):
         c1.c1_likes = LikeComment1.objects.filter(comment1=c1).count()
         comments1_new.append(c1)
 
+    following = check_listener(
+        member=request.user,
+        application="Forums",
+        event_type="forums.post.comment",
+        topic=pk,
+    )
+
+    # for forums and moderate we can't call rbac_user_has_role as the default for forums is Allow
+    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)
+
     return render(
         request,
         "forums/post_detail.html",
@@ -303,6 +361,8 @@ def post_detail(request, pk):
             "comments1": comments1_new,
             "post_likes": post_likes,
             "total_comments": total_comments,
+            "following": following,
+            "is_moderator": is_moderator,
         },
     )
 
@@ -362,16 +422,8 @@ def post_new(request, forum_id=None):
                     topic=post.forum.id,
                     link=link,
                     email_subject=email_subject,
+                    user=request.user,
                 )
-
-                # notify user of comments
-                # create_user_notification(
-                #     member=post.author,
-                #     application_name="Forums",
-                #     event_type="forums.post.comment",
-                #     topic=post.id,
-                #     notification_type="Email",
-                # )
 
                 return redirect("forums:post_detail", pk=post.pk)
             else:
@@ -395,23 +447,44 @@ def post_new(request, forum_id=None):
     return render(request, "forums/post_edit.html", {"form": form, "forum": forum})
 
 
+def user_is_moderator_for_forum(user, forum_id):
+    """ check if user is a moderator for a forum.
+
+        For forums and moderate we can't call rbac_user_has_role as the default
+        for forums is Allow, so everyone gets in by default.
+    """
+
+    if rbac_user_has_role_exact(user, "forums.forum.%s.moderate" % forum_id):
+        return True
+    elif rbac_user_has_role_exact(user, "forums.forum.moderate"):
+        return True
+    else:
+        return False
+
+
 @login_required()
 def post_edit(request, post_id):
-    """ Edit a post in a forum """
+    """ Edit a post in a forum.
+
+    This can be done by the user who created it or a moderator """
 
     post = get_object_or_404(Post, pk=post_id)
+    role = "forums.forum.%s.create" % post.forum.id
 
-    if request.method == "POST":
-        if "publish" in request.POST:  # Publish
-            form = PostForm(request.POST, instance=post)
-            if form.is_valid():
-                if (
-                    rbac_user_has_role(
-                        request.user,
-                        "forums.forum.%s.create" % form.cleaned_data["forum"].id,
-                    )
-                    and post.author == request.user
-                ):
+    # check access
+    if not (
+        (rbac_user_has_role(request.user, role) and post.author == request.user)
+        or user_is_moderator_for_forum(request.user, post.forum.id)
+    ):
+        return rbac_forbidden(request, role)
+
+    else:
+
+        if request.method == "POST":
+            if "publish" in request.POST:  # Publish
+                form = PostForm(request.POST, instance=post)
+                if form.is_valid():
+
                     post = form.save(commit=False)
                     post.last_change_date = timezone.now()
                     post.save()
@@ -419,24 +492,16 @@ def post_edit(request, post_id):
                         request, "Post edited", extra_tags="cobalt-message-success"
                     )
                     return redirect("forums:post_detail", pk=post.pk)
-                else:
-                    return rbac_forbidden(
-                        request,
-                        "forums.forum.%s.create" % form.cleaned_data["forum"].id,
-                    )
 
-        elif "delete" in request.POST:  # Delete
-            post.delete()
-            messages.success(
-                request, "Post deleted", extra_tags="cobalt-message-success"
-            )
-            return redirect("forums:forums")
+            elif "delete" in request.POST:  # Delete
+                post.delete()
+                messages.success(
+                    request, "Post deleted", extra_tags="cobalt-message-success"
+                )
+                return redirect("forums:forums")
 
-        else:  # Maybe cancel hit or back button - reload page
-            return redirect("forums:post_edit", post_id=post_id)
-    else:
-        if request.user != post.author:
-            return HttpResponseForbidden()
+            else:  # Maybe cancel hit or back button - reload page
+                return redirect("forums:post_edit", post_id=post_id)
 
         # see which forums are blocked for this user - load a list of the others
         blocked_forums = rbac_user_blocked_for_model(
@@ -448,7 +513,7 @@ def post_edit(request, post_id):
     return render(
         request,
         "forums/post_edit.html",
-        {"form": form, "request": request, "edit": True},
+        {"form": form, "request": request, "edit": True, "forum": post.forum},
     )
 
 
@@ -576,7 +641,16 @@ def forum_list(request):
 
         forums_all.append(detail)
 
-    return render(request, "forums/forum_list.html", {"forums": forums_all})
+    if rbac_user_has_role(request.user, "forums.forumadmin.change"):
+        is_admin = True
+    else:
+        is_admin = False
+
+    print(is_admin)
+
+    return render(
+        request, "forums/forum_list.html", {"forums": forums_all, "is_admin": is_admin}
+    )
 
 
 @login_required
@@ -649,6 +723,48 @@ def unfollow_forum_ajax(request, forum_id):
 
 
 @login_required()
+def follow_post_ajax(request, post_id):
+    """ Function to follow a post over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        post_id(int):    Primary key of the post to follow
+
+    Returns:
+        HttpResponse
+    """
+
+    add_listener(
+        member=request.user,
+        application="Forums",
+        event_type="forums.post.comment",
+        topic=post_id,
+    )
+    return HttpResponse("You will receive an email when someone comments on this post.")
+
+
+@login_required()
+def unfollow_post_ajax(request, post_id):
+    """ Function to unfollow a post over ajax
+
+    Args:
+        request(HTTPRequest): standard request object
+        post_id(int):    Primary key of the post to unfollow
+
+    Returns:
+        HttpResponse
+    """
+
+    remove_listener(
+        member=request.user,
+        application="Forums",
+        event_type="forums.post.comment",
+        topic=post_id,
+    )
+    return HttpResponse("You will no longer receive email notifications for this post.")
+
+
+@login_required()
 def forum_create(request):
     """ view to create a new forum
 
@@ -659,7 +775,7 @@ def forum_create(request):
     """
 
     if not rbac_user_has_role(request.user, "forums.forumadmin.change"):
-        return HttpResponseForbidden()
+        return rbac_forbidden(request, "forums.forumadmin.change")
 
     if request.method == "POST":
         form = ForumForm(request.POST)
@@ -686,9 +802,25 @@ def forum_create(request):
 #     return render(request, "forums/frontpage.html", {"posts": posts})
 
 
+# @login_required()
+# def forum_colours_ajax(request, forum_id):
+#     """ Function to get the forum colours
+#
+#     Args:
+#         request(HTTPRequest): standard request object
+#         forum_id(int):    Primary key of the forum
+#
+#     Returns:
+#         HttpResponse
+#     """
+#
+#     forum = get_object_or_404(Forum, pk=forum_id)
+#     return HttpResponse("%s %s" % (forum.bg_colour, forum.fg_colour))
+
+
 @login_required()
-def forum_colours_ajax(request, forum_id):
-    """ Function to get the forum colours
+def forum_delete_ajax(request, forum_id):
+    """ Function to delete a forum
 
     Args:
         request(HTTPRequest): standard request object
@@ -698,5 +830,68 @@ def forum_colours_ajax(request, forum_id):
         HttpResponse
     """
 
+    if not rbac_user_has_role(request.user, "forums.forumadmin.change"):
+        rbac_forbidden(request.user, "forums.forumadmin.change")
+
     forum = get_object_or_404(Forum, pk=forum_id)
-    return HttpResponse("%s %s" % (forum.bg_colour, forum.fg_colour))
+    forum.delete()
+
+    return HttpResponse("%s deleted." % forum)
+
+
+@login_required()
+def comment_edit_common(request, comment):
+    """ common code for editing c1 and c2 """
+
+    role = "forums.forum.%s.create" % comment.post.forum.id
+    is_moderator = user_is_moderator_for_forum(request.user, comment.post.forum.id)
+
+    # check access
+    if not (
+        (rbac_user_has_role(request.user, role) and comment.author == request.user)
+        or is_moderator
+    ):
+        return rbac_forbidden(request, role)
+
+    else:
+        # access is okay
+        if request.method == "POST":
+            form = CommentForm(request.POST, instance=comment)
+            if form.is_valid():
+
+                comment = form.save(commit=False)
+                comment.last_change_date = timezone.now()
+
+                # Mark as edited by moderator unless own comment
+                if is_moderator and comment.author != request.user:
+                    comment.last_changed_by = "Moderator"
+                else:
+                    comment.last_changed_by = request.user.first_name
+                comment.save()
+                messages.success(
+                    request, "Comment edited", extra_tags="cobalt-message-success"
+                )
+                return redirect("forums:post_detail", pk=comment.post.pk)
+
+            else:
+                print(form.errors)
+
+        form = CommentForm(instance=comment)
+
+    return render(
+        request, "forums/comment_edit.html", {"form": form, "post": comment.post.id},
+    )
+
+
+@login_required()
+def comment1_edit(request, comment_id):
+
+    comment = get_object_or_404(Comment1, pk=comment_id)
+    return comment_edit_common(request, comment)
+
+
+@login_required()
+def comment2_edit(request, comment_id):
+
+    comment = get_object_or_404(Comment2, pk=comment_id)
+    return comment_edit_common(request, comment)

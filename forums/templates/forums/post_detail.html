@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
 <!-- Other libraries needed for this page -->
-<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
 
 <style>
 .cobalt-min-width-100 {
@@ -72,17 +72,24 @@
 {% endif %}
 <!-- End post -->
 
-{% if post.author == user %}
-
-<a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-info btn-sm">Edit Your Post</a><br>
-
+{% if following %}
+<button class="btn btn-success btn-sm" id="cobalt-follow">Un-follow</button>
+{% else %}
+<button class="btn btn-default btn-sm" id="cobalt-follow">Follow</button>
 {% endif %}
+
+{% if post.author == user %}
+<a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-info btn-sm">Edit Your Post</a>
+{% elif is_moderator %}
+<a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-danger btn-sm">Moderate</a><br>
+{% endif %}
+
 <br>
 <br>
 {% if total_comments == 0 %}
-  <h4>Be the first to comment</h4>
+  <h5>Be the first to comment</h5>
 {% else %}
-<h4>Comments</h4>
+<h5>Comments</h5>
 {% endif %}
 {% for c1 in comments1 %}
 
@@ -110,9 +117,16 @@
       <span id="cobalt_c1_likes_{{ c1.id }}">{{ c1.c1_likes }}</span> <i class="material-icons">thumb_up</i>
       <a href="javascript:void(0);" class="cobalt_like_c1_class" id="cobalt_like_c1_{{ c1.id }}">Like</a>
     </div>
+    {% if c1.author == user %}
+    <a href="{% url "forums:comment1_edit" comment_id=c1.id %}" class="btn btn-info btn-sm">Edit Comment</a>
+    {% elif is_moderator %}
+    <a href="{% url "forums:comment1_edit" comment_id=c1.id %}" class="btn btn-danger btn-sm">Moderate</a><br>
+    {% endif %}
   </div>
 </div>
-
+{% if c1.last_changed_by %}
+<p class="m-2" style="font-size: 12px;"><i>{{ c1.last_changed_by }} edited this on {{ c1.last_change_date }}</i></p>
+{% endif %}
 
 <!-- end Comment 1 -->
 
@@ -123,7 +137,7 @@
 
     {% for c2 in c1.c2 %}
 
-    <div class="card card-nav-tabs">
+    <div class="card card-nav-tabs m-2">
       <div class="card-body bg-light">
         <div class=" justify-content-between">
             <a href="{% url 'accounts:public_profile' pk=c2.author.pk %}">
@@ -144,13 +158,22 @@
           <span id="cobalt_c2_likes_{{ c2.id }}">{{ c2.c2_likes }}</span> <i class="material-icons">thumb_up</i>
           <a href="javascript:void(0);" class="cobalt_like_c2_class" id="cobalt_like_c2_{{ c2.id }}">Like</a>
         </div>
+        {% if c2.author == user %}
+        <a href="{% url "forums:comment2_edit" comment_id=c2.id %}" class="btn btn-info btn-sm">Edit Comment</a>
+        {% elif is_moderator %}
+        <a href="{% url "forums:comment2_edit" comment_id=c2.id %}" class="btn btn-danger btn-sm">Moderate</a><br>
+        {% endif %}
       </div>
     </div>
-
+    {% if c2.last_changed_by %}
+    <p class="m-0 p-0" style="font-size: 12px;"><i>{{ c2.last_changed_by }} edited this on {{ c2.last_change_date }}</i></p>
+    {% endif %}
     {% endfor %}
 
   </div>
 </div>
+
+
 
 <a href="javascript:void(0);"><p class="cobalt-open-reply" id="cobalt-click-{{ c1.id }}">Reply to this thread</p></a>
 <div id="cobalt-thread-{{ c1.id }}" class="d-none">
@@ -169,12 +192,12 @@
 
 <!-- Reply -->
 <hr>
-<h4 id="cobalt-post-comment">{{ total_comments }} comment{{ total_comments|pluralize }} so far. Want to add yours?</h4>
+<h5 id="cobalt-post-comment">{{ total_comments }} comment{{ total_comments|pluralize }} so far. Want to add yours?</h5>
 
 <form method="POST" class="post-form">{% csrf_token %}
   <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
   {{ form.text|as_crispy_field }}
-    <button type="submit" name="submit-c1" class="save btn btn-default">Reply to Post</button>
+    <button type="submit" name="submit-c1" class="save btn btn-success btn-sm">Reply to Post</button>
 </form>
 
 <script>
@@ -304,6 +327,38 @@ jQuery(document).ready(function() {
        });
   }
 
+  function followpost(e) {
+          console.log($("#cobalt-follow").text());
+    if ($("#cobalt-follow").text() == "Follow") {
+
+      console.log("text is follow");
+      var url = "/forums/post/follow/{{ post.id }}/";
+      $("#cobalt-follow").html("Un-Follow");
+      $("#cobalt-follow").toggleClass('btn-default btn-info');
+    } else {
+      console.log($("#cobalt-follow").innerText);
+      console.log("text is not follow");
+      var url = "/forums/post/unfollow/{{ post.id }}/";
+      $("#cobalt-follow").html("Follow");
+      $("#cobalt-follow").toggleClass('btn-info btn-default');
+    }
+
+    $.ajax({
+           url: url,
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "post",
+           success: function (response) {
+                swal.fire({ title:"Post Notifications", html: response, icon: "success", buttonsStyling: false});
+           },
+           error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+           }
+       });
+  }
+
   jQuery('#cobalt_like_post').on('click', function(e) {
     likePost();
   });
@@ -320,6 +375,10 @@ jQuery(document).ready(function() {
       event.stopPropagation();
       event.stopImmediatePropagation();
       likeC2(e);
+    });
+
+    jQuery('#cobalt-follow').on('click', function(e) {
+      followpost(e);
     });
 
 })

@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block header %}
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+{% endblock %}
+
 {% block content %}
 
   <div class="container">
@@ -26,11 +30,18 @@
         {% else %}
           <button class="btn btn-sm btn-success cobalt-follow" id="button-{{ forum.id }}" style="width: 90px;">follow</button>
         {% endif %}
+        {% if is_admin %}
+          <button class="btn btn-sm btn-danger cobalt-delete" id="delete-{{ forum.id }}" style="width: 90px; border:0px; margin:0px">Delete</button>
+        {% endif %}
 
       </div>
     </div>
     {% endfor %}
   </div>
+
+  {% if is_admin %}
+    <a href="{% url "forums:forum_create" %}" class="btn btn-warning">Create New Forum</a>
+  {% endif %}
 
 {% endblock %}
 
@@ -61,6 +72,41 @@
             success: function(txt){
             }
         });
+     });
+
+// handle delete
+    $(".cobalt-delete").click(function () {
+        forum = this.id.split('-')[1];
+        var url = "forum/delete/" + forum;
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.value) {
+
+            $.ajax({
+                url: url,
+                context: document.body,
+                success: function(txt){
+                  Swal.fire(
+                    'Deleted!',
+                    txt,
+                    'success'
+                  );
+                  location.reload();
+                }
+            });
+
+
+          }
+        })
+
      });
   });
 

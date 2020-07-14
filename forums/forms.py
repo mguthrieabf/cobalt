@@ -97,4 +97,4 @@ class Comment2Form(forms.ModelForm):
 class ForumForm(forms.ModelForm):
     class Meta:
         model = Forum
-        fields = ["title", "description"]
+        fields = ["title", "description", "forum_type", "fg_colour", "bg_colour"]

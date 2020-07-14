@@ -187,6 +187,7 @@ def rbac_user_has_role_exact(member, role):
     matches = RBACGroupRole.objects.filter(group__in=groups)
 
     for m in matches:
+        print(m.role)
         if m.role == role or m.role == all_role:
             return m.rule_type
 
@@ -194,45 +195,68 @@ def rbac_user_has_role_exact(member, role):
     return None
 
 
-def rbac_user_has_role(member, role):
+def rbac_user_has_role(member, role, debug=False):
     """ check if a user has a specific role
 
     Args:
         member(User): standard user object
         role(str): role to check
+        debug(bool): print debug info
 
     Returns:
         bool: True or False for user role
     """
 
+    if debug:
+        print(f"Checking Member: {member} Role: {role}")
+
     # Is there a specific rule for this user and role
+    if debug:
+        print("Checking for specific rule for user")
     return_code = rbac_user_has_role_exact(member, role)
+    if debug:
+        print(f"-->{return_code}")
     if return_code:
         return allow_to_boolean(return_code)
 
     # Is there a specific rule for Everyone and this role
     everyone = User.objects.get(pk=RBAC_EVERYONE)
+    if debug:
+        print("Checking specific rule for EVERYONE")
     return_code = rbac_user_has_role_exact(everyone, role)
+    if debug:
+        print(f"-->{return_code}")
     if return_code:
         return allow_to_boolean(return_code)
 
     # Is there a higher role. eg. for forums.forum.5 if no match then is there
     # a rule for forums.forum. We only go one level up for performance reasons.
-    if role.count(".") == 2:  # 3 levels
+    if role.count(".") == 3:  # 3 levels plus action
         parts = role.split(".")
-        role = ".".join(parts[:2])  # drop last part
+        role = "%s.%s.%s" % (parts[0], parts[1], parts[3])  # f.f.5.create -> f.f.create
 
         # next level rule for this user
+        if debug:
+            print(f"Checking higher rule for user: {role}")
+
         return_code = rbac_user_has_role_exact(member, role)
+        if debug:
+            print(f"-->{return_code}")
         if return_code:
             return allow_to_boolean(return_code)
 
         #  next level rule for everyone
+        if debug:
+            print(f"Checking higher rule for EVERYONE")
         return_code = rbac_user_has_role_exact(everyone, role)
+        if debug:
+            print(f"-->{return_code}")
         if return_code:
             return allow_to_boolean(return_code)
 
     # No match or no higher rule - use default
+    if debug:
+        print("Checking defaults for this app")
     (app, model, model_instance, action) = role_to_parts(role)
     default = (
         RBACModelDefault.objects.filter(app=app, model=model)

@@ -34,6 +34,9 @@ class RBACGroup(models.Model):
     )
     """ Standard User object """
 
+    class Meta:
+        unique_together = ["name_qualifier", "name_item"]
+
     def __str__(self):
         return "%s.%s - %s" % (self.name_qualifier, self.name_item, self.description)
 
@@ -149,6 +152,9 @@ class RBACAdminGroup(models.Model):
     )
     """ Standard User object """
 
+    class Meta:
+        unique_together = ["name_qualifier", "name_item"]
+
     def __str__(self):
         return "%s.%s - %s" % (self.name_qualifier, self.name_item, self.description)
 
@@ -203,7 +209,7 @@ class RBACAdminTree(models.Model):
     group = models.ForeignKey(RBACAdminGroup, on_delete=models.CASCADE)
     """ RBACGroup for this Role """
 
-    tree = models.CharField(max_length=100)
+    tree = models.CharField(max_length=100, unique=True)
     """ tree is an allowed entry point for a user. e.g. rbac.org.org """
 
     def __str__(self):

@@ -139,6 +139,12 @@ The following roles are currently supported:
   +------------------------+-----------------------------------------+
   | forums.forum           | *Ability to do something in all forums* |
   +------------------------+-----------------------------------------+
+  | forums.forumadmin      | *Make changes at the forum level*       |
+  +------------------------+-----------------------------------------+
+  | payments.view.x        | *View payments for org x*               |
+  +------------------------+-----------------------------------------+
+  | payments.view          | *View payments for any org*             |
+  +------------------------+-----------------------------------------+
   | payments.manage.x      | *Do things with payments for org x*     |
   +------------------------+-----------------------------------------+
   | payments.manage        | *Do things with payments for any org*   |
@@ -146,10 +152,6 @@ The following roles are currently supported:
   | org.org.x              | *Management of org x*                   |
   +------------------------+-----------------------------------------+
   | org.org                | *Management of all orgs*                |
-  +------------------------+-----------------------------------------+
-  | scoring.score.x        | *Scoring for org x*                     |
-  +------------------------+-----------------------------------------+
-  | scoring.score          | *Scoring for all orgs*                  |
   +------------------------+-----------------------------------------+
 
 
@@ -354,7 +356,7 @@ Administration of Administrators
 --------------------------------
 
 Any admin can create or delete administrators within their sphere of
-administration. 
+administration.
 
 We will need some sort of a review of access but nobody can ever give another
 user more access than they already have. The roles such as *forums.forum* are

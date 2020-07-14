@@ -81,7 +81,9 @@ def get_notifications_for_user(user):
     note_count = InAppNotification.objects.filter(
         member=user, acknowledged=False
     ).count()
-    notes = InAppNotification.objects.filter(member=user, acknowledged=False)[:10]
+    notes = InAppNotification.objects.filter(member=user, acknowledged=False).order_by(
+        "-created_date"
+    )[:10]
 
     for note in notes:
         notifications.append(
@@ -157,17 +159,11 @@ def notify_happening_forums(
     link=None,
     html_msg=None,
     email_subject=None,
+    user=None,
 ):
     """ sub function for notify_happening() - handles Forum events
         Might be able to make this generic
     """
-
-    print("Incoming event:")
-    print("Event tpye: %s" % event_type)
-    print("App: %s" % application_name)
-    print("Topic: %s" % topic)
-    print("Subtopic: %s" % subtopic)
-
     listeners = NotificationMapping.objects.filter(
         application=application_name,
         event_type=event_type,
@@ -175,29 +171,16 @@ def notify_happening_forums(
         subtopic=subtopic,
     )
 
-    print(listeners)
-    lvar = NotificationMapping.objects.all()
-    for x in lvar:
-        print(x.event_type)
-        print(event_type)
-        print(x.application)
-        print(application_name)
-        print(x.member)
-        print(x.topic)
-        print(topic)
-        print(x.subtopic)
-        print(subtopic)
-
     for listener in listeners:
-        print(listener)
-        contact_member(
-            listener.member,
-            msg,
-            listener.notification_type,
-            link,
-            html_msg,
-            email_subject,
-        )
+        if user != listener.member:
+            contact_member(
+                listener.member,
+                msg,
+                listener.notification_type,
+                link,
+                html_msg,
+                email_subject,
+            )
 
 
 def notify_happening(
@@ -209,6 +192,7 @@ def notify_happening(
     link=None,
     html_msg=None,
     email_subject=None,
+    user=None,
 ):
     """ Called by Cobalt applications to tell notify they have done something.
 
@@ -230,7 +214,7 @@ def notify_happening(
         Nothing
 
     """
-    print("inside notify happening")
+
     if application_name == "Forums":
         notify_happening_forums(
             application_name,
@@ -241,6 +225,7 @@ def notify_happening(
             link,
             html_msg,
             email_subject,
+            user,
         )
 
 
@@ -271,7 +256,9 @@ def delete_all_in_app_notifications(member):
 def homepage(request):
     """ homepage for notifications listings """
 
-    notes = InAppNotification.objects.filter(member=request.user)
+    notes = InAppNotification.objects.filter(member=request.user).order_by(
+        "-created_date"
+    )
     things = cobalt_paginator(request, notes, 10)
     return render(request, "notifications/homepage.html", {"things": things})
 
@@ -295,3 +282,54 @@ def passthrough(request, id):
 
     note = acknowledge_in_app_notification(id)
     return redirect(note.link)
+
+
+def add_listener(
+    member,
+    application,
+    event_type,
+    topic=None,
+    subtopic=None,
+    notification_type="Email",
+):
+    """ Add a user to be notified of an event """
+
+    listener = NotificationMapping(
+        member=member,
+        application=application,
+        event_type=event_type,
+        topic=topic,
+        subtopic=subtopic,
+        notification_type=notification_type,
+    )
+    listener.save()
+
+
+def remove_listener(member, application, event_type, topic=None, subtopic=None):
+    """ Remove a user from being notified of an event """
+
+    listeners = NotificationMapping.objects.filter(
+        member=member,
+        application=application,
+        event_type=event_type,
+        topic=topic,
+        subtopic=subtopic,
+    )
+    for listener in listeners:
+        listener.delete()
+
+
+def check_listener(member, application, event_type, topic=None, subtopic=None):
+    """ Check if a user is being notified of an event """
+
+    listeners = NotificationMapping.objects.filter(
+        member=member,
+        application=application,
+        event_type=event_type,
+        topic=topic,
+        subtopic=subtopic,
+    )
+    if listeners:
+        return True
+    else:
+        return False

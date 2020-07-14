@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
-<h2>View Posts - {{ msg }}</h2>
+<h2>View Posts - {{ forum }}</h2>
 
 <div class="col-md-12 d-flex">
  <div>
-   <div class="form-check form-check-radio form-check-inline">
+   <!-- <div class="form-check form-check-radio form-check-inline">
      <label class="form-check-label">
        <input class="form-check-input cobalt-checkbox" type="checkbox" name="preview" id="id_preview" value=""> Show Preview
        <span class="form-check-sign">
@@ -27,12 +28,12 @@
            <span class="check"></span>
        </span>
      </label>
-   </div>
-   <a href="{% url "forums:forum_list" %}" class="btn btn-danger btn-sm">Browse Forums</a>
+   </div> -->
+   <a href="{% url "forums:forum_list" %}" class="btn btn-danger btn-sm">All Forums</a>
    <a href="{% url "forums:post_search" %}" class="btn btn-primary btn-sm"><i class="material-icons">search</i> Search</a>
  </div>
  <div class="ml-auto">
-   <button class="btn btn-success btn-sm" onclick="location.reload();location.href='{% url "forums:post_new" %}'">Create New Post</button>
+   <button class="btn btn-success btn-sm" onclick="location.reload();location.href='{% url "forums:post_new_with_id" forum_id=forum.id %}'">Create New Post</button>
  </div>
 </div>
 
@@ -46,16 +47,17 @@
       <div class="container">
         <div class="row">
           <div class="col-10">
-            <h3 style="padding:0px; margin: 0px;"><a href="{% url 'forums:post_detail' pk=thing.pk %}">{{ thing.title }}</a></h3>
-            <h5 style="padding:0px; margin: 0px;">{{ thing.author.full_name }} posted in {{ thing.forum.title }}</h5>
-            <h6 style="padding:0px; margin: 0px;">{{ thing.created_date }}</h6>
+            <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=thing.pk %}">{{ thing.title }}</a></h3>
+            <h5 class="p-0 m-0">{{ thing.author.full_name }} posted in {{ thing.forum.title }}</h5>
+            <p class="p-0 m-0 font-italic"><small>{{ thing.created_date|naturaltime }}</small></p>
+            <p class="p-0 m-0"><small>{{ thing.created_date|date:"n M Y P" }}</small></p>
           </div>
           <div class="col-2 my-auto">
             <div class="text-center display-2">
-              {{ thing.post_comments }}
+              {{ thing.comment_count }}
             </div>
             <div class="text-center">
-              comment{{ thing.post_comments|pluralize}}
+              comment{{ thing.comment_count|pluralize}}
             </div>
           </div>
         </div>
@@ -66,17 +68,10 @@
 
 {% empty %}
 <br>
-<h2>Hmmm... There doesn't appear to be anything here.</h2>
-<p>Try following some forums or selecting "All Forums" above.</p>
+<h2>Hmmm... There doesn't appear to be anything here yet.</h2>
 {% endfor %}
 <br>
 {% include 'pagination_footer.html' %}
 
-
-{% endblock %}
-
-{% block footer %}
-
-{% include 'forums/view_footer.html' %}
 
 {% endblock %}
