@@ -280,6 +280,7 @@ SUMMERNOTE_CONFIG = {
 # Default user to be the everyone user for RBAC
 RBAC_EVERYONE = 1
 
+# logging
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
