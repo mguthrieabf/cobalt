@@ -26,6 +26,7 @@ def home(request):
     posts2 = get_announcements(request)
 
     logger.info(posts)
+    logger.info("has next: %s" % posts.has_next())
 
     return render(
         request,
