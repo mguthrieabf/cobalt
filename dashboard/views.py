@@ -102,4 +102,7 @@ def get_posts(request):
 
     posts = cobalt_paginator(request, posts_list, 4)
 
+    for p in posts:
+        logger.info(p)
+
     return posts
