@@ -14,13 +14,13 @@ from rbac.core import rbac_user_blocked_for_model
 @login_required()
 def home(request):
     """ Home page """
+    print("MGDEBUG-HOME")
     system_number = request.user.system_number
     masterpoints = get_masterpoints(system_number)
     payments = get_balance_detail(request.user)
     posts = get_posts(request)
     posts2 = get_announcements(request)
 
-    print("MGDEBUG------")
     print(posts)
 
     return render(
