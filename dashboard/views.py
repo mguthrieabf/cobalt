@@ -20,6 +20,9 @@ def home(request):
     posts = get_posts(request)
     posts2 = get_announcements(request)
 
+    print("MGDEBUG------")
+    print(posts)
+
     return render(
         request,
         "dashboard/home.html",

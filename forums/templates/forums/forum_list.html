@@ -10,15 +10,14 @@
 
   <div class="container">
     <h2>All Forums</h2>
+    <p class="font-italic">If you follow a forum then any new posts will appear on the feed in your dashboard.</p>
+    <p class="font-italic">If you do not follow any forums then all forum posts will be included.</p>
     {% for forum in forums %}
     <div class="row">
       <div class="col-md-8 align-self-center">
         <div class="card card-block m-1">
           <div class="card-body">
             <h4 class="card-title"><a href="{% url "forums:post_list_single_forum" forum_id=forum.id %}">{{ forum.title }} ({{ forum.count }} post{{ forum.count|pluralize}})</a></h4>
-            <!-- <p class="category">{{ forum.description }}</p>
-            <h4>Latest Post</h4>
-             {{ forum.latest_title }} {{ forum.latest_author }} {{ forum.latest_date }} -->
           </div>
         </div>
       </div>
