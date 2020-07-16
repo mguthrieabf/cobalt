@@ -10,18 +10,22 @@ from cobalt.utils import cobalt_paginator
 from forums.models import Post, ForumFollow
 from rbac.core import rbac_user_blocked_for_model
 
+import logging
+
+logger = logging.getLogger("django")
+
 
 @login_required()
 def home(request):
     """ Home page """
-    print("MGDEBUG-HOME")
+    logger.info("MGDEBUG-HOME")
     system_number = request.user.system_number
     masterpoints = get_masterpoints(system_number)
     payments = get_balance_detail(request.user)
     posts = get_posts(request)
     posts2 = get_announcements(request)
 
-    print(posts)
+    logger.info(posts)
 
     return render(
         request,
@@ -55,7 +59,6 @@ def scroll2(request):
     other front page database hits. """
 
     posts2 = get_announcements(request)
-    print(posts2)
     return render(request, "dashboard/home.html", {"posts2": posts2})
 
 

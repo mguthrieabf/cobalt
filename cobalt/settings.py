@@ -280,17 +280,15 @@ SUMMERNOTE_CONFIG = {
 # Default user to be the everyone user for RBAC
 RBAC_EVERYONE = 1
 
-# Bring in Elastic Beanstalk config if present.
-# with open("/opt/elasticbeanstalk/deployment/env") as env:
-# with open("/tmp/env") as env:
-#     lines=env.readlines()
-#     for line in lines:
-#         if not line.find("PATH")>=0:
-#             parts=line.split("=")
-#             exec(f"{parts[0]}='{parts[1].strip()}'")
-
-
-# try:
-#     from .local_settings import *
-# except ImportError:
-#     pass
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "/tmp/cobalt.log",
+        },
+    },
+    "loggers": {"django": {"handlers": ["file"], "level": "DEBUG", "propagate": True}},
+}
