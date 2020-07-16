@@ -144,38 +144,31 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-            <form class="navbar-form">
-              <div class="input-group no-border">
-                <input type="text" value="" class="form-control" placeholder="Search...">
-                <button type="submit" class="btn btn-white btn-round btn-just-icon">
-                  <i class="material-icons">search</i>
-                  <div class="ripple-container"></div>
-                </button>
-              </div>
-            </form>
+
             <ul class="navbar-nav">
 
             {% if notifications %}
 
               <li class="nav-item dropdown">
-                <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">notifications</i>
 
                   <span class="notification">
                     {{ notification_count }}
                   </span>
-                  <p class="d-lg-none d-md-block">
-                    Notifications
-                  </p>
+
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+
                   {% for msg in notifications %}
                        <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
-                </div>
-            {% endif %}
-              </li>
 
+                </div>
+                {% endif %}
+
+              </li>
               <li class="nav-item dropdown">
+                <form class="navbar-form navbar-right">
                 <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">person</i>
                   <p class="d-lg-none d-md-block">
@@ -183,16 +176,16 @@
                   </p>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                  <a class="dropdown-item" href="{% url "accounts:user_profile" %}">Profile</a>
+                  <a class="dropdown-item" href="/accounts/profile">Profile</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/accounts/logout">Log out</a>
                 </div>
+              </form>
               </li>
             </ul>
           </div>
-        </div>
+          </div>
       </nav>
-      <!-- End Navbar -->
     <div class="content" style="margin-top:20px;">
 
       {% include 'messages.html' %}
