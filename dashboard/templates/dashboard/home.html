@@ -125,11 +125,15 @@
                       </div>
                     </div>
                   </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-10">
+                      {{ post.text|truncatewords_html:50|safe }}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                {{ post.text|truncatewords_html:50|safe }}
-              </div>
+
             </div>
           </div>
           {% endfor %}

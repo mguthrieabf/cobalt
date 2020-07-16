@@ -11,7 +11,7 @@
       </div>
       <div class="card-body">
           <img src="{% static "assets/img/stop.jpg" %}" width="200px">
-        Sorry! You do not the right permissions to view this page.
+        Sorry! You do not have the right permissions for this action.
         <br>
         <div class="container">
           <div class="row">
@@ -30,9 +30,11 @@
               <br>
               You tried to access {{ request.META.PATH_INFO }}
               <br>
-              This requires the role: {{ role }} which you do not have.
+              This requires the role: {{ role }} Allow which you do not have.
+              This could be because you are not in a group that provides this access,
+              or it could be that you are in a group that blocks this access.
               <br>
-              The following groups have this access:
+              The following groups refer to this access:
               <ul>
                 {% for group in groups %}
                 <li><a href="{% url "rbac:group_view" group_id=group.group.id %}">{{ group.group.name_qualifier }}.{{ group.group.name_item }}</a>

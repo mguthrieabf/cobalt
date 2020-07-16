@@ -35,105 +35,6 @@ from .models import (
 )
 
 
-# @login_required()
-# def post_list(
-#     request,
-#     forum_list=None,
-#     preview_view=False,
-#     all_forums=False,
-#     msg=None,
-#     forum_id=None,
-# ):
-#     """ Summary view showing a list of posts.
-#
-#     Args:
-#         request(HTTPRequest): standard user request
-#         forum_list(list): list of forums to include (Optional) - default is users preferences
-#         preview_view(Boolean): Flag for long or short view
-#         msg(str): message to go into title line explaining page
-#         all_forums(Boolean): True to show all allowed forums
-#         forum_id(int): specific forum to view - only required for the searchparams
-#
-#     Returns:
-#         page(HTTPResponse): page with list of posts
-#     """
-#
-#     # Interacting with JS requires a common language so we use 0 and 1 not
-#     # True and False.
-#
-#     if preview_view:
-#         preview_view = 1
-#     else:
-#         preview_view = 0
-#
-#     if all_forums:
-#         all_forums = 1
-#     else:
-#         all_forums = 0
-#
-#     # build parameter string so pagination includes the right params on other pages
-#     searchparams = "preview_view=%s&all_forums=%s&" % (preview_view, all_forums)
-#
-#     # add specific forum if requested
-#     # if forum_id:
-#     #     searchparams = "%s/%s" % (forum_id, searchparams)
-#
-#     # get list of forums user cannot access
-#     blocked = rbac_user_blocked_for_model(
-#         user=request.user, app="forums", model="forum", action="view"
-#     )
-#
-#     # if we got a forum list then remove anything blocked
-#     if forum_list:
-#         forum_list_allowed = [item for item in forum_list if item not in blocked]
-#         posts_list = Post.objects.filter(forum__in=forum_list_allowed).order_by(
-#             "-created_date"
-#         )
-#         all_forums = False
-#
-#     # Otherwise load everything not blocked
-#     else:
-#         posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
-#         all_forums = True
-#
-#     # handle pagination
-#     posts = cobalt_paginator(request, posts_list, 30)
-#
-#     #    print(posts)
-#
-#     # TODO: fix counts on paginated pages - doesn't work with posts_new
-#     posts_new = []
-#     for post in posts:
-#         post.post_comments = Comment1.objects.filter(post=post).count()
-#         post.post_comments += Comment2.objects.filter(post=post).count()
-#         posts_new.append(post)
-#
-#     #    print(posts_new)
-#
-#     if preview_view:
-#         return render(
-#             request,
-#             "forums/post_list.html",
-#             {
-#                 "things": posts,
-#                 "all_forums": all_forums,
-#                 "msg": msg,
-#                 "searchparams": searchparams,
-#             },
-#         )
-#     else:
-#         return render(
-#             request,
-#             "forums/post_list_short.html",
-#             {
-#                 "things": posts,
-#                 "all_forums": all_forums,
-#                 "msg": msg,
-#                 "searchparams": searchparams,
-#             },
-#         )
-
-
 def post_list_single_forum(request, forum_id):
     """ shows posts for a single forum
 
@@ -159,80 +60,13 @@ def post_list_single_forum(request, forum_id):
     # handle pagination
     posts = cobalt_paginator(request, posts_list, 30)
 
+    can_post = rbac_user_has_role(request.user, f"forums.forum.{forum_id}.create")
+
     return render(
-        request, "forums/post_list_short.html", {"things": posts, "forum": forum}
+        request,
+        "forums/post_list_short.html",
+        {"things": posts, "forum": forum, "can_post": can_post},
     )
-
-
-# def post_list_filter(request):
-#     """ Front for post_list takes parameters and pre-processes
-#
-#     Args:
-#         request(HTTPRequest): standard user request
-#         short_view(int): inside Request. long or short view of forums
-#         all_forums(int): inside Request. Show all or just the users forums
-#
-#     Returns:
-#         page(HTTPResponse): page with list of posts
-#     """
-#
-#     # checkboxes come in as 0 or 1 for True or False. Sometimes they are empty = False
-#     # 0 or 1 are False and True in Python, but if we get no value set to False
-#     try:
-#         preview_view = int(request.GET.get("preview_view"))
-#     except TypeError:
-#         preview_view = False
-#
-#     try:
-#         all_forums = int(request.GET.get("all_forums"))
-#     except TypeError:
-#         all_forums = False
-#
-#     if not all_forums:
-#         forum_follows = list(
-#             ForumFollow.objects.filter(user=request.user).values_list(
-#                 "forum", flat=True
-#             )
-#         )
-#         return post_list(
-#             request,
-#             forum_list=forum_follows,
-#             preview_view=preview_view,
-#             msg="My Forums",
-#             all_forums=all_forums,
-#         )
-#
-#     return post_list(
-#         request, preview_view=preview_view, msg="All Forums", all_forums=all_forums
-#     )
-
-
-# @login_required()
-# def post_list_dashboard(request):
-#     """ Summary view showing a list of posts for use by the dashboard.
-#
-#     Args:
-#         request(HTTPRequest): standard user request
-#
-#     Returns:
-#         list:   list of Post objects
-#     """
-#
-#     # TODO: decide if this should be filtered or not - currently not
-#
-#     # get list of forums user cannot access
-#     blocked = rbac_user_blocked_for_model(
-#         user=request.user, app="forums", model="forum", action="view"
-#     )
-#
-#     posts = Post.objects.exclude(forum__in=blocked).order_by("-created_date")[:20]
-#     posts_new = []
-#     for post in posts:
-#         post.post_comments = Comment1.objects.filter(post=post).count()
-#         post.post_comments += Comment2.objects.filter(post=post).count()
-#         posts_new.append(post)
-#
-#     return posts_new
 
 
 @login_required()
@@ -256,6 +90,10 @@ def post_detail(request, pk):
         return rbac_forbidden(request, "forums.forum.%s.view" % post.forum.id)
 
     if request.method == "POST":
+        if not rbac_user_has_role(
+            request.user, "forums.forum.%s.create" % post.forum.id
+        ):
+            return rbac_forbidden(request, "forums.forum.%s.create" % post.forum.id)
         # identify which form submitted this - comments1 or comments2
         if "submit-c1" in request.POST:
             form = CommentForm(request.POST)
@@ -604,7 +442,7 @@ def forum_list(request):
 
     # get allowed forum list
     blocked_forums = rbac_user_blocked_for_model(
-        user=request.user, app="forums", model="forum", action="create"
+        user=request.user, app="forums", model="forum", action="view"
     )
     forums = Forum.objects.exclude(id__in=blocked_forums)
 
@@ -614,6 +452,7 @@ def forum_list(request):
         ForumFollow.objects.filter(user=request.user).values_list("forum", flat=True)
     )
 
+    # TODO: remove redundant fields in this bit
     for forum in forums:
         detail = {}
         count = Post.objects.filter(forum=forum).count()
@@ -634,6 +473,7 @@ def forum_list(request):
         detail["latest_author"] = latest_author
         detail["latest_title"] = latest_title
         detail["latest_date"] = latest_date
+        detail["forum_type"] = forum.forum_type
         if forum.id in forum_follows:
             detail["follows"] = True
         else:

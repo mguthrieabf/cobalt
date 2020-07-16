@@ -18,15 +18,11 @@ logger = logging.getLogger("django")
 @login_required()
 def home(request):
     """ Home page """
-    logger.info("MGDEBUG-HOME")
     system_number = request.user.system_number
     masterpoints = get_masterpoints(system_number)
     payments = get_balance_detail(request.user)
     posts = get_posts(request)
     posts2 = get_announcements(request)
-
-    logger.info(posts)
-    logger.info("has next: %s" % posts.has_next())
 
     return render(
         request,
@@ -39,7 +35,7 @@ def home(request):
 def scroll1(request):
     """ Cutdown homepage to be called by infinite scroll.
 
-    This handles the left column - discussion posts
+    This handles the right column - discussion posts
 
     Infinite scroll will call this when the user scrolls off the bottom
     of the page. We don't need to update anything except the posts so exclude
@@ -53,7 +49,7 @@ def scroll1(request):
 def scroll2(request):
     """ Cutdown homepage to be called by infinite scroll.
 
-    This handles the right column - announcements
+    This handles the left column - announcements
 
     Infinite scroll will call this when the user scrolls off the bottom
     of the page. We don't need to update anything except the posts so exclude
@@ -102,8 +98,5 @@ def get_posts(request):
         posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
 
     posts = cobalt_paginator(request, posts_list, 4)
-
-    for p in posts:
-        logger.info(p)
 
     return posts
