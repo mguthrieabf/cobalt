@@ -12,7 +12,10 @@ from rbac.core import (
     rbac_user_blocked_for_model,
     rbac_user_has_role,
     rbac_user_has_role_exact,
+    rbac_get_users_in_group,
+    rbac_add_user_to_group,
 )
+from rbac.models import RBACGroup, RBACGroupRole, RBACUserGroup
 from notifications.views import (
     notify_happening,
     add_listener,
@@ -33,6 +36,7 @@ from .models import (
     Forum,
     ForumFollow,
 )
+from accounts.models import User
 
 
 def post_list_single_forum(request, forum_id):
@@ -90,10 +94,19 @@ def post_detail(request, pk):
         return rbac_forbidden(request, "forums.forum.%s.view" % post.forum.id)
 
     if request.method == "POST":
+
+        # Check user permissions to post
         if not rbac_user_has_role(
             request.user, "forums.forum.%s.create" % post.forum.id
         ):
             return rbac_forbidden(request, "forums.forum.%s.create" % post.forum.id)
+
+        # Check for rascals
+        # if rbac_user_has_role_exact(
+        #     request.user, "forums.forum.%s.blocked_users" % post.forum.id
+        # ):
+        #     return rbac_forbidden(request, "forums.forum.%s.blocked_users" % post.forum.id)
+
         # identify which form submitted this - comments1 or comments2
         if "submit-c1" in request.POST:
             form = CommentForm(request.POST)
@@ -633,29 +646,9 @@ def forum_create(request):
     else:
         form = ForumForm()
 
-    return render(request, "forums/forum_create.html", {"form": form})
-
-
-# def frontpage(request):
-#     posts_list = Post.objects.all().order_by("-created_date")
-#     posts = cobalt_paginator(request, posts_list, 30)
-#     return render(request, "forums/frontpage.html", {"posts": posts})
-
-
-# @login_required()
-# def forum_colours_ajax(request, forum_id):
-#     """ Function to get the forum colours
-#
-#     Args:
-#         request(HTTPRequest): standard request object
-#         forum_id(int):    Primary key of the forum
-#
-#     Returns:
-#         HttpResponse
-#     """
-#
-#     forum = get_object_or_404(Forum, pk=forum_id)
-#     return HttpResponse("%s %s" % (forum.bg_colour, forum.fg_colour))
+    return render(
+        request, "forums/forum_edit.html", {"form": form, "title": "Create New Forum"}
+    )
 
 
 @login_required()
@@ -735,3 +728,119 @@ def comment2_edit(request, comment_id):
 
     comment = get_object_or_404(Comment2, pk=comment_id)
     return comment_edit_common(request, comment)
+
+
+@login_required()
+def forum_edit(request, forum_id):
+    """ View to allow an admin to edit a forums settings """
+
+    # Moderators or forum admins can do this
+    if not (
+        rbac_user_has_role(request.user, "forums.forumadmin.change")
+        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+    ):
+        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+
+    forum = get_object_or_404(Forum, pk=forum_id)
+
+    if request.method == "POST":
+        form = ForumForm(request.POST, instance=forum)
+        if form.is_valid():
+            forum.title = form.cleaned_data["title"]
+            forum.description = form.cleaned_data["description"]
+            forum.save()
+            messages.success(
+                request, "Forum edited", extra_tags="cobalt-message-success"
+            )
+            return redirect("forums:post_list_single_forum", forum_id=forum.id)
+        else:
+            print(form.errors)
+    else:
+        form = ForumForm(instance=forum)
+
+    blocked_users = rbac_get_users_in_group(f"forums.forum.{forum_id}.blocked_users")
+
+    print(blocked_users)
+
+    return render(
+        request,
+        "forums/forum_edit.html",
+        {
+            "form": form,
+            "title": "Edit Forum",
+            "blocked_users": blocked_users,
+            "forum": forum,
+        },
+    )
+
+
+@login_required()
+def block_user(request, user_id, forum_id):
+    """ stop a user from being able to post to a forum """
+
+    if not (
+        rbac_user_has_role(request.user, "forums.forumadmin.change")
+        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+    ):
+        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+
+    user = get_object_or_404(User, pk=user_id)
+    forum = get_object_or_404(Forum, pk=forum_id)
+    group = RBACGroup.objects.filter(
+        name_qualifier=f"forums.forum.{forum_id}", name_item="blocked_users"
+    ).first()
+
+    # If group exists do not change its permissions
+
+    if not group:
+        group = RBACGroup(
+            name_qualifier=f"forums.forum.{forum_id}",
+            name_item="blocked_users",
+            description=f"Auto generated - block users from forum {forum_id}",
+        )
+        group.save()
+
+        role = RBACGroupRole(
+            group=group,
+            app="forums",
+            model="forum",
+            model_id=forum_id,
+            action="create",
+            rule_type="Block",
+        )
+        role.save()
+
+    rbac_add_user_to_group(user, group)
+
+    messages.success(
+        request,
+        f"{user} blocked from posting in forum - {forum}",
+        extra_tags="cobalt-message-success",
+    )
+    return redirect("forums:post_list_single_forum", forum_id=forum.id)
+
+
+@login_required()
+def unblock_user(request, user_id, forum_id):
+    """ remove block on a user so they can post to a forum """
+
+    if not (
+        rbac_user_has_role(request.user, "forums.forumadmin.change")
+        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+    ):
+        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+
+    user = get_object_or_404(User, pk=user_id)
+    forum = get_object_or_404(Forum, pk=forum_id)
+    group = RBACGroup.objects.filter(
+        name_qualifier=f"forums.forum.{forum_id}", name_item="create"
+    ).first()
+    blocked = RBACUserGroup.objects.filter(member=user, group=group).first()
+    blocked.delete()
+
+    messages.success(
+        request,
+        f"{user} can now post in forum - {forum}",
+        extra_tags="cobalt-message-success",
+    )
+    return redirect("forums:forum_edit", forum_id=forum.id)

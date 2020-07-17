@@ -86,8 +86,10 @@ def rbac_add_user_to_group(member, group):
         RBACUserGroup
     """
 
-    user_group = RBACUserGroup(member=member, group=group)
-    user_group.save()
+    user_group = RBACUserGroup.objects.filter(member=member, group=group).first()
+    if not user_group:
+        user_group = RBACUserGroup(member=member, group=group)
+        user_group.save()
     return user_group
 
 
@@ -187,7 +189,6 @@ def rbac_user_has_role_exact(member, role):
     matches = RBACGroupRole.objects.filter(group__in=groups)
 
     for m in matches:
-        print(m.role)
         if m.role == role or m.role == all_role:
             return m.rule_type
 
@@ -633,3 +634,18 @@ def rbac_get_groups_for_role(role):
     ).filter(Q(action=action) | Q(action="All"))
 
     return groups
+
+
+def rbac_get_users_in_group(groupname):
+    """ returns a list of users in a group or None """
+    print(groupname)
+    parts = groupname.split(".")
+    name_qualifier = ".".join(parts[:-1])
+    name_item = parts[len(parts) - 1]
+    print(name_qualifier)
+    print(name_item)
+    group = RBACGroup.objects.filter(
+        name_qualifier=name_qualifier, name_item=name_item
+    ).first()
+    print(group)
+    return RBACUserGroup.objects.filter(group=group).order_by("member")

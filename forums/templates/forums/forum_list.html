@@ -26,7 +26,7 @@
 
         {% if forum.forum_type == "Discussion" %}
           {% if forum.follows %}
-            <button class="btn btn-sm btn-info cobalt-follow" id="button-{{ forum.id }}" style="width: 90px; border:0px; margin:0px">Unfollow</button>
+            <button class="btn btn-sm btn-info cobalt-follow" id="button-{{ forum.id }}" style="width: 90px; border:0px; margin:0px">Un-follow</button>
           {% else %}
             <button class="btn btn-sm btn-success cobalt-follow" id="button-{{ forum.id }}" style="width: 90px;">follow</button>
           {% endif %}
@@ -34,6 +34,7 @@
           <button class="btn btn-sm btn-default" disabled style="width: 90px;">Fixed</button>
         {% endif %}
         {% if is_admin %}
+          <button class="btn btn-sm btn-warning" onclick="location.href = '{% url "forums:forum_edit" forum_id=forum.id %}';" style="width: 90px; border:0px; margin:0px">Edit</button>
           <button class="btn btn-sm btn-danger cobalt-delete" id="delete-{{ forum.id }}" style="width: 90px; border:0px; margin:0px">Delete</button>
         {% endif %}
 

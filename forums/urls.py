@@ -25,8 +25,19 @@ urlpatterns = [
     path("post/edit/<int:post_id>", views.post_edit, name="post_edit"),
     path("forum/list", views.forum_list, name="forum_list"),
     path("forum/create", views.forum_create, name="forum_create"),
+    path("forum/edit/<int:forum_id>", views.forum_edit, name="forum_edit"),
     path("forum/delete/<int:forum_id>", views.forum_delete_ajax, name="forum_delete"),
     path("post/like-post/<int:pk>/", views.like_post, name="like_post"),
+    path(
+        "forum/blockuser/<int:user_id>/<int:forum_id>",
+        views.block_user,
+        name="block_user",
+    ),
+    path(
+        "forum/unblockuser/<int:user_id>/<int:forum_id>",
+        views.unblock_user,
+        name="unblock_user",
+    ),
     path("post/like-comment1/<int:pk>/", views.like_comment1, name="like_comment1"),
     path("post/like-comment2/<int:pk>/", views.like_comment2, name="like_comment2"),
     path(

@@ -82,7 +82,7 @@
 <a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-info btn-sm">Edit Your Post</a>
 {% elif is_moderator %}
 <a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-danger btn-sm">Moderate</a>
-<a href="{% url "forums:post_edit" post_id=post.id %}" class="btn btn-danger btn-sm">Block</a><br>
+<a href="{% url "forums:block_user" user_id=post.author.id forum_id=post.forum.id %}" class="btn btn-danger btn-sm">Block User</a><br>
 {% endif %}
 
 <br>
@@ -121,7 +121,8 @@
     {% if c1.author == user %}
     <a href="{% url "forums:comment1_edit" comment_id=c1.id %}" class="btn btn-info btn-sm">Edit Comment</a>
     {% elif is_moderator %}
-    <a href="{% url "forums:comment1_edit" comment_id=c1.id %}" class="btn btn-danger btn-sm">Moderate</a><br>
+    <a href="{% url "forums:comment1_edit" comment_id=c1.id %}" class="btn btn-danger btn-sm">Moderate</a>
+    <a href="{% url "forums:block_user" user_id=c1.author.id forum_id=post.forum.id %}" class="btn btn-danger btn-sm">Block User</a><br>
     {% endif %}
   </div>
 </div>
@@ -162,8 +163,10 @@
         {% if c2.author == user %}
         <a href="{% url "forums:comment2_edit" comment_id=c2.id %}" class="btn btn-info btn-sm">Edit Comment</a>
         {% elif is_moderator %}
-        <a href="{% url "forums:comment2_edit" comment_id=c2.id %}" class="btn btn-danger btn-sm">Moderate</a><br>
-        {% endif %}
+        <a href="{% url "forums:comment2_edit" comment_id=c2.id %}" class="btn btn-danger btn-sm">Moderate</a>
+        <a href="{% url "forums:block_user" user_id=c2.author.id forum_id=post.forum.id %}" class="btn btn-danger btn-sm">Block User</a><br>
+      {% endif %}
+
       </div>
     </div>
     {% if c2.last_changed_by %}
