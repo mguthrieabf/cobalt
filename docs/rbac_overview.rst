@@ -1,4 +1,4 @@
-.. _notifications-overview:
+.. _rbac-overview:
 
 
 .. image:: images/cobalt.jpg

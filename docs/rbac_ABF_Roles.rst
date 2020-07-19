@@ -101,6 +101,10 @@ Payments
 
 * **payments.org.N.manage** [*Allow*] - can manage payments for organisation N.
 
+* **payments.global.view** [*Allow*] - can view payments for the ABF.
+
+* **payments.global.manage** [*Allow*] - can manage payments for the ABF.
+
 Organisations
 -------------
 
@@ -118,14 +122,8 @@ Groups and Trees
 As mentioned above, the groups and trees (normal and admin) are just a way to index
 things, the names are arbitrary.
 
-For convenience (or inconvenience!) the admin tree mirrors the normal tree.
-
-Normal Tree: rbac.forums.forum.5
-
-Admin Tree: admin.forums.forum.5
-
 Groups can (and should) contain multiple roles. This means that they cannot
-easily match the "tree" structure of roles. The RBAC tree reflects functions
+easily match the dotted name structure of roles. The RBAC tree reflects functions
 that users need to perform, such as "System Administrator", "Club N Directors",
 "State N Financial Controllers".
 
@@ -134,14 +132,57 @@ Groups
 
 This is the basic structure of the tree and groups for RBAC.
 
-  +------------------------+-----------------------------------------+
-  | Group / Tree           | Purpose                                 |
-  +========================+=========================================+
-  | rbac.clubs.N           | *Things relating to club N*             |
-  |                        | e.g. rbac.clubs.N.directors             |
-  |                        | rbac.clubs.N.finance                    |
-  +------------------------+-----------------------------------------+
-  | rbac.abf               | *Things relating to the ABF*            |
-  |                        | e.g. rbac.abf.finance                   |
-  |                        | rbac.abf.forumadmins                    |
-  +------------------------+-----------------------------------------+
++------------------------+-----------------------------------------+
+| Group / Tree           | Purpose                                 |
++========================+=========================================+
+| rbac.clubs.STATE.N     | *Things relating to club N*             |
+|                        | e.g. rbac.clubs.SA.N.directors          |
+|                        | rbac.clubs.NSW.N.finance                |
++------------------------+-----------------------------------------+
+| rbac.abf               | *Things relating to the ABF*            |
+|                        | e.g. rbac.abf.finance                   |
+|                        | rbac.abf.forumadmins                    |
++------------------------+-----------------------------------------+
+| rbac.general           | *General this such as public forums*    |
+|                        | e.g. rbac.abf.general.forums            |
++------------------------+-----------------------------------------+
+
+Admin
+=====
+
+It is important to realise the difference between admin within a module and
+admin for RBAC. For example, if you are in the group *rbac.abf.forumadmins*
+this allows you to create and delete forums. However, it doesn't give you any
+rights to change the RBAC tree itself. You can't add other users to this
+group for example. If you could, then it would be chaos, once one person
+got into a group they could let all of their friends in too.
+
+Admin has a separate structure. There are two things required, what you can do,
+and where you can do it. The WHAT is which roles you are an admin for. Putting
+a user into an admin group for forums should not allow them to also administer
+payments. The WHERE is the location the tree that you are an admin for.
+Making a club owner an admin for their club in the tree and giving them
+admin rights for roles relating to their club (payments for their club,
+settings for their club, their club forum etc) should not allow them to do
+the same thing for another club.
+
+
++------------------------+-------------------------+------------------------+------------------------------------+
+| Group / Tree           | Purpose                 | Typical Roles          |  Where in Tree                     |
++========================+==================================================+====================================+
+| admin.clubs.STATE.N    | *Admin for club N*      | forums.forum.N         | rbac.clubs.STATE.N                 |
+|                        |                         | org.org.N              | e.g. rbac.clubs.SA.N               |
+|                        |                         |                        |      rbac.clubs.NSW.N              |
++------------------------+-------------------------+------------------------+------------------------------------+
+| admin.abf.finance      | *Finance for ABF*       | payments.global.view   | rbac.abf                           |
+|                        |                         | payments.global.manage |                                    |
++------------------------+-------------------------+------------------------+------------------------------------+
+| admin.abf.forums       | *Forums for ABF*        | forums.forumadmin      | rbac.abf                           |
+|                        |                         |                        |                                    |
++------------------------+-------------------------+------------------------+------------------------------------+
+
+Admin for Admin
+===============
+
+Any admin can add another user to a group that they are an administrator for.
+Creating new groups will for now be an IT function.
