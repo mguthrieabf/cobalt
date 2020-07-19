@@ -242,10 +242,15 @@ def admin_group_view(request, group_id):
     group = get_object_or_404(RBACAdminGroup, pk=group_id)
     users = RBACAdminUserGroup.objects.filter(group=group)
     roles = RBACAdminGroupRole.objects.filter(group=group)
+    user_list = users.values_list("member", flat=True)
+    if request.user.id in user_list:
+        is_admin = True
+    else:
+        is_admin = False
     return render(
         request,
         "rbac/admin_group_view.html",
-        {"users": users, "roles": roles, "group": group},
+        {"users": users, "roles": roles, "group": group, "is_admin": is_admin},
     )
 
 
@@ -385,6 +390,53 @@ def group_edit(request, group_id):
                 "admin_roles": admin_roles,
             },
         )
+
+
+@login_required
+def admin_group_edit(request, group_id):
+    """ view to edit an admin group """
+
+    group = get_object_or_404(RBACAdminGroup, pk=group_id)
+
+    # could use rbac_user_is_admin_for_admin_group but we need the
+    # users anyway so more efficient to do it here
+
+    users = RBACAdminUserGroup.objects.filter(group=group)
+    user_list = users.values_list("member", flat=True)
+    if request.user.id not in user_list:
+        return HttpResponse("You are not an admin for this admin group")
+
+    if request.method == "POST":
+        form = AddGroup(request.POST, user=request.user)
+        if form.is_valid():
+            group.name_item = form.cleaned_data["name_item"]
+            group.description = form.cleaned_data["description"]
+            group.save()
+            messages.success(
+                request,
+                "Admin Group successfully updated.",
+                extra_tags="cobalt-message-success",
+            )
+        else:
+            print(form.errors)
+    else:
+        form = AddGroup(user=request.user)
+        form.fields["name_item"].initial = group.name_item
+        form.fields["description"].initial = group.description
+
+    roles = RBACAdminGroupRole.objects.filter(group=group)
+    admin_roles = rbac_admin_all_rights(request.user)
+    return render(
+        request,
+        "rbac/admin_group_edit.html",
+        {
+            "form": form,
+            "group": group,
+            "users": users,
+            "roles": roles,
+            "admin_roles": admin_roles,
+        },
+    )
 
 
 @login_required

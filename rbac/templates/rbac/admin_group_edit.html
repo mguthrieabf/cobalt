@@ -11,12 +11,12 @@
 <div class="jumbotron">
 
   <h1>Role Based Access Controls</h1>
-  <p>This lets you edit the members of a group and its associated roles.</p>
+  <p>This lets you edit the members of an admin group and its associated roles.</p>
 
 
   <div class="card col-lg-9">
     <div class="card-header card-header-danger">
-      <h3 class="card-title">Group Information</h3>
+      <h3 class="card-title">Admin Group Information</h3>
     </div>
     <div class="card-body" style="text-align: center">
       <div class="container">
@@ -56,7 +56,7 @@
           <div class="d-flex">
             <div>
               <input type="submit" value="Update" class="btn btn-primary center-text">
-              <input type="submit" value="Delete" class="btn btn-danger center-text" onclick="window.location.href='{% url "rbac:group_delete" group_id=group.pk %}'; return false;">
+              <input type="submit" value="Delete" class="btn btn-danger center-text" onclick="window.location.href='{% url "rbac:admin_group_delete" group_id=group.pk %}'; return false;">
             </div>
             <div class="ml-auto">
               <button class="btn btn-info center-text" onclick="window.location.href='/'; return false;">Cancel</button>
@@ -107,7 +107,7 @@
         <div class="container">
           <select class="w-100" size="10" id="role_list">
           {% for role in roles %}
-            <option value="{{ role.id }}">{{ role.app }}.{{ role.model }}.{{ role.model_id|default_if_none:"*" }} - {{ role.action }} {{ role.rule_type }}</option>
+            <option value="{{ role.id }}">{{ role.app }}.{{ role.model }}.{{ role.model_id|default_if_none:"*" }}</option>
           {% endfor %}
           </select>
         </div>
@@ -137,28 +137,13 @@
                       </select>
                     </div>
 
-                    <div class="col-12 form-group" style="display: none;" id="model-instance-div">
+                    <div class="col-12 form-group" id="model-instance-div">
                       <label for="lastname" class="bmd-label-floating">Model Instance</label>
                       <input type="text" class="form-control" id="id_model_id" name="model_id" value="">
                     </div>
 
-                    <div class="col-12 form-group" style="display: none;" id="action-div">
-                      <label for="id_action" class="bmd-label-floating">Action</label>
-                      <select class="form-control" id="id_action">
-                        <option>-----</option>
-                      </select>
-                    </div>
-
-                    <div class="col-12 form-group" style="display: none;" id="type-div">
-                      <label for="lastname" class="bmd-label-floating">Type</label>
-                      <select class="form-control" id="id_type">
-                        <option>Allow</option>
-                        <option>Block</option>
-                      </select>
-                    </div>
-
                   </div>
-                  <button class="btn btn-success" style="display: none;" id="role-button" onclick="cobaltRoleAdd(); return false;">Ok</button>
+                  <button class="btn btn-success" id="role-button" onclick="cobaltRoleAdd(); return false;">Ok</button>
                 </div>
               </div>
             </div>
@@ -191,11 +176,11 @@
   function cobaltMemberSearchOk() {
     clearModal();
 
-    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
+    $.get("{% url "rbac:rbac_add_user_to_admin_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
         .done(response => {
           msg = response['data']['message'];
           if (msg == 'Success'){
-            swal.fire({ title:"User Added", html: "Success. User added to group.", icon: "success", buttonsStyling: false})
+            swal.fire({ title:"User Added", html: "Success. User added to admin group.", icon: "success", buttonsStyling: false})
             .then((result) => {
               location.reload();
             });
@@ -217,7 +202,7 @@
       }).then((result) => {
         if (result.value) {
           member_id = $('#user_list').val();
-          $.get("{% url "rbac:rbac_delete_user_from_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
+          $.get("{% url "rbac:rbac_delete_user_from_admin_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
@@ -245,7 +230,7 @@
       }).then((result) => {
         if (result.value) {
           role_id = $('#role_list').val();
-          $.get("{% url "rbac:rbac_delete_role_from_group_ajax" %}?role_id=" + role_id)
+          $.get("{% url "rbac:rbac_delete_role_from_admin_group_ajax" %}?role_id=" + role_id)
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
@@ -280,11 +265,8 @@
       if (isNaN(model_id)){
         model_id = "None";
       }
-      alert(model_id);
-      var action = $("#id_action").val();
-      var rule_type = $("#id_type").val();
 
-      $.get("{% url "rbac:rbac_add_role_to_group_ajax" %}?group_id={{ group.id }}&app=" + app + "&model=" + model + "&model_id=" + model_id + "&action=" + action + "&rule_type=" + rule_type)
+      $.get("{% url "rbac:rbac_add_role_to_admin_group_ajax" %}?group_id={{ group.id }}&app=" + app + "&model=" + model + "&model_id=" + model_id)
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success'){
@@ -297,32 +279,5 @@
             }
         });
     }
-
-    jQuery(document).ready(function() {
-      // When a user selects something from the Application-Model drop down, fetch the
-      // corresponding Actions and enable the fields.
-      $("#id-app-model").change(function(){
-
-        var fields = $(this).val().split(".");
-        var app = fields[0];
-        var model = fields[1];
-
-        $.get("{% url "rbac:rbac_get_action_for_model_ajax" %}?app=" + app + "&model=" + model)
-            .done(response => {
-              // use replacewith() not html() for performance reasons
-              var new_select =  "<select  class='form-control' id='id_action'>" + response['data'] + "</select>"
-              $("#id_action").replaceWith(new_select);
-              $("#action-div").show();
-              $("#role-button").show();
-              $("#type-div").show();
-              if (fields.length==2){
-                $("#model-instance-div").show();
-              }
-              else{
-                $("#model-instance-div").hide();
-              }
-            });
-        });
-      });
 </script>
 {% endblock %}

@@ -3,8 +3,8 @@
 {% block content %}
 
 <h1>Role Based Access Controls</h1>
-<p>This shows the groups you are a member of. Groups control security within
-the system.</p>
+<p>Groups control security within
+the system. This shows the groups you are a member of.</p>
 
 {% if groups %}
 
@@ -48,6 +48,8 @@ the system.</p>
 <br>
 {% endfor %}
 
+<p>Groups have roles which allow you to access parts of the system.
+  These are your roles and the groups that they come from</p>
 <div>
   <div class="card col-lg-9">
     <div class="card-header card-header-warning">

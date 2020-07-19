@@ -21,6 +21,11 @@ urlpatterns = [
         name="admin_group_view",
     ),
     path(
+        "admin/group/edit/<int:group_id>/",
+        views.admin_group_edit,
+        name="admin_group_edit",
+    ),
+    path(
         "admin/group/delete/<int:group_id>/",
         views.admin_group_delete,
         name="admin_group_delete",
@@ -49,6 +54,26 @@ urlpatterns = [
         "rbac-add-role-to-group-ajax",
         ajax.rbac_add_role_to_group_ajax,
         name="rbac_add_role_to_group_ajax",
+    ),
+    path(
+        "rbac-add-user-to-admin_group-ajax",
+        ajax.rbac_add_user_to_admin_group_ajax,
+        name="rbac_add_user_to_admin_group_ajax",
+    ),
+    path(
+        "rbac-delete-user-from-admin-group-ajax",
+        ajax.rbac_delete_user_from_admin_group_ajax,
+        name="rbac_delete_user_from_admin_group_ajax",
+    ),
+    path(
+        "rbac-delete-role-from-admin-group-ajax",
+        ajax.rbac_delete_role_from_admin_group_ajax,
+        name="rbac_delete_role_from_admin_group_ajax",
+    ),
+    path(
+        "rbac-add-role-to-admin-group-ajax",
+        ajax.rbac_add_role_to_admin_group_ajax,
+        name="rbac_add_role_to_admin_group_ajax",
     ),
     path(
         "group-to-user/<int:group_id>/",

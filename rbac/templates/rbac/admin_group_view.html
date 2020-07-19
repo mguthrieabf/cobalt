@@ -34,6 +34,9 @@
             </tr>
           </table>
         </div>
+        {% if is_admin %}
+        <a href="{% url "rbac:admin_group_edit" group.id %}" class="btn btn-success">Edit</a>
+        {% endif %}
       </div>
     </div>
   </div>

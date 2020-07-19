@@ -33,11 +33,15 @@ def rbac_create_group(name_qualifier, name_item, description):
         RBACGroup
     """
 
-    obj = RBACGroup(
-        name_qualifier=name_qualifier, name_item=name_item, description=description
-    )
-    obj.save()
-    return obj
+    group = RBACGroup.objects.filter(
+        name_qualifier=name_qualifier, name_item=name_item
+    ).first()
+    if not group:
+        group = RBACGroup(
+            name_qualifier=name_qualifier, name_item=name_item, description=description
+        )
+        group.save()
+    return group
 
 
 def rbac_delete_group(group):
@@ -112,6 +116,25 @@ def rbac_remove_user_from_group(member, group):
         return False
 
 
+def rbac_remove_admin_user_from_group(member, group):
+    """ Removes a user from an RBAC admin group
+
+    Args:
+        member(User): standard user object
+        group(RBACAdminGroup): group to remove user from
+
+    Returns:
+        bool
+    """
+
+    try:
+        user_group = RBACAdminUserGroup.objects.filter(member=member, group=group)
+        user_group.delete()
+        return True
+    except RBACAdminUserGroup.DoesNotExist:
+        return False
+
+
 def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
 
     """ Adds a role to an RBAC group
@@ -128,14 +151,24 @@ def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
         RBACGroupRole
     """
 
-    group_role = RBACGroupRole()
-    group_role.group = group
-    group_role.app = app
-    group_role.model = model
-    group_role.action = action
-    group_role.rule_type = rule_type
-    group_role.model_id = model_id
-    group_role.save()
+    group_role = RBACGroupRole.objects.filter(
+        group=group,
+        app=app,
+        model=model,
+        model_id=model_id,
+        action=action,
+        rule_type=rule_type,
+    ).first()
+
+    if not group_role:
+        group_role = RBACGroupRole()
+        group_role.group = group
+        group_role.app = app
+        group_role.model = model
+        group_role.action = action
+        group_role.rule_type = rule_type
+        group_role.model_id = model_id
+        group_role.save()
 
     return group_role
 
@@ -259,11 +292,17 @@ def rbac_user_has_role(member, role, debug=False):
     if debug:
         print("Checking defaults for this app")
     (app, model, model_instance, action) = role_to_parts(role)
-    default = (
-        RBACModelDefault.objects.filter(app=app, model=model)
-        .values_list("default_behaviour")
-        .first()[0]
-    )
+    try:
+        default = (
+            RBACModelDefault.objects.filter(app=app, model=model)
+            .values_list("default_behaviour")
+            .first()[0]
+        )
+    except TypeError:
+        raise TypeError(
+            "It looks like there is no default set up for app=%s model=%s"
+            % (app, model)
+        )
     return allow_to_boolean(default)
 
 
@@ -426,33 +465,20 @@ def rbac_user_is_group_admin(member, group):
     Returns:
         bool: True of False for user role
     """
-    print(
-        "-->user_is_group_admin: User is: %s. Group is: %s" % (member.full_name, group)
-    )
 
     path = group.name
-    print("-->user_is_group_admin: Path is: %s" % path)
 
     group_list = RBACAdminUserGroup.objects.filter(member=member).values_list("group")
 
     trees = RBACAdminTree.objects.filter(group__in=group_list)
 
-    print(
-        "-->user_is_group_admin: Count of RBACAdminTree for this user is: %s"
-        % trees.count()
-    )
     # TODO: Tree is deeper than 2 levels - need to decide if we recurse the whole tree
     for tree in trees:
-        print("-->user_is_group_admin: checking %s = %s" % (tree.tree, path))
         if tree.tree == path:
-            print("-->user_is_group_admin: Matched %s = %s" % (tree.tree, path))
-            print("-->user_is_group_admin: returning true")
             return True
         # check for match on aaaaa.bbbbb.
         partial = tree.tree + "."
-        print("-->user_is_group_admin: checking patial match %s = %s" % (partial, path))
         if path.find(partial) == 0:
-            print("-->user_is_group_admin: returning true")
             return True
 
     return False
@@ -469,15 +495,8 @@ def rbac_user_is_role_admin(member, role):
         bool: True of False for user role
     """
 
-    print("-->user_is_role_admin: User is: %s. Role is: %s" % (member.full_name, role))
-
     groups = RBACAdminUserGroup.objects.filter(member=member).values_list("group")
-    print("-->user_is_role_admin: Looked up admin groups for %s:" % member)
-    print("  -->>user_is_role_admin: Found %s" % groups)
     matches = RBACAdminGroupRole.objects.filter(group__in=groups)
-    print("-->user_is_role_admin: Looked up roles for groups:")
-    for m in matches:
-        print("  -->user_is_role_admin: %s" % m)
 
     # look for specific rule
     for m in matches:
@@ -487,10 +506,7 @@ def rbac_user_is_role_admin(member, role):
             m_str = "%s.%s.%s" % (m.app, m.model, m.model_id)
         else:
             m_str = "%s.%s" % (m.app, m.model)
-        print("-->user_is_role_admin: role is: #%s#" % role_str)
-        print("-->user_is_role_admin: Checking #%s#" % m_str)
         if m_str == role_str:
-            print("  -->user_is_role_admin: Matched with %s" % m)
             return True
 
     # change role org.org.15 --> org.org
@@ -499,20 +515,35 @@ def rbac_user_is_role_admin(member, role):
         role = ".".join(parts[:-1])
 
         # look for general rule
-        print("-->user_is_role_admin: No specific match found, next try general")
-        print("-->user_is_role_admin: General")
         for m in matches:
             # compare strings not objects
             role_str = "%s" % role
             m_str = "%s.%s" % (m.app, m.model)
-            print("-->user_is_role_admin: role is: #%s#" % role_str)
-            print("-->user_is_role_admin: Checking #%s#" % m_str)
 
             if m_str == role_str:
-                print("-->user_is_role_admin: Matched with %s" % m)
                 return True
     # No match
     return False
+
+
+def rbac_user_is_admin_for_admin_group(member, group):
+    """ check if a user is an admin for an admin group. Any member of an
+    admin group is automatically an administrator for that group.
+
+    Args:
+        member(User): standard user object
+        group(RBACAdminGroup): admin group to check
+
+    Returns:
+        bool: True of False for user role
+    """
+
+    users = RBACAdminUserGroup.objects.filter(group=group)
+    user_list = users.values_list("member", flat=True)
+    if member.id in user_list:
+        return True
+    else:
+        return False
 
 
 def rbac_access_in_english(user):
@@ -566,13 +597,18 @@ def rbac_access_in_english_sub(user, this_name):
 
 
 def rbac_get_admins_for_group(group):
-    """ returns a queryset of admins for a given group """
+    """ returns a queryset of admins who can change users for a given group """
 
     path = group.name
-    print(path)
-    trees = RBACAdminTree.objects.filter(tree=path)
-    print(trees)
-    return trees
+    # Get the groups who have access to this part of the tree
+    # if path is rbac.abf.forums we also want to match on rbac.abf or rbac
+    # this needs a SQL query like WHERE 'rbac.abf.forums' like tree||'%'
+    # Django can't do this so we need to use extra to add out own SQL
+    tree = RBACAdminTree.objects.extra(where=["%s LIKE tree||'%%'"], params=[path])
+    tree_groups = tree.values("group")
+    # Get the members of the groups
+    admins = RBACAdminUserGroup.objects.filter(group__in=tree_groups)
+    return admins
 
 
 def rbac_add_user_to_admin_group(group, user):
@@ -638,14 +674,10 @@ def rbac_get_groups_for_role(role):
 
 def rbac_get_users_in_group(groupname):
     """ returns a list of users in a group or None """
-    print(groupname)
     parts = groupname.split(".")
     name_qualifier = ".".join(parts[:-1])
     name_item = parts[len(parts) - 1]
-    print(name_qualifier)
-    print(name_item)
     group = RBACGroup.objects.filter(
         name_qualifier=name_qualifier, name_item=name_item
     ).first()
-    print(group)
     return RBACUserGroup.objects.filter(group=group).order_by("member")

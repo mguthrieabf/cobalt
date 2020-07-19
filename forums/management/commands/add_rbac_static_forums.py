@@ -34,11 +34,11 @@ class Command(BaseCommand):
 
         group = create_RBAC_admin_group(
             self,
-            "forums.forumadmin",
-            "admins",
+            "admin.abf.forums",
+            "forumadmin",
             "Group to create users who can create, modify or delete forums",
         )
-        create_RBAC_admin_tree(self, group, "forums.forumadmin")
+        create_RBAC_admin_tree(self, group, "rbac.abf.forums")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="forums", model="forumadmin")
 
@@ -46,10 +46,11 @@ class Command(BaseCommand):
         # This creates admins who can make people moderators or block forum access
         group = create_RBAC_admin_group(
             self,
-            "forums.forum",
-            "admins",
+            "admin.abf.forums",
+            "moderators",
             "Group to create users who are moderators of forums or can hide forums",
         )
+        # create group - won't duplicate if already exists
         create_RBAC_admin_tree(self, group, "forums.forum")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="forums", model="forum")
