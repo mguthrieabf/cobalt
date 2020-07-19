@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content">
+  <div class="content">
+    <div class="container-fluid">
+      <h2>Edit Settings</h2>
+      <form>
+        <div class="row">
+          <div class="col-md-8">
+
+<!-- Personal Notifications -->
+
+          <div class="card">
+              <div class="card-header card-header-primary">
+                <h4 class="card-title">Personal Notifications</h4>
+                <p class="card-category">SMS and Email</p>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-check">
+                    <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" checked="Checked">
+                          Receive SMS notifications of results
+                          <span class="form-check-sign">
+                              <span class="check"></span>
+                          </span>
+                    </label>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-check">
+                    <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" checked="Checked">
+                        Receive SMS reminders for upcoming events
+                        <span class="form-check-sign">
+                            <span class="check"></span>
+                        </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+<!-- End Personal Notifications -->
+
+<!-- General Notifications -->
+
+          <div class="card">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">General Notifications</h4>
+              <p class="card-category">Marketing and Communications</p>
+            </div>
+            <div class="col-md-12">
+              <div class="form-check">
+                  <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                      Receive ABF Newsletter
+                      <span class="form-check-sign">
+                          <span class="check"></span>
+                      </span>
+                  </label>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-check">
+                  <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                      Receive Marketing information
+                      <span class="form-check-sign">
+                          <span class="check"></span>
+                      </span>
+                  </label>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-check">
+                  <label class="form-check-label">
+                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                      Receive monthly masterpoints report
+                      <span class="form-check-sign">
+                          <span class="check"></span>
+                      </span>
+                  </label>
+              </div>
+            </div>
+          </div>
+<!-- End General Notifications -->
+
+<!-- ABF Dollars -->
+
+          <div class="card">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">ABF Dollars</h4>
+              <p class="card-category">Payment System</p>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+
+                  <div class="col-md-12">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            Receive email verifications
+                            <span class="form-check-sign">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+<!-- End ABF Dollars -->
+
+<!-- Site -->
+
+          <div class="card">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">Site Settings</h4>
+              <p class="card-category">Preferences</p>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+
+                  <div class="col-md-12">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            Show Tips and Comments
+                            <span class="form-check-sign">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            Show MP Percentage on Dashboard
+                            <span class="form-check-sign">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            Only if above 50%
+                            <span class="form-check-sign">
+                                <span class="check"></span>
+                            </span>
+                        </label>
+                    </div>
+                  </div>
+
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+<!-- End Site Settings -->
+
+<!-- Club -->
+
+          <div class="card" style="width: 400px">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">Your Clubs</h4>
+              <p class="card-category">Tick shows home club</p>
+            </div>
+
+            <div class="card-body">
+
+              <button type="button" class="btn btn-default">SABA&nbsp;<i class="material-icons">done</i></button>
+              <button type="button" class="btn btn-default">NSBC</button>
+              <button type="button" class="btn btn-default">Trumps</button>
+              <br>
+              <a href="./settings.html">Change settings...</a>
+            </div>
+          </div>
+
+
+
+          <div class="card" style="width: 400px">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title">Your States</h4>
+              <p class="card-category">Tick shows home state</p>
+            </div>
+
+            <div class="card-body">
+              <button type="button" class="btn btn-info">NSW&nbsp;<i class="material-icons">done</i></button>
+              <button type="button" class="btn btn-info">SA</button>
+              <br>
+              <a href="./settings.html">Change settings...</a>
+            </div>
+          </div>
+
+
+
+
+<!-- Club Settings -->
+
+
+          <div class="col-md-12">
+            <button type="submit" class="btn btn-primary ">Update Settings</button>
+            <div class="clearfix"></div>
+          </div>
+          </form>
+          </div>
+
+
+        <div class="col-md-4">
+          <div class="card card-profile">
+            <div class="card-avatar">
+              <a href="#pablo">
+                <img class="img" src="../assets/img/faces/as.jpg" />
+              </a>
+            </div>
+            <div class="card-body">
+              <h6 class="card-category text-gray">Bridge Player and Lover of Life</h6>
+              <h4 class="card-title">Allison Stralow</h4>
+              <p class="card-description">
+                Fair play and competition makes me smile.
+              </p>
+              <a href="#pablo" class="btn btn-primary btn-round">Edit</a>
+            </div>
+          </div>
+        </div>
+{% endblock %}

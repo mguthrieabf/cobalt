@@ -459,3 +459,18 @@ def public_profile(request, pk):
     """
     pub_profile = get_object_or_404(User, pk=pk)
     return render(request, "accounts/public_profile.html", {"profile": pub_profile})
+
+
+@login_required
+def user_settings(request):
+    """ User settings form.
+
+    Allow user to chose preferences
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HttpResponse
+    """
+    return render(request, "accounts/user_settings.html")
