@@ -151,6 +151,7 @@
 
 <span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">django.utils.deconstruct</span> <span class="kn">import</span> <span class="n">deconstructible</span>
+<span class="kn">from</span> <span class="nn">django.utils.encoding</span> <span class="kn">import</span> <span class="n">punycode</span>
 <span class="kn">from</span> <span class="nn">django.utils.functional</span> <span class="kn">import</span> <span class="n">SimpleLazyObject</span>
 <span class="kn">from</span> <span class="nn">django.utils.ipv6</span> <span class="kn">import</span> <span class="n">is_valid_ipv6_address</span>
 <span class="kn">from</span> <span class="nn">django.utils.translation</span> <span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span><span class="p">,</span> <span class="n">ngettext_lazy</span>
@@ -270,7 +271,7 @@
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># for example, &quot;Invalid IPv6 URL&quot;</span>
                     <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">netloc</span> <span class="o">=</span> <span class="n">netloc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;idna&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>  <span class="c1"># IDN -&gt; ACE</span>
+                    <span class="n">netloc</span> <span class="o">=</span> <span class="n">punycode</span><span class="p">(</span><span class="n">netloc</span><span class="p">)</span>  <span class="c1"># IDN -&gt; ACE</span>
                 <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>  <span class="c1"># invalid domain part</span>
                     <span class="k">raise</span> <span class="n">e</span>
                 <span class="n">url</span> <span class="o">=</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span><span class="p">))</span>
@@ -345,7 +346,7 @@
                 <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_domain_part</span><span class="p">(</span><span class="n">domain_part</span><span class="p">)):</span>
             <span class="c1"># Try for possible IDN domain-part</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">domain_part</span> <span class="o">=</span> <span class="n">domain_part</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;idna&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+                <span class="n">domain_part</span> <span class="o">=</span> <span class="n">punycode</span><span class="p">(</span><span class="n">domain_part</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>
@@ -382,14 +383,14 @@
 <span class="n">validate_slug</span> <span class="o">=</span> <span class="n">RegexValidator</span><span class="p">(</span>
     <span class="n">slug_re</span><span class="p">,</span>
     <span class="c1"># Translators: &quot;letters&quot; means latin letters: a-z and A-Z.</span>
-    <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Enter a valid &#39;slug&#39; consisting of letters, numbers, underscores or hyphens.&quot;</span><span class="p">),</span>
+    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.&#39;</span><span class="p">),</span>
     <span class="s1">&#39;invalid&#39;</span>
 <span class="p">)</span>
 
 <span class="n">slug_unicode_re</span> <span class="o">=</span> <span class="n">_lazy_re_compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[-\w]+\Z&#39;</span><span class="p">)</span>
 <span class="n">validate_unicode_slug</span> <span class="o">=</span> <span class="n">RegexValidator</span><span class="p">(</span>
     <span class="n">slug_unicode_re</span><span class="p">,</span>
-    <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Enter a valid &#39;slug&#39; consisting of Unicode letters, numbers, underscores, or hyphens.&quot;</span><span class="p">),</span>
+    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.&#39;</span><span class="p">),</span>
     <span class="s1">&#39;invalid&#39;</span>
 <span class="p">)</span>
 
@@ -612,8 +613,8 @@
 <span class="nd">@deconstructible</span>
 <span class="k">class</span> <span class="nc">FileExtensionValidator</span><span class="p">:</span>
     <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span>
-        <span class="s2">&quot;File extension &#39;</span><span class="si">%(extension)s</span><span class="s2">&#39; is not allowed. &quot;</span>
-        <span class="s2">&quot;Allowed extensions are: &#39;</span><span class="si">%(allowed_extensions)s</span><span class="s2">&#39;.&quot;</span>
+        <span class="s1">&#39;File extension “</span><span class="si">%(extension)s</span><span class="s1">” is not allowed. &#39;</span>
+        <span class="s1">&#39;Allowed extensions are: </span><span class="si">%(allowed_extensions)s</span><span class="s1">.&#39;</span>
     <span class="p">)</span>
     <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;invalid_extension&#39;</span>
 

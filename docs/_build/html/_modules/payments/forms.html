@@ -154,7 +154,7 @@
     <span class="n">AUTO_TOP_UP_MAX_AMT</span><span class="p">,</span>
     <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">TRANSACTION_TYPE</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">TRANSACTION_TYPE</span><span class="p">,</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">OrganisationTransaction</span>
 
 
 <div class="viewcode-block" id="TestTransaction"><a class="viewcode-back" href="../../payments.html#payments.forms.TestTransaction">[docs]</a><span class="k">class</span> <span class="nc">TestTransaction</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
@@ -218,6 +218,48 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Please enter a value&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span></div></div>
+
+
+<div class="viewcode-block" id="SettlementForm"><a class="viewcode-back" href="../../payments.html#payments.forms.SettlementForm">[docs]</a><span class="k">class</span> <span class="nc">SettlementForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For payments to Orgs &quot;&quot;&quot;</span>
+
+    <span class="n">CARD_CHOICES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Dummy&quot;</span><span class="p">,</span> <span class="s2">&quot;Dummy&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">settle_list</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">MultipleChoiceField</span><span class="p">(</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">CheckboxSelectMultiple</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">CARD_CHOICES</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; dynamic override of checkbox list &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orgs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;orgs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SettlementForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;settle_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orgs</span></div>
+
+
+<div class="viewcode-block" id="AdjustMemberForm"><a class="viewcode-back" href="../../payments.html#payments.forms.AdjustMemberForm">[docs]</a><span class="k">class</span> <span class="nc">AdjustMemberForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For dodgy changes to members &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AdjustMemberForm.Meta"><a class="viewcode-back" href="../../payments.html#payments.forms.AdjustMemberForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">MemberTransaction</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;member&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;amount&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AdjustOrgForm"><a class="viewcode-back" href="../../payments.html#payments.forms.AdjustOrgForm">[docs]</a><span class="k">class</span> <span class="nc">AdjustOrgForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For dodgy changes to orgs &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AdjustOrgForm.Meta"><a class="viewcode-back" href="../../payments.html#payments.forms.AdjustOrgForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;organisation&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;amount&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

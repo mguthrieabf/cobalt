@@ -236,7 +236,10 @@
     <span class="k">def</span> <span class="nf">resolve_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_joins</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">summarize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># We must promote any new joins to left outer joins so that when Q is</span>
         <span class="c1"># used as an expression, rows aren&#39;t filtered due to joins.</span>
-        <span class="n">clause</span><span class="p">,</span> <span class="n">joins</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">_add_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reuse</span><span class="p">,</span> <span class="n">allow_joins</span><span class="o">=</span><span class="n">allow_joins</span><span class="p">,</span> <span class="n">split_subq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">clause</span><span class="p">,</span> <span class="n">joins</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">_add_q</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">reuse</span><span class="p">,</span> <span class="n">allow_joins</span><span class="o">=</span><span class="n">allow_joins</span><span class="p">,</span> <span class="n">split_subq</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">check_filterable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">query</span><span class="o">.</span><span class="n">promote_joins</span><span class="p">(</span><span class="n">joins</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">clause</span>
 
@@ -262,8 +265,8 @@
 <span class="sd">    A wrapper for a deferred-loading field. When the value is read from this</span>
 <span class="sd">    object the first time, the query is executed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">field_name</span> <span class="o">=</span> <span class="n">field_name</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">field</span>
 
     <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -273,26 +276,26 @@
         <span class="k">if</span> <span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="vm">__dict__</span>
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+        <span class="n">field_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">attname</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
             <span class="c1"># Let&#39;s see if the field is part of the parent chain. If so we</span>
             <span class="c1"># might be able to reuse the already loaded value. Refs #18343.</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_parent_chain</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_parent_chain</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">instance</span><span class="o">.</span><span class="n">refresh_from_db</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">])</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">)</span>
-            <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">]</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">refresh_from_db</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">field_name</span><span class="p">])</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_check_parent_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_parent_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the field value can be fetched from a parent field already</span>
 <span class="sd">        loaded in the instance. This can be done if the to-be fetched</span>
 <span class="sd">        field is a primary key field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">opts</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">_meta</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">link_field</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">get_ancestor_link</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">primary_key</span> <span class="ow">and</span> <span class="n">f</span> <span class="o">!=</span> <span class="n">link_field</span><span class="p">:</span>
+        <span class="n">link_field</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">get_ancestor_link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">primary_key</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">!=</span> <span class="n">link_field</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">link_field</span><span class="o">.</span><span class="n">attname</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -429,7 +432,7 @@
     <span class="c1"># If the field is a primary key, then doing a query against the field&#39;s</span>
     <span class="c1"># model is ok, too. Consider the case:</span>
     <span class="c1"># class Restaurant(models.Model):</span>
-    <span class="c1">#     place = OnetoOneField(Place, primary_key=True):</span>
+    <span class="c1">#     place = OneToOneField(Place, primary_key=True):</span>
     <span class="c1"># Restaurant.objects.filter(pk__in=Restaurant.objects.all()).</span>
     <span class="c1"># If we didn&#39;t have the primary key check, then pk__in (== place__in) would</span>
     <span class="c1"># give Place&#39;s opts as the target opts, but Restaurant isn&#39;t compatible</span>

@@ -194,7 +194,16 @@
     <span class="n">stripe_customer_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
         <span class="s2">&quot;Stripe Customer Id&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">25</span>
     <span class="p">)</span>
-    <span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">AUTO_STATUS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Off&quot;</span><span class="p">,</span> <span class="s2">&quot;Off&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Pending&quot;</span><span class="p">,</span> <span class="s2">&quot;Pending&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;On&quot;</span><span class="p">,</span> <span class="s2">&quot;On&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="s2">&quot;Stripe Auto Confirmed&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">AUTO_STATUS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Off&quot;</span>
+    <span class="p">)</span>
 
     <span class="n">REQUIRED_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;system_number&quot;</span><span class="p">,</span>

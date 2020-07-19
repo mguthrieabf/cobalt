@@ -145,9 +145,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <a class="reference internal image-reference" href="_images/cobalt.jpg" id="notifications-overview"><img alt="Cobalt Chemical Symbol" id="notifications-overview" src="_images/cobalt.jpg" style="width: 300px;" /></a>
-<div class="section" id="rbac-overview">
-<h1>RBAC Overview<a class="headerlink" href="#rbac-overview" title="Permalink to this headline">¶</a></h1>
+  <a class="reference internal image-reference" href="_images/cobalt.jpg" id="rbac-overview"><img alt="Cobalt Chemical Symbol" id="rbac-overview" src="_images/cobalt.jpg" style="width: 300px;" /></a>
+<div class="section" id="id1">
+<h1>RBAC Overview<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>Role Based Access Control (<strong>RBAC</strong>) is a standard approach to security within
 applications that have multiple users with different roles. This allows us to
 control a user being an administrator at Club A, a director at Club B, and
@@ -226,7 +226,7 @@ user has. Roles are hierarchical, and have a role_type of either “Allow” or
 <ol class="arabic simple">
 <li><p>“forums.forum.moderate” “Allow”</p></li>
 <li><p>“forums.post.5.edit” “Block”</p></li>
-<li><p>“organisations.organisation.7.admin” “Allow”</p></li>
+<li><p>“organisations.organisation.7.view” “Allow”</p></li>
 </ol>
 <p>Example 1 says that this user is allowed to moderate all forums (RBAC doesn’t know
 what moderating is, it just handles the rules, it is up to each application
@@ -269,22 +269,25 @@ never reused.</p>
 <tr class="row-odd"><td><p>forums.forum</p></td>
 <td><p><em>Ability to do something in all forums</em></p></td>
 </tr>
-<tr class="row-even"><td><p>payments.view.x</p></td>
-<td><p><em>View payments details for org x</em></p></td>
+<tr class="row-even"><td><p>forums.forumadmin</p></td>
+<td><p><em>Make changes at the forum level</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>payments.view</p></td>
-<td><p><em>View payments details for any org</em></p></td>
+<tr class="row-odd"><td><p>payments.view.x</p></td>
+<td><p><em>View payments for org x</em></p></td>
 </tr>
-<tr class="row-even"><td><p>payments.manage.x</p></td>
-<td><p><em>Make payments for org x</em></p></td>
+<tr class="row-even"><td><p>payments.view</p></td>
+<td><p><em>View payments for any org</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>payments.manage</p></td>
-<td><p><em>Make payments for any org</em></p></td>
+<tr class="row-odd"><td><p>payments.manage.x</p></td>
+<td><p><em>Do things with payments for org x</em></p></td>
 </tr>
-<tr class="row-even"><td><p>org.org.x</p></td>
+<tr class="row-even"><td><p>payments.manage</p></td>
+<td><p><em>Do things with payments for any org</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>org.org.x</p></td>
 <td><p><em>Management of org x</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>org.org</p></td>
+<tr class="row-even"><td><p>org.org</p></td>
 <td><p><em>Management of all orgs</em></p></td>
 </tr>
 </tbody>
@@ -348,7 +351,7 @@ you need to have a global ability to change things. For this reason RBAC
 has the concept of <strong>everyone</strong>.</p>
 <p>Probably the easiest way to explain this is to consider the case where we do
 not have <strong>everyone</strong>. Imagine that you wish to block people from accessing
-forum id=15, with description “World Domination”, given than the default
+forum id=15, with description “World Domination”, given that the default
 behaviour for forums.forum is “Allow”. You can easily add a rule that says:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mf">15.</span><span class="n">view</span> <span class="n">block</span>
 </pre></div>
@@ -381,6 +384,29 @@ disabled anyway.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="the-tree">
+<h2>The Tree<a class="headerlink" href="#the-tree" title="Permalink to this headline">¶</a></h2>
+<p>From a security execution point of view the group name is largely irrelevant.
+Simplistically we get a list of groups for a user and a list of roles from those
+groups to decide whether or not to allow an action. However, with potentially
+lots of groups we need some kind of way to navigate around them. This also allows
+users who need access to be able to see where this access could come from and
+who could give it to them.</p>
+<p>The tree looks similar to the RBAC roles with words separated by full stops, but
+they are not related. The tree represents a logical way to divide things up. A
+lot of admin is done at the club level, some at the state level and some at the
+highest level (in our case the ABF), so it makes sense to use this as part of the
+tree. e.g.:</p>
+<blockquote>
+<div><p>org.abf.nsw.north-shore-bridge-club (NSWBA’s part of the tree)
+org.abf.nsw.trumps (Trumps part of the tree)
+org.abf.sa.saba (SABA’s part of the tree)
+org.abf.nsw.nswba (NSWBA’s part of the tree)
+org.abf.abf (The ABF’s part of the tree)</p>
+</div></blockquote>
+<p>Note that there is nothing in the code to enforce this and the tree can
+evolve as we see fit.</p>
+</div>
 </div>
 <div class="section" id="admin">
 <h1>Admin<a class="headerlink" href="#admin" title="Permalink to this headline">¶</a></h1>
@@ -392,7 +418,7 @@ that administrators can only do things they are supposed to do.</p>
 Every group is created with a location in the tree. The tree is similar to the
 roles, it is a hierarchical dot based model.</p>
 <p>Lets start with a simple example.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACGroup</span><span class="p">:</span> <span class="s2">&quot;Springfield Bridge Club Directors&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACGroup</span><span class="p">:</span> <span class="n">org</span><span class="o">.</span><span class="n">abf</span><span class="o">.</span><span class="n">qld</span><span class="o">.</span><span class="n">surfers</span><span class="o">.</span><span class="n">directors</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Bob</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Jane</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Alice</span>
@@ -402,38 +428,31 @@ roles, it is a hierarchical dot based model.</p>
 <p>This defines a group of directors for a club. There are 3 users, Bob, Jane and
 Alice, and there is one role: <em>forums.forum.37.all</em>.</p>
 <p>Now lets add two administrators:</p>
-<p><strong>Note that admin has a matching set of models with the word Admin added.</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACAdminGroup</span><span class="p">:</span> <span class="s2">&quot;Springfield Bridge Club Admins&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACAdminGroup</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mi">37</span>
 <span class="n">RBACAdminUserGroup</span><span class="p">:</span> <span class="n">Bob</span>
 <span class="n">RBACAdminGroupRole</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mi">37</span>
 
-<span class="n">RBACAdminGroup</span><span class="p">:</span> <span class="s2">&quot;Global Forum Admins&quot;</span>
+<span class="n">RBACAdminGroup</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span>
 <span class="n">RBACAdminUserGroup</span><span class="p">:</span> <span class="n">Fred</span>
 <span class="n">RBACAdminGroupRole</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span>
 </pre></div>
 </div>
-<p>So here Bob, as well as being a member of the group “Springfield Bridge Club
-Directors”, is also an administrator. Fred has access at a higher level and is
+<p>So here Bob, as well as being a member of the directors group at Surfers,
+is also an administrator. Fred has access at a higher level and is
 an administrator for all forums.</p>
-<p>Both Bob and Fred can add or remove users from the group “Springfield Bridge
-Club Directors”. However, using these rules, Fred could also add the role
-<em>forums.forum.6.view</em> to this group, while Bob could not.</p>
-<p>Lets keep this in place and add one further admin group into the mix:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACAdminGroup</span><span class="p">:</span> <span class="s2">&quot;Springfield Bridge Club Admins - More Access&quot;</span>
-<span class="n">RBACAdminUserGroup</span><span class="p">:</span> <span class="n">Bob</span>
-<span class="n">RBACAdminGroupRole</span><span class="p">:</span> <span class="n">organisations</span><span class="o">.</span><span class="n">organisation</span><span class="o">.</span><span class="mi">142</span>
+<p>There are two different kinds of admin rights within RBAC. There is <strong>WHAT</strong>
+you can change (as shown above for Bob and Fred), but also <strong>WHERE</strong> you can
+change it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACAdminTree</span><span class="o">..</span><span class="n">tree</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="mi">37</span>   <span class="p">(</span><span class="n">Where</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">tree</span> <span class="n">you</span> <span class="n">have</span> <span class="n">rights</span><span class="p">)</span>
+<span class="n">RBACAdminTree</span><span class="o">..</span><span class="n">group</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forums</span><span class="o">.</span><span class="mi">37</span>  <span class="p">(</span><span class="n">Group</span> <span class="n">above</span> <span class="k">with</span> <span class="n">Bob</span><span class="p">)</span>
+<span class="n">RBACAdminTree</span><span class="o">..</span><span class="n">group</span><span class="p">:</span> <span class="n">forums</span><span class="o">.</span><span class="n">forums</span>   <span class="p">(</span><span class="n">Group</span> <span class="n">above</span> <span class="k">with</span> <span class="n">Fred</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This rule gives Bob admin rights over organisation 142.</p>
-<p>Now Bob can also update our original group “Springfield Bridge Club Directors”
-to add the role <em>organisations.organisation.143.view</em>, however, based upon the
-rules we have shown here, Fred could not. Equally, if Bob does add this role,
-then Fred could not remove it.</p>
 <p>So, in summary:</p>
 <ul class="simple">
 <li><p>Administrator access applies at the role level, not directly to groups.</p></li>
-<li><p>If an administrator has rights to a group through any admin role,
-then they can change the membership of that group (add or remove users).</p></li>
+<li><p>Administrators need both admin access to the role and write access to the
+tree in order to make changes.</p></li>
 <li><p>An administrator can only change the roles within a group that they have
 explicit rights to. They cannot change any other roles.</p></li>
 </ul>
@@ -442,9 +461,7 @@ someone to be an administrator of a group without being a member.</p>
 <div class="section" id="administration-of-administrators">
 <h2>Administration of Administrators<a class="headerlink" href="#administration-of-administrators" title="Permalink to this headline">¶</a></h2>
 <p>Any admin can create or delete administrators within their sphere of
-administration. So if they want to then Bob can give Fred access to
-“Springfield Bridge Club Admins - More Access” and Fred can give Bob access to
-“Global Forum Admins”.</p>
+administration.</p>
 <p>We will need some sort of a review of access but nobody can ever give another
 user more access than they already have. The roles such as <em>forums.forum</em> are
 the ones that need education so that admins at this level give admin rights to
@@ -565,13 +582,13 @@ whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
 </div>
 <div class="section" id="ajax-calls">
 <h2>Ajax calls<a class="headerlink" href="#ajax-calls" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_user_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_action_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_user_to_group_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_role_to_group_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_get_action_for_model_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_user_from_group_ajax()</span></code></p>
-<p><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_role_from_group_ajax()</span></code></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.group_to_user_ajax" title="rbac.ajax.group_to_user_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_user_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.group_to_action_ajax" title="rbac.ajax.group_to_action_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.group_to_action_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.rbac_add_user_to_group_ajax" title="rbac.ajax.rbac_add_user_to_group_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_user_to_group_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.rbac_add_role_to_group_ajax" title="rbac.ajax.rbac_add_role_to_group_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_add_role_to_group_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.rbac_get_action_for_model_ajax" title="rbac.ajax.rbac_get_action_for_model_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_get_action_for_model_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.rbac_delete_user_from_group_ajax" title="rbac.ajax.rbac_delete_user_from_group_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_user_from_group_ajax()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.ajax.rbac_delete_role_from_group_ajax" title="rbac.ajax.rbac_delete_role_from_group_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.ajax.rbac_delete_role_from_group_ajax()</span></code></a></p>
 </div>
 </div>
 

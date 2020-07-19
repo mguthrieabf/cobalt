@@ -311,9 +311,7 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="notifications.models.InAppNotification.member_id">
 <code class="sig-name descname">member_id</code><a class="headerlink" href="#notifications.models.InAppNotification.member_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="notifications.models.InAppNotification.message">
@@ -401,9 +399,7 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="notifications.models.NotificationMapping.member_id">
 <code class="sig-name descname">member_id</code><a class="headerlink" href="#notifications.models.NotificationMapping.member_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="notifications.models.NotificationMapping.notification_type">
@@ -449,6 +445,18 @@ object the first time, the query is executed.</p>
 <dt id="notifications.views.add_in_app_notification">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">add_in_app_notification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#add_in_app_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.add_in_app_notification" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.add_listener">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">add_listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">application</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">topic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">notification_type</span><span class="o">=</span><span class="default_value">'Email'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#add_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.add_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a user to be notified of an event</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.check_listener">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">check_listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">application</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">topic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#check_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.check_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a user is being notified of an event</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="notifications.views.contact_member">
@@ -525,11 +533,12 @@ page to view them all.</p>
 <dl class="py function">
 <dt id="notifications.views.homepage">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">homepage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#homepage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.homepage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>homepage for notifications listings</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="notifications.views.notify_happening">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by Cobalt applications to tell notify they have done something.</p>
 <p>Main entry point for general notifications of events within the system.
 Applications publish an event through this call and Notifications tells
@@ -555,7 +564,7 @@ any member who has registered an interest in this event.</p>
 
 <dl class="py function">
 <dt id="notifications.views.notify_happening_forums">
-<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening_forums</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening_forums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening_forums" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening_forums</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening_forums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening_forums" title="Permalink to this definition">¶</a></dt>
 <dd><p>sub function for notify_happening() - handles Forum events
 Might be able to make this generic</p>
 </dd></dl>
@@ -564,6 +573,12 @@ Might be able to make this generic</p>
 <dt id="notifications.views.passthrough">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">passthrough</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#passthrough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.passthrough" title="Permalink to this definition">¶</a></dt>
 <dd><p>passthrough function to acknowledge a message has been clicked on</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="notifications.views.remove_listener">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">remove_listener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">application</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">topic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#remove_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.remove_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a user from being notified of an event</p>
 </dd></dl>
 
 <dl class="py function">

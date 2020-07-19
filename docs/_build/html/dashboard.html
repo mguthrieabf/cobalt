@@ -199,9 +199,41 @@
 <span id="dashboard-views-module"></span><h2>dashboard.views module<a class="headerlink" href="#module-dashboard.views" title="Permalink to this headline">¶</a></h2>
 <p>views for dashboard</p>
 <dl class="py function">
+<dt id="dashboard.views.get_announcements">
+<code class="sig-prename descclassname">dashboard.views.</code><code class="sig-name descname">get_announcements</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dashboard/views.html#get_announcements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.get_announcements" title="Permalink to this definition">¶</a></dt>
+<dd><p>internal function to get Posts for forum_type=”Announcements”</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dashboard.views.get_posts">
+<code class="sig-prename descclassname">dashboard.views.</code><code class="sig-name descname">get_posts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dashboard/views.html#get_posts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.get_posts" title="Permalink to this definition">¶</a></dt>
+<dd><p>internal function to get Posts</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="dashboard.views.home">
 <code class="sig-prename descclassname">dashboard.views.</code><code class="sig-name descname">home</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dashboard/views.html#home"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.home" title="Permalink to this definition">¶</a></dt>
 <dd><p>Home page</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dashboard.views.scroll1">
+<code class="sig-prename descclassname">dashboard.views.</code><code class="sig-name descname">scroll1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dashboard/views.html#scroll1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.scroll1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cutdown homepage to be called by infinite scroll.</p>
+<p>This handles the right column - discussion posts</p>
+<p>Infinite scroll will call this when the user scrolls off the bottom
+of the page. We don’t need to update anything except the posts so exclude
+other front page database hits.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="dashboard.views.scroll2">
+<code class="sig-prename descclassname">dashboard.views.</code><code class="sig-name descname">scroll2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dashboard/views.html#scroll2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.scroll2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cutdown homepage to be called by infinite scroll.</p>
+<p>This handles the left column - announcements</p>
+<p>Infinite scroll will call this when the user scrolls off the bottom
+of the page. We don’t need to update anything except the posts so exclude
+other front page database hits.</p>
 </dd></dl>
 
 </div>

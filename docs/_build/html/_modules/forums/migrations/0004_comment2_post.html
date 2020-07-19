@@ -153,14 +153,16 @@
 <div class="viewcode-block" id="Migration"><a class="viewcode-back" href="../../../forums.migrations.html#forums.migrations.0004_comment2_post.Migration">[docs]</a><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
 
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span> <span class="s1">&#39;0003_post_summary&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="s2">&quot;0003_post_summary&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AddField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;comment2&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span>
-            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;forums.Post&#39;</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;comment2&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;forums.Post&quot;</span>
+            <span class="p">),</span>
             <span class="n">preserve_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">]</span></div>

@@ -150,7 +150,16 @@
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">masterpoints.views</span> <span class="kn">import</span> <span class="n">get_masterpoints</span>
 <span class="kn">from</span> <span class="nn">payments.core</span> <span class="kn">import</span> <span class="n">get_balance_detail</span>
-<span class="kn">from</span> <span class="nn">forums.views</span> <span class="kn">import</span> <span class="n">post_list_dashboard</span>
+
+<span class="c1"># from forums.views import post_list_dashboard</span>
+<span class="kn">from</span> <span class="nn">cobalt.utils</span> <span class="kn">import</span> <span class="n">cobalt_paginator</span>
+<span class="kn">from</span> <span class="nn">forums.models</span> <span class="kn">import</span> <span class="n">Post</span><span class="p">,</span> <span class="n">ForumFollow</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_blocked_for_model</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;django&quot;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -158,10 +167,85 @@
     <span class="n">system_number</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span>
     <span class="n">masterpoints</span> <span class="o">=</span> <span class="n">get_masterpoints</span><span class="p">(</span><span class="n">system_number</span><span class="p">)</span>
     <span class="n">payments</span> <span class="o">=</span> <span class="n">get_balance_detail</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
-    <span class="n">posts</span> <span class="o">=</span> <span class="n">post_list_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;dashboard/home.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;mp&#39;</span><span class="p">:</span> <span class="n">masterpoints</span><span class="p">,</span>
-                                                   <span class="s1">&#39;payments&#39;</span><span class="p">:</span> <span class="n">payments</span><span class="p">,</span>
-                                                   <span class="s1">&#39;posts&#39;</span><span class="p">:</span> <span class="n">posts</span><span class="p">})</span></div>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">posts2</span> <span class="o">=</span> <span class="n">get_announcements</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;dashboard/home.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;mp&quot;</span><span class="p">:</span> <span class="n">masterpoints</span><span class="p">,</span> <span class="s2">&quot;payments&quot;</span><span class="p">:</span> <span class="n">payments</span><span class="p">,</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span> <span class="s2">&quot;posts2&quot;</span><span class="p">:</span> <span class="n">posts2</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="scroll1"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.scroll1">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">scroll1</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Cutdown homepage to be called by infinite scroll.</span>
+
+<span class="sd">    This handles the right column - discussion posts</span>
+
+<span class="sd">    Infinite scroll will call this when the user scrolls off the bottom</span>
+<span class="sd">    of the page. We don&#39;t need to update anything except the posts so exclude</span>
+<span class="sd">    other front page database hits. &quot;&quot;&quot;</span>
+
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;dashboard/home.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="scroll2"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.scroll2">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">scroll2</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Cutdown homepage to be called by infinite scroll.</span>
+
+<span class="sd">    This handles the left column - announcements</span>
+
+<span class="sd">    Infinite scroll will call this when the user scrolls off the bottom</span>
+<span class="sd">    of the page. We don&#39;t need to update anything except the posts so exclude</span>
+<span class="sd">    other front page database hits. &quot;&quot;&quot;</span>
+
+    <span class="n">posts2</span> <span class="o">=</span> <span class="n">get_announcements</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;dashboard/home.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;posts2&quot;</span><span class="p">:</span> <span class="n">posts2</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="get_announcements"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.get_announcements">[docs]</a><span class="k">def</span> <span class="nf">get_announcements</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; internal function to get Posts for forum_type=&quot;Announcements&quot; &quot;&quot;&quot;</span>
+
+    <span class="c1"># TODO: Add clubs</span>
+    <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum__forum_type</span><span class="o">=</span><span class="s2">&quot;Announcement&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;-created_date&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_posts"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.get_posts">[docs]</a><span class="k">def</span> <span class="nf">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; internal function to get Posts &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get users preferences plus default Forums</span>
+    <span class="c1"># TODO: ADD EVERYONE</span>
+    <span class="n">forum_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="n">ForumFollow</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># get list of forums user cannot access</span>
+    <span class="n">blocked</span> <span class="o">=</span> <span class="n">rbac_user_blocked_for_model</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;view&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Remove anything blocked</span>
+    <span class="k">if</span> <span class="n">forum_list</span><span class="p">:</span>
+        <span class="n">forum_list_allowed</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">forum_list</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">blocked</span><span class="p">]</span>
+        <span class="n">posts_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">forum_list_allowed</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum__forum_type</span><span class="o">=</span><span class="s2">&quot;Discussion&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Otherwise load everything not blocked</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">posts</span></div>
 </pre></div>
 
            </div>

@@ -93,7 +93,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.backend">accounts.backend module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.forms">accounts.forms module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.models">accounts.models module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#accounts-tests-module">accounts.tests module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.tokens">accounts.tokens module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.urls">accounts.urls module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-accounts.views">accounts.views module</a></li>
@@ -318,6 +317,12 @@ users to login using either their email address or system_number.</p>
 <code class="sig-name descname">base_fields</code><em class="property"> = {'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.CharField object&gt;, 'password1': &lt;django.forms.fields.CharField object&gt;, 'password2': &lt;django.forms.fields.CharField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserRegisterForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="accounts.forms.UserRegisterForm.clean_username">
+<code class="sig-name descname">clean_username</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#UserRegisterForm.clean_username"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserRegisterForm.clean_username" title="Permalink to this definition">¶</a></dt>
+<dd><p>check system_number is valid. Don’t rely on client side validation</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="accounts.forms.UserRegisterForm.declared_fields">
 <code class="sig-name descname">declared_fields</code><em class="property"> = {'email': &lt;django.forms.fields.EmailField object&gt;, 'password1': &lt;django.forms.fields.CharField object&gt;, 'password2': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserRegisterForm.declared_fields" title="Permalink to this definition">¶</a></dt>
@@ -379,6 +384,11 @@ users to login using either their email address or system_number.</p>
 <em class="property">class </em><code class="sig-prename descclassname">accounts.models.</code><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/models.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.models.User" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.models.AbstractUser</span></code></p>
 <p>User class based upon AbstractUser.</p>
+<dl class="py attribute">
+<dt id="accounts.models.User.AUTO_STATUS">
+<code class="sig-name descname">AUTO_STATUS</code><em class="property"> = [('Off', 'Off'), ('Pending', 'Pending'), ('On', 'On')]</em><a class="headerlink" href="#accounts.models.User.AUTO_STATUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py exception">
 <dt id="accounts.models.User.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#accounts.models.User.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -454,6 +464,21 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 object the first time, the query is executed.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="accounts.models.User.forumfollow_set">
+<code class="sig-name descname">forumfollow_set</code><a class="headerlink" href="#accounts.models.User.forumfollow_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="accounts.models.User.full_name">
 <em class="property">property </em><code class="sig-name descname">full_name</code><a class="headerlink" href="#accounts.models.User.full_name" title="Permalink to this definition">¶</a></dt>
@@ -468,6 +493,11 @@ object the first time, the query is executed.</p>
 <dl class="py method">
 <dt id="accounts.models.User.get_previous_by_date_joined">
 <code class="sig-name descname">get_previous_by_date_joined</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: date_joined&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.models.User.get_previous_by_date_joined" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="accounts.models.User.get_stripe_auto_confirmed_display">
+<code class="sig-name descname">get_stripe_auto_confirmed_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: stripe_auto_confirmed&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.models.User.get_stripe_auto_confirmed_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -730,21 +760,6 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="accounts.models.User.rbacadmintree_set">
-<code class="sig-name descname">rbacadmintree_set</code><a class="headerlink" href="#accounts.models.User.rbacadmintree_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
-</dd></dl>
-
-<dl class="py attribute">
 <dt id="accounts.models.User.rbacadminusergroup_set">
 <code class="sig-name descname">rbacadminusergroup_set</code><a class="headerlink" href="#accounts.models.User.rbacadminusergroup_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
@@ -828,9 +843,6 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 </dd></dl>
 
-</div>
-<div class="section" id="accounts-tests-module">
-<h2>accounts.tests module<a class="headerlink" href="#accounts-tests-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-accounts.tokens">
 <span id="accounts-tokens-module"></span><h2>accounts.tokens module<a class="headerlink" href="#module-accounts.tokens" title="Permalink to this headline">¶</a></h2>

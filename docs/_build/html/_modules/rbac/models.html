@@ -158,12 +158,6 @@
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
 
 <span class="n">RULE_TYPES</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span> <span class="s2">&quot;Allow User Access&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="s2">&quot;Block User Access&quot;</span><span class="p">)]</span>
-<span class="n">GROUP_TYPES</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">&quot;Forum&quot;</span><span class="p">,</span> <span class="s2">&quot;Forums&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;Organisation&quot;</span><span class="p">,</span> <span class="s2">&quot;Organisations&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;Payment&quot;</span><span class="p">,</span> <span class="s2">&quot;Payments&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;Scoring&quot;</span><span class="p">,</span> <span class="s2">&quot;Scoring&quot;</span><span class="p">),</span>
-<span class="p">]</span>
 
 
 <div class="viewcode-block" id="RBACGroup"><a class="viewcode-back" href="../../rbac.html#rbac.models.RBACGroup">[docs]</a><span class="k">class</span> <span class="nc">RBACGroup</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
@@ -185,6 +179,9 @@
         <span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; Standard User object &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">,</span> <span class="s2">&quot;name_item&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
@@ -287,10 +284,10 @@
     <span class="n">name_qualifier</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; eg &quot;organisations.trumps&quot; &quot;&quot;&quot;</span>
 
-    <span class="n">name_item</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">name_item</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; chosen by the admin. appends onto name_qualifier &quot;&quot;&quot;</span>
 
-    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; Free format decription &quot;&quot;&quot;</span>
 
     <span class="n">created_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="s2">&quot;Create Date&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
@@ -300,6 +297,9 @@
         <span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; Standard User object &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">,</span> <span class="s2">&quot;name_item&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
@@ -352,10 +352,10 @@
 <div class="viewcode-block" id="RBACAdminTree"><a class="viewcode-back" href="../../rbac.html#rbac.models.RBACAdminTree">[docs]</a><span class="k">class</span> <span class="nc">RBACAdminTree</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Control where in the tree a user can create groups &quot;&quot;&quot;</span>
 
-    <span class="n">member</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; Standard User object &quot;&quot;&quot;</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; RBACGroup for this Role &quot;&quot;&quot;</span>
 
-    <span class="n">tree</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; tree is an allowed entry point for a user. e.g. rbac.org.org &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

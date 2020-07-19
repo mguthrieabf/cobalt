@@ -145,20 +145,31 @@
             
   <h1>Source code for forums.admin</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Forum</span><span class="p">,</span> <span class="n">Post</span><span class="p">,</span> <span class="n">Comment1</span><span class="p">,</span> <span class="n">Comment2</span><span class="p">,</span> <span class="n">LikePost</span><span class="p">,</span> <span class="n">LikeComment1</span><span class="p">,</span> <span class="n">LikeComment2</span>
 <span class="kn">from</span> <span class="nn">django_summernote.admin</span> <span class="kn">import</span> <span class="n">SummernoteModelAdmin</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Forum</span><span class="p">,</span>
+    <span class="n">Post</span><span class="p">,</span>
+    <span class="n">Comment1</span><span class="p">,</span>
+    <span class="n">Comment2</span><span class="p">,</span>
+    <span class="n">LikePost</span><span class="p">,</span>
+    <span class="n">LikeComment1</span><span class="p">,</span>
+    <span class="n">LikeComment2</span><span class="p">,</span>
+    <span class="n">ForumFollow</span><span class="p">,</span>
+<span class="p">)</span>
+
 
 <div class="viewcode-block" id="PostAdmin"><a class="viewcode-back" href="../../forums.html#forums.admin.PostAdmin">[docs]</a><span class="k">class</span> <span class="nc">PostAdmin</span><span class="p">(</span><span class="n">SummernoteModelAdmin</span><span class="p">):</span>
-    <span class="n">summernote_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,)</span></div>
+    <span class="n">summernote_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,)</span></div>
+
 
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Post</span><span class="p">,</span> <span class="n">PostAdmin</span><span class="p">)</span>
-
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Forum</span><span class="p">)</span>
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Comment1</span><span class="p">)</span>
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Comment2</span><span class="p">)</span>
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LikePost</span><span class="p">)</span>
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LikeComment1</span><span class="p">)</span>
 <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LikeComment2</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ForumFollow</span><span class="p">)</span>
 </pre></div>
 
            </div>

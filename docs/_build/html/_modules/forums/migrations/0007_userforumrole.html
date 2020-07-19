@@ -155,18 +155,58 @@
 
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">swappable_dependency</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">),</span>
-        <span class="p">(</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span> <span class="s1">&#39;0006_auto_20200502_1048&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="s2">&quot;0006_auto_20200502_1048&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">CreateModel</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;UserForumRole&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;UserForumRole&quot;</span><span class="p">,</span>
             <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;role&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Poster&#39;</span><span class="p">,</span> <span class="s1">&#39;Poster - can create a new post&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Responder&#39;</span><span class="p">,</span> <span class="s1">&#39;Responder - can reply to a post&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Moderator&#39;</span><span class="p">,</span> <span class="s1">&#39;Moderator - can manage the forum&#39;</span><span class="p">)],</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;User role in forum&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;rule&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Allow&#39;</span><span class="p">,</span> <span class="s1">&#39;Allows a user to perform a role&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Block&#39;</span><span class="p">,</span> <span class="s1">&#39;Blocks a user from performing a role&#39;</span><span class="p">)],</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;Type of Rule&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;forums.Forum&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">)),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span>
+                        <span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+                        <span class="n">choices</span><span class="o">=</span><span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;Poster&quot;</span><span class="p">,</span> <span class="s2">&quot;Poster - can create a new post&quot;</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;Responder&quot;</span><span class="p">,</span> <span class="s2">&quot;Responder - can reply to a post&quot;</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;Moderator&quot;</span><span class="p">,</span> <span class="s2">&quot;Moderator - can manage the forum&quot;</span><span class="p">),</span>
+                        <span class="p">],</span>
+                        <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;User role in forum&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;rule&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+                        <span class="n">choices</span><span class="o">=</span><span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;Allow&quot;</span><span class="p">,</span> <span class="s2">&quot;Allows a user to perform a role&quot;</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;Block&quot;</span><span class="p">,</span> <span class="s2">&quot;Blocks a user from performing a role&quot;</span><span class="p">),</span>
+                        <span class="p">],</span>
+                        <span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Type of Rule&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;forum&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                        <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;forums.Forum&quot;</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                        <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+                        <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
     <span class="p">]</span></div>

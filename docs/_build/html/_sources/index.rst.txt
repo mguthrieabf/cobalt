@@ -24,6 +24,7 @@ These are links to documents that describe each module.
 * :doc:`payments_overview`
 * :doc:`notifications_overview`
 * :doc:`rbac_overview`
+* :doc:`rbac_ABF_Roles`
 * :doc:`forums_overview`
 * :doc:`utilities_overview`
 

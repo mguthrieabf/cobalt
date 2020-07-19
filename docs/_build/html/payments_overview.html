@@ -166,10 +166,12 @@ differentiate between the location of a function.</p>
 <div class="section" id="functions">
 <h1>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h1>
 <img alt="Payments Diagram" src="_images/payments_overview.png" />
-<div class="section" id="internal">
-<h2>Internal<a class="headerlink" href="#internal" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="internal-member">
+<h2>Internal - Member<a class="headerlink" href="#internal-member" title="Permalink to this headline">¶</a></h2>
 <p>The internal functions work as standard Django view functions. They work with
-the models to handle data updates.</p>
+the models to handle data updates. There are three broad categories of functions:
+Member (relating to members), Organisation (relating to Organisations) and
+Admin (for administrators).</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="payments.html#payments.core.auto_topup_member" title="payments.core.auto_topup_member"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.core.auto_topup_member()</span></code></a> - processes an auto top up for a
 member.</p></li>
@@ -185,9 +187,40 @@ organisations account.</p></li>
 up amount.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.views.member_transfer" title="payments.views.member_transfer"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.member_transfer()</span></code></a> - transfer money to another member.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.views.statement" title="payments.views.statement"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement()</span></code></a> - show member’s statement.</p></li>
-<li><p><a class="reference internal" href="payments.html#payments.views.statement_pdf" title="payments.views.statement_pdf"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_pdf()</span></code></a> - show member’s statement as PDF.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.views.statement_csv" title="payments.views.statement_csv"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_csv()</span></code></a> - show member’s statement as CSV.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.views.statement_common" title="payments.views.statement_common"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_common()</span></code></a> - common code across all statements.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.manual_topup" title="payments.views.manual_topup"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.manual_topup()</span></code></a> - manually add to account.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.cancel_auto_top_up" title="payments.views.cancel_auto_top_up"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.cancel_auto_top_up()</span></code></a> - turn off Auto Top Up.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.stripe_webpage_confirm" title="payments.views.stripe_webpage_confirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.stripe_webpage_confirm()</span></code></a> - called by the webpage when
+Stripe has notified the user of successful one off payment. We do not trust
+the client, but update the status in case of Stripe problems. Usually the
+webhook will have been called before this gets called so it will do nothing.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.stripe_autotopup_confirm" title="payments.views.stripe_autotopup_confirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.stripe_autotopup_confirm()</span></code></a> - called by the webpage when
+Stripe has notified the user of successful card registration. We do not trust
+the client, but update the status in case of Stripe problems. Usually the
+webhook will have been called before this gets called so it will do nothing.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.stripe_autotopup_off" title="payments.views.stripe_autotopup_off"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.stripe_autotopup_off()</span></code></a> - called by the webpage just before
+registering new card details. Required to track status.</p></li>
+</ul>
+</div>
+<div class="section" id="internal-organisations">
+<h2>Internal - Organisations<a class="headerlink" href="#internal-organisations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="payments.html#payments.views.statement_org" title="payments.views.statement_org"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_org()</span></code></a> - shows an organisation’s statement.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.statement_csv_org" title="payments.views.statement_csv_org"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_csv_org()</span></code></a> - downloads an organisation’s statement.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.statement_org_summary_ajax" title="payments.views.statement_org_summary_ajax"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_org_summary_ajax()</span></code></a> - called by the web page
+when the summary date range changes to update the summary amounts.</p></li>
+</ul>
+</div>
+<div class="section" id="internal-admin">
+<h2>Internal - Admin<a class="headerlink" href="#internal-admin" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="payments.html#payments.views.statement_admin_summary" title="payments.views.statement_admin_summary"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_admin_summary()</span></code></a> - main page for admins.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.statement_admin_view" title="payments.views.statement_admin_view"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.statement_admin_view()</span></code></a> - wrapper for viewing member
+statements by admins. Accepts member_id as paramter.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.settlement" title="payments.views.settlement"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.settlement()</span></code></a> - view to make settlements to clubs</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.manual_adjust_member" title="payments.views.manual_adjust_member"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.manual_adjust_member()</span></code></a> - adjust member balance</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.views.manual_adjust_org" title="payments.views.manual_adjust_org"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.manual_adjust_org()</span></code></a> - adjust org balance</p></li>
 </ul>
 </div>
 <div class="section" id="stripe">
@@ -202,7 +235,9 @@ member may be going to register a credit card.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.views.stripe_create_customer" title="payments.views.stripe_create_customer"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.views.stripe_create_customer()</span></code></a> - creates a new customer in
 Stripe and records the customer number against the member.</p></li>
 <li><p><a class="reference internal" href="payments.html#payments.core.stripe_webhook" title="payments.core.stripe_webhook"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.core.stripe_webhook()</span></code></a> - this is the method for Stripe to
-contact us. Can be for a number reasons.</p></li>
+contact us. Can be for a number reasons. Calls one of the next two functions.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.core.stripe_webhook_manual" title="payments.core.stripe_webhook_manual"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.core.stripe_webhook_manual()</span></code></a> - handles one off transactions.</p></li>
+<li><p><a class="reference internal" href="payments.html#payments.core.stripe_webhook_autosetup" title="payments.core.stripe_webhook_autosetup"><code class="xref py py-func docutils literal notranslate"><span class="pre">payments.core.stripe_webhook_autosetup()</span></code></a> - handles auto top up set up.</p></li>
 </ul>
 </div>
 <div class="section" id="api">

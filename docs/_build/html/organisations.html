@@ -262,9 +262,7 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="organisations.models.MemberOrganisation.member_id">
 <code class="sig-name descname">member_id</code><a class="headerlink" href="#organisations.models.MemberOrganisation.member_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="organisations.models.MemberOrganisation.objects">
@@ -287,15 +285,13 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="organisations.models.MemberOrganisation.organisation_id">
 <code class="sig-name descname">organisation_id</code><a class="headerlink" href="#organisations.models.MemberOrganisation.organisation_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt id="organisations.models.Organisation">
-<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">Organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">org_id</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">address1</span></em>, <em class="sig-param"><span class="n">address2</span></em>, <em class="sig-param"><span class="n">suburb</span></em>, <em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">postcode</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#Organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.Organisation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">Organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">org_id</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">address1</span></em>, <em class="sig-param"><span class="n">address2</span></em>, <em class="sig-param"><span class="n">suburb</span></em>, <em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">postcode</span></em>, <em class="sig-param"><span class="n">bank_bsb</span></em>, <em class="sig-param"><span class="n">bank_account</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#Organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.Organisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <dl class="py exception">
 <dt id="organisations.models.Organisation.DoesNotExist">
@@ -324,6 +320,20 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="organisations.models.Organisation.address2">
 <code class="sig-name descname">address2</code><a class="headerlink" href="#organisations.models.Organisation.address2" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.bank_account">
+<code class="sig-name descname">bank_account</code><a class="headerlink" href="#organisations.models.Organisation.bank_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.bank_bsb">
+<code class="sig-name descname">bank_bsb</code><a class="headerlink" href="#organisations.models.Organisation.bank_bsb" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -470,6 +480,39 @@ object the first time, the query is executed.</p>
 </div>
 <div class="section" id="module-organisations.views">
 <span id="organisations-views-module"></span><h2>organisations.views module<a class="headerlink" href="#module-organisations.views" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="organisations.views.org_detail_ajax">
+<code class="sig-prename descclassname">organisations.views.</code><code class="sig-name descname">org_detail_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/views.html#org_detail_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.views.org_detail_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns basic info on an org for the generic org search.</p>
+<p>Ajax call to get basic info on an org. Will return an empty json array
+if the org number is invalid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- org number</strong> (<em>org_id</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>address etc.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Json array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="organisations.views.org_search_ajax">
+<code class="sig-prename descclassname">organisations.views.</code><code class="sig-name descname">org_search_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/views.html#org_search_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.views.org_search_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax org search function. Used by the generic org search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- partial org name to search for.</strong> (<em>orgname</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse - either a message or a list of users in HTML format.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-organisations">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-organisations" title="Permalink to this headline">¶</a></h2>

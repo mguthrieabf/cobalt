@@ -162,43 +162,101 @@
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">CreateModel</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Comment1&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Comment1&quot;</span><span class="p">,</span>
             <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
-                <span class="p">(</span><span class="s1">&#39;created_date&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span>
+                        <span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;created_date&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">),</span>
+                <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">CreateModel</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Comment2&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Comment2&quot;</span><span class="p">,</span>
             <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
-                <span class="p">(</span><span class="s1">&#39;created_date&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;comment1&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;forums.Comment1&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">)),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span>
+                        <span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;created_date&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;comment1&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                        <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+                        <span class="n">to</span><span class="o">=</span><span class="s2">&quot;forums.Comment1&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                        <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+                        <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">CreateModel</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Post&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Post&quot;</span><span class="p">,</span>
             <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;ID&#39;</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
-                <span class="p">(</span><span class="s1">&#39;created_date&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;last_change_date&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)),</span>
-                <span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">)),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span>
+                        <span class="n">auto_created</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">serialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;created_date&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;last_change_date&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;author&quot;</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                        <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+                        <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">),</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AddField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;comment1&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span>
-            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s1">&#39;forums.Post&#39;</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;comment1&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;forums.Post&quot;</span>
+            <span class="p">),</span>
         <span class="p">),</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AddField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;comment1&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;user&#39;</span><span class="p">,</span>
-            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;comment1&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                <span class="n">on_delete</span><span class="o">=</span><span class="n">django</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">deletion</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">AUTH_USER_MODEL</span>
+            <span class="p">),</span>
         <span class="p">),</span>
     <span class="p">]</span></div>
 </pre></div>

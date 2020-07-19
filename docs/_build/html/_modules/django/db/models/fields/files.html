@@ -287,7 +287,7 @@
 
 <span class="sd">    Assign a file object on assignment so you can do::</span>
 
-<span class="sd">        &gt;&gt;&gt; with open(&#39;/path/to/hello.world&#39;, &#39;r&#39;) as f:</span>
+<span class="sd">        &gt;&gt;&gt; with open(&#39;/path/to/hello.world&#39;) as f:</span>
 <span class="sd">        ...     instance.file = File(f)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
@@ -448,7 +448,7 @@
         <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upload_to</span><span class="p">):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upload_to</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dirname</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upload_to</span><span class="p">)</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upload_to</span><span class="p">))</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">generate_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
@@ -523,7 +523,7 @@
                 <span class="n">checks</span><span class="o">.</span><span class="n">Error</span><span class="p">(</span>
                     <span class="s1">&#39;Cannot use ImageField because Pillow is not installed.&#39;</span><span class="p">,</span>
                     <span class="n">hint</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Get Pillow at https://pypi.org/project/Pillow/ &#39;</span>
-                          <span class="s1">&#39;or run command &quot;pip install Pillow&quot;.&#39;</span><span class="p">),</span>
+                          <span class="s1">&#39;or run command &quot;python -m pip install Pillow&quot;.&#39;</span><span class="p">),</span>
                     <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
                     <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;fields.E210&#39;</span><span class="p">,</span>
                 <span class="p">)</span>

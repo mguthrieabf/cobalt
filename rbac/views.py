@@ -102,12 +102,104 @@ def view_screen(request):
 
 
 @login_required
+def generic_tree_screen(request, groups, detail_link, title):
+    """ Show full RBAC Tree for RBAC or Admin """
+
+    # build a list of the tree. We want to turn:
+    #  abf.people.fred          (id=34)
+    #  abf.people.john          (id=45)
+    #  abf.animals.dogs.rover   (id=2)
+    #  abf.animals.cats.felix   (id=21)
+    #
+    # into:
+    #  items["abf"]=["people", "animals"]
+    #  items["abf.people"]=["fred", "john"]
+    #  items["abf.people.fred"]=34
+    #  items["abf.people.john"]=45
+    #  items["abf.animals"]=["dogs", "cats"]
+    #  items["abf.animals.dogs"]=["rover"]
+    #  items["abf.animals.cats"]=["felix"]
+    #  items["abf.animals.dogs.rover"]=2
+    #  items["abf.animals.cats.felix"]=21
+
+    items = {}
+    for group in groups:
+        line = f"{group.name_qualifier}.{group.name_item}"
+        parts = line.split(".")
+        for i in range(1, len(parts) + 1):
+
+            string = ".".join(parts[:i])
+
+            if i == len(parts):  # end of line
+                child = group.id
+            else:  # more left
+                child = parts[i]
+
+            if string in items:
+                if child not in items[string]:
+                    items[string].append(child)
+            else:
+                items[string] = [child]
+
+    # sort the dictionary on keys
+    sorted_items = dict(sorted(items.items()))
+
+    # generate html - loop through the sorted dictionary and do 3 things:
+    #  1) if there is more below create a new ul
+    #  2) if we are the end of the tree (contents is an integer) print the link to the details
+    #  3) manage the stack so we close the right number of uls
+
+    html_tree = ""
+    depth = []
+    for key, value in sorted_items.items():
+        this_level = ".".join(key.split(".")[:-1])  # eg we are a.b.c level=a.b
+
+        # are we at the top?
+        if len(depth) == 0:
+            depth.append(this_level)
+
+        # at the same level?
+        elif this_level == depth[-1]:
+            pass
+
+        # gone down?
+        elif this_level.find(depth[-1]) == 0:
+            depth.append(this_level)
+
+        # gone up? If so how far?
+        else:
+            while len(depth) > 0:
+                if depth[-1] == this_level:
+                    break
+                else:
+                    depth = depth[:-1]
+                    html_tree += "</ul>\n"
+
+        # now process line
+        last_part = key.split(".")[-1]
+        if isinstance(value[0], int):
+            html_tree += "<li><a href='%s%s/'>%s</a></li>\n" % (
+                detail_link,
+                value[0],
+                last_part,
+            )
+        else:
+            html_tree += (
+                "<li><span class='caret'>%s</span><ul class='nested'>\n" % last_part
+            )
+
+    return render(
+        request, "rbac/tree-screen.html", {"html_tree": html_tree, "title": title}
+    )
+
+
+@login_required
 def tree_screen(request):
     """ Show full RBAC Tree """
     # Get groups
     groups = RBACGroup.objects.all().order_by("name_qualifier")
 
-    return render(request, "rbac/tree-screen.html", {"groups": groups})
+    return generic_tree_screen(request, groups, "/rbac/group/view/", "Tree Viewer")
 
 
 @login_required
@@ -116,7 +208,9 @@ def admin_tree_screen(request):
     # Get groups
     groups = RBACAdminGroup.objects.all().order_by("name_qualifier")
 
-    return render(request, "rbac/admin-tree-screen.html", {"groups": groups})
+    return generic_tree_screen(
+        request, groups, "/rbac/admin/group/view/", "Admin Tree Viewer"
+    )
 
 
 @login_required

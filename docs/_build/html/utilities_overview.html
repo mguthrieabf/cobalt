@@ -185,6 +185,40 @@ for another user. In order to implement this you need to do 4 things:</p>
 </li>
 </ol>
 </div>
+<div class="section" id="pagination-footer">
+<h2>Pagination Footer<a class="headerlink" href="#pagination-footer" title="Permalink to this headline">¶</a></h2>
+<p>To use the same pagination footer (Next Page, Previous Page, etc at the bottom of a screen that is too big to show everything on one page.),
+you can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="n">include</span> <span class="s1">&#39;pagination_footer.html&#39;</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Your list must be called ‘things’ for this to work.</p>
+<p>If you are paginating over a search list you will need to supply your search string as well. e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">)</span>
+<span class="n">title</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+<span class="n">forum</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;forum&quot;</span><span class="p">)</span>
+<span class="n">searchparams</span> <span class="o">=</span> <span class="s2">&quot;author=</span><span class="si">%s</span><span class="s2">&amp;title=</span><span class="si">%s</span><span class="s2">&amp;forum=</span><span class="si">%s</span><span class="s2">&amp;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">forum</span><span class="p">)</span>
+
+<span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">,</span>
+    <span class="s2">&quot;forums/post_search.html&quot;</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="n">post_filter</span><span class="p">,</span> <span class="s2">&quot;things&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span> <span class="s2">&quot;searchparams&quot;</span><span class="p">:</span> <span class="n">searchparams</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pagination-formatter">
+<h2>Pagination Formatter<a class="headerlink" href="#pagination-formatter" title="Permalink to this headline">¶</a></h2>
+<p>Pagination in views is a common thing so we have a central utility for it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cobalt.utils</span> <span class="kn">import</span> <span class="n">cobalt_paginator</span>
+
+<span class="n">my_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;some&quot;</span><span class="p">,</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="s2">&quot;paginate&quot;</span><span class="p">]</span>
+<span class="n">items_per_page</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">things</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">my_list</span><span class="p">,</span> <span class="n">items_per_page</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;mypage.html&quot;</span> <span class="p">{</span><span class="s2">&quot;things&quot;</span><span class="p">:</span> <span class="n">things</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 

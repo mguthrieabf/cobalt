@@ -377,7 +377,7 @@
                         <span class="s2">&quot;global_org&quot;</span><span class="p">:</span> <span class="n">global_org</span><span class="p">,</span>
                     <span class="p">},</span>
                 <span class="p">)</span>
-                <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
+                <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">,</span> <span class="s2">&quot;member&quot;</span><span class="p">:</span> <span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">}</span>
                 <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request&quot;</span><span class="p">})</span></div>
 
@@ -532,6 +532,9 @@
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
             <span class="c1"># auto top up select list needs to be refreshed</span>
+            <span class="c1"># Fix DOB format for browser - expects DD/MM/YYYY</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
             <span class="n">form</span> <span class="o">=</span> <span class="n">UserUpdateForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
             <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
                 <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Profile Updated&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>

@@ -148,11 +148,13 @@
 
 <span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.forms</span> <span class="kn">import</span> <span class="n">UserCreationForm</span>
+<span class="kn">from</span> <span class="nn">masterpoints.views</span> <span class="kn">import</span> <span class="n">system_number_available</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">User</span>
 
 
 <div class="viewcode-block" id="UserRegisterForm"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserRegisterForm">[docs]</a><span class="k">class</span> <span class="nc">UserRegisterForm</span><span class="p">(</span><span class="n">UserCreationForm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; User Registration &quot;&quot;&quot;</span>
+
     <span class="n">email</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
 
 <div class="viewcode-block" id="UserRegisterForm.Meta"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserRegisterForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
@@ -168,7 +170,19 @@
             <span class="s2">&quot;mobile&quot;</span><span class="p">,</span>
             <span class="s2">&quot;password1&quot;</span><span class="p">,</span>
             <span class="s2">&quot;password2&quot;</span><span class="p">,</span>
-        <span class="p">]</span></div></div>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="UserRegisterForm.clean_username"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserRegisterForm.clean_username">[docs]</a>    <span class="k">def</span> <span class="nf">clean_username</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check system_number is valid. Don&#39;t rely on client side validation &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inside&quot;</span><span class="p">)</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system_number_available</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Number invalid or in use&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;System number missing&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">username</span></div></div>
 
 
 <div class="viewcode-block" id="UserUpdateForm"><a class="viewcode-back" href="../../accounts.html#accounts.forms.UserUpdateForm">[docs]</a><span class="k">class</span> <span class="nc">UserUpdateForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>

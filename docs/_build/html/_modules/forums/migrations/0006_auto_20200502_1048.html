@@ -152,19 +152,19 @@
 <div class="viewcode-block" id="Migration"><a class="viewcode-back" href="../../../forums.migrations.html#forums.migrations.0006_auto_20200502_1048.Migration">[docs]</a><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
 
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span> <span class="s1">&#39;0005_post_comments_allowed&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="s2">&quot;0005_post_comments_allowed&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AlterField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;description&#39;</span><span class="p">,</span>
-            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;Forum Description&#39;</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Forum Description&quot;</span><span class="p">),</span>
         <span class="p">),</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AlterField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;forum&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;title&#39;</span><span class="p">,</span>
-            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s1">&#39;Forum Short Title&#39;</span><span class="p">),</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;title&quot;</span><span class="p">,</span>
+            <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Forum Short Title&quot;</span><span class="p">),</span>
         <span class="p">),</span>
     <span class="p">]</span></div>
 </pre></div>

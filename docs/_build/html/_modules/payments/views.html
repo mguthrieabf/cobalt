@@ -172,43 +172,66 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">csv</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">stripe</span>
-<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">dateformat</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
-<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
-<span class="kn">from</span> <span class="nn">django.core.paginator</span> <span class="kn">import</span> <span class="n">Paginator</span><span class="p">,</span> <span class="n">EmptyPage</span><span class="p">,</span> <span class="n">PageNotAnInteger</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Sum</span>
 <span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
-<span class="kn">from</span> <span class="nn">easy_pdf.rendering</span> <span class="kn">import</span> <span class="n">render_to_pdf_response</span>
+
+<span class="c1"># from easy_pdf.rendering import render_to_pdf_response</span>
 <span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">log_event</span>
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">STRIPE_SECRET_KEY</span><span class="p">,</span>
     <span class="n">GLOBAL_MPSERVER</span><span class="p">,</span>
     <span class="n">AUTO_TOP_UP_LOW_LIMIT</span><span class="p">,</span>
     <span class="n">AUTO_TOP_UP_DEFAULT_AMT</span><span class="p">,</span>
+    <span class="n">GLOBAL_ORG</span><span class="p">,</span>
+    <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
+    <span class="n">TIME_ZONE</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">TestTransaction</span><span class="p">,</span> <span class="n">MemberTransfer</span><span class="p">,</span> <span class="n">ManualTopup</span>
-<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">payment_api</span><span class="p">,</span> <span class="n">get_balance</span><span class="p">,</span> <span class="n">auto_topup_member</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">StripeTransaction</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TestTransaction</span><span class="p">,</span>
+    <span class="n">MemberTransfer</span><span class="p">,</span>
+    <span class="n">ManualTopup</span><span class="p">,</span>
+    <span class="n">SettlementForm</span><span class="p">,</span>
+    <span class="n">AdjustMemberForm</span><span class="p">,</span>
+    <span class="n">AdjustOrgForm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">payment_api</span><span class="p">,</span>
+    <span class="n">get_balance</span><span class="p">,</span>
+    <span class="n">auto_topup_member</span><span class="p">,</span>
+    <span class="n">update_organisation</span><span class="p">,</span>
+    <span class="n">update_account</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">StripeTransaction</span><span class="p">,</span> <span class="n">OrganisationTransaction</span>
 <span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">cobalt.utils</span> <span class="kn">import</span> <span class="n">cobalt_paginator</span>
+<span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">Organisation</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_has_role</span>
+<span class="kn">from</span> <span class="nn">rbac.views</span> <span class="kn">import</span> <span class="n">rbac_forbidden</span>
 
 <span class="c1">####################</span>
 <span class="c1"># Home             #</span>
 <span class="c1">####################</span>
-<div class="viewcode-block" id="home"><a class="viewcode-back" href="../../payments.html#payments.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Default page.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            request (HTTPRequest): Standard request object</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            httpResponse: webpage</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/home.html&quot;</span><span class="p">)</span></div>
+<span class="c1"># @login_required()</span>
+<span class="c1"># def home(request):</span>
+<span class="c1">#     &quot;&quot;&quot; Default page.</span>
+<span class="c1">#</span>
+<span class="c1">#         Args:</span>
+<span class="c1">#             request (HTTPRequest): Standard request object</span>
+<span class="c1">#</span>
+<span class="c1">#         Returns:</span>
+<span class="c1">#             httpResponse: webpage</span>
+<span class="c1">#</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     return render(request, &quot;payments/home.html&quot;)</span>
 
 
 <div class="viewcode-block" id="test_payment"><a class="viewcode-back" href="../../payments.html#payments.views.test_payment">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
@@ -267,14 +290,13 @@
 <span class="c1">####################</span>
 <span class="c1"># statement_common #</span>
 <span class="c1">####################</span>
-<div class="viewcode-block" id="statement_common"><a class="viewcode-back" href="../../payments.html#payments.views.statement_common">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="statement_common"><a class="viewcode-back" href="../../payments.html#payments.views.statement_common">[docs]</a><span class="k">def</span> <span class="nf">statement_common</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Member statement view - common part across online, pdf and csv</span>
 
 <span class="sd">    Handles the non-formatting parts of statements.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        request (str): standard request object</span>
+<span class="sd">        user (User): standard user object</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        5-element tuple containing</span>
@@ -287,8 +309,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Get summary data</span>
-    <span class="n">qry</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/mps/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
-    <span class="n">summary</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">qry</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/mps/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
 
     <span class="c1"># Set active to a boolean</span>
     <span class="k">if</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;IsActive&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
@@ -301,19 +326,19 @@
     <span class="n">club</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;ClubName&quot;</span><span class="p">]</span>
 
     <span class="c1"># get balance</span>
-    <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
         <span class="n">balance</span> <span class="o">=</span> <span class="n">last_tran</span><span class="o">.</span><span class="n">balance</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
 
     <span class="c1"># get auto top up</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">==</span> <span class="s2">&quot;On&quot;</span><span class="p">:</span>
         <span class="n">auto_button</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">auto_button</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">events_list</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+    <span class="n">events_list</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
         <span class="s2">&quot;-created_date&quot;</span>
     <span class="p">)</span>
 
@@ -336,23 +361,15 @@
 <span class="sd">        HTTPResponse</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
-    <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">events_list</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">events</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">PageNotAnInteger</span><span class="p">:</span>
-        <span class="n">events</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">EmptyPage</span><span class="p">:</span>
-        <span class="n">events</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="n">paginator</span><span class="o">.</span><span class="n">num_pages</span><span class="p">)</span>
+    <span class="n">things</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">events_list</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
         <span class="s2">&quot;payments/statement.html&quot;</span><span class="p">,</span>
         <span class="p">{</span>
-            <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events</span><span class="p">,</span>
+            <span class="s2">&quot;things&quot;</span><span class="p">:</span> <span class="n">things</span><span class="p">,</span>
             <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
             <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
             <span class="s2">&quot;club&quot;</span><span class="p">:</span> <span class="n">club</span><span class="p">,</span>
@@ -362,32 +379,271 @@
     <span class="p">)</span></div>
 
 
+<span class="c1">################################</span>
+<span class="c1"># statement_admin_view         #</span>
+<span class="c1">################################</span>
+<div class="viewcode-block" id="statement_admin_view"><a class="viewcode-back" href="../../payments.html#payments.views.statement_admin_view">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">statement_admin_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">member_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Member statement view for administrators.</span>
+
+<span class="sd">    Basic view of statement showing transactions in a web page. Used by an</span>
+<span class="sd">    administrator to view a members statement</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">)</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">things</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">events_list</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;payments/statement.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;things&quot;</span><span class="p">:</span> <span class="n">things</span><span class="p">,</span>
+            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
+            <span class="s2">&quot;club&quot;</span><span class="p">:</span> <span class="n">club</span><span class="p">,</span>
+            <span class="s2">&quot;balance&quot;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
+            <span class="s2">&quot;auto_button&quot;</span><span class="p">:</span> <span class="n">auto_button</span><span class="p">,</span>
+            <span class="s2">&quot;admin_view&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">#####################</span>
+<span class="c1"># statement_org     #</span>
+<span class="c1">#####################</span>
+<div class="viewcode-block" id="statement_org"><a class="viewcode-back" href="../../payments.html#payments.views.statement_org">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">statement_org</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Organisation statement view.</span>
+
+<span class="sd">    Basic view of statement showing transactions in a web page.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: standard request object</span>
+<span class="sd">        org_id: organisation to view</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">organisation</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Organisation</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">org_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">)</span>
+
+    <span class="c1"># get balance</span>
+    <span class="n">last_tran</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">last_tran</span><span class="p">:</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="n">last_tran</span><span class="o">.</span><span class="n">balance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="s2">&quot;Nil&quot;</span>
+
+    <span class="c1"># get summary</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">ref_date</span> <span class="o">=</span> <span class="n">today</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">,</span> <span class="n">created_date__gte</span><span class="o">=</span><span class="n">ref_date</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">Sum</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-total&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">total</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">])</span>
+
+    <span class="c1"># get details</span>
+    <span class="n">events_list</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+
+    <span class="n">things</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">events_list</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;payments/statement_org.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;things&quot;</span><span class="p">:</span> <span class="n">things</span><span class="p">,</span>
+            <span class="s2">&quot;balance&quot;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
+            <span class="s2">&quot;org&quot;</span><span class="p">:</span> <span class="n">organisation</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
+            <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">#########################</span>
+<span class="c1"># statement_csv_org     #</span>
+<span class="c1">#########################</span>
+<div class="viewcode-block" id="statement_csv_org"><a class="viewcode-back" href="../../payments.html#payments.views.statement_csv_org">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">statement_csv_org</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Organisation statement CSV.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: standard request object</span>
+<span class="sd">        org_id: organisation to view</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: CSV</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">organisation</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Organisation</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">org_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">)</span>
+
+    <span class="c1"># get details</span>
+    <span class="n">events_list</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+
+    <span class="n">local_dt</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">TIME_ZONE</span><span class="p">))</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">dateformat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">local_dt</span><span class="p">,</span> <span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">)</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/csv&quot;</span><span class="p">)</span>
+    <span class="n">response</span><span class="p">[</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;statement.csv&quot;&#39;</span>
+
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">organisation</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Downloaded by </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">today</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;Date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Counterparty&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Reference&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Amount&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Balance&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">events_list</span><span class="p">:</span>
+        <span class="n">counterparty</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">member</span><span class="p">:</span>
+            <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">member</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">other_organisation</span><span class="p">:</span>
+            <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">other_organisation</span>
+
+        <span class="n">local_dt</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">TIME_ZONE</span><span class="p">))</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dateformat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">local_dt</span><span class="p">,</span> <span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">),</span>
+                <span class="n">counterparty</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">reference_no</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">balance</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="statement_org_summary_ajax"><a class="viewcode-back" href="../../payments.html#payments.views.statement_org_summary_ajax">[docs]</a><span class="k">def</span> <span class="nf">statement_org_summary_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Called by the org statement when the summary date range changes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+<span class="sd">        org_id(int): pk of the org to query</span>
+<span class="sd">        range(str): range to include in summary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: data for table</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+
+        <span class="n">organisation</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Organisation</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">org_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.manage.</span><span class="si">%s</span><span class="s2">.view&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">range</span> <span class="o">==</span> <span class="s2">&quot;All&quot;</span><span class="p">:</span>
+            <span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">Sum</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-total&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">days</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">range</span><span class="p">)</span>
+            <span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">ref_date</span> <span class="o">=</span> <span class="n">today</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">days</span><span class="p">)</span>
+            <span class="n">summary</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">organisation</span><span class="o">=</span><span class="n">organisation</span><span class="p">,</span> <span class="n">created_date__gte</span><span class="o">=</span><span class="n">ref_date</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">Sum</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-total&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">total</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;payments/statement_org_summary_ajax.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
 <span class="c1">#####################</span>
 <span class="c1"># statement_csv     #</span>
 <span class="c1">#####################</span>
 <div class="viewcode-block" id="statement_csv"><a class="viewcode-back" href="../../payments.html#payments.views.statement_csv">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">statement_csv</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">statement_csv</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">member_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Member statement view - csv download</span>
 
 <span class="sd">    Generates a CSV of the statement.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request (HTTPRequest): standard request object</span>
+<span class="sd">        member_id(int): id of member to view, defaults to logged in user</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        HTTPResponse: CSV headed response with CSV statement data</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span>
-        <span class="n">request</span>
-    <span class="p">)</span>  <span class="c1"># pylint: disable=unused-variable</span>
-    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-d</span><span class="s2"> %B %Y at %I:%H:%M&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">member_id</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">)</span>
+        <span class="n">member</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">member</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+
+    <span class="n">local_dt</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">TIME_ZONE</span><span class="p">))</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">dateformat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">local_dt</span><span class="p">,</span> <span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">)</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/csv&quot;</span><span class="p">)</span>
     <span class="n">response</span><span class="p">[</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;statement.csv&quot;&#39;</span>
 
     <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span> <span class="n">today</span><span class="p">])</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">member</span><span class="o">.</span><span class="n">system_number</span><span class="p">,</span> <span class="n">today</span><span class="p">])</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="s2">&quot;Date&quot;</span><span class="p">,</span>
@@ -406,9 +662,10 @@
             <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">other_member</span>
         <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">organisation</span><span class="p">:</span>
             <span class="n">counterparty</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">organisation</span>
+        <span class="n">local_dt</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">TIME_ZONE</span><span class="p">))</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">created_date</span><span class="p">,</span>
+                <span class="n">dateformat</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">local_dt</span><span class="p">,</span> <span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">),</span>
                 <span class="n">counterparty</span><span class="p">,</span>
                 <span class="n">row</span><span class="o">.</span><span class="n">reference_no</span><span class="p">,</span>
                 <span class="n">row</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
@@ -438,24 +695,26 @@
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span> <span class="o">=</span> <span class="n">statement_common</span><span class="p">(</span>
-        <span class="n">request</span>
-    <span class="p">)</span>  <span class="c1"># pylint: disable=unused-variable</span>
+    <span class="c1">#    (summary, club, balance, auto_button, events_list) = statement_common(</span>
+    <span class="c1">#        request</span>
+    <span class="c1">#    )  # pylint: disable=unused-variable</span>
 
-    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%-d</span><span class="s2"> %B %Y&quot;</span><span class="p">)</span>
+    <span class="c1">#    today = datetime.today().strftime(&quot;%-d %B %Y&quot;)</span>
 
-    <span class="k">return</span> <span class="n">render_to_pdf_response</span><span class="p">(</span>
-        <span class="n">request</span><span class="p">,</span>
-        <span class="s2">&quot;payments/statement_pdf.html&quot;</span><span class="p">,</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events_list</span><span class="p">,</span>
-            <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
-            <span class="s2">&quot;club&quot;</span><span class="p">:</span> <span class="n">club</span><span class="p">,</span>
-            <span class="s2">&quot;balance&quot;</span><span class="p">:</span> <span class="n">balance</span><span class="p">,</span>
-            <span class="s2">&quot;today&quot;</span><span class="p">:</span> <span class="n">today</span><span class="p">,</span>
-        <span class="p">},</span>
-    <span class="p">)</span></div>
+    <span class="c1"># return render_to_pdf_response(</span>
+    <span class="c1">#     request,</span>
+    <span class="c1">#     &quot;payments/statement_pdf.html&quot;,</span>
+    <span class="c1">#     {</span>
+    <span class="c1">#         &quot;events&quot;: events_list,</span>
+    <span class="c1">#         &quot;user&quot;: request.user,</span>
+    <span class="c1">#         &quot;summary&quot;: summary,</span>
+    <span class="c1">#         &quot;club&quot;: club,</span>
+    <span class="c1">#         &quot;balance&quot;: balance,</span>
+    <span class="c1">#         &quot;today&quot;: today,</span>
+    <span class="c1">#     },</span>
+    <span class="c1"># )</span>
+
+    <span class="k">return</span></div>
 
 
 <span class="c1">############################</span>
@@ -504,7 +763,7 @@
     <span class="n">warn</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="c1"># Already set up?</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">==</span> <span class="s2">&quot;On&quot;</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">paylist</span> <span class="o">=</span> <span class="n">stripe</span><span class="o">.</span><span class="n">PaymentMethod</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
                 <span class="n">customer</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;card&quot;</span><span class="p">,</span>
@@ -562,7 +821,7 @@
             <span class="n">card_exp_month</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">exp_month</span>
             <span class="n">card_exp_year</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">exp_year</span>
             <span class="n">card_last4</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">last4</span>
-            <span class="n">warn</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;This will override your </span><span class="si">{</span><span class="n">card_type</span><span class="si">}</span><span class="s2"> card ending in </span><span class="si">{</span><span class="n">card_last4</span><span class="si">}</span><span class="s2"> </span><span class="se">\</span>
+            <span class="n">warn</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Changing card details will override your </span><span class="si">{</span><span class="n">card_type</span><span class="si">}</span><span class="s2"> card ending in </span><span class="si">{</span><span class="n">card_last4</span><span class="si">}</span><span class="s2"> </span><span class="se">\</span>
 <span class="s2">                    with expiry </span><span class="si">{</span><span class="n">card_exp_month</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">card_exp_year</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -605,7 +864,7 @@
                 <span class="n">amount</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">],</span>
                 <span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
                 <span class="n">other_member</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;transfer_to&quot;</span><span class="p">],</span>
-                <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Pay a Friend&quot;</span><span class="p">,</span>
+                <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Member Transfer&quot;</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
@@ -639,7 +898,8 @@
 <span class="c1">########################</span>
 <span class="c1"># update_auto_amount   #</span>
 <span class="c1">########################</span>
-<div class="viewcode-block" id="update_auto_amount"><a class="viewcode-back" href="../../payments.html#payments.views.update_auto_amount">[docs]</a><span class="k">def</span> <span class="nf">update_auto_amount</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="update_auto_amount"><a class="viewcode-back" href="../../payments.html#payments.views.update_auto_amount">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">update_auto_amount</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Called by the auto top up page when a user changes the amount of the auto top up.</span>
 
 <span class="sd">    The auto top up page has Stripe code on it so a standard form won&#39;t work</span>
@@ -663,7 +923,8 @@
 <span class="c1">###################</span>
 <span class="c1"># manual_topup    #</span>
 <span class="c1">###################</span>
-<div class="viewcode-block" id="manual_topup"><a class="viewcode-back" href="../../payments.html#payments.views.manual_topup">[docs]</a><span class="k">def</span> <span class="nf">manual_topup</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="manual_topup"><a class="viewcode-back" href="../../payments.html#payments.views.manual_topup">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">manual_topup</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Page to allow credit card top up regardless of auto status.</span>
 
 <span class="sd">    This page allows a member to add to their account using a credit card,</span>
@@ -717,7 +978,8 @@
 <span class="c1">######################</span>
 <span class="c1"># cancel_auto_top_up #</span>
 <span class="c1">######################</span>
-<div class="viewcode-block" id="cancel_auto_top_up"><a class="viewcode-back" href="../../payments.html#payments.views.cancel_auto_top_up">[docs]</a><span class="k">def</span> <span class="nf">cancel_auto_top_up</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<div class="viewcode-block" id="cancel_auto_top_up"><a class="viewcode-back" href="../../payments.html#payments.views.cancel_auto_top_up">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">cancel_auto_top_up</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Cancel auto top up.</span>
 
 <span class="sd">    Args:</span>
@@ -730,7 +992,7 @@
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stop_auto&quot;</span><span class="p">):</span>
             <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">auto_amount</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="s2">&quot;Off&quot;</span>
             <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_customer_id</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
@@ -743,6 +1005,377 @@
 
     <span class="n">balance</span> <span class="o">=</span> <span class="n">get_balance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/cancel_autotopup.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;balance&quot;</span><span class="p">:</span> <span class="n">balance</span><span class="p">})</span></div>
+
+
+<span class="c1">###########################</span>
+<span class="c1"># statement_admin_summary #</span>
+<span class="c1">###########################</span>
+<div class="viewcode-block" id="statement_admin_summary"><a class="viewcode-back" href="../../payments.html#payments.views.statement_admin_summary">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">statement_admin_summary</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Main statement page for system administrators</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Member summary</span>
+    <span class="n">total_members</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">auto_top_up</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stripe_auto_confirmed</span><span class="o">=</span><span class="s2">&quot;On&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="c1">#    total_balance_members_list = MemberTransaction.objects.distinct(&quot;member&quot;)</span>
+    <span class="n">total_balance_members_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">,</span> <span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">total_balance_members</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">members_with_balances</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">total_balance_members_list</span><span class="p">:</span>
+        <span class="n">total_balance_members</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">balance</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">balance</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">members_with_balances</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Organisation summary</span>
+    <span class="n">total_orgs</span> <span class="o">=</span> <span class="n">Organisation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="c1">#    total_balance_orgs_list = OrganisationTransaction.objects.distinct(&quot;organisation&quot;)</span>
+    <span class="n">total_balance_orgs_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;organisation&quot;</span><span class="p">,</span> <span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;organisation&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">orgs_with_balances</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_balance_orgs</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">total_balance_orgs_list</span><span class="p">:</span>
+        <span class="n">total_balance_orgs</span> <span class="o">+=</span> <span class="n">item</span><span class="o">.</span><span class="n">balance</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">balance</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">orgs_with_balances</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Stripe Summary</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">ref_date</span> <span class="o">=</span> <span class="n">today</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">stripe</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">created_date__gte</span><span class="o">=</span><span class="n">ref_date</span><span class="p">)</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
+        <span class="n">Sum</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;payments/statement_admin_summary.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;total_members&quot;</span><span class="p">:</span> <span class="n">total_members</span><span class="p">,</span>
+            <span class="s2">&quot;auto_top_up&quot;</span><span class="p">:</span> <span class="n">auto_top_up</span><span class="p">,</span>
+            <span class="s2">&quot;total_balance_members&quot;</span><span class="p">:</span> <span class="n">total_balance_members</span><span class="p">,</span>
+            <span class="s2">&quot;total_orgs&quot;</span><span class="p">:</span> <span class="n">total_orgs</span><span class="p">,</span>
+            <span class="s2">&quot;total_balance_orgs&quot;</span><span class="p">:</span> <span class="n">total_balance_orgs</span><span class="p">,</span>
+            <span class="s2">&quot;members_with_balances&quot;</span><span class="p">:</span> <span class="n">members_with_balances</span><span class="p">,</span>
+            <span class="s2">&quot;orgs_with_balances&quot;</span><span class="p">:</span> <span class="n">orgs_with_balances</span><span class="p">,</span>
+            <span class="s2">&quot;balance&quot;</span><span class="p">:</span> <span class="n">total_balance_orgs</span> <span class="o">+</span> <span class="n">total_balance_members</span><span class="p">,</span>
+            <span class="s2">&quot;stripe&quot;</span><span class="p">:</span> <span class="n">stripe</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">##############</span>
+<span class="c1"># settlement #</span>
+<span class="c1">##############</span>
+<div class="viewcode-block" id="settlement"><a class="viewcode-back" href="../../payments.html#payments.views.settlement">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">settlement</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; process payments to organisations. This is expected to be a monthly</span>
+<span class="sd">        activity.</span>
+
+<span class="sd">    At certain points in time an administrator will clear out the balances of</span>
+<span class="sd">    the organisations accounts and transfer actual money to them through the</span>
+<span class="sd">    banking system. This is not currently possible to do electronically so this</span>
+<span class="sd">    is a manual process.</span>
+
+<span class="sd">    The administrator should use this list to match with the bank transactions and</span>
+<span class="sd">    then confirm through this view that the payments have been made.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.edit&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.view&quot;</span><span class="p">)</span>
+
+    <span class="c1"># orgs with outstanding balances</span>
+    <span class="c1"># Django is a bit too clever here so we actually have to include balance=0.0 and filter</span>
+    <span class="c1"># it in the code, otherwise we get the most recent non-zero balance. There may be</span>
+    <span class="c1"># a way to do this but I couldn&#39;t figure it out.</span>
+    <span class="n">orgs</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;organisation&quot;</span><span class="p">,</span> <span class="s2">&quot;-created_date&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;organisation&quot;</span><span class="p">)</span>
+    <span class="n">org_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">non_zero_orgs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">org</span> <span class="ow">in</span> <span class="n">orgs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">org</span><span class="o">.</span><span class="n">balance</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">org</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+            <span class="n">org_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">org</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">org</span><span class="o">.</span><span class="n">organisation</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">non_zero_orgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">org</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SettlementForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">orgs</span><span class="o">=</span><span class="n">org_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+            <span class="c1"># load balances - Important! Do not get the current balance for an</span>
+            <span class="c1"># org as this may have changed. Use the list confirmed by the user.</span>
+            <span class="n">settlement_ids</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;settle_list&quot;</span><span class="p">]</span>
+            <span class="n">settlements</span> <span class="o">=</span> <span class="n">OrganisationTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk__in</span><span class="o">=</span><span class="n">settlement_ids</span><span class="p">)</span>
+
+            <span class="n">trans_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="c1"># Remove money from org accounts</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">settlements</span><span class="p">:</span>
+                <span class="n">total</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+                <span class="n">trans</span> <span class="o">=</span> <span class="n">update_organisation</span><span class="p">(</span>
+                    <span class="n">organisation</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">organisation</span><span class="p">,</span>
+                    <span class="n">amount</span><span class="o">=-</span><span class="n">item</span><span class="o">.</span><span class="n">balance</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Settlement from </span><span class="si">{</span><span class="n">GLOBAL_ORG</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">log_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Settlement from </span><span class="si">{</span><span class="n">GLOBAL_ORG</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">organisation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;payments&quot;</span><span class="p">,</span>
+                    <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;settlements&quot;</span><span class="p">,</span>
+                    <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Settlement&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Settlement processed successfully.&quot;</span><span class="p">,</span>
+                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;payments/settlement-complete.html&quot;</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;trans&quot;</span><span class="p">:</span> <span class="n">trans_list</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">total</span><span class="p">},</span>
+            <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SettlementForm</span><span class="p">(</span><span class="n">orgs</span><span class="o">=</span><span class="n">org_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/settlement.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;orgs&quot;</span><span class="p">:</span> <span class="n">non_zero_orgs</span><span class="p">,</span> <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1">########################</span>
+<span class="c1"># manual_adjust_member #</span>
+<span class="c1">########################</span>
+<div class="viewcode-block" id="manual_adjust_member"><a class="viewcode-back" href="../../payments.html#payments.views.manual_adjust_member">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">manual_adjust_member</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; make a manual adjustment on a member account</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.edit&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.edit&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AdjustMemberForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">member</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;member&quot;</span><span class="p">]</span>
+            <span class="n">amount</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+            <span class="n">update_account</span><span class="p">(</span>
+                <span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span>
+                <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">log_msg</span><span class="o">=</span><span class="s2">&quot;Manual adjustment by </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">amount</span><span class="p">),</span>
+                <span class="n">source</span><span class="o">=</span><span class="s2">&quot;payments&quot;</span><span class="p">,</span>
+                <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;manual_adjust_member&quot;</span><span class="p">,</span>
+                <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Manual Adjustment&quot;</span><span class="p">,</span>
+                <span class="n">other_member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Manual adjustment successful. </span><span class="si">%s</span><span class="s2"> adjusted by </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">member</span><span class="p">,</span>
+                <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
+                <span class="n">amount</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;payments:statement_admin_summary&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AdjustMemberForm</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/manual_adjust_member.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+<span class="c1">########################</span>
+<span class="c1"># manual_adjust_org    #</span>
+<span class="c1">########################</span>
+<div class="viewcode-block" id="manual_adjust_org"><a class="viewcode-back" href="../../payments.html#payments.views.manual_adjust_org">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">manual_adjust_org</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; make a manual adjustment on an organisation account</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;payments.global.edit&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments.global.edit&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AdjustOrgForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">org</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;organisation&quot;</span><span class="p">]</span>
+            <span class="n">amount</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+            <span class="n">update_organisation</span><span class="p">(</span>
+                <span class="n">organisation</span><span class="o">=</span><span class="n">org</span><span class="p">,</span>
+                <span class="n">amount</span><span class="o">=</span><span class="n">amount</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">log_msg</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="s2">&quot;payments&quot;</span><span class="p">,</span>
+                <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;manual_adjustment_org&quot;</span><span class="p">,</span>
+                <span class="n">payment_type</span><span class="o">=</span><span class="s2">&quot;Manual Adjustment&quot;</span><span class="p">,</span>
+                <span class="n">member</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Manual adjustment successful. </span><span class="si">%s</span><span class="s2"> adjusted by </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">org</span><span class="p">,</span>
+                <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span>
+                <span class="n">amount</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;payments:statement_admin_summary&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AdjustOrgForm</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/manual_adjust_org.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+<span class="c1">##########################</span>
+<span class="c1"># stripe_webpage_confirm #</span>
+<span class="c1">##########################</span>
+<div class="viewcode-block" id="stripe_webpage_confirm"><a class="viewcode-back" href="../../payments.html#payments.views.stripe_webpage_confirm">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_webpage_confirm</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">stripe_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; User has been told by Stripe that transaction went through.</span>
+
+<span class="sd">    This is called by the web page after Stripe confirms the transaction is approved.</span>
+<span class="sd">    Because this originates from the client we do not trust it, but we do move</span>
+<span class="sd">    the status to Pending unless it is already Confirmed (timing issues).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): stasndard request object</span>
+<span class="sd">        stripe_id(int):  pk of stripe transaction</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">stripe</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">StripeTransaction</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">stripe_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">stripe</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;Intent&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stripe status is intend - updating&quot;</span><span class="p">)</span>
+        <span class="n">stripe</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Pending&quot;</span>
+        <span class="n">stripe</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">############################</span>
+<span class="c1"># stripe_autotopup_confirm #</span>
+<span class="c1">############################</span>
+<div class="viewcode-block" id="stripe_autotopup_confirm"><a class="viewcode-back" href="../../payments.html#payments.views.stripe_autotopup_confirm">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_autotopup_confirm</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; User has been told by Stripe that auto top up went through.</span>
+
+<span class="sd">    This is called by the web page after Stripe confirms that auto top up is approved.</span>
+<span class="sd">    Because this originates from the client we do not trust it, but we do move</span>
+<span class="sd">    the status to Pending unless it is already Confirmed (timing issues).</span>
+
+<span class="sd">    For manual payments we update the transaction, but for auto top up there is</span>
+<span class="sd">    no transaction so we record this on the User object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): stasndard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">==</span> <span class="s2">&quot;Off&quot;</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="s2">&quot;Pending&quot;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">############################</span>
+<span class="c1"># stripe_autotopup_confirm #</span>
+<span class="c1">############################</span>
+<div class="viewcode-block" id="stripe_autotopup_off"><a class="viewcode-back" href="../../payments.html#payments.views.stripe_autotopup_off">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_autotopup_off</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Switch off auto top up</span>
+
+<span class="sd">    This is called by the web page when a user submits new card details to</span>
+<span class="sd">    Stripe. This is the latest point that we can turn it off in case the</span>
+<span class="sd">    user aborts the change.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): stasndard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Nothing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="s2">&quot;Off&quot;</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">######################</span>
+<span class="c1"># stripe_pending     #</span>
+<span class="c1">######################</span>
+<div class="viewcode-block" id="stripe_pending"><a class="viewcode-back" href="../../payments.html#payments.views.stripe_pending">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">stripe_pending</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Shows any pending stripe transactions.</span>
+
+<span class="sd">    Stripe transactions should never really be in a pending state unless</span>
+<span class="sd">    there is a problem. They go from intent to success usually. The only time</span>
+<span class="sd">    they will sit in pending is if Stripe is slow to talk to us or there is an</span>
+<span class="sd">    error.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request (HTTPRequest): standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">stripe_latest</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;Complete&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span>
+        <span class="s2">&quot;created_date&quot;</span>
+    <span class="p">)</span>
+    <span class="n">stripe_manual_pending</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;Pending&quot;</span><span class="p">)</span>
+    <span class="n">stripe_manual_intent</span> <span class="o">=</span> <span class="n">StripeTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;Intent&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;-created_date&quot;</span>
+    <span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+    <span class="n">stripe_auto_pending</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">stripe_auto_confirmed</span><span class="o">=</span><span class="s2">&quot;Pending&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;payments/stripe_pending.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;stripe_manual_pending&quot;</span><span class="p">:</span> <span class="n">stripe_manual_pending</span><span class="p">,</span>
+            <span class="s2">&quot;stripe_manual_intent&quot;</span><span class="p">:</span> <span class="n">stripe_manual_intent</span><span class="p">,</span>
+            <span class="s2">&quot;stripe_latest&quot;</span><span class="p">:</span> <span class="n">stripe_latest</span><span class="p">,</span>
+            <span class="s2">&quot;stripe_auto_pending&quot;</span><span class="p">:</span> <span class="n">stripe_auto_pending</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
 </pre></div>
 
            </div>

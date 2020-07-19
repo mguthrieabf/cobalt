@@ -152,13 +152,13 @@
 <div class="viewcode-block" id="Migration"><a class="viewcode-back" href="../../../forums.migrations.html#forums.migrations.0005_post_comments_allowed.Migration">[docs]</a><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
 
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s1">&#39;forums&#39;</span><span class="p">,</span> <span class="s1">&#39;0004_comment2_post&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="s2">&quot;0004_comment2_post&quot;</span><span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">migrations</span><span class="o">.</span><span class="n">AddField</span><span class="p">(</span>
-            <span class="n">model_name</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;comments_allowed&#39;</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;comments_allowed&quot;</span><span class="p">,</span>
             <span class="n">field</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
         <span class="p">),</span>
     <span class="p">]</span></div>
