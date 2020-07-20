@@ -1210,15 +1210,20 @@ def stripe_pending(request):
     Returns:
         HTTPResponse
     """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
 
-    stripe_latest = StripeTransaction.objects.filter(status="Complete").latest(
-        "created_date"
-    )
-    stripe_manual_pending = StripeTransaction.objects.filter(status="Pending")
-    stripe_manual_intent = StripeTransaction.objects.filter(status="Intent").order_by(
-        "-created_date"
-    )[:20]
-    stripe_auto_pending = User.objects.filter(stripe_auto_confirmed="Pending")
+    try:
+        stripe_latest = StripeTransaction.objects.filter(status="Complete").latest(
+            "created_date"
+        )
+        stripe_manual_pending = StripeTransaction.objects.filter(status="Pending")
+        stripe_manual_intent = StripeTransaction.objects.filter(
+            status="Intent"
+        ).order_by("-created_date")[:20]
+        stripe_auto_pending = User.objects.filter(stripe_auto_confirmed="Pending")
+    except StripeTransaction.DoesNotExist:
+        return HttpResponse("No Stripe data found")
 
     return render(
         request,

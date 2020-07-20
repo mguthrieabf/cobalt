@@ -89,6 +89,7 @@
           <div>
             <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search">Add User</a>
             <button class="btn btn-success" id="cobalt_everyone" onclick="addEveryone();">Add Everyone</button>
+            <button class="btn btn-success" id="cobalt_self" onclick="addSelf();">Add Yourself</button>
           </div>
           <div class="ml-auto">
             <button class="btn btn-info center-text" onclick="deleteUser();">Delete</button>
@@ -212,6 +213,10 @@
 
     function addEveryone() {
       addUser({{ RBAC_EVERYONE }});
+    }
+
+    function addSelf() {
+      addUser({{ request.user.id }});
     }
 
     function deleteUser() {

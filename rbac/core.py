@@ -591,6 +591,11 @@ def rbac_access_in_english_sub(user, this_name):
         else:
             desc = f"{this_name} {verb} {action_word} in every {role.model} in the application '{role.app}'."
 
+        # some specific hard coding
+        if role.app == "payments":
+            if role.model == "global":
+                desc = f"{this_name} {verb} {action_word} in {role.model} {role.app}."
+
         english.append(desc)
 
     return english

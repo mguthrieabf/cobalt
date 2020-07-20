@@ -21,17 +21,18 @@ class Command(BaseCommand):
         user = User.objects.filter(username="Mark").first()
         orgs = Organisation.objects.all()
         for org in orgs:
-            if org.state == "" or org.state == " ":
-                state = "UNKNOWN"
-            else:
-                state = org.state
-            item = org.name.replace(" ", "-")
-            qualifier = f"admin.clubs.{state}"
-            description = f"{org.name} Admins"
+            if org.type == "Club":
+                if org.state == "" or org.state == " ":
+                    state = "UNKNOWN"
+                else:
+                    state = org.state
+                item = org.name.replace(" ", "-")
+                qualifier = f"admin.clubs.{state}"
+                description = f"{org.name} Admins"
 
-            group = create_RBAC_admin_group(self, qualifier, item, description)
-            create_RBAC_admin_tree(self, group, f"{qualifier}.{item}")
-            rbac_add_user_to_admin_group(group, user)
-            rbac_add_role_to_admin_group(
-                group, app="payments", model="manage", model_id=org.id
-            )
+                group = create_RBAC_admin_group(self, qualifier, item, description)
+                create_RBAC_admin_tree(self, group, f"{qualifier}.{item}")
+                rbac_add_user_to_admin_group(group, user)
+                rbac_add_role_to_admin_group(
+                    group, app="payments", model="manage", model_id=org.id
+                )

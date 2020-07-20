@@ -28,9 +28,9 @@
             <div class="card-body">
               You are {{ request.user}}.
               <br>
-              You tried to access {{ request.META.PATH_INFO }}
+              You tried to access <code>{{ request.META.PATH_INFO }}</code>
               <br>
-              This requires the role: {{ role }} Allow which you do not have.
+              This requires the role: <kbd>{{ role }} Allow</kbd> which you do not have.
               This could be because you are not in a group that provides this access,
               or it could be that you are in a group that blocks this access.
               <br>
@@ -38,6 +38,8 @@
               <ul>
                 {% for group in groups %}
                 <li><a href="{% url "rbac:group_view" group_id=group.group.id %}">{{ group.group.name_qualifier }}.{{ group.group.name_item }}</a>
+                {% empty %}
+                No matches found
                 {% endfor %}
               </ul>
             </div>

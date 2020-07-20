@@ -51,9 +51,6 @@ class Command(BaseCommand):
             "Group to create users who are moderators of forums or can hide forums",
         )
         # create group - won't duplicate if already exists
-        create_RBAC_admin_tree(self, group, "forums.forum")
+        create_RBAC_admin_tree(self, group, "rbac.abf.forums")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="forums", model="forum")
-
-
-# create moderators groups

@@ -103,26 +103,28 @@ def view_screen(request):
 
 @login_required
 def generic_tree_screen(request, groups, detail_link, title):
-    """ Show full RBAC Tree for RBAC or Admin """
+    """ Show full RBAC Tree for RBAC or Admin
 
-    # build a list of the tree. We want to turn:
-    #  abf.people.fred          (id=34)
-    #  abf.people.john          (id=45)
-    #  abf.animals.dogs.rover   (id=2)
-    #  abf.animals.cats.felix   (id=21)
-    #
-    # into:
-    #  items["abf"]=["people", "animals"]
-    #  items["abf.people"]=["fred", "john"]
-    #  items["abf.people.fred"]=34
-    #  items["abf.people.john"]=45
-    #  items["abf.animals"]=["dogs", "cats"]
-    #  items["abf.animals.dogs"]=["rover"]
-    #  items["abf.animals.cats"]=["felix"]
-    #  items["abf.animals.dogs.rover"]=2
-    #  items["abf.animals.cats.felix"]=21
+    build a list of the tree. We want to turn:
+     abf.people.fred          (id=34)
+     abf.people.john          (id=45)
+     abf.animals.dogs.rover   (id=2)
+     abf.animals.cats.felix   (id=21)
+
+    into:
+     items["abf"]=["people", "animals"]
+     items["abf.people"]=["fred", "john"]
+     items["abf.people.fred"]=34
+     items["abf.people.john"]=45
+     items["abf.animals"]=["dogs", "cats"]
+     items["abf.animals.dogs"]=["rover"]
+     items["abf.animals.cats"]=["felix"]
+     items["abf.animals.dogs.rover"]=2
+     items["abf.animals.cats.felix"]=21
+     """
 
     items = {}
+    items_description = {}
     for group in groups:
         line = f"{group.name_qualifier}.{group.name_item}"
         parts = line.split(".")
@@ -132,6 +134,8 @@ def generic_tree_screen(request, groups, detail_link, title):
 
             if i == len(parts):  # end of line
                 child = group.id
+                items_description[group.id] = group.description
+
             else:  # more left
                 child = parts[i]
 
@@ -144,10 +148,11 @@ def generic_tree_screen(request, groups, detail_link, title):
     # sort the dictionary on keys
     sorted_items = dict(sorted(items.items()))
 
-    # generate html - loop through the sorted dictionary and do 3 things:
-    #  1) if there is more below create a new ul
-    #  2) if we are the end of the tree (contents is an integer) print the link to the details
-    #  3) manage the stack so we close the right number of uls
+    """ generate html - loop through the sorted dictionary and do 3 things:
+     1) if there is more below create a new ul
+     2) if we are the end of the tree (contents is an integer) print the link to the details
+     3) manage the stack so we close the right number of uls
+     """
 
     html_tree = ""
     depth = []
@@ -178,10 +183,11 @@ def generic_tree_screen(request, groups, detail_link, title):
         # now process line
         last_part = key.split(".")[-1]
         if isinstance(value[0], int):
-            html_tree += "<li><a href='%s%s/'>%s</a></li>\n" % (
+            html_tree += "<li><a href='%s%s/'>%s (%s)</a></li>\n" % (
                 detail_link,
                 value[0],
                 last_part,
+                items_description[value[0]],
             )
         else:
             html_tree += (
@@ -297,7 +303,7 @@ def group_create(request):
     """ view to create a new group """
 
     if request.method == "POST":
-        form = AddGroup(request.POST, user=request.user)
+        form = AddGroup(request.POST, user=request.user, environment="rbac")
         if form.is_valid():
             group = RBACGroup(
                 name_item=form.cleaned_data["name_item"],
@@ -311,7 +317,7 @@ def group_create(request):
             return redirect("rbac:group_edit", group_id=group.id)
 
     else:
-        form = AddGroup(user=request.user)
+        form = AddGroup(user=request.user, environment="rbac")
     return render(request, "rbac/group_create.html", {"form": form})
 
 
@@ -320,7 +326,7 @@ def admin_group_create(request):
     """ view to create a new admin group """
 
     if request.method == "POST":
-        form = AddGroup(request.POST, user=request.user)
+        form = AddGroup(request.POST, user=request.user, environment="admin")
         if form.is_valid():
             group = RBACAdminGroup(
                 name_item=form.cleaned_data["name_item"],
@@ -342,10 +348,10 @@ def admin_group_create(request):
                     "Added you to group %s." % group,
                     extra_tags="cobalt-message-success",
                 )
-            return redirect("rbac:rbac_admin")
+            return redirect("rbac:admin_group_view", group_id=group.id)
 
     else:
-        form = AddGroup(user=request.user)
+        form = AddGroup(user=request.user, environment="admin")
     return render(request, "rbac/admin_group_create.html", {"form": form})
 
 
@@ -358,7 +364,7 @@ def group_edit(request, group_id):
         return HttpResponse("You are not an admin for this group")
     else:
         if request.method == "POST":
-            form = AddGroup(request.POST, user=request.user)
+            form = AddGroup(request.POST, user=request.user, environment="rbac")
             if form.is_valid():
                 group.name_item = form.cleaned_data["name_item"]
                 group.description = form.cleaned_data["description"]
@@ -371,7 +377,7 @@ def group_edit(request, group_id):
             else:
                 print(form.errors)
         else:
-            form = AddGroup(user=request.user)
+            form = AddGroup(user=request.user, environment="rbac")
             form.fields["name_item"].initial = group.name_item
             form.fields["description"].initial = group.description
 
@@ -407,7 +413,7 @@ def admin_group_edit(request, group_id):
         return HttpResponse("You are not an admin for this admin group")
 
     if request.method == "POST":
-        form = AddGroup(request.POST, user=request.user)
+        form = AddGroup(request.POST, user=request.user, environment="admin")
         if form.is_valid():
             group.name_item = form.cleaned_data["name_item"]
             group.description = form.cleaned_data["description"]
@@ -420,7 +426,7 @@ def admin_group_edit(request, group_id):
         else:
             print(form.errors)
     else:
-        form = AddGroup(user=request.user)
+        form = AddGroup(user=request.user, environment="admin")
         form.fields["name_item"].initial = group.name_item
         form.fields["description"].initial = group.description
 
