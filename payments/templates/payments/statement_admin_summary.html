@@ -36,6 +36,7 @@
           </table>
           {% include "generic_user_search_body.html" %}
           <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search" data-target="#cobalt_general_member_search"><span style="color: white;">Lookup Member Statement</span></a>
+          <a href="{% url "payments:admin_members_with_balance" %}" class="btn btn-success btn-sm">Members with Balances</a>
           <a href="{% url "payments:manual_adjust_member" %}" class="btn btn-info btn-sm">Manual Adjustment</a>
         </div>
       </div>
@@ -45,7 +46,6 @@
               <h2>Organisations</h2>
             </div>
             <div class="card-body">
-          <h2>Organisations</h2>
           <table>
             <tr>
               <td>Total Organisations:</td>
@@ -62,11 +62,22 @@
           </table>
           {% include "generic_org_search_body.html" %}
           <a class="cobalt_generic_org btn btn-warning btn-sm" data-toggle="modal" id="id_org_search" data-target="#cobalt_general_org_search"><span style="color: white;">Lookup Org Statement</span></a>
+          <a href="{% url "payments:admin_orgs_with_balance" %}" class="btn btn-success btn-sm">Orgs with Balances</a>
           <a href="{% url "payments:manual_adjust_org" %}" class="btn btn-info btn-sm">Manual Adjustment</a>
           <br>
-          <a href="{% url "payments:settlement" %}" class="btn btn-sm btn-danger">Settlement</a>
+          <a href="{% url "payments:settlement" %}" class="btn btn-danger">Settlement</a>
         </div>
       </div>
+      <br>
+      <div class="card">
+        <div class="card-header card-header-info">
+          <h2>Other</h2>
+        </div>
+        <div class="card-body">
+          <a href="{% url "payments:admin_view_manual_adjustments" %}" class="btn btn-sm btn-primary">View Manual Adjustments</a>
+        </div>
+      </div>
+
       <br>
       <div class="card">
         <div class="card-header card-header-danger">

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME}}s - Organisation Open Balances</h1>
+    </div>
+    <div class="card-body table-responsive">
+      <a href="{% url "payments:admin_orgs_with_balance_csv" %}" class="btn btn-sm btn-warning">Download All as CSV</a>
+      <table class="table table-responsive">
+        <thead>
+          <th>Member</th>
+          <th>Balance({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+          <th></th>
+        </thead>
+        <tbody>
+          {% for thing in things %}
+          <tr>
+            <td><a href=" {% url "accounts:public_profile" pk=thing.member.id %}">{{ thing.organisation }}</a></td>
+            <td class="text-right">{{ thing.balance }}</td>
+            <td><a href="{% url "payments:statement_org" org_id=thing.organisation.id %}" class="btn btn-sm btn-info">View Statement</a></td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+
+  {% include 'pagination_footer.html' %}
+
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

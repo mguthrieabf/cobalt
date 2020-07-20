@@ -34,6 +34,31 @@ urlpatterns = [
     path("statement-pdf", views.statement_pdf, name="statement_pdf"),
     path("setup-autotopup", views.setup_autotopup, name="setup_autotopup"),
     path("update-auto-amount", views.update_auto_amount, name="update_auto_amount"),
+    path(
+        "admin-orgs-with-balance",
+        views.admin_orgs_with_balance,
+        name="admin_orgs_with_balance",
+    ),
+    path(
+        "admin-members-with-balance",
+        views.admin_members_with_balance,
+        name="admin_members_with_balance",
+    ),
+    path(
+        "admin-members-with-balance-csv",
+        views.admin_members_with_balance_csv,
+        name="admin_members_with_balance_csv",
+    ),
+    path(
+        "admin-orgs-with-balance-csv",
+        views.admin_orgs_with_balance_csv,
+        name="admin_orgs_with_balance_csv",
+    ),
+    path(
+        "admin-view-manual-adjustments",
+        views.admin_view_manual_adjustments,
+        name="admin_view_manual_adjustments",
+    ),
     path("member-transfer", views.member_transfer, name="member_transfer"),
     path("manual-topup", views.manual_topup, name="manual_topup"),
     path("cancel-autotopup", views.cancel_auto_top_up, name="cancel_autotopup"),

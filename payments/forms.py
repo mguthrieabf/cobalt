@@ -114,3 +114,10 @@ class AdjustOrgForm(forms.ModelForm):
             "description",
             "amount",
         )
+
+
+class DateForm(forms.Form):
+    """ for simple from to date ranges """
+
+    from_date = forms.DateField(input_formats=["%d/%m/%Y"])
+    to_date = forms.DateField(input_formats=["%d/%m/%Y"])

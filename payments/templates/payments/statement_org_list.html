@@ -15,6 +15,16 @@
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="font-weight-bold">Closing Balance</td>
+      <td></td>
+      <td></td>
+      <td class="text-right">{{ page_balance.closing_balance|floatformat:2|intcomma }}</td>
+    </tr>
     {% for thing in things %}
       <tr>
         <td><a href="#" onclick="
@@ -95,5 +105,16 @@
 
       </tr>
     {% endfor %}
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td class="font-weight-bold">Opening Balance</td>
+      <td></td>
+      <td></td>
+      <td class="text-right">{{ page_balance.opening_balance|floatformat:2|intcomma }}</td>
+    </tr>
+
   </tbody>
 </table>

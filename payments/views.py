@@ -45,6 +45,7 @@ from cobalt.settings import (
     AUTO_TOP_UP_LOW_LIMIT,
     AUTO_TOP_UP_DEFAULT_AMT,
     GLOBAL_ORG,
+    GLOBAL_ORG_ID,
     GLOBAL_CURRENCY_SYMBOL,
     TIME_ZONE,
 )
@@ -55,6 +56,7 @@ from .forms import (
     SettlementForm,
     AdjustMemberForm,
     AdjustOrgForm,
+    DateForm,
 )
 from .core import (
     payment_api,
@@ -325,7 +327,15 @@ def statement_org(request, org_id):
         organisation=organisation
     ).order_by("-created_date")
 
-    things = cobalt_paginator(request, events_list, 30)
+    things = cobalt_paginator(request, events_list, 5)
+
+    page_balance = {}
+
+    page_balance["closing_balance"] = things[0].balance
+    page_balance["closing_date"] = things[0].created_date
+    earliest = things[len(things) - 1]
+    page_balance["opening_balance"] = earliest.balance - earliest.amount
+    page_balance["opening_date"] = earliest.created_date
 
     return render(
         request,
@@ -336,6 +346,7 @@ def statement_org(request, org_id):
             "org": organisation,
             "summary": summary,
             "total": total,
+            "page_balance": page_balance,
         },
     )
 
@@ -975,6 +986,7 @@ def settlement(request):
             non_zero_orgs.append(org)
 
     if request.method == "POST":
+
         form = SettlementForm(request.POST, orgs=org_list)
         if form.is_valid():
 
@@ -983,33 +995,73 @@ def settlement(request):
             settlement_ids = form.cleaned_data["settle_list"]
             settlements = OrganisationTransaction.objects.filter(pk__in=settlement_ids)
 
-            trans_list = []
-            total = 0.0
+            if "export" in request.POST:  # CSV download
 
-            # Remove money from org accounts
-            for item in settlements:
-                total += float(item.balance)
-                trans = update_organisation(
-                    organisation=item.organisation,
-                    amount=-item.balance,
-                    description=f"Settlement from {GLOBAL_ORG}",
-                    log_msg=f"Settlement from {GLOBAL_ORG} to {item.organisation}",
-                    source="payments",
-                    sub_source="settlements",
-                    payment_type="Settlement",
+                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+                response = HttpResponse(content_type="text/csv")
+                response[
+                    "Content-Disposition"
+                ] = 'attachment; filename="settlements.csv"'
+
+                writer = csv.writer(response)
+                writer.writerow(
+                    [
+                        "Settlments Export",
+                        "Downloaded by %s" % request.user.full_name,
+                        today,
+                    ]
                 )
-                trans_list.append(trans)
+                writer.writerow(
+                    ["CLub Number", "CLub Name", "BSB", "Account Number", "Amount"]
+                )
 
-            messages.success(
-                request,
-                "Settlement processed successfully.",
-                extra_tags="cobalt-message-success",
-            )
-            return render(
-                request,
-                "payments/settlement-complete.html",
-                {"trans": trans_list, "total": total},
-            )
+                for org in settlements:
+                    writer.writerow(
+                        [
+                            org.organisation.org_id,
+                            org.organisation.name,
+                            org.organisation.bank_bsb,
+                            org.organisation.bank_account,
+                            org.balance,
+                        ]
+                    )
+
+                return response
+
+            else:  # confirm payments
+
+                trans_list = []
+                total = 0.0
+
+                system_org = get_object_or_404(Organisation, pk=GLOBAL_ORG_ID)
+
+                # Remove money from org accounts
+                for item in settlements:
+                    total += float(item.balance)
+                    trans = update_organisation(
+                        organisation=item.organisation,
+                        other_organisation=system_org,
+                        amount=-item.balance,
+                        description=f"Settlement from {GLOBAL_ORG}",
+                        log_msg=f"Settlement from {GLOBAL_ORG} to {item.organisation}",
+                        source="payments",
+                        sub_source="settlements",
+                        payment_type="Settlement",
+                    )
+                    trans_list.append(trans)
+
+                messages.success(
+                    request,
+                    "Settlement processed successfully.",
+                    extra_tags="cobalt-message-success",
+                )
+                return render(
+                    request,
+                    "payments/settlement-complete.html",
+                    {"trans": trans_list, "total": total},
+                )
 
     else:
         form = SettlementForm(orgs=org_list)
@@ -1234,4 +1286,289 @@ def stripe_pending(request):
             "stripe_latest": stripe_latest,
             "stripe_auto_pending": stripe_auto_pending,
         },
+    )
+
+
+#################################
+#  admin_members_with_balance   #
+#################################
+@login_required()
+def admin_members_with_balance(request):
+    """ Shows any open balances held by members
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    members = (
+        MemberTransaction.objects.exclude(balance=0)
+        .order_by("member", "-created_date")
+        .distinct("member")
+    )
+
+    things = cobalt_paginator(request, members, 3)
+
+    return render(
+        request, "payments/admin_members_with_balance.html", {"things": things}
+    )
+
+
+#################################
+#  admin_orgs_with_balance      #
+#################################
+@login_required()
+def admin_orgs_with_balance(request):
+    """ Shows any open balances held by orgs
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    orgs = (
+        OrganisationTransaction.objects.exclude(balance=0)
+        .order_by("organisation", "-created_date")
+        .distinct("organisation")
+    )
+
+    things = cobalt_paginator(request, orgs, 3)
+
+    return render(request, "payments/admin_orgs_with_balance.html", {"things": things})
+
+
+#####################################
+#  admin_members_with_balance_csv   #
+#####################################
+@login_required()
+def admin_members_with_balance_csv(request):
+    """ Shows any open balances held by members - as CSV
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse - CSV
+    """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    members = (
+        MemberTransaction.objects.exclude(balance=0)
+        .order_by("member", "-created_date")
+        .distinct("member")
+    )
+
+    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="member-balances.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        ["Member Balances", "Downloaded by %s" % request.user.full_name, today]
+    )
+    writer.writerow(
+        ["Member Number", "Member First Name", "Member Last Name", "Balance"]
+    )
+
+    for member in members:
+        writer.writerow(
+            [
+                member.member.system_number,
+                member.member.first_name,
+                member.member.last_name,
+                member.balance,
+            ]
+        )
+
+    return response
+
+
+#####################################
+#  admin_orgs_with_balance_csv      #
+#####################################
+@login_required()
+def admin_orgs_with_balance_csv(request):
+    """ Shows any open balances held by orgs - as CSV
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse - CSV
+    """
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    orgs = (
+        OrganisationTransaction.objects.exclude(balance=0)
+        .order_by("organisation", "-created_date")
+        .distinct("organisation")
+    )
+
+    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="organisation-balances.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        ["Organisation Balances", "Downloaded by %s" % request.user.full_name, today]
+    )
+    writer.writerow(["Club Number", "Club Name", "Balance"])
+
+    for org in orgs:
+        writer.writerow([org.organisation.org_id, org.organisation.name, org.balance])
+
+    return response
+
+
+###################################
+# admin_view_manual_adjustments   #
+###################################
+@login_required()
+def admin_view_manual_adjustments(request):
+    """ Shows any open balances held by orgs - as CSV
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse - CSV
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    if request.method == "POST":
+        form = DateForm(request.POST)
+        if form.is_valid():
+
+            to_date = form.cleaned_data["to_date"]
+            from_date = form.cleaned_data["from_date"]
+
+            # TODO: fix warning about timezone not being set
+            # to_date= pytz.utc.localize(to_date_form)
+            # from_date= pytz.utc.localize(from_date_form)
+
+            manual_member = MemberTransaction.objects.filter(
+                type="Manual Adjustment"
+            ).filter(created_date__range=(from_date, to_date))
+            manual_org = OrganisationTransaction.objects.filter(
+                type="Manual Adjustment"
+            ).filter(created_date__range=(from_date, to_date))
+
+            if "export" in request.POST:
+
+                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+                response = HttpResponse(content_type="text/csv")
+                response[
+                    "Content-Disposition"
+                ] = 'attachment; filename="manual-adjustments.csv"'
+
+                writer = csv.writer(response)
+                writer.writerow(
+                    [
+                        "Manual Adjustments",
+                        "Downloaded by %s" % request.user.full_name,
+                        today,
+                    ]
+                )
+
+                # Members
+
+                writer.writerow(
+                    [
+                        "Date",
+                        "Administrator",
+                        "Transaction Type",
+                        "User",
+                        "Description",
+                        "Amount",
+                    ]
+                )
+
+                for member in manual_member:
+                    local_dt = timezone.localtime(
+                        member.created_date, pytz.timezone(TIME_ZONE)
+                    )
+
+                    writer.writerow(
+                        [
+                            dateformat.format(local_dt, "Y-m-d H:i:s"),
+                            member.other_member,
+                            member.type,
+                            member.member,
+                            member.description,
+                            member.amount,
+                        ]
+                    )
+
+                # Organisations
+                writer.writerow("")
+                writer.writerow("")
+
+                writer.writerow(
+                    [
+                        "Date",
+                        "Administrator",
+                        "Transaction Type",
+                        "Club ID",
+                        "Organisation",
+                        "Description",
+                        "Amount",
+                    ]
+                )
+
+                for org in manual_org:
+                    local_dt = timezone.localtime(
+                        member.created_date, pytz.timezone(TIME_ZONE)
+                    )
+
+                    writer.writerow(
+                        [
+                            dateformat.format(local_dt, "Y-m-d H:i:s"),
+                            org.member,
+                            org.type,
+                            org.organisation.org_id,
+                            org.organisation,
+                            org.description,
+                            org.amount,
+                        ]
+                    )
+
+                return response
+
+            else:
+                return render(
+                    request,
+                    "payments/admin_view_manual_adjustments.html",
+                    {
+                        "form": form,
+                        "manual_member": manual_member,
+                        "manual_org": manual_org,
+                    },
+                )
+
+        else:
+            print(form.errors)
+
+    else:
+        form = DateForm()
+
+    return render(
+        request, "payments/admin_view_manual_adjustments.html", {"form": form}
     )

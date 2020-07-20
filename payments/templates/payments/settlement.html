@@ -26,6 +26,7 @@
         <table class="bx-5">
           <thead>
             <th class="px-2">Include</th>
+            <th class="px-2">Club Number</th>
             <th class="px-2">Organisation</th>
             <th class="px-2">BSB</th>
             <th class="px-2">Account Number</th>
@@ -35,6 +36,7 @@
             {% for org in orgs %}
             <tr>
               <td class="px-2"><input type="checkbox" value="{{ org.id }}" id="id_settle_list" name="settle_list" value="{{ org.id }}"></td>
+              <td class="px-2"><a href="{% url 'payments:statement_org' org_id=org.organisation.id %}">{{ org.organisation.org_id }}</a></td>
               <td class="px-2"><a href="{% url 'payments:statement_org' org_id=org.organisation.id %}">{{ org.organisation.name }}</a></td>
               <td class="px-2">{{ org.organisation.bank_bsb|default_if_none:'<b>NOT SET</b>' }}</td>
               <td class="px-2">{{ org.organisation.bank_account|default_if_none:'<b>NOT SET</b>' }}</td>
@@ -48,7 +50,8 @@
         </table>
       </div>
       <div class="text-center">
-        <button class="btn btn-primary" type="submit">Confirm Payment</button>
+        <button class="btn btn-success" type="submit" name="export">Export Selected to CSV</button>
+        <button class="btn btn-primary" type="submit" name="confirm">Confirm Payment</button>
       </div>
     </form>
   </div>
