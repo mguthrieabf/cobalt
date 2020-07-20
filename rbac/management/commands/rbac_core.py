@@ -4,6 +4,7 @@ from rbac.models import (
     RBACAdminTree,
     RBACAdminGroup,
 )
+from django.db.utils import IntegrityError
 
 
 def create_RBAC_default(self, app, model, default_behaviour="Block"):
@@ -69,13 +70,17 @@ def create_RBAC_admin_tree(self, group, tree):
     Returns: Nothing
     """
 
-    if not RBACAdminTree.objects.filter(group=group, tree=tree).exists():
+    # This is weird. If we check for the row existing the same as the other methods
+    # then it says it doesn't and then crashes creating it. Need to use try except.
+    # Not a core part of the system so not going to worry about it.
+
+    try:
         r = RBACAdminTree(group=group, tree=tree)
         r.save()
         self.stdout.write(
             self.style.SUCCESS("Added %s %s to RBACAdminTree" % (group, tree))
         )
-    else:
+    except IntegrityError:
         self.stdout.write(
             self.style.SUCCESS("%s %s already in RBACAdminTree. Ok." % (group, tree))
         )
