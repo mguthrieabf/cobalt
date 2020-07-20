@@ -38,7 +38,7 @@ class Command(BaseCommand):
             "forumadmin",
             "Group to create users who can create, modify or delete forums",
         )
-        create_RBAC_admin_tree(self, group, "rbac.abf.forums")
+        create_RBAC_admin_tree(self, group, "admin.abf.forums")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="forums", model="forumadmin")
 
