@@ -90,6 +90,7 @@
               <td class="text-right px-2">{{ GLOBAL_CURRENCY_SYMBOL }}{{ stripe.amount__sum|floatformat:2|intcomma }}</td>
             </tr>
           </table>
+          <a href="{% url "payments:admin_view_stripe_transactions" %}" class="btn btn-sm btn-primary">View Stripe Transactions</a>
         </div>
       </div>
 

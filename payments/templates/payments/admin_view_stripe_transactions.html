@@ -4,10 +4,10 @@
 {% block content %}
 
 <div class="container">
-  <div class="card md-6">
+  <div class="card">
     <div class="card-header card-header-primary">
       <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME }}s</h1>
-      <h2>Manual Adjustments Report</h2>
+      <h2>Stripe Transactions Report</h2>
     </div>
 
     <div class="card-body table-responsive">
@@ -28,33 +28,34 @@
          </div>
        </div>
 
-{% if manual_member %}
+{% if stripes %}
 
   <div class="card">
-    <div class="card-header card-header-danger">
-      <h2>Members</h2>
+    <div class="card-header card-header-success">
+      <h2>Stripe Transactions</h2>
+      <h4>There are more details in the CSV download</h4>
     </div>
     <div class="card-body">
   <table class="table table-responsive">
     <thead>
       <tr>
         <th>Date</th>
-        <th>Administrator</th>
-        <th>Transaction Type</th>
-        <th>User</th>
+        <th>Member</th>
         <th>Description</th>
+        <th>Stripe Reference</th>
         <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+        <th>Due Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
       </tr>
     </thead>
     <tbody>
-      {% for member in manual_member %}
+      {% for stripe in stripes %}
       <tr>
-        <td>{{ member.created_date }}</td>
-        <td>{{ member.other_member }}</td>
-        <td>{{ member.type }}</td>
-        <td>{{ member.member }}</td>
-        <td>{{ member.description }}</td>
-        <td class="text-right">{{ member.amount|intcomma }}</td>
+        <td>{{ stripe.created_date }}</td>
+        <td>{{ stripe.member }}</td>
+        <td>{{ stripe.description }}</td>
+        <td>{{ stripe.stripe_reference }}</td>
+        <td class="text-right">{{ stripe.amount|intcomma }}</td>
+        <td class="text-right">{{ stripe.amount_settle|floatformat:2|intcomma }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -62,46 +63,7 @@
   </div>
   </div>
 {% else %}
-<br><br><br><br><br><br>
-{% endif %}
-
-{% if manual_org %}
-
-  <div class="card">
-    <div class="card-header card-header-danger">
-      <h2>Organisations</h2>
-    </div>
-    <div class="card-body">
-  <table class="table table-responsive">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Administrator</th>
-        <th>Transaction Type</th>
-        <th>Club ID</th>
-        <th>Organisation</th>
-        <th>Description</th>
-        <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for org in manual_org %}
-      <tr>
-        <td>{{ org.created_date }}</td>
-        <td>{{ org.member }}</td>
-        <td>{{ org.type }}</td>
-        <td>{{ org.organisation.org_id }}</td>
-        <td>{{ org.organisation }}</td>
-        <td>{{ org.description }}</td>
-        <td class="text-right">{{ org.amount|intcomma }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  </div>
-{% else %}
-<br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br>
 {% endif %}
 
 <button type="submit" class="btn btn-primary" name="show">Show</button>

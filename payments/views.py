@@ -1445,7 +1445,7 @@ def admin_view_manual_adjustments(request):
         request (HTTPRequest): standard request object
 
     Returns:
-        HTTPResponse - CSV
+        HTTPResponse (Can be CSV)
     """
 
     if not rbac_user_has_role(request.user, "payments.global.view"):
@@ -1571,4 +1571,122 @@ def admin_view_manual_adjustments(request):
 
     return render(
         request, "payments/admin_view_manual_adjustments.html", {"form": form}
+    )
+
+
+###################################
+# admin_view_stripe_transactions  #
+###################################
+@login_required()
+def admin_view_stripe_transactions(request):
+    """ Shows stripe transactions for an admin
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse (can be CSV)
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    if request.method == "POST":
+        form = DateForm(request.POST)
+        if form.is_valid():
+
+            to_date = form.cleaned_data["to_date"]
+            from_date = form.cleaned_data["from_date"]
+
+            # TODO: fix warning about timezone not being set
+            # to_date= pytz.utc.localize(to_date_form)
+            # from_date= pytz.utc.localize(from_date_form)
+
+            stripes = StripeTransaction.objects.filter().filter(
+                created_date__range=(from_date, to_date)
+            )
+
+            for stripe_item in stripes:
+                stripe_item.amount_settle = (float(stripe_item.amount) - 0.3) * 0.9825
+
+            if "export" in request.POST:
+
+                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+                response = HttpResponse(content_type="text/csv")
+                response[
+                    "Content-Disposition"
+                ] = 'attachment; filename="manual-adjustments.csv"'
+
+                writer = csv.writer(response)
+                writer.writerow(
+                    [
+                        "Stripe Transactions",
+                        "Downloaded by %s" % request.user.full_name,
+                        today,
+                    ]
+                )
+
+                writer.writerow(
+                    [
+                        "Date",
+                        "Status",
+                        "member",
+                        "Amount",
+                        "Expected Settlement Amount",
+                        "Description",
+                        "stripe_reference",
+                        "stripe_exp_month",
+                        "stripe_exp_year",
+                        "stripe_last4",
+                        "linked_organisation",
+                        "linked_member",
+                        "linked_transaction_type",
+                        "linked_amount",
+                        "stripe_receipt_url",
+                    ]
+                )
+
+                for stripe_item in stripes:
+                    local_dt = timezone.localtime(
+                        stripe.created_date, pytz.timezone(TIME_ZONE)
+                    )
+
+                    writer.writerow(
+                        [
+                            dateformat.format(local_dt, "Y-m-d H:i:s"),
+                            stripe_item.status,
+                            stripe_item.member,
+                            stripe_item.amount,
+                            stripe_item.amount_settle,
+                            stripe_item.description,
+                            stripe_item.stripe_reference,
+                            stripe_item.stripe_exp_month,
+                            stripe_item.stripe_exp_year,
+                            stripe_item.stripe_last4,
+                            stripe_item.linked_organisation,
+                            stripe_item.linked_member,
+                            stripe_item.linked_transaction_type,
+                            stripe_item.linked_amount,
+                            stripe_item.stripe_receipt_url,
+                        ]
+                    )
+                return response
+
+            else:
+                return render(
+                    request,
+                    "payments/admin_view_stripe_transactions.html",
+                    {"form": form, "stripes": stripes},
+                )
+
+        else:
+            print(form.errors)
+
+    else:
+        form = DateForm()
+
+    return render(
+        request, "payments/admin_view_stripe_transactions.html", {"form": form}
     )

@@ -18,6 +18,11 @@ urlpatterns = [
         name="paymentsuperintent",
     ),
     path("stripe-pending", views.stripe_pending, name="stripe_pending"),
+    path(
+        "admin-view-stripe-transactions",
+        views.admin_view_stripe_transactions,
+        name="admin_view_stripe_transactions",
+    ),
     path("statement", views.statement, name="statement"),
     path("settlement", views.settlement, name="settlement"),
     path(
