@@ -20,25 +20,29 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12">
-                    <div class="form-check">
-                    <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" checked="Checked">
-                          Receive SMS notifications of results
-                          <span class="form-check-sign">
-                              <span class="check"></span>
-                          </span>
-                    </label>
+                    <div class="col-md-12">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                              <input class="form-check-input" type="checkbox" checked="Checked">
+                              Receive SMS notifications of results
+                              <span class="form-check-sign">
+                                  <span class="check"></span>
+                              </span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-12">
+                  <div class="col-md-12">
                     <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" checked="Checked">
-                        Receive SMS reminders for upcoming events
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
-                    </label>
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" checked="Checked">
+                          Receive SMS reminders for upcoming events
+                          <span class="form-check-sign">
+                              <span class="check"></span>
+                          </span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -54,39 +58,50 @@
               <h4 class="card-title">General Notifications</h4>
               <p class="card-category">Marketing and Communications</p>
             </div>
-            <div class="col-md-12">
-              <div class="form-check">
-                  <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
-                      Receive ABF Newsletter
-                      <span class="form-check-sign">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="col-md-12">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                        Receive ABF Newsletter
+                        <span class="form-check-sign">
                           <span class="check"></span>
-                      </span>
-                  </label>
-              </div>
-            </div>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
 
-            <div class="col-md-12">
-              <div class="form-check">
-                  <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
-                      Receive Marketing information
-                      <span class="form-check-sign">
-                          <span class="check"></span>
-                      </span>
-                  </label>
-              </div>
-            </div>
 
-            <div class="col-md-12">
-              <div class="form-check">
-                  <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" value="" checked="Checked">
-                      Receive monthly masterpoints report
-                      <span class="form-check-sign">
-                          <span class="check"></span>
-                      </span>
-                  </label>
+                <div class="col-md-12">
+                  <div class="col-md-12">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                          Receive Marketing information
+                          <span class="form-check-sign">
+                              <span class="check"></span>
+                          </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="col-md-12">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                          Receive monthly masterpoints report
+                          <span class="form-check-sign">
+                              <span class="check"></span>
+                          </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -107,7 +122,7 @@
                     <div class="form-check">
                         <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" value="" checked="Checked">
-                            Receive email verifications
+                            Receive email notifications
                             <span class="form-check-sign">
                                 <span class="check"></span>
                             </span>
@@ -226,20 +241,17 @@
           </div>
 
 
+
         <div class="col-md-4">
           <div class="card card-profile">
             <div class="card-avatar">
-              <a href="#pablo">
-                <img class="img" src="../assets/img/faces/as.jpg" />
-              </a>
-            </div>
+                 <img id="cobalt-pic" class="img" src="/media/{{ request.user.pic }}" />
+             </div>
             <div class="card-body">
-              <h6 class="card-category text-gray">Bridge Player and Lover of Life</h6>
-              <h4 class="card-title">Allison Stralow</h4>
+              <h4 class="card-title">{{ request.user.full_name }}</h4>
               <p class="card-description">
-                Fair play and competition makes me smile.
+                {{ request.user.about }}
               </p>
-              <a href="#pablo" class="btn btn-primary btn-round">Edit</a>
             </div>
           </div>
         </div>
