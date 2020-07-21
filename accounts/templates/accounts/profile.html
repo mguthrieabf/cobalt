@@ -3,8 +3,8 @@
 {% block content %}
 
 {% block header %}
-
  <link href="{% static "assets/demo/demo.css" %}" rel="stylesheet" />
+ <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
  {% endblock %}
 
@@ -97,12 +97,6 @@
                </div>
            </div>
 
-
-
-           <p class="card-description">
-             <label class="bmd-label-floating">Short Description of You</label>
-             <textarea rows=3 name="headline" id="id_headline" class="form-control">{{ blurbform.headline.value }}</textarea>
-           </p>
            <p class="card-description">
              <label class="bmd-label-floating">About You</label>
              <textarea rows=8 name="about" id="id_about" class="form-control">{{ blurbform.about.value }}</textarea>
@@ -133,18 +127,17 @@
           reader.onload = function (e) {
               $('#cobalt-pic')
                   .attr('src', e.target.result);
+                  swal.fire({ title:"Picture Loaded", html: "If you like the picture don't forget to hit update to save it.", icon: "success", buttonsStyling: false})
           };
           reader.readAsDataURL(input.files[0]);
       }
   }
 
-  $(document).ready(function() {
-    // initialise Datetimepicker and Sliders
-    md.initFormExtendedDatetimepickers();
-    if ($('.slider').length != 0) {
-       md.initSliders();
-    }
-  });
+    $(document).ready(function() {
+      // initialise Datetimepicker and Sliders
+      md.initFormExtendedDatetimepickers();
+
+    });
 </script>
 
 

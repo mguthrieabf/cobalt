@@ -54,7 +54,6 @@ class UserUpdateForm(forms.ModelForm):
             "system_number",
             "dob",
             "mobile",
-            "headline",
             "about",
             "pic",
             "bbo_name",
@@ -68,4 +67,4 @@ class BlurbUpdateForm(forms.ModelForm):
         """ Meta data """
 
         model = User
-        fields = ["headline", "about", "pic"]
+        fields = ["about", "pic"]

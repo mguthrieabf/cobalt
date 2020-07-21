@@ -28,12 +28,7 @@ class User(AbstractUser):
         max_length=15,
         validators=[phone_regex],
     )
-    headline = models.TextField(
-        "Headline", blank=True, null=True, default="Not filled in", max_length=100
-    )
-    about = models.TextField(
-        "About Me", blank=True, null=True, default="Not filled in", max_length=800
-    )
+    about = models.TextField("About Me", blank=True, null=True, max_length=800)
     pic = models.ImageField(
         upload_to="pic_folder/", default="pic_folder/default-avatar.png"
     )
