@@ -18,7 +18,6 @@
 <!-- These can cause problems, for example in forums with Summernote so we allow them to be overridden -->
   <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
   <script src="{% static "assets/js/core/popper.min.js" %}"></script>
-  <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
   <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 {% endblock %}
   {% block header %}
@@ -147,11 +146,11 @@
           <div class="collapse navbar-collapse justify-content-end">
             <form class="navbar-form">
               <div class="input-group no-border">
-                <!-- <input type="text" value="" class="form-control" placeholder="Search...">
+                <input type="text" value="" class="form-control" placeholder="Search...">
                 <button type="submit" class="btn btn-white btn-round btn-just-icon">
                   <i class="material-icons">search</i>
                   <div class="ripple-container"></div>
-                </button> -->
+                </button>
               </div>
             </form>
             <ul class="navbar-nav">
@@ -160,13 +159,13 @@
 
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="material-icons">notification</i>
+                  <i class="material-icons">notifications</i>
 
                   <span class="notification">
                     {{ notification_count }}
                   </span>
                   <p class="d-lg-none d-md-block">
-                    Notification{{ notification_count|pluralize }}
+                    Notifications
                   </p>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                   {% for msg in notifications %}

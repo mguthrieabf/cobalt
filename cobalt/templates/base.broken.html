@@ -12,6 +12,7 @@
   </title>
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+
   <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
   <link href="{% static "assets/css/cobalt.css" %}" rel="stylesheet" />
 {% block headerjs %}
@@ -145,28 +146,28 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-            <form class="navbar-form">
+            <!-- <form class="navbar-form">
               <div class="input-group no-border">
-                <!-- <input type="text" value="" class="form-control" placeholder="Search...">
+                <input type="text" value="" class="form-control" placeholder="Search...">
                 <button type="submit" class="btn btn-white btn-round btn-just-icon">
                   <i class="material-icons">search</i>
                   <div class="ripple-container"></div>
-                </button> -->
+                </button>
               </div>
-            </form>
+            </form> -->
             <ul class="navbar-nav">
 
             {% if notifications %}
 
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="material-icons">notification</i>
+                  <i class="material-icons">notifications</i>
 
                   <span class="notification">
                     {{ notification_count }}
                   </span>
                   <p class="d-lg-none d-md-block">
-                    Notification{{ notification_count|pluralize }}
+                    Notifications
                   </p>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                   {% for msg in notifications %}
@@ -185,6 +186,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
                   <a class="dropdown-item" href="{% url "accounts:user_profile" %}">Profile</a>
+                  <a class="dropdown-item" href="{% url "accounts:user_settings" %}">Settings</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/accounts/logout">Log out</a>
                 </div>
