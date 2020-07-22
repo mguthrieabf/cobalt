@@ -12,7 +12,7 @@
       <div class="card-body table-responsive">
         <div class="container">
           Latest Successful Transaction: {{ stripe_latest.created_date }} ({{ stripe_latest.created_date|timesince }} ago)
-          <div class="card">
+          <div class="card bg-light text-dark">
             <div class="card-header card-header-danger">
 
               <h2>Manual Checkout Pending</h2>
@@ -51,7 +51,7 @@
             </div>
           </div>
           <br>
-          <div class="card">
+          <div class="card bg-light text-dark">
             <div class="card-header card-header-warning">
 
               <h2>Manual Checkout Intent</h2>
@@ -85,7 +85,7 @@
             </div>
           </div>
           <br>
-          <div class="card">
+          <div class="card bg-light text-dark">
             <div class="card-header card-header-info">
 
               <h2>Auto Checkout Pending</h2>
@@ -119,6 +119,7 @@
           </div>
 
         </div>
+        <a href="{% url "payments:admin_view_stripe_transactions" %}" class="btn btn-sm btn-primary">View Stripe Transactions</a>
       </div>
     </div>
   </div>

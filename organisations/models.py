@@ -27,6 +27,8 @@ class Organisation(models.Model):
 class MemberOrganisation(models.Model):
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    home_club = models.BooleanField(blank=True, null=True)
+    home_state = models.BooleanField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.member.full_name}, member of {self.organisation.name}"

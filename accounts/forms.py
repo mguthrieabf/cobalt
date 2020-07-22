@@ -68,3 +68,21 @@ class BlurbUpdateForm(forms.ModelForm):
 
         model = User
         fields = ["about", "pic"]
+
+
+class UserSettingsForm(forms.ModelForm):
+    """ Used by Settings to update details """
+
+    class Meta:
+        """ Meta data """
+
+        model = User
+        fields = [
+            "username",
+            "receive_sms_results",
+            "receive_sms_reminders",
+            "receive_abf_newsletter",
+            "receive_marketing",
+            "receive_monthly_masterpoints_report",
+            "receive_payments_emails",
+        ]

@@ -20,13 +20,12 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
 from django.contrib.auth.views import PasswordResetView
 import ipinfo
-from notifications.views import send_cobalt_email
+from notifications.views import send_cobalt_email, notifications_in_english
 from logs.views import get_client_ip, log_event
 from organisations.models import MemberOrganisation
 from .models import User
-from .forms import UserRegisterForm
 from .tokens import account_activation_token
-from .forms import UserUpdateForm, BlurbUpdateForm
+from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
 
 
 def html_email_reset(request):
@@ -473,4 +472,21 @@ def user_settings(request):
     Returns:
         HttpResponse
     """
-    return render(request, "accounts/user_settings.html")
+
+    if request.method == "POST":
+        form = UserSettingsForm(data=request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Settings saved.", extra_tags="cobalt-message-success"
+            )
+    else:
+        form = UserSettingsForm(instance=request.user)
+
+    notifications_list = notifications_in_english(request.user)
+
+    return render(
+        request,
+        "accounts/user_settings.html",
+        {"form": form, "notifications_list": notifications_list},
+    )

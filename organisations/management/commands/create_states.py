@@ -3,12 +3,7 @@ from organisations.models import Organisation
 
 
 class Command(BaseCommand):
-    """
-    Run this before setting up any clubs or states. If the pk is not 1 then change the
-    settings.py to have the actual pk. Cleaner to keep it as 1 though.
-    """
-
-    def CreateClubs(
+    def CreateStates(
         self, org_id, name, address1, address2, address3, state, postcode, type
     ):
 
@@ -34,7 +29,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("%s org already exists - ok" % name))
 
     def handle(self, *args, **options):
-        print("Creating ABF.")
-        self.CreateClubs(
-            0, "ABF", "PO Box 397", None, "Fyshwick", "ACT", "2609", "National"
-        )
+        print("Creating State Organisations.")
+        self.CreateStates(1, "ACT", None, None, None, "ACT", None, "State")
+        self.CreateStates(2, "NSW", None, None, None, "NSW", None, "State")
+        self.CreateStates(3, "VIC", None, None, None, "VIC", None, "State")
+        self.CreateStates(4, "QLD", None, None, None, "QLD", None, "State")
+        self.CreateStates(5, "SA", None, None, None, "SA", None, "State")
+        self.CreateStates(6, "WA", None, None, None, "WA", None, "State")
+        self.CreateStates(7, "TAS", None, None, None, "TAS", None, "State")
+        self.CreateStates(8, "NT", None, None, None, "NT", None, "State")

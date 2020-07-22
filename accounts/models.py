@@ -54,6 +54,17 @@ class User(AbstractUser):
         "Stripe Auto Confirmed", max_length=9, choices=AUTO_STATUS, default="Off"
     )
 
+    receive_sms_results = models.BooleanField("Receive SMS Results", default=False)
+    receive_sms_reminders = models.BooleanField("Receive SMS Reminders", default=False)
+    receive_abf_newsletter = models.BooleanField("Receive ABF Newsletter", default=True)
+    receive_marketing = models.BooleanField("Receive Marketing", default=True)
+    receive_monthly_masterpoints_report = models.BooleanField(
+        "Receive Monthly Masterpoints Report", default=True
+    )
+    receive_payments_emails = models.BooleanField(
+        "Receive Payments Emails", default=True
+    )
+
     REQUIRED_FIELDS = [
         "system_number",
         "email",

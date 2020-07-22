@@ -5,10 +5,18 @@
 <div class="content">
   <div class="content">
     <div class="container-fluid">
-      <h2>Edit Settings</h2>
-      <form>
         <div class="row">
           <div class="col-md-8">
+            <div class="card">
+              <div class="card-header card-header-warning">
+                <h2>Edit Settings</h2>
+              </div>
+              <div class="card-body">
+
+            <form method="post">
+              {% csrf_token %}
+
+            <input type="hidden" name="username" id="id_username" value="{{ form.username.value }}">
 
 <!-- Personal Notifications -->
 
@@ -22,8 +30,11 @@
                   <div class="col-md-12">
                     <div class="col-md-12">
                       <div class="form-check">
+                        <div class="row justify-content-center">
+                           <span class="cobalt-form-error" id="id_receive_sms_results">{{ form.receive_sms.errors|striptags }}</span>
+                        </div>
                         <label class="form-check-label">
-                              <input class="form-check-input" type="checkbox" checked="Checked">
+                              <input class="form-check-input" id="id_receive_sms_results" name="receive_sms_results" type="checkbox" {% if form.receive_sms_results.value %}checked="Checked"{% endif %}>
                               Receive SMS notifications of results
                               <span class="form-check-sign">
                                   <span class="check"></span>
@@ -35,8 +46,11 @@
                   <div class="col-md-12">
                   <div class="col-md-12">
                     <div class="form-check">
+                      <div class="row justify-content-center">
+                         <span class="cobalt-form-error" id="id_receive_sms_reminders">{{ form.receive_sms_reminders.errors|striptags }}</span>
+                      </div>
                       <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" checked="Checked">
+                            <input class="form-check-input" id="id_receive_sms_reminders" name="receive_sms_reminders" type="checkbox" {% if form.receive_sms_reminders.value %}checked="Checked"{% endif %}>
                           Receive SMS reminders for upcoming events
                           <span class="form-check-sign">
                               <span class="check"></span>
@@ -63,8 +77,11 @@
                 <div class="col-md-12">
                   <div class="col-md-12">
                     <div class="form-check">
+                      <div class="row justify-content-center">
+                         <span class="cobalt-form-error" id="id_receive_sms_results">{{ form.receive_abf_newsletter.errors|striptags }}</span>
+                      </div>
                       <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            <input class="form-check-input" id="id_receive_abf_newsletter" name="receive_abf_newsletter" type="checkbox" {% if form.receive_abf_newsletter.value %}checked="Checked"{% endif %}>
                         Receive ABF Newsletter
                         <span class="form-check-sign">
                           <span class="check"></span>
@@ -78,8 +95,11 @@
                 <div class="col-md-12">
                   <div class="col-md-12">
                     <div class="form-check">
+                      <div class="row justify-content-center">
+                         <span class="cobalt-form-error" id="id_receive_marketing">{{ form.receive_marketing.errors|striptags }}</span>
+                      </div>
                       <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            <input class="form-check-input" id="id_receive_marketing" name="receive_marketing" type="checkbox" {% if form.receive_marketing.value %}checked="Checked"{% endif %}>
                           Receive Marketing information
                           <span class="form-check-sign">
                               <span class="check"></span>
@@ -92,8 +112,11 @@
                 <div class="col-md-12">
                   <div class="col-md-12">
                     <div class="form-check">
+                      <div class="row justify-content-center">
+                         <span class="cobalt-form-error" id="id_receive_monthly_masterpoints_report">{{ form.receive_monthly_masterpoints_report.errors|striptags }}</span>
+                      </div>
                       <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                            <input class="form-check-input" id="id_receive_monthly_masterpoints_report" name="receive_monthly_masterpoints_report" type="checkbox" {% if form.receive_monthly_masterpoints_report.value %}checked="Checked"{% endif %}>
                           Receive monthly masterpoints report
                           <span class="form-check-sign">
                               <span class="check"></span>
@@ -120,8 +143,11 @@
 
                   <div class="col-md-12">
                     <div class="form-check">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" value="" checked="Checked">
+                      <div class="row justify-content-center">
+                         <span class="cobalt-form-error" id="id_receive_payments_emails">{{ form.receive_payments_emails.errors|striptags }}</span>
+                      </div>
+                      <label class="form-check-label">
+                            <input class="form-check-input" id="id_receive_payments_emails" name="receive_payments_emails" type="checkbox" {% if form.receive_payments_emails.value %}checked="Checked"{% endif %}>
                             Receive email notifications
                             <span class="form-check-sign">
                                 <span class="check"></span>
@@ -139,7 +165,7 @@
 
 <!-- Site -->
 
-          <div class="card">
+          <!-- <div class="card">
             <div class="card-header card-header-primary">
               <h4 class="card-title">Site Settings</h4>
               <p class="card-category">Preferences</p>
@@ -189,7 +215,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
 <!-- End Site Settings -->
 
@@ -233,15 +259,63 @@
 <!-- Club Settings -->
 
 
+
+
           <div class="col-md-12">
             <button type="submit" class="btn btn-primary ">Update Settings</button>
             <div class="clearfix"></div>
           </div>
           </form>
+</div>
+</div>
+          <!-- system notifications -->
+
+<br>
+          <div class="card">
+            <div class="card-header card-header-success">
+              <h4 class="card-title">Manage Notifications</h4>
+              <p class="card-category">System alerts</p>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  {% if notifications %}
+                    <td><button class="btn btn-sm btn-info">Remove All</button></td>
+                  {% endif %}
+                    <td><button class="btn btn-sm btn-info">Add Notification</button></td>
+                    <br>
+                <table class="table table-responsive">
+                {% if notifications %}
+                <thead>
+                  <th>Application</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Action</th>
+                </thead>
+                {% endif %}
+                <tbody>
+                  {% for notification in notifications_list %}
+                  <tr>
+                    <td>{{ notification.application }}</td>
+                    <td>{{ notification.type }}</td>
+                    <td>{{ notification.description }}</td>
+                    <td><button class="btn btn-sm btn-info">Remove</button></td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td>Nothing set</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                </table>
+
+                </div>
+              </div>
+            </div>
           </div>
+          <!-- system notifications -->
 
-
-
+      </div>
         <div class="col-md-4">
           <div class="card card-profile">
             <div class="card-avatar">

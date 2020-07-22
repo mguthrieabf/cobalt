@@ -9,6 +9,7 @@
 import boto3
 from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID
 from .models import InAppNotification, NotificationMapping
+from forums.models import Forum, Post
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
@@ -333,3 +334,25 @@ def check_listener(member, application, event_type, topic=None, subtopic=None):
         return True
     else:
         return False
+
+
+def notifications_in_english(member):
+    """ returns a list of notifications in a simple English format.
+    This is hand coded and needs to be updated when new notifications are
+    defined. Used by Accounts:Settings but can be used more generally. """
+
+    notifications = NotificationMapping.objects.filter(member=member)
+    for notification in notifications:
+        if notification.application == "Forums":
+            if notification.event_type == "forums.post.create":
+                forum = Forum.objects.filter(pk=notification.topic).first()
+                notification.description = f"New posts in '{forum.title}'"
+                notification.type = "Posts"
+            if notification.event_type == "forums.post.comment":
+                post = Post.objects.filter(pk=notification.topic).first()
+                notification.description = (
+                    f"Comments on '{post.title}' in Forum: {post.forum}"
+                )
+                notification.type = "Comments"
+
+    return notifications
