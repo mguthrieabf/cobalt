@@ -7,3 +7,23 @@ window.onload = function() {
   var countUp = new CountUp('system_balance', 201, options);
   countUp.start();
 }
+
+Things to Add
+
+Cookies notification
+Credit page
+Licence
+Support page
+Forum follow notification
+Payments - pay org
+Payments Org - pay org, pay member, take money from members
+version and upgrade the JS and CSS
+Move cobalt files to a cobalt directory
+Set up UAT to be like Prod
+Tour (Enjoyhunt)
+Send a member a private message
+Logging
+Location of admin links in site
+Clubs homepage to enter BSB and Account number
+RBAC ability to create admin at lower level
+RBAC check admin at higher level
