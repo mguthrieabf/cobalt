@@ -37,4 +37,8 @@ class Command(BaseCommand):
             "518891", "julianrfoster@gmail.com", "518891", "Julian", "Foster"
         )
 
+        self.CreateDefaultTestUsers(
+            "41841", "matmc@internode.on.net", "41841", "Matthew", "McManus"
+        )
+
     #    self.CreateDefaultTestUsers("Neil", "nwilliams36@internode.on.net", "952281", "Neil", "Williams")
