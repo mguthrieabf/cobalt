@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="col-lg-12 col-md-12">
+<div class="card">
+<div class="card-header card-header-warning">
+<h2 class="card-title">{{ congress.name }}</h2>
+<h3>{{ congress.date_string }}</h3>
+</div>
+<div class="card-body table-responsive">
+<div class="row">
+<div class="col-lg-4 col-md-4">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">People</h4>
+    </div>
+    <div class="card-body table-responsive">
+      <table>
+        <tr>
+          <td>Organiser:
+          <td>Justine Beaumont
+        </tr>
+        <tr>
+          <td>Phone:
+          <td>0414 637 075
+        </tr>
+        <tr>
+          <td>Email:
+          <td>cib@abf.com.au
+        </tr>
+        <tr>
+          <td>Chief Tournament Director:
+          <td>John McIlrath
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-lg-4 col-md-4">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h4 class="card-title">Links</h4>
+    </div>
+    <div class="card-body table-responsive">
+      <ul>
+        <li><a href="http://www.abfevents.com.au/events/cib/2019/docs/2019CIBBrochure.pdf">Brochure</a></li>
+        <li><a href="http://www.abfevents.com.au/events/cib/2019/restaurants.asp#pgid">Restaurants</a></li>
+        <li><a href="#">Past Results</a></li>
+        <li><a href="#">Photos</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-danger">
+      <h4 class="card-title">General Information</h4>
+    </div>
+    <div class="card-body table-responsive">
+      <ol>
+        <li>Free parking at the Gungahlin Club, Gungahlin
+        <li>Gold masterpoints will be awarded for every event
+        <li>There will be hospitality and presentation of medallions and cash prizes immediately after the conclusion of the Swiss pairs – at 4.40pm on Monday afternoon, 7th October
+        <li>Cash prizes, trophies and medallions will be awarded for every event
+        <li>The Tournament Organiser may grant permission for still or moving photographs to be taken during the course of the Canberra in Bloom Bridge Festival. Players may only refuse to be photographed for religious or cultural reasons deemed valid by the Tournament Organiser or Director.
+      </ol>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">Location - {{ congress.venue_name }}</h4>
+    </div>
+    <div class="card-body table-responsive">
+      <div id="regularMap" class="map"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">Program</h4>
+    </div>
+    <div class="card-body table-responsive">
+    <div class="table-responsive">
+        <table border class="table">
+            <thead class="text-primary">
+              <th>Event</th>
+              <th>Day</th>
+              <th>Time</th>
+              <th>Action</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span>Royal Bluebell Matchpoint Swiss Pairs</span></td>
+                    <td>Friday</td>
+                    <td>04-10-2019 - 10am &amp; 2pm</td>
+                    <td><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+                 <tr>
+                    <td><span class="title">Spider Orchid Novice &amp; Restricted Matchpoint Swiss Pairs</span></td>
+                    <td>Friday</td>
+                    <td>04-10-2019 - 10am &amp; 2pm</td>
+                    <td><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><span class="title">Golden Wattle Open Teams</span></td>
+                    <td>Saturday </td>
+                    <td>05-10-2019 - 10am &amp; 2.20pm</td>
+                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+
+
+                </tr>
+
+                <tr>
+                    <td>Sunday</td>
+                    <td>06-10-2019 - 10am</td>
+
+
+                </tr>
+
+                <tr>
+                    <td rowspan="2"><span class="title">Val &amp; John Brockwell Mixed Teams Qualifying<br /><br />NEW EVENT</span></td>
+                    <td>Saturday </td>
+                    <td>05-10-2019 - 10am &amp; 2.20pm</td>
+
+                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+
+                <tr>
+                    <td>Sunday</td>
+                    <td>06-10-2019 - 10am</td>
+
+                </tr>
+
+                <tr>
+                    <td rowspan="2"><span class="title">Val &amp; John Brockwell Mixed Teams Finals</span></td>
+                    <td>Sunday</td>
+                    <td>06-10-2019 - 2.15pm</td>
+
+                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+
+                <tr>
+                    <td>Monday</td>
+                    <td>07-10-2019 - 10am</td>
+
+                </tr>
+
+                <tr>
+                    <td rowspan="2"><span class="title">Canberra Bells Swiss Pairs</span>
+                    </td>
+                    <td>Sunday</td>
+                    <td>06-10-2019 - 2.15pm </td>
+
+                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+                <tr>
+                    <td>Monday</td>
+                    <td>07-10-2019 - 10am &amp; 2.15pm</td>
+
+                    </tr>
+                <tr>
+                    <td rowspan="2"><span class="title">Federation Rose Novice &amp; Restricted Swiss Pairs</span>
+                    </td>
+                    <td>Sunday</td>
+                    <td>06-10-2019 - 2.15pm </td>
+
+                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
+                    <br><a href="./view-event.html">View Entries</a></td>
+                </tr>
+                <tr>
+                    <td>Monday</td>
+                    <td>07-10-2019 - 10am &amp; 2.15pm</td>
+
+                </tr>
+                </tbody>
+            </table>
+          </div>
+           <p>
+              Novice eligibility: &lt;100 masterpoints per player at 30 June 2019<br />
+              Restricted eligibility: &lt;300 masterpoints per player at 30 June 2019
+          </p>
+
+
+
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+
+<!--  Google Maps Plugin    -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY"></script>
+
+  <script>
+    $(document).ready(function() {
+      var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
+      var mapOptions = {
+        zoom: 14,
+        center: myLatlng,
+        scrollwheel: false, //we disable de scroll over the map, it is a really annoing when you scroll through page
+      }
+
+      var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+
+      var marker = new google.maps.Marker({
+        position: myLatlng,
+        title: "Regular Map!"
+      });
+
+      marker.setMap(map);
+
+
+
+    });
+  </script>
+{% endblock %}
