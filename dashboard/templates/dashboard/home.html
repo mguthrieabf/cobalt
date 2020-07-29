@@ -2,12 +2,9 @@
 {% load humanize %}
 {% load static %}
 
-{% block header %}
-  <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
-  <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
-{% endblock %}
 
 {% block content %}
+
 
 <div class="row">
 
@@ -97,7 +94,12 @@
 
 
 
+
+
+
+
 <!-- Forum posts -->
+
 <div class="row">
 
   <div class="col-12 col-md-6">
@@ -140,7 +142,7 @@
         </div>
       </div>
 {% if posts2.has_next %}
-  <a class="infinite-more-link2" href="scroll2?page={{ posts2.next_page_number }}"><div class="container text-center"><button class="btn btn-primary">More</button></div></a>
+  <a class="infinite-more-link2" href="scroll2?page={{ posts2.next_page_number }}">More</a>
 {% endif %}
     </div>
   </div>
@@ -186,13 +188,19 @@
         </div>
       </div>
 {% if posts.has_next %}
-<a class="infinite-more-link" href="scroll1?page={{ posts.next_page_number }}"><div class="container text-center"><button class="btn btn-primary">More</button></div></a>
+<a class="infinite-more-link" href="scroll1?page={{ posts.next_page_number }}">More</a>
 {% endif %}
     </div>
   </div>
 
 
 </div>
+
+
+
+  <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
+  <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
+  <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
 
 <script>
   var infinite = new Waypoint.Infinite({
@@ -205,6 +213,7 @@
       $('.loading').hide();
     }
   });
+
   var infinite2 = new Waypoint.Infinite({
     element: $('.infinite-container2')[0],
     items: '.infinite-item2',
