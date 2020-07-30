@@ -1,5 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from .models import Congress
 from .forms import CongressForm
 from rbac.core import rbac_user_allowed_for_model, rbac_user_has_role
@@ -9,7 +10,8 @@ from django.contrib import messages
 
 @login_required()
 def home(request):
-    return render(request, "events/home.html")
+    congresses = Congress.objects.all()
+    return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -18,7 +20,7 @@ def view_congress(request, congress_id):
 
     Args:
         request(HTTPRequest): standard user request
-        event_id(int): event to view
+        congress_id(int): congress to view
 
     Returns:
         page(HTTPResponse): page with details about the event
@@ -61,4 +63,68 @@ def create_congress(request):
     else:
         form = CongressForm(valid_orgs=valid_orgs)
 
-    return render(request, "events/edit_congress.html", {"form": form})
+    return render(
+        request,
+        "events/edit_congress.html",
+        {"form": form, "title": "Create New Congress"},
+    )
+
+
+@login_required()
+def edit_congress(request, congress_id):
+    """ edit a new congress
+
+    Args:
+        request(HTTPRequest): standard user request
+        congress_id(int): congress to view
+
+    Returns:
+        page(HTTPResponse): page to create congress
+    """
+    # get orgs that this user can manage congresses for
+    valid_orgs = rbac_user_allowed_for_model(
+        user=request.user, app="events", model="org", action="manage"
+    )
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    if request.method == "POST":
+
+        if "Delete" in request.POST:  # Delete it
+            congress.delete()
+            messages.success(
+                request, "Congress edited", extra_tags="cobalt-message-success"
+            )
+            return redirect("events:home")
+
+        else:  # Other options are Save and Publish which are similar
+
+            form = CongressForm(request.POST, instance=congress, valid_orgs=valid_orgs)
+            if form.is_valid():
+                role = "events.org.%s.manage" % form.cleaned_data["org"].id
+                if not rbac_user_has_role(request.user, role):
+                    return rbac_forbidden(request, role)
+
+                congress = form.save(commit=False)
+                congress.last_updated_by = request.user
+                congress.last_updated = timezone.localtime()
+
+                if "Publish" in request.POST:
+                    congress.status = "Published"
+                    messages.success(
+                        request,
+                        "Congress published",
+                        extra_tags="cobalt-message-success",
+                    )
+
+                congress.save()
+                messages.success(
+                    request, "Congress saved", extra_tags="cobalt-message-success"
+                )
+
+    else:
+        form = CongressForm(instance=congress, valid_orgs=valid_orgs)
+
+    return render(
+        request, "events/edit_congress.html", {"form": form, "title": "Edit Congress"}
+    )

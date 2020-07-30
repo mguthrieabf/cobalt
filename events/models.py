@@ -51,11 +51,19 @@ class Congress(models.Model):
     venue_catering = models.CharField(
         "Venue Catering", max_length=400, null=True, blank=True
     )
-    venue_additonal_info = models.CharField(
+    venue_additional_info = models.CharField(
         "Venue Additional Information", max_length=400, null=True, blank=True
     )
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="author")
     created_date = models.DateTimeField(default=timezone.now)
+    last_updated_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="last_updated_by",
+    )
+    last_updated = models.DateTimeField(default=timezone.now)
     status = models.CharField(
         "Congress Status", max_length=10, choices=CONGRESS_STATUSES, default="Draft"
     )

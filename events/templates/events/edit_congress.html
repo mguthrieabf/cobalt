@@ -1,27 +1,24 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 {% load crispy_forms_tags %}
 {% block headerjs %}
 
-<!-- The js libraries are a problem for Summernote so we override thwm here -->
+
+<!-- The js libraries are a problem for Summernote so we override them here -->
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
-
-  <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
-  <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
-
-  <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
-
+<link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+<script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
+<link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
 <style> /* remove bug from summernote height in codeview mode */
-  .note-codable { min-height: 600px !important; }
+  .note-codable { min-height: 100px !important; }
   .note-editable {
   line-height: 1.0;
-  background-color: {{ forum.bg_colour }} !important; color: {{ forum.fg_colour }} !important;
-}
-.cobalt-min-width-100 {
-  min-width: 100%;
+  background-color: white !important; color: black !important;
 }
 </style>
 {% endblock %}
@@ -41,35 +38,192 @@
 <script type="text/javascript" src="{% static "forums/summernote/summernote-bs4.min.js" %}"></script>
 <script type="text/javascript" src="{% static "forums/summernote/ResizeSensor.js" %}"></script>
 
-<div class="col-lg-12 col-md-12">
+
+<div class="">
   <div class="card">
     <div class="card-header card-header-warning">
-      <h2 class="card-title">Create New Congress</h2>
-
+      <h2>{{ title }}</h2>
     </div>
-    <div class="card-body table-responsive">
-      <div class="row">
 
-        <form method="post">
-          {% csrf_token %}
-          <table class="">
-            {{ form.as_table }}
-          </table>
-          {% if congress.status == "Draft" %}
-            <button type="submit" name="Save" class="btn btn-success">Save</button>
-            <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
-            <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
-            <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
-            {% elif congress.status == "Published" %}
-            <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
-            <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
-            {% else %}
-            <button type="submit" name="Save" class="btn btn-success">Save</button>
-            <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
-            <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
-          {% endif %}
-          </form>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+
+<!-- Organisation -->
+        <div class="card col-md-10">
+          <div class="card-header card-header-success">
+            <h3>Organisation and Conveners</h3>
+          </div>
+          <div class="card-body">
+            <div class="container">
+
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Organisation
+                </div>
+                <div class="col-7">
+                  {{ form.org|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Organisation", "All congresses must be associated with an organisation in order for payments and other things to work properly.");'>help</a>
+                </div>
+              </div>
+              <br><br>
+              Conveners go here
+
+          </div>
+        </div>
       </div>
+
+<!-- End Organisation -->
+<!-- Basic Details -->
+        <div class="card col-md-10">
+          <div class="card-header card-header-info">
+            <h3>Basic Details</h3>
+          </div>
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Congress Master
+                </div>
+                <div class="col-7">
+                  {{ form.congress_master|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Year
+                </div>
+                <div class="col-7">
+                  {{ form.year|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Name
+                </div>
+                <div class="col-7">
+                  {{ form.name|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Congress Name", "The name you wish to give this congress. Typically the Congress Master plus the Year.");'>help</a>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Dates
+                </div>
+                <div class="col-7">
+                  {{ form.date_string|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Date String", "Free format text for the dates of the congress. e.g. 23rd March 2021 to 29th March 2021.");'>help</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<!-- end basics -->
+
+<!-- venue -->
+<!-- Organisation -->
+        <div class="card col-md-10">
+          <div class="card-header card-header-danger">
+            <h3>Venue</h3>
+          </div>
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Venue Name
+                </div>
+                <div class="col-7">
+                  {{ form.venue_name|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Name", "The name of the venue hosting the event.");'>help</a>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-4 justify-content-center align-self-center">
+                  Venue Location
+                </div>
+                <div class="col-7">
+                  {{ form.venue_name|as_crispy_field }}
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
+                </div>
+              </div>
+
+              <hr>
+              <div class="row">
+                <div class="col-11 justify-content-center align-self-center">
+                  Venue Transport Info
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Transport", "Details of how to get to the venue such as public transport and parking options.");'>help</a>
+                </div>
+                <div class="col-12">
+                  {{ form.venue_transport|as_crispy_field }}
+                </div>
+              </div>
+
+              <hr>
+              <div class="row">
+                <div class="col-11 justify-content-center align-self-center">
+                  Venue Catering Info
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Catering", "Details of catering options available at the venue.");'>help</a>
+                </div>
+                <div class="col-12">
+                  {{ form.venue_catering|as_crispy_field }}
+                </div>
+              </div>
+
+              <hr>
+              <div class="row">
+                <div class="col-11 justify-content-center align-self-center">
+                  Venue Additional Info
+                </div>
+                <div class="col-1 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Additional Info", "Anything else you have not already covered.");'>help</a>
+                </div>
+                <div class="col-12">
+                  {{ form.venue_additional_info|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if congress.status == "Draft" %}
+          <button type="submit" name="Save" class="btn btn-success">Save</button>
+          <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
+          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
+          <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
+        {% elif congress.status == "Published" %}
+          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
+          <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
+        {% else %}
+          <button type="submit" name="Save" class="btn btn-success">Save</button>
+          <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
+          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
+        {% endif %}
+        </form>
     </div>
   </div>
 </div>
@@ -86,7 +240,16 @@
 <!--  Google Maps Plugin    -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY"></script>
 
+<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
+
+
   <script>
+    function help(title, html){
+      swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+      return false;
+    }
+
+
     $(document).ready(function() {
       var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
       var mapOptions = {
@@ -103,7 +266,6 @@
       });
 
       marker.setMap(map);
-
 
 
     });
