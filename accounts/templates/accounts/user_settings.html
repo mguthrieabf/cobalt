@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 
 <div class="content">
@@ -329,4 +330,15 @@
             </div>
           </div>
         </div>
+{% endblock %}
+
+{% block footer %}
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+
+<script>
+$(document).ready(function() {
+  swal.fire({ title:"Not Active Yet", html: "This is a work in progress. The settings work but there is nothing connected to the backend yet.", icon: "info", buttonsStyling: false})
+});
+</script>
 {% endblock %}

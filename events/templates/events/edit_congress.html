@@ -57,14 +57,28 @@
           <div class="card-body">
             <div class="container">
 
+
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
+                  Congress Master
+                </div>
+                <div class="col-7">
+                  {{ form.congress_master|as_crispy_field }}
+                </div>
+                <div class="bg-success col-2 justify-content-center align-self-right">
+                  <a href="#" onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
+                </div>
+              </div>
+
+
+              <div class="row">
+                <div class="col-3 justify-content-center align-self-center">
                   Organisation
                 </div>
                 <div class="col-7">
                   {{ form.org|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Organisation", "All congresses must be associated with an organisation in order for payments and other things to work properly.");'>help</a>
                 </div>
               </div>
@@ -76,6 +90,37 @@
       </div>
 
 <!-- End Organisation -->
+<a href="#" id="advanced_link">Advanced...</a>
+<br>
+<!-- Advanced -->
+        <div  id="advanced" style="display: none;" class="card col-md-10">
+          <div class="card-header card-header-primary">
+            <h3>Advanced Options</h3>
+          </div>
+          <div class="card-body">
+            <div class="container">
+
+
+              <div class="row">
+                <div class="col-3 justify-content-center align-self-center">
+                  Raw HTML
+                </div>
+                <div class="col-7">
+                  {{ form.raw_html }}
+                </div>
+                <div class="col-2 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Raw HTML", "If you understand HTML you can build the page yourself and insert it here. This will override everything else. You can use the Congress builder to generate a starting point and then tweak the HTML and insert it here if you like.");'>help</a>
+                </div>
+              </div>
+
+
+          </div>
+        </div>
+      </div>
+
+<!-- End Advanced -->
+
+<br>
 <!-- Basic Details -->
         <div class="card col-md-10">
           <div class="card-header card-header-info">
@@ -84,49 +129,49 @@
           <div class="card-body">
             <div class="container">
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Congress Master
                 </div>
                 <div class="col-7">
                   {{ form.congress_master|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
                 </div>
               </div>
 
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Year
                 </div>
                 <div class="col-7">
                   {{ form.year|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
                 </div>
               </div>
 
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Name
                 </div>
                 <div class="col-7">
                   {{ form.name|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Name", "The name you wish to give this congress. Typically the Congress Master plus the Year.");'>help</a>
                 </div>
               </div>
 
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Dates
                 </div>
                 <div class="col-7">
                   {{ form.date_string|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Date String", "Free format text for the dates of the congress. e.g. 23rd March 2021 to 29th March 2021.");'>help</a>
                 </div>
               </div>
@@ -135,9 +180,9 @@
         </div>
 
 <!-- end basics -->
-
+<br>
 <!-- venue -->
-<!-- Organisation -->
+
         <div class="card col-md-10">
           <div class="card-header card-header-danger">
             <h3>Venue</h3>
@@ -145,35 +190,35 @@
           <div class="card-body">
             <div class="container">
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Venue Name
                 </div>
                 <div class="col-7">
                   {{ form.venue_name|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Name", "The name of the venue hosting the event.");'>help</a>
                 </div>
               </div>
 
               <div class="row">
-                <div class="col-4 justify-content-center align-self-center">
+                <div class="col-3 justify-content-center align-self-center">
                   Venue Location
                 </div>
                 <div class="col-7">
                   {{ form.venue_name|as_crispy_field }}
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
                 </div>
               </div>
 
               <hr>
               <div class="row">
-                <div class="col-11 justify-content-center align-self-center">
+                <div class="col-10 justify-content-center align-self-center">
                   Venue Transport Info
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Transport", "Details of how to get to the venue such as public transport and parking options.");'>help</a>
                 </div>
                 <div class="col-12">
@@ -183,10 +228,10 @@
 
               <hr>
               <div class="row">
-                <div class="col-11 justify-content-center align-self-center">
+                <div class="col-10 justify-content-center align-self-center">
                   Venue Catering Info
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Catering", "Details of catering options available at the venue.");'>help</a>
                 </div>
                 <div class="col-12">
@@ -196,10 +241,10 @@
 
               <hr>
               <div class="row">
-                <div class="col-11 justify-content-center align-self-center">
+                <div class="col-10 justify-content-center align-self-center">
                   Venue Additional Info
                 </div>
-                <div class="col-1 justify-content-center align-self-center">
+                <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Additional Info", "Anything else you have not already covered.");'>help</a>
                 </div>
                 <div class="col-12">
@@ -251,11 +296,17 @@
 
 
     $(document).ready(function() {
+
+      $("#advanced_link").click(function(){
+        $("#advanced").show();
+        $("#advanced_link").hide();
+      });
+
       var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
       var mapOptions = {
         zoom: 14,
         center: myLatlng,
-        scrollwheel: false, //we disable de scroll over the map, it is a really annoing when you scroll through page
+        scrollwheel: false,
       }
 
       var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
@@ -266,7 +317,6 @@
       });
 
       marker.setMap(map);
-
 
     });
   </script>
