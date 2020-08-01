@@ -282,18 +282,24 @@ def post_new(request, forum_id=None):
                     request, "forums.forum.%s.create" % form.cleaned_data["forum"].id
                 )
 
-    else:
-        # see which forums are blocked for this user - load a list of the others
-        blocked_forums = rbac_user_blocked_for_model(
-            user=request.user, app="forums", model="forum", action="create"
-        )
-        valid_forums = Forum.objects.exclude(id__in=blocked_forums)
+    # If we got here then either it is not a post, or it is with an invalid form
+
+    # see which forums are blocked for this user - load a list of the others
+    blocked_forums = rbac_user_blocked_for_model(
+        user=request.user, app="forums", model="forum", action="create"
+    )
+    valid_forums = Forum.objects.exclude(id__in=blocked_forums)
+
+    if request.method == "POST":  # invalid form
+        form = PostForm(request.POST, valid_forums=valid_forums)
+    else:  # blank form
         form = PostForm(valid_forums=valid_forums)
-        if forum_id:
-            form.fields["forum"].initial = forum_id
-            forum = get_object_or_404(Forum, pk=forum_id)
-        else:
-            forum = None
+
+    if forum_id:
+        form.fields["forum"].initial = forum_id
+        forum = get_object_or_404(Forum, pk=forum_id)
+    else:
+        forum = None
 
     return render(request, "forums/post_edit.html", {"form": form, "forum": forum})
 

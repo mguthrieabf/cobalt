@@ -351,10 +351,6 @@ def payment_api(
 
     """
 
-    print("inside")
-    print("Member - %s" % other_member)
-    print("Org - %s" % organisation)
-
     if other_member and organisation:  # one or the other, not both
         log_event(
             user="Stripe API",

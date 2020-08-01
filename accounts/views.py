@@ -437,7 +437,11 @@ def blurb_form_upload(request):
     else:
         blurbform = BlurbUpdateForm(data=request.POST, instance=request.user)
 
+    if request.user.dob:
+        request.user.dob = request.user.dob.strftime("%d/%m/%Y")
+
     form = UserUpdateForm(instance=request.user)
+
     context = {
         "form": form,
         "blurbform": blurbform,

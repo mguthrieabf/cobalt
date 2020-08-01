@@ -94,7 +94,7 @@ var pay = function(stripe, card, clientSecret) {
 
 /* Shows a success message when the payment is complete */
 var orderComplete = function(clientSecret) {
-    $("#cobalt-main-body").html("<h1>Success!</h1><h3>Your card details have been recorded.</h3><p>It may take several minutes for this change to take effect. If your balance was below the low balance threshold then a credit card payment will also be taken.</p><p>Click <b>Payments</b> in the main menu to view your statement.</p>");
+    $("#cobalt-main-body").html("<h1>Success!</h1><h3>Your card details have been recorded.</h3><p>It may take several minutes for this change to take effect. If your balance was below the low balance threshold then a credit card payment will also be taken.</p><p>Click <b>Payments</b> in the menu to view your statement.</p>");
     // notify backend to expect incoming event
     $.getJSON("stripe-autotopup-confirm");
 };

@@ -722,7 +722,6 @@ def member_transfer(request):
     if request.method == "POST":
         form = MemberTransfer(request.POST, user=request.user)
         if form.is_valid():
-            print("member_transfer - about to call")
             return payment_api(
                 request=request,
                 description=form.cleaned_data["description"],

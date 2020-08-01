@@ -1,9 +1,13 @@
-// Cobalt common JavaScript functions
+// Used for pages with forms - checks if user tries to leave without saving data
 
 var unsaved = false;
 
 $(":input").change(function(){
     unsaved = true;
+});
+
+$('.cobalt-save').click(function() {
+    unsaved = false;
 });
 
 function unloadPage(){

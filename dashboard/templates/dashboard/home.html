@@ -52,7 +52,8 @@
           <i class="material-icons">call_made</i>
         </div>
         <p class="card-category">Masterpoints</p>
-        <h3 class="card-title"> <a href="./masterpoints/view/{{ request.user.system_number }}"><span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span></a> </h3>
+        <a href="./masterpoints/view/{{ request.user.system_number }}">
+        <h3 class="card-title"> <span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span> </h3></a>
       </div>
       <div class="card-footer">
         <div class="stats">
@@ -198,7 +199,7 @@
 
 
 
-  
+
   <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
   <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
 
