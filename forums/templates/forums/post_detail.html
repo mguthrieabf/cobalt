@@ -102,7 +102,7 @@
         <a href="{% url 'accounts:public_profile' pk=c1.author.pk %}">
       <div>
         <img width="50px" class="rounded-circle float-left" src="/media/{{ c1.author.pic }}" />
-        <h5>{{ c1.author.full_name }}</h5>
+        <h5 id="c1-{{ c1.id }}">{{ c1.author.full_name }}</h5>
       </div>
       </a>
       <div>
@@ -145,7 +145,7 @@
             <a href="{% url 'accounts:public_profile' pk=c2.author.pk %}">
           <div>
             <img width="50px" class="rounded-circle float-left" src="/media/{{ c2.author.pic }}" />
-            <h5>{{ c2.author.full_name }}</h5>
+            <h5 id="c2-{{ c2.id }}">{{ c2.author.full_name }}</h5>
           </div>
           </a>
           <div>

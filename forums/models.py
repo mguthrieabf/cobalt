@@ -39,6 +39,7 @@ class AbstractForum(models.Model):
         """ We are abstract """
 
         abstract = True
+        ordering = ["-created_date"]
 
 
 class Post(AbstractForum):

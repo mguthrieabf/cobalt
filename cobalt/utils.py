@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-def cobalt_paginator(request, events_list, items_per_page=30):
+def cobalt_paginator(request, events_list, items_per_page=30, page_no=None):
     """ common pagination function
 
     Args:
@@ -12,7 +12,10 @@ def cobalt_paginator(request, events_list, items_per_page=30):
     Returns: list
     """
 
-    page = request.GET.get("page", 1)
+    if page_no:
+        page = page_no
+    else:
+        page = request.GET.get("page", 1)
 
     paginator = Paginator(events_list, items_per_page)
     try:

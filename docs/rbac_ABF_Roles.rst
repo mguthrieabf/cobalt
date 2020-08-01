@@ -108,13 +108,13 @@ Payments
 Organisations
 -------------
 
-* **org.org.view** [*Allow*] - can view details about all organisations.
+* **orgs.org.view** [*Allow*] - can view details about all organisations.
 
-* **org.org.N.view** [*Allow*] - can view details about organisation N.
+* **orgs.org.N.view** [*Allow*] - can view details about organisation N.
 
-* **org.org.edit** [*Allow*] - can edit details about all organisations.
+* **orgs.org.edit** [*Allow*] - can edit details about all organisations.
 
-* **org.org.N.edit** [*Allow*] - can edit details about organisation N.
+* **orgs.org.N.edit** [*Allow*] - can edit details about organisation N.
 
 Groups and Trees
 ================

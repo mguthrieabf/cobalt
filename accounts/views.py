@@ -26,6 +26,8 @@ from organisations.models import MemberOrganisation
 from .models import User
 from .tokens import account_activation_token
 from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
+from forums.models import Post, Comment1, Comment2
+from cobalt.utils import cobalt_paginator
 
 
 def html_email_reset(request):
@@ -456,8 +458,63 @@ def public_profile(request, pk):
     Returns:
         HttpResponse
     """
+
+    PAGE_SIZE = 30
+
     pub_profile = get_object_or_404(User, pk=pk)
-    return render(request, "accounts/public_profile.html", {"profile": pub_profile})
+
+    post_list = Post.objects.filter(author=pub_profile).order_by("-created_date")
+    comment1_list = Comment1.objects.filter(author=pub_profile).order_by(
+        "-created_date"
+    )
+    comment2_list = Comment2.objects.filter(author=pub_profile).order_by(
+        "-created_date"
+    )
+
+    # Get tab id from URL - this means we are on this tab
+    if "tab" in request.GET:
+        tab = request.GET["tab"]
+    else:
+        tab = None
+
+    posts_active = None
+    comment1s_active = None
+    comment2s_active = None
+
+    # if we are on a tab then get the right page for that tab and page 1 for the others
+
+    if not tab or tab == "posts":
+        posts_active = "active"
+        print("here")
+        posts = cobalt_paginator(request, post_list, PAGE_SIZE)
+        comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE, 1)
+        comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE, 1)
+    elif tab == "comment1s":
+        comment1s_active = "active"
+        posts = cobalt_paginator(request, post_list, PAGE_SIZE, 1)
+        comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE)
+        comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE, 1)
+    elif tab == "posts":
+        comment2s_active = "active"
+        posts = cobalt_paginator(request, post_list, PAGE_SIZE, 1)
+        comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE, 1)
+        comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE)
+
+    print(posts)
+
+    return render(
+        request,
+        "accounts/public_profile.html",
+        {
+            "profile": pub_profile,
+            "posts": posts,
+            "comment1s": comment1s,
+            "comment2s": comment2s,
+            "posts_active": posts_active,
+            "comment1s_active": comment1s_active,
+            "comment2s_active": comment2s_active,
+        },
+    )
 
 
 @login_required

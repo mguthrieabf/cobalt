@@ -1,8 +1,13 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.utils import timezone
+from django.contrib import messages
 from .models import Organisation
+from rbac.core import rbac_user_has_role
+from rbac.views import rbac_forbidden
+from .forms import OrgForm
 
 
 @login_required()
@@ -70,3 +75,37 @@ def org_detail_ajax(request):
                 data_dict = {"data": html, "org": org.name}
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={"error": "Invalid request"})
+
+
+@login_required()
+def org_edit(request, org_id):
+    """ Edit details about an organisation
+
+    Args:
+        org_id - organisation to edit
+
+    Returns:
+        HttpResponse - page to edit organisation
+    """
+    if not rbac_user_has_role(request.user, "orgs.org.%s.edit" % org_id):
+        return rbac_forbidden(request, "orgs.org.%s.edit" % org_id)
+
+    org = get_object_or_404(Organisation, pk=org_id)
+
+    if request.method == "POST":
+
+        form = OrgForm(request.POST, instance=org)
+        if form.is_valid():
+
+            org = form.save(commit=False)
+            org.last_updated_by = request.user
+            org.last_updated = timezone.localtime()
+            org.save()
+            messages.success(
+                request, "Changes saved", extra_tags="cobalt-message-success"
+            )
+
+    else:
+        form = OrgForm(instance=org)
+
+    return render(request, "organisations/edit_org.html", {"form": form})

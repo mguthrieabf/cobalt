@@ -30,7 +30,6 @@ def masterpoints_detail(request, system_number=None):
     qry = "%s/mps/%s" % (GLOBAL_MPSERVER, system_number)
     r = requests.get(qry).json()
     if len(r) == 0:
-        print("nothing")
         raise Http404("No entry found for %s" % system_number)
     summary = r[0]
 
@@ -57,7 +56,6 @@ def masterpoints_detail(request, system_number=None):
         year,
         month,
     )
-    print(qry)
     details = requests.get(qry).json()
 
     counter = summary["TotalMPs"]  # we need to construct the balance to show
@@ -204,7 +202,6 @@ def masterpoints_search(request):
                     % (GLOBAL_MPSERVER, first_name, last_name)
                 ).json()
             if len(matches) == 1:
-                print(matches)
                 system_number = matches[0]["ABFNumber"]
                 return redirect("view/%s/" % system_number)
             else:

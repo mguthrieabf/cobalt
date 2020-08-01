@@ -1650,7 +1650,7 @@ def admin_view_stripe_transactions(request):
 
                 for stripe_item in stripes:
                     local_dt = timezone.localtime(
-                        stripe.created_date, pytz.timezone(TIME_ZONE)
+                        stripe_item.created_date, pytz.timezone(TIME_ZONE)
                     )
 
                     writer.writerow(

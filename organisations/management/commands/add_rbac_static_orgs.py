@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand
 from rbac.management.commands.rbac_core import (
     create_RBAC_admin_group,
     create_RBAC_admin_tree,
+    create_RBAC_default,
+    create_RBAC_action,
 )
 from rbac.core import rbac_add_user_to_admin_group, rbac_add_role_to_admin_group
 from organisations.models import Organisation
@@ -11,6 +13,8 @@ from accounts.models import User
 
     Creates an admin group for every club with a corresponding place in the
     tree and rights to manage payments.
+
+    Also creates the security to manage editing club details
 
 """
 
@@ -36,3 +40,17 @@ class Command(BaseCommand):
                 rbac_add_role_to_admin_group(
                     group, app="payments", model="manage", model_id=org.id
                 )
+
+        # Edit club details permissions
+        create_RBAC_default(self, "orgs", "org", "Block")
+        create_RBAC_action(self, "orgs", "org", "edit")
+        create_RBAC_action(self, "orgs", "org", "view")
+        group = create_RBAC_admin_group(
+            self,
+            "admin.abf.clubs",
+            "edit-orgs",
+            "Group for admins who can grant access to edit orgs.",
+        )
+        create_RBAC_admin_tree(self, group, "admin.abf.clubs.edit-orgs")
+        rbac_add_user_to_admin_group(group, user)
+        rbac_add_role_to_admin_group(group, app="orgs", model="org")
