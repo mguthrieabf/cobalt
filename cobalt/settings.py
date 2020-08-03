@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "logs",
     "rbac",
     "cobalt",
+    "utils",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

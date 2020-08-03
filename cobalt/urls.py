@@ -21,6 +21,7 @@ urlpatterns = [
     path("notifications/", include("notifications.urls", namespace="notifications")),
     path("masterpoints/", include("masterpoints.urls", namespace="masterpoints")),
     path("payments/", include("payments.urls", namespace="payments")),
+    path("utils/", include("utils.urls", namespace="utils")),
     path("rbac/", include("rbac.urls", namespace="rbac")),
     path("logs/", include("logs.urls", namespace="logs")),
     path("organisations/", include("organisations.urls", namespace="organisations")),
