@@ -9,10 +9,14 @@
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
+
+  <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
+
 <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
 <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
 
 <style> /* remove bug from summernote height in codeview mode */
   .note-codable { min-height: 100px !important; }
@@ -201,6 +205,21 @@
                 </div>
               </div>
 
+
+
+              <div class="row">
+                <div class="col-3 justify-content-center align-self-center">
+                  Venue Lookup
+                </div>
+                <div class="col-7">
+                  <input type="text" name="venue_lookup" id="id_venue_lookup" value="">
+                  <button type="button" name="lookup_button" id="lookup_button" class="btn btn-sm btn-info">Lookup</button>
+                </div>
+                <div class="col-2 justify-content-center align-self-center">
+                  <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
+                </div>
+              </div>
+
               <div class="row">
                 <div class="col-3 justify-content-center align-self-center">
                   Venue Location
@@ -302,21 +321,52 @@
         $("#advanced_link").hide();
       });
 
-      var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
-      var mapOptions = {
-        zoom: 14,
-        center: myLatlng,
-        scrollwheel: false,
-      }
+      // $("#lookup_button").click(function(){
+      //   var loc = $("#id_venue_lookup").val();
+      //
+      //   $.post('/form.php', serializedData, function(response) {
+      //       // Log the response to the console
+      //       console.log("Response: "+response);
+      //   });
 
-      var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
 
-      var marker = new google.maps.Marker({
-        position: myLatlng,
-        title: "Regular Map!"
+        $.ajax({
+            type: "POST",
+            url: "{% url "utils:geo_location" %}",
+            // data: JSON.stringify({ location: loc }),
+            data:  loc,
+            success: function(data){alert(data);},
+            headers: {
+              "Content-Type": "application/json",
+               "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+            },
+
+            // contentType: "application/json; charset=utf-8",
+            // dataType: "json",
+            failure: function(errMsg) {
+                alert(errMsg);
+            }
+        });
+
+
       });
 
-      marker.setMap(map);
+
+      // var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
+      // var mapOptions = {
+      //   zoom: 14,
+      //   center: myLatlng,
+      //   scrollwheel: false,
+      // }
+      //
+      // var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+      //
+      // var marker = new google.maps.Marker({
+      //   position: myLatlng,
+      //   title: "Regular Map!"
+      // });
+      //
+      // marker.setMap(map);
 
     });
   </script>

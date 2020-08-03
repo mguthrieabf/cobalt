@@ -285,15 +285,15 @@ RBAC_EVERYONE = 1
 GLOBAL_ORG_ID = 1
 
 # logging
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "/tmp/cobalt.log",
-        },
-    },
-    "loggers": {"django": {"handlers": ["file"], "level": "DEBUG", "propagate": True}},
-}
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": "/tmp/cobalt.log",
+#         },
+#     },
+#     "loggers": {"django": {"handlers": ["file"], "level": "DEBUG", "propagate": True}},
+# }
