@@ -315,7 +315,6 @@
       return false;
     }
 
-
     $(document).ready(function() {
 
 // show advanced options when requested
@@ -327,7 +326,7 @@
 // lookup geo location info
       $("#lookup_button").click(function(event){
 
-// Get data as JSON
+// Get location
         var loc = $("#id_venue_lookup").val();
 
 // Stop anything firing by default
@@ -339,66 +338,15 @@
         $inputs.prop("disabled", true);
 
         $.get("/utils/geo-location/" + loc)
-
         .done(response => {
-          console.log(result);
-          console.log(result.json());
+          console.log(response);
+          console.log(response.data);
+          console.log(response.data.lat);
+          console.log(response.json());
         }).always(function () {
           $inputs.prop("disabled", false);
       });
     });
   });
-
-
-
-
-
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //      "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
-        //   },
-        //   body: JSON.stringify(orderData)
-        // })
-        //   .then(function(result) {
-        //     console.log(result.json());
-        //   });
-        //
-// Make Ajax call
-        // var request = $.post({
-
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //        "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
-        //     },
-        //     data: {location: '20 Lawley'}
-        //   });
-        //
-        //     // Callback handler that will be called on success
-        //   request.done(function (response, textStatus, jqXHR){
-        //       // Log a message to the console
-        //       console.log("Hooray, it worked!");
-        //   });
-        //
-        //     // Callback handler that will be called on failure
-        //     request.fail(function (jqXHR, textStatus, errorThrown){
-        //         // Log the error to the console
-        //         console.error(
-        //             "The following error occurred: "+
-        //             textStatus, errorThrown
-        //         );
-        //     });
-        //
-        //     // Callback handler that will be called regardless
-        //     // if the request failed or succeeded
-        //     request.always(function () {
-        //         // Reenable the inputs
-        //         $inputs.prop("disabled", false);
-        //     });
-        // });
-
-
-
-
   </script>
 {% endblock %}
