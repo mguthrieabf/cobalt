@@ -74,3 +74,17 @@ Pagination in views is a common thing so we have a central utility for it::
     items_per_page = 20
     things = cobalt_paginator(request, my_list, items_per_page)
     return render(request, "mypage.html" {"things": things})
+
+Unsaved Changes
+---------------
+
+Lots of forms need to handle users navigating away from the page without saving
+changes. We have a JavaScript function to handle this::
+
+    <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
+
+You also need to identify which buttons are *save* buttons and should be
+ignored if pressed (i.e. don't warn the user about navigating away with unsaved
+changes). Do this using the class cobalt-save::
+
+    <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>

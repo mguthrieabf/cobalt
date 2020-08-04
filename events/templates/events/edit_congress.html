@@ -308,6 +308,8 @@
 
 
   <script>
+
+// Show help text
     function help(title, html){
       swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
       return false;
@@ -316,58 +318,87 @@
 
     $(document).ready(function() {
 
+// show advanced options when requested
       $("#advanced_link").click(function(){
         $("#advanced").show();
         $("#advanced_link").hide();
       });
 
-      // $("#lookup_button").click(function(){
-      //   var loc = $("#id_venue_lookup").val();
-      //
-      //   $.post('/form.php', serializedData, function(response) {
-      //       // Log the response to the console
-      //       console.log("Response: "+response);
-      //   });
+// lookup geo location info
+      $("#lookup_button").click(function(event){
 
+// Get data as JSON
+        var loc = $("#id_venue_lookup").val();
 
-        $.ajax({
-            type: "POST",
-            url: "{% url "utils:geo_location" %}",
-            // data: JSON.stringify({ location: loc }),
-            data:  loc,
-            success: function(data){alert(data);},
-            headers: {
-              "Content-Type": "application/json",
-               "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
-            },
+// Stop anything firing by default
+        event.preventDefault();
 
-            // contentType: "application/json; charset=utf-8",
-            // dataType: "json",
-            failure: function(errMsg) {
-                alert(errMsg);
-            }
-        });
+// Stop inputs
+        var $form = $(this);
+        var $inputs = $form.find("input, select, button, textarea");
+        $inputs.prop("disabled", true);
 
+        $.get("/utils/geo-location/" + loc)
 
+        .done(response => {
+          console.log(result);
+          console.log(result.json());
+        }).always(function () {
+          $inputs.prop("disabled", false);
       });
-
-
-      // var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
-      // var mapOptions = {
-      //   zoom: 14,
-      //   center: myLatlng,
-      //   scrollwheel: false,
-      // }
-      //
-      // var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
-      //
-      // var marker = new google.maps.Marker({
-      //   position: myLatlng,
-      //   title: "Regular Map!"
-      // });
-      //
-      // marker.setMap(map);
-
     });
+  });
+
+
+
+
+
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //      "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+        //   },
+        //   body: JSON.stringify(orderData)
+        // })
+        //   .then(function(result) {
+        //     console.log(result.json());
+        //   });
+        //
+// Make Ajax call
+        // var request = $.post({
+
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //        "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+        //     },
+        //     data: {location: '20 Lawley'}
+        //   });
+        //
+        //     // Callback handler that will be called on success
+        //   request.done(function (response, textStatus, jqXHR){
+        //       // Log a message to the console
+        //       console.log("Hooray, it worked!");
+        //   });
+        //
+        //     // Callback handler that will be called on failure
+        //     request.fail(function (jqXHR, textStatus, errorThrown){
+        //         // Log the error to the console
+        //         console.error(
+        //             "The following error occurred: "+
+        //             textStatus, errorThrown
+        //         );
+        //     });
+        //
+        //     // Callback handler that will be called regardless
+        //     // if the request failed or succeeded
+        //     request.always(function () {
+        //         // Reenable the inputs
+        //         $inputs.prop("disabled", false);
+        //     });
+        // });
+
+
+
+
   </script>
 {% endblock %}
