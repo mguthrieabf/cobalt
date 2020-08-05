@@ -11,9 +11,6 @@ class CongressForm(forms.ModelForm):
         valid_orgs = kwargs.pop("valid_orgs", None)
         super(CongressForm, self).__init__(*args, **kwargs)
         # Modify valid orgs if they were passed
-        print("###")
-        print(valid_orgs)
-        print("###")
         self.fields["org"].queryset = Organisation.objects.filter(pk__in=valid_orgs)
 
         # Hide the crispy labels

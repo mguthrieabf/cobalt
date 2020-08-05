@@ -87,6 +87,7 @@ def edit_congress(request, congress_id):
     )
 
     congress = get_object_or_404(Congress, pk=congress_id)
+    print(congress.venue_location)
 
     if request.method == "POST":
 
@@ -98,9 +99,13 @@ def edit_congress(request, congress_id):
             return redirect("events:home")
 
         else:  # Other options are Save and Publish which are similar
+            print("save")
 
             form = CongressForm(request.POST, instance=congress, valid_orgs=valid_orgs)
             if form.is_valid():
+
+                print(form.cleaned_data["venue_location"])
+
                 role = "events.org.%s.manage" % form.cleaned_data["org"].id
                 if not rbac_user_has_role(request.user, role):
                     return rbac_forbidden(request, role)
@@ -120,6 +125,12 @@ def edit_congress(request, congress_id):
                 congress.save()
                 messages.success(
                     request, "Congress saved", extra_tags="cobalt-message-success"
+                )
+            else:
+                messages.warning(
+                    request,
+                    "There are errors on this form",
+                    extra_tags="cobalt-message-warning",
                 )
 
     else:

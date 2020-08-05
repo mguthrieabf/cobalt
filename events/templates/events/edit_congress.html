@@ -225,11 +225,15 @@
                   Venue Location
                 </div>
                 <div class="col-7">
-                  {{ form.venue_name|as_crispy_field }}
+                  {{ form.venue_location|as_crispy_field }}
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
                 </div>
+              </div>
+
+              <div class="card-body table-responsive">
+                <div id="regularMap" class="map"></div>
               </div>
 
               <hr>
@@ -275,17 +279,17 @@
         </div>
 
         {% if congress.status == "Draft" %}
-          <button type="submit" name="Save" class="btn btn-success">Save</button>
-          <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
-          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
-          <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
+          <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
+          <button type="submit" name="Preview" class="cobalt-save btn btn-warning">Preview</button>
+          <button type="submit" name="Publish" class="cobalt-save btn btn-primary">Publish</button>
+          <button type="submit" name="Delete" class="cobalt-save btn btn-danger">Delete</button>
         {% elif congress.status == "Published" %}
-          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
-          <button type="submit" name="Delete" class="btn btn-danger">Delete</button>
+          <button type="submit" name="Publish" class="cobalt-save btn btn-primary">Publish</button>
+          <button type="submit" name="Delete" class="cobalt-save btn btn-danger">Delete</button>
         {% else %}
-          <button type="submit" name="Save" class="btn btn-success">Save</button>
-          <button type="submit" name="Preview" class="btn btn-warning">Preview</button>
-          <button type="submit" name="Publish" class="btn btn-primary">Publish</button>
+          <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
+          <button type="submit" name="Preview" class="cobalt-save btn btn-warning">Preview</button>
+          <button type="submit" name="Publish" class="cobalt-save btn btn-primary">Publish</button>
         {% endif %}
         </form>
     </div>
@@ -315,6 +319,25 @@
       return false;
     }
 
+// Google map
+    function googlemap(lat,lon){
+      var myLatlng = new google.maps.LatLng(lat,lon);
+      var mapOptions = {
+        zoom: 15,
+        center: myLatlng,
+        scrollwheel: false,
+      }
+
+      var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+
+      var marker = new google.maps.Marker({
+        position: myLatlng,
+        title: "Venue Location"
+      });
+
+      marker.setMap(map);
+    }
+
     $(document).ready(function() {
 
 // show advanced options when requested
@@ -326,27 +349,89 @@
 // lookup geo location info
       $("#lookup_button").click(function(event){
 
+        Swal.fire({
+          title: 'Enter location address',
+          input: 'text',
+          inputAttributes: {
+            autocapitalize: 'off'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Look up',
+          showLoaderOnConfirm: true,
+          preConfirm: (login) => {
+            return fetch(`/utils/geo-location/${login}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(response.statusText)
+                }
+                return response.json()
+              })
+              .catch(error => {
+                Swal.showValidationMessage(
+                  `Request failed: ${error}`
+                )
+              })
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.value) {
+            console.log(result.value);
+             $("#id_venue_location").val(result.value.data.lat + "," + result.value.data.lon);
+             googlemap(result.value.data.lat, result.value.data.lon);
+
+          }
+        })
+
+      });
+
+    });
+
+
 // Get location
-        var loc = $("#id_venue_lookup").val();
+//        var loc = $("#id_venue_lookup").val();
 
 // Stop anything firing by default
-        event.preventDefault();
+//        event.preventDefault();
 
 // Stop inputs
-        var $form = $(this);
-        var $inputs = $form.find("input, select, button, textarea");
-        $inputs.prop("disabled", true);
+//        var $form = $(this);
+//        var $inputs = $form.find("input, select, button, textarea");
+//        $inputs.prop("disabled", true);
 
-        $.get("/utils/geo-location/" + loc)
-        .done(response => {
-          console.log(response);
-          console.log(response.data);
-          console.log(response.data.lat);
-          console.log(response.json());
-        }).always(function () {
-          $inputs.prop("disabled", false);
-      });
-    });
-  });
+// cursor
+//        document.body.style.cursor = 'wait';
+
+// Ajax get
+//         $.get("/utils/geo-location/" + loc)
+//         .done(response => {
+//           $("#id_venue_location").val(response.data.lat + "," + response.data.lon);
+//           googlemap(response.data.lat, response.data.lon);
+//         }).always(function () {
+// // enable inputs again
+//           $inputs.prop("disabled", false);
+// // cursor
+//           document.body.style.cursor = 'default';
+
+
+  $("#id_venue_location").change(function(){
+     var latlon = $("#id_venue_location").val();
+     lat = latlon.split(",")[0];
+     lon = latlon.split(",")[1];
+
+     googlemap(lat, lon);
+  })
+
+
+{% if form.venue_location %}
+  latlon = "{{ form.venue_location.value }}"
+  lat = latlon.split(",")[0];
+  lon = latlon.split(",")[1];
+
+  googlemap(lat, lon);
+{% endif %}
+
+
+
+
   </script>
 {% endblock %}
