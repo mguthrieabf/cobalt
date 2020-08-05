@@ -207,22 +207,12 @@
 
 
 
-              <div class="row">
-                <div class="col-3 justify-content-center align-self-center">
-                  Venue Lookup
-                </div>
-                <div class="col-7">
-                  <input type="text" name="venue_lookup" id="id_venue_lookup" value="">
-                  <button type="button" name="lookup_button" id="lookup_button" class="btn btn-sm btn-info">Lookup</button>
-                </div>
-                <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
-                </div>
-              </div>
+    
 
               <div class="row">
                 <div class="col-3 justify-content-center align-self-center">
                   Venue Location
+                                    <button type="button" name="lookup_button" id="lookup_button" class="btn btn-sm btn-info">Lookup</button>
                 </div>
                 <div class="col-7">
                   {{ form.venue_location|as_crispy_field }}
