@@ -30,29 +30,29 @@ class CongressForm(forms.ModelForm):
 
     venue_transport = forms.CharField(
         widget=SummernoteInplaceWidget(
-            # attrs={
-            #     "summernote": {
-            #         "placeholder": "<br><br>Write your article. <br><br>You can enter card symbols and hand diagrams from the toolbar."
-            #     }
-            # }
+            attrs={
+                "summernote": {
+                    "placeholder": "<br><br>Enter information about how to get to the venue, such as public transport or parking."
+                }
+            }
         )
     )
     venue_catering = forms.CharField(
         widget=SummernoteInplaceWidget(
-            # attrs={
-            #     "summernote": {
-            #         "placeholder": "<br><br>Write your article. <br><br>You can enter card symbols and hand diagrams from the toolbar."
-            #     }
-            # }
+            attrs={
+                "summernote": {
+                    "placeholder": "<br><br>Enter any information about catering that could be useful for attendees."
+                }
+            }
         )
     )
     venue_additional_info = forms.CharField(
         widget=SummernoteInplaceWidget(
-            # attrs={
-            #     "summernote": {
-            #         "placeholder": "<br><br>Write your article. <br><br>You can enter card symbols and hand diagrams from the toolbar."
-            #     }
-            # }
+            attrs={
+                "summernote": {
+                    "placeholder": "<br><br>Add any additional notes here."
+                }
+            }
         )
     )
 

@@ -62,17 +62,6 @@
             <div class="container">
 
 
-              <div class="row">
-                <div class="col-3 justify-content-center align-self-center">
-                  Congress Master
-                </div>
-                <div class="col-7">
-                  {{ form.congress_master|as_crispy_field }}
-                </div>
-                <div class="bg-success col-2 justify-content-center align-self-right">
-                  <a href="#" onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
-                </div>
-              </div>
 
 
               <div class="row">
@@ -207,7 +196,7 @@
 
 
 
-    
+
 
               <div class="row">
                 <div class="col-3 justify-content-center align-self-center">
@@ -218,7 +207,7 @@
                   {{ form.venue_location|as_crispy_field }}
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue.");'>help</a>
+                  <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue. <br><br>You can use the lookup button to search for this. If the lookup button does not work for you then you can open another window and search in there. Find your location in Google Maps and right click on it. Choose <b>Whats Here</b> and it will show you the coordinates.");'>help</a>
                 </div>
               </div>
 
