@@ -45,15 +45,17 @@ class Congress(models.Model):
     org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     venue_name = models.CharField("Venue Name", max_length=100)
     venue_location = models.CharField("Venue Location", max_length=100)
-    venue_transport = models.CharField(
-        "Venue Transport", max_length=400, null=True, blank=True
+    venue_transport = models.TextField("Venue Transport", null=True, blank=True)
+    venue_catering = models.TextField("Venue Catering", null=True, blank=True)
+    venue_additional_info = models.TextField(
+        "Venue Additional Information", null=True, blank=True
     )
-    venue_catering = models.CharField(
-        "Venue Catering", max_length=400, null=True, blank=True
+    additional_info = models.TextField(
+        "Congress Additional Information", null=True, blank=True
     )
-    venue_additional_info = models.CharField(
-        "Venue Additional Information", max_length=400, null=True, blank=True
-    )
+    raw_html = models.TextField("Raw HTML", null=True, blank=True)
+    people = models.TextField("People", null=True, blank=True)
+    general_info = models.TextField("General Information")
     author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="author")
     created_date = models.DateTimeField(default=timezone.now)
     last_updated_by = models.ForeignKey(

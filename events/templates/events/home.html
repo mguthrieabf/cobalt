@@ -7,6 +7,8 @@
     <h2>Congresses</h2>
   </div>
   <div class="card-body">
+    <a href="{% url "events:create_congress" %}" class="btn btn-success">Create</a>
+    <a href="{% url "events:create_congress" %}" class="btn btn-info">Copy</a>
     <ul>
       {% for congress in congresses %}
         <li>

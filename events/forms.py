@@ -10,6 +10,7 @@ class CongressForm(forms.ModelForm):
         # Get valid orgs as parameter
         valid_orgs = kwargs.pop("valid_orgs", None)
         super(CongressForm, self).__init__(*args, **kwargs)
+
         # Modify valid orgs if they were passed
         self.fields["org"].queryset = Organisation.objects.filter(pk__in=valid_orgs)
 
@@ -18,21 +19,46 @@ class CongressForm(forms.ModelForm):
         self.fields["year"].label = False
         self.fields["date_string"].label = False
         self.fields["org"].label = False
+        self.fields["people"].label = False
+        self.fields["general_info"].label = False
         self.fields["venue_name"].label = False
         self.fields["venue_location"].label = False
         self.fields["venue_transport"].label = False
         self.fields["venue_catering"].label = False
         self.fields["venue_additional_info"].label = False
+        self.fields["additional_info"].label = False
+
+        # mark fields as optional
+        self.fields["venue_transport"].required = False
+        self.fields["venue_catering"].required = False
+        self.fields["venue_additional_info"].required = False
+        self.fields["additional_info"].required = False
+        self.fields["raw_html"].required = False
 
     # name = forms.CharField(
     #     widget=forms.TextInput(attrs={"class": "cobalt-min-width-100"})
     # )
 
+    general_info = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>Enter basic information about the congress.",
+                }
+            }
+        )
+    )
+
+    people = forms.CharField(
+        widget=SummernoteInplaceWidget(attrs={"summernote": {"height": "250"}})
+    )
     venue_transport = forms.CharField(
         widget=SummernoteInplaceWidget(
             attrs={
                 "summernote": {
-                    "placeholder": "<br><br>Enter information about how to get to the venue, such as public transport or parking."
+                    "height": "250",
+                    "placeholder": "<br><br>Enter information about how to get to the venue, such as public transport or parking.",
                 }
             }
         )
@@ -41,7 +67,8 @@ class CongressForm(forms.ModelForm):
         widget=SummernoteInplaceWidget(
             attrs={
                 "summernote": {
-                    "placeholder": "<br><br>Enter any information about catering that could be useful for attendees."
+                    "height": "250",
+                    "placeholder": "<br><br>Enter any information about catering that could be useful for attendees.",
                 }
             }
         )
@@ -50,7 +77,18 @@ class CongressForm(forms.ModelForm):
         widget=SummernoteInplaceWidget(
             attrs={
                 "summernote": {
-                    "placeholder": "<br><br>Add any additional notes here."
+                    "height": "250",
+                    "placeholder": "<br><br>Add any additional notes here.",
+                }
+            }
+        )
+    )
+    additional_info = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>Add any additional notes here. This appears at the bottom of the page and is not inside a box.",
                 }
             }
         )
@@ -69,4 +107,8 @@ class CongressForm(forms.ModelForm):
             "venue_transport",
             "venue_catering",
             "venue_additional_info",
+            "additional_info",
+            "people",
+            "raw_html",
+            "general_info",
         )

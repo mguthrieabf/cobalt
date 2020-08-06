@@ -1,7 +1,11 @@
-{% extends 'base.html' %}
+{% extends preview|yesno:"empty.html,base.html" %}
 {% load static %}
 
 {% block content %}
+{% if congress.raw_html %}
+{{ congress.raw_html|safe }}
+{% else %}
+
 
 <div class="col-lg-12 col-md-12">
 <div class="card">
@@ -17,7 +21,7 @@
       <h4 class="card-title">People</h4>
     </div>
     <div class="card-body table-responsive">
-      <table>
+      <!-- <table>
         <tr>
           <td>Organiser:
           <td>Justine Beaumont
@@ -34,7 +38,8 @@
           <td>Chief Tournament Director:
           <td>John McIlrath
         </tr>
-      </table>
+      </table> -->
+      {{ congress.people|safe }}
     </div>
   </div>
 </div>
@@ -64,13 +69,7 @@
       <h4 class="card-title">General Information</h4>
     </div>
     <div class="card-body table-responsive">
-      <ol>
-        <li>Free parking at the Gungahlin Club, Gungahlin
-        <li>Gold masterpoints will be awarded for every event
-        <li>There will be hospitality and presentation of medallions and cash prizes immediately after the conclusion of the Swiss pairs – at 4.40pm on Monday afternoon, 7th October
-        <li>Cash prizes, trophies and medallions will be awarded for every event
-        <li>The Tournament Organiser may grant permission for still or moving photographs to be taken during the course of the Canberra in Bloom Bridge Festival. Players may only refuse to be photographed for religious or cultural reasons deemed valid by the Tournament Organiser or Director.
-      </ol>
+     {{ congress.general_info|safe }}
     </div>
 
   </div>
@@ -88,6 +87,47 @@
 
   </div>
 </div>
+
+{% if congress.venue_transport %}
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">Transport</h4>
+    </div>
+    <div class="card-body table-responsive">
+      {{ congress.venue_transport|safe }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if congress.venue_catering %}
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">Catering</h4>
+    </div>
+    <div class="card-body table-responsive">
+      {{ congress.venue_catering|safe }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if congress.venue_additional_info %}
+<div class="col-lg-8 col-md-8">
+  <div class="card">
+    <div class="card-header card-header-success">
+      <h4 class="card-title">Additonal Information</h4>
+    </div>
+    <div class="card-body table-responsive">
+      {{ congress.venue_additional_info|safe }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
 
 <div class="col-lg-8 col-md-8">
   <div class="card">
@@ -196,10 +236,7 @@
                 </tbody>
             </table>
           </div>
-           <p>
-              Novice eligibility: &lt;100 masterpoints per player at 30 June 2019<br />
-              Restricted eligibility: &lt;300 masterpoints per player at 30 June 2019
-          </p>
+  {{ congress.additional_info|safe }}
 
 
 
@@ -209,6 +246,8 @@
   </div>
 </div>
 
+<!-- end raw HTML if/else -->
+{% endif %}
 {% endblock %}
 
 {% block footer %}
