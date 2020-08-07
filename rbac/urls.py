@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.view_screen, name="access_screen"),
     path("mainadmin", views.main_admin_screen, name="main_admin_screen"),
     path("tree", views.tree_screen, name="tree_screen"),
+    path("role-view", views.role_view_screen, name="role_view_screen"),
     path("group/view/<int:group_id>/", views.group_view, name="group_view"),
     path("group/edit/<int:group_id>/", views.group_edit, name="group_edit"),
     path("group/delete/<int:group_id>/", views.group_delete, name="group_delete"),

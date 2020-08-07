@@ -271,11 +271,45 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="rbac.ajax.rbac_add_role_to_admin_group_ajax">
+<code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_add_role_to_admin_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_add_role_to_admin_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_add_role_to_admin_group_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to add a role to an admin group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success, failure or error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rbac.ajax.rbac_add_role_to_group_ajax">
 <code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_add_role_to_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_add_role_to_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_add_role_to_group_ajax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ajax call to add a role to a group</p>
 <p>The user needs to be both a group admin (have access to this part of
 the tree), and also be an admin for the role thay are adding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success, failure or error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.ajax.rbac_add_user_to_admin_group_ajax">
+<code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_add_user_to_admin_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_add_user_to_admin_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_add_user_to_admin_group_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to add a user to an admin group</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
@@ -307,9 +341,43 @@ the tree), and also be an admin for the role thay are adding.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="rbac.ajax.rbac_delete_role_from_admin_group_ajax">
+<code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_delete_role_from_admin_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_delete_role_from_admin_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_delete_role_from_admin_group_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to delete a role from an admin group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success, failure or error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rbac.ajax.rbac_delete_role_from_group_ajax">
 <code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_delete_role_from_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_delete_role_from_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_delete_role_from_group_ajax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ajax call to delete a role from a group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>success, failure or error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.ajax.rbac_delete_user_from_admin_group_ajax">
+<code class="sig-prename descclassname">rbac.ajax.</code><code class="sig-name descname">rbac_delete_user_from_admin_group_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/ajax.html#rbac_delete_user_from_admin_group_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.ajax.rbac_delete_user_from_admin_group_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to delete an admin user from a group</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard request</p>
@@ -533,7 +601,7 @@ the tree), and also be an admin for the role thay are adding.</p>
 <dl class="py function">
 <dt id="rbac.core.rbac_get_admins_for_group">
 <code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_get_admins_for_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_get_admins_for_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_get_admins_for_group" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a queryset of admins for a given group</p>
+<dd><p>returns a queryset of admins who can change users for a given group</p>
 </dd></dl>
 
 <dl class="py function">
@@ -547,6 +615,31 @@ the tree), and also be an admin for the role thay are adding.</p>
 <dt id="rbac.core.rbac_get_users_in_group">
 <code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_get_users_in_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groupname</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_get_users_in_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_get_users_in_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a list of users in a group or None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.core.rbac_get_users_with_role">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_get_users_with_role</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">role</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_get_users_with_role"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_get_users_with_role" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of all users who have a role, either speicifically or
+from having the equivalent generic role. E.g. forums.forum.5.view would
+also return users with forums.forum.view or forums.forum.all</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.core.rbac_remove_admin_user_from_group">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_remove_admin_user_from_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_remove_admin_user_from_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_remove_admin_user_from_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a user from an RBAC admin group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard user object</p></li>
+<li><p><strong>group</strong> (<a class="reference internal" href="#rbac.models.RBACAdminGroup" title="rbac.models.RBACAdminGroup"><em>RBACAdminGroup</em></a>) – group to remove user from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -657,6 +750,27 @@ something. This function only checks at the most specific level.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="rbac.core.rbac_user_is_admin_for_admin_group">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_user_is_admin_for_admin_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_user_is_admin_for_admin_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_user_is_admin_for_admin_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if a user is an admin for an admin group. Any member of an
+admin group is automatically an administrator for that group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard user object</p></li>
+<li><p><strong>group</strong> (<a class="reference internal" href="#rbac.models.RBACAdminGroup" title="rbac.models.RBACAdminGroup"><em>RBACAdminGroup</em></a>) – admin group to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True of False for user role</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rbac.core.rbac_user_is_group_admin">
 <code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_user_is_group_admin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_user_is_group_admin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_user_is_group_admin" title="Permalink to this definition">¶</a></dt>
 <dd><p>check if a user has admin rights to a group based upon their rights
@@ -744,6 +858,13 @@ model_ids and actions that a user can perform. For example, if you provide:</p>
 <dt id="rbac.forms.AddGroup.base_fields">
 <code class="sig-name descname">base_fields</code><em class="property"> = {'add_self': &lt;django.forms.fields.BooleanField object&gt;, 'description': &lt;django.forms.fields.CharField object&gt;, 'name_item': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#rbac.forms.AddGroup.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="rbac.forms.AddGroup.clean">
+<code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/forms.html#AddGroup.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.forms.AddGroup.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>We allow uses to put . into the name_item so here we split that
+out and put the part before the . into name_qualifier</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="rbac.forms.AddGroup.declared_fields">
@@ -1077,6 +1198,12 @@ object the first time, the query is executed.</p>
 <dt id="rbac.models.RBACAppModelAction.app">
 <code class="sig-name descname">app</code><a class="headerlink" href="#rbac.models.RBACAppModelAction.app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Application level hierarchy</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="rbac.models.RBACAppModelAction.description">
+<code class="sig-name descname">description</code><a class="headerlink" href="#rbac.models.RBACAppModelAction.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>description of what this does</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1438,6 +1565,12 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="rbac.views.admin_group_edit">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">admin_group_edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">group_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#admin_group_edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.admin_group_edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>view to edit an admin group</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rbac.views.admin_group_view">
 <code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">admin_group_view</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">group_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#admin_group_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.admin_group_view" title="Permalink to this definition">¶</a></dt>
 <dd><p>view to show details of an admin group</p>
@@ -1447,6 +1580,29 @@ object the first time, the query is executed.</p>
 <dt id="rbac.views.admin_tree_screen">
 <code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">admin_tree_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#admin_tree_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.admin_tree_screen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Show full RBAC Admin Tree</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.views.generic_tree_screen">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">generic_tree_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">groups</span></em>, <em class="sig-param"><span class="n">detail_link</span></em>, <em class="sig-param"><span class="n">title</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#generic_tree_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.generic_tree_screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show full RBAC Tree for RBAC or Admin</p>
+<dl class="simple">
+<dt>build a list of the tree. We want to turn:</dt><dd><p>abf.people.fred          (id=34)
+abf.people.john          (id=45)
+abf.animals.dogs.rover   (id=2)
+abf.animals.cats.felix   (id=21)</p>
+</dd>
+<dt>into:</dt><dd><p>items[“abf”]=[“people”, “animals”]
+items[“abf.people”]=[“fred”, “john”]
+items[“abf.people.fred”]=34
+items[“abf.people.john”]=45
+items[“abf.animals”]=[“dogs”, “cats”]
+items[“abf.animals.dogs”]=[“rover”]
+items[“abf.animals.cats”]=[“felix”]
+items[“abf.animals.dogs.rover”]=2
+items[“abf.animals.cats.felix”]=21</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1490,6 +1646,12 @@ object the first time, the query is executed.</p>
 <code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">rbac_forbidden</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">role</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#rbac_forbidden"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.rbac_forbidden" title="Permalink to this definition">¶</a></dt>
 <dd><p>RBAC screen for fobidden access - gives the user more info than a
 normal error screen</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.views.role_view_screen">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">role_view_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#role_view_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.role_view_screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show Roles</p>
 </dd></dl>
 
 <dl class="py function">

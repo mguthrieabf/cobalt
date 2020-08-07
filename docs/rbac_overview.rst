@@ -97,11 +97,11 @@ user has. Roles are hierarchical, and have a role_type of either "Allow" or
 
 For example:
 
-1. "forums.forum.moderate" "Allow"
-2. "forums.post.5.edit" "Block"
-3. "organisations.organisation.7.view" "Allow"
+1. "forums.moderate.edit" "Allow"
+2. "forums.forum.5.create" "Block"
+3. "orgs.org.7.view" "Allow"
 
-Example 1 says that this user is allowed to moderate all forums (RBAC doesn't know
+Example 1 says that this group is allowed to moderate all forums (RBAC doesn't know
 what moderating is, it just handles the rules, it is up to each application
 to implement the required controls itself). We can break this down as follows:
 
@@ -112,8 +112,9 @@ to implement the required controls itself). We can break this down as follows:
 Note that an application can choose to use this structure for anything, it doesn't
 have to refer to a model, or even an application.
 
-Example 2 is more specific. It says that this user cannot edit the post with a
-primary key of 5. This relies on the fact that Django primary keys are unique and
+Example 2 is more specific. It says that this group cannot create content in
+the forum with primary key of 5.
+This relies on the fact that Django primary keys are unique and
 never reused.
 
 **Specific rules take precedent over general rules**
@@ -122,38 +123,16 @@ If there are two rules in place as follows:
 
 .. code-block:: python
 
-  payments.stripetransaction.view "Allow"
-  payments.stripetransaction.27.view "Block"
+  payments.manage.view "Allow"
+  payments.manage.27.view "Block"
 
-Then a request for *payments.stripetransaction.27.view* will return Block.
+Then a request for *payments.manage.27.view* will return Block.
 
 Supported Roles
 ---------------
 
-The following roles are currently supported:
-
-  +------------------------+-----------------------------------------+
-  | Role                   | Purpose                                 |
-  +========================+=========================================+
-  | forums.forum.x         | *Ability to do something in forum x*    |
-  +------------------------+-----------------------------------------+
-  | forums.forum           | *Ability to do something in all forums* |
-  +------------------------+-----------------------------------------+
-  | forums.forumadmin      | *Make changes at the forum level*       |
-  +------------------------+-----------------------------------------+
-  | payments.view.x        | *View payments for org x*               |
-  +------------------------+-----------------------------------------+
-  | payments.view          | *View payments for any org*             |
-  +------------------------+-----------------------------------------+
-  | payments.manage.x      | *Do things with payments for org x*     |
-  +------------------------+-----------------------------------------+
-  | payments.manage        | *Do things with payments for any org*   |
-  +------------------------+-----------------------------------------+
-  | org.org.x              | *Management of org x*                   |
-  +------------------------+-----------------------------------------+
-  | org.org                | *Management of all orgs*                |
-  +------------------------+-----------------------------------------+
-
+The currently supported roles can be seen within the system, for example:
+`ABF Test System RBAC Static <https://test.abftech.com.au/rbac/role-view>`_.
 
 Default Behaviour
 -----------------
@@ -187,7 +166,8 @@ e.g.
 
   from rbac.models import RBACAppModelAction
 
-  r = RBACAppModelAction(app="forums", model="forum", valid_action="create")
+  r = RBACAppModelAction(app="forums", model="forum", valid_action="create",
+      description="Can create a Post in the specified forum.")
   r.save()
 
 For consistency across applications, all *valid_actions* should be lowercase
@@ -197,6 +177,8 @@ and unless there is good reason, the basic CRUD types should be named:
 - edit
 - view
 - delete
+
+If a role only needs one type then use **edit**.
 
 The All Action
 --------------
@@ -267,6 +249,12 @@ So in this example, the rules to create would be:
 The Tree
 --------
 
+.. important::
+
+  To avoid confusion between the RBAC tree and the Admin tree discussed later
+  in this document, the RBAC tree always starts with *rbac.* and the Admin
+  tree always starts with *admin.*
+
 From a security execution point of view the group name is largely irrelevant.
 Simplistically we get a list of groups for a user and a list of roles from those
 groups to decide whether or not to allow an action. However, with potentially
@@ -280,15 +268,17 @@ lot of admin is done at the club level, some at the state level and some at the
 highest level (in our case the ABF), so it makes sense to use this as part of the
 tree. e.g.:
 
-  org.abf.nsw.north-shore-bridge-club (NSWBA's part of the tree)
-  org.abf.nsw.trumps (Trumps part of the tree)
-  org.abf.sa.saba (SABA's part of the tree)
-  org.abf.nsw.nswba (NSWBA's part of the tree)
-  org.abf.abf (The ABF's part of the tree)
+  * rbac.abf.nsw.north-shore-bridge-club (NSWBA's part of the tree)
+  * rbac.abf.nsw.trumps (Trumps part of the tree)
+  * rbac.abf.sa.saba (SABA's part of the tree)
+  * rbac.abf.nsw.nswba (NSWBA's part of the tree)
+  * rbac.abf.abf (The ABF's part of the tree)
 
 Note that there is nothing in the code to enforce this and the tree can
 evolve as we see fit.
 
+You can view the tree within the system. e.g.
+`ABF Test System RBAC Tree <https://test.abftech.com.au/rbac/tree>`_.
 
 Admin
 =====
@@ -306,7 +296,7 @@ Lets start with a simple example.
 
 .. code-block:: python
 
-  RBACGroup: org.abf.qld.surfers.directors
+  RBACGroup: rbac.abf.qld.surfers.directors
   RBACUserGroup: Bob
   RBACUserGroup: Jane
   RBACUserGroup: Alice
@@ -431,11 +421,13 @@ Operating – Checking User Access
 
 :func:`rbac.core.rbac_user_has_role`
 
-:func:`rbac.core.rbac_user_has_role_exact` - internal
+:func:`rbac.core.rbac_user_has_role_exact`
 
 :func:`rbac.core.rbac_user_blocked_for_model`
 
 :func:`rbac.core.rbac_user_allowed_for_model`
+
+:func:`rbac.core.rbac_get_users_with_role`
 
 Operating – Checking Admin Access
 ---------------------------------

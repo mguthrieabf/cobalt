@@ -18,7 +18,13 @@ class Command(BaseCommand):
 
         # basic events behaviours
         create_RBAC_default(self, "events", "org", "Block")
-        create_RBAC_action(self, "events", "org", "manage")
+        create_RBAC_action(
+            self,
+            "events",
+            "org",
+            "edit",
+            "Allows a user to run a congress associated with the organisation specified.",
+        )
 
         # add myself as an admin and create tree and group
         # This lets us create admins who can create and delete forums

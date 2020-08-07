@@ -75,8 +75,9 @@
                 </div>
               </div>
               <br><br>
-              Conveners go here
-
+            {% for convener in conveners %}
+              {{ convener }}
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -183,7 +184,7 @@
     <div class="container">
       <div class="row">
         <div class="col-10 justify-content-center align-self-center">
-          People
+          <h3>People</h3>
         </div>
         <div class="col-2 justify-content-center align-self-center">
           <a href="#" onclick='help("People", "List people and contact details.");'>help</a>
@@ -196,7 +197,7 @@
     <div class="container">
       <div class="row">
         <div class="col-10 justify-content-center align-self-center">
-          General Information
+          <h3>General Information</h3>
         </div>
         <div class="col-2 justify-content-center align-self-center">
           <a href="#" onclick='help("General Info", "This goes near the top and should describe high level things about the congress.");'>help</a>
@@ -209,7 +210,7 @@
     <div class="container">
       <div class="row">
         <div class="col-10 justify-content-center align-self-center">
-          Additional Information (footer)
+          <h3>Additional Information (footer)</h3>
         </div>
         <div class="col-2 justify-content-center align-self-center">
           <a href="#" onclick='help("Additional Info", "This is extra info for the bottom of the page if required.");'>help</a>
@@ -269,7 +270,7 @@
               <hr>
               <div class="row">
                 <div class="col-10 justify-content-center align-self-center">
-                  Venue Transport Info
+                  <h3>Venue Transport Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Transport", "Details of how to get to the venue such as public transport and parking options.");'>help</a>
@@ -282,7 +283,7 @@
               <hr>
               <div class="row">
                 <div class="col-10 justify-content-center align-self-center">
-                  Venue Catering Info
+                  <h3>Venue Catering Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Catering", "Details of catering options available at the venue.");'>help</a>
@@ -295,7 +296,7 @@
               <hr>
               <div class="row">
                 <div class="col-10 justify-content-center align-self-center">
-                  Venue Additional Info
+                  <h3>Venue Additional Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Additional Info", "Anything else you have not already covered.");'>help</a>

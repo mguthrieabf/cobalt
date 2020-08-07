@@ -537,6 +537,14 @@ page to view them all.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="notifications.views.notifications_in_english">
+<code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notifications_in_english</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notifications_in_english"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notifications_in_english" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of notifications in a simple English format.
+This is hand coded and needs to be updated when new notifications are
+defined. Used by Accounts:Settings but can be used more generally.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="notifications.views.notify_happening">
 <code class="sig-prename descclassname">notifications.views.</code><code class="sig-name descname">notify_happening</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">application_name</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">topic</span></em>, <em class="sig-param"><span class="n">subtopic</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_msg</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">email_subject</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notifications/views.html#notify_happening"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#notifications.views.notify_happening" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by Cobalt applications to tell notify they have done something.</p>

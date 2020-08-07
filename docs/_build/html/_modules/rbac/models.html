@@ -275,7 +275,10 @@
     <span class="sd">&quot;&quot;&quot; model level hierarchy &quot;&quot;&quot;</span>
 
     <span class="n">valid_action</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; valid actions for this combination &quot;&quot;&quot;</span></div>
+    <span class="sd">&quot;&quot;&quot; valid actions for this combination &quot;&quot;&quot;</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; description of what this does &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="RBACAdminGroup"><a class="viewcode-back" href="../../rbac.html#rbac.models.RBACAdminGroup">[docs]</a><span class="k">class</span> <span class="nc">RBACAdminGroup</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>

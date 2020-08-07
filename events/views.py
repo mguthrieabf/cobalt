@@ -3,7 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Congress
 from .forms import CongressForm
-from rbac.core import rbac_user_allowed_for_model, rbac_user_has_role
+from rbac.core import (
+    rbac_user_allowed_for_model,
+    rbac_user_has_role,
+    rbac_get_users_with_role,
+)
 from rbac.views import rbac_forbidden
 from django.contrib import messages
 
@@ -68,7 +72,7 @@ def create_congress(request):
     if request.method == "POST":
         form = CongressForm(request.POST, valid_orgs=valid_orgs)
         if form.is_valid():
-            role = "events.org.%s.manage" % form.cleaned_data["org"].id
+            role = "events.org.%s.edit" % form.cleaned_data["org"].id
             if not rbac_user_has_role(request.user, role):
                 return rbac_forbidden(request, role)
 
@@ -108,11 +112,12 @@ def edit_congress(request, congress_id):
     )
 
     congress = get_object_or_404(Congress, pk=congress_id)
-    print(congress.venue_location)
 
-    role = "events.org.%s.manage" % congress.org.id
+    role = "events.org.%s.edit" % congress.org.id
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
+
+    conveners = rbac_get_users_with_role("events.org.%s.edit" % congress.org.id)
 
     if request.method == "POST":
 
@@ -123,7 +128,7 @@ def edit_congress(request, congress_id):
 
             print(form.cleaned_data["venue_location"])
 
-            role = "events.org.%s.manage" % form.cleaned_data["org"].id
+            role = "events.org.%s.edit" % form.cleaned_data["org"].id
             if not rbac_user_has_role(request.user, role):
                 return rbac_forbidden(request, role)
 
@@ -154,7 +159,12 @@ def edit_congress(request, congress_id):
     return render(
         request,
         "events/edit_congress.html",
-        {"form": form, "title": "Edit Congress", "congress": congress},
+        {
+            "form": form,
+            "title": "Edit Congress",
+            "congress": congress,
+            "conveners": conveners,
+        },
     )
 
 
@@ -172,7 +182,7 @@ def delete_congress(request, congress_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
-    role = "events.org.%s.manage" % congress.org.id
+    role = "events.org.%s.edit" % congress.org.id
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
 

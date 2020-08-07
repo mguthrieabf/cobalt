@@ -19,11 +19,35 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Running add_rbac_static_payments")
         create_RBAC_default(self, "payments", "manage", "Block")
-        create_RBAC_action(self, "payments", "manage", "view")
-        create_RBAC_action(self, "payments", "manage", "edit")
+        create_RBAC_action(
+            self,
+            "payments",
+            "manage",
+            "view",
+            "Can view payments information for the specified organisation.",
+        )
+        create_RBAC_action(
+            self,
+            "payments",
+            "manage",
+            "edit",
+            "Can change payments information for the specified organisation.",
+        )
         create_RBAC_default(self, "payments", "global", "Block")
-        create_RBAC_action(self, "payments", "global", "view")
-        create_RBAC_action(self, "payments", "global", "edit")
+        create_RBAC_action(
+            self,
+            "payments",
+            "global",
+            "view",
+            "View access to the central payments functions.",
+        )
+        create_RBAC_action(
+            self,
+            "payments",
+            "global",
+            "edit",
+            "Ability to perform central payments functions such as adjustments and settlements.",
+        )
 
         # Create admin groups for payments global
         user = User.objects.filter(username="Mark").first()

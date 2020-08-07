@@ -184,7 +184,8 @@
 <div class="viewcode-block" id="AbstractForum.Meta"><a class="viewcode-back" href="../../forums.html#forums.forms.AbstractForum.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot; We are abstract &quot;&quot;&quot;</span>
 
-        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-created_date&quot;</span><span class="p">]</span></div></div>
 
 
 <div class="viewcode-block" id="Post"><a class="viewcode-back" href="../../forums.html#forums.forms.Post">[docs]</a><span class="k">class</span> <span class="nc">Post</span><span class="p">(</span><span class="n">AbstractForum</span><span class="p">):</span>

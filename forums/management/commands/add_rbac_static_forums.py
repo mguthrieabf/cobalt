@@ -18,15 +18,48 @@ class Command(BaseCommand):
 
         # basic forums behaviours
         create_RBAC_default(self, "forums", "forum", "Allow")
-        create_RBAC_action(self, "forums", "forum", "create")
-        create_RBAC_action(self, "forums", "forum", "delete")
-        create_RBAC_action(self, "forums", "forum", "view")
-        create_RBAC_action(self, "forums", "forum", "edit")
-        create_RBAC_action(self, "forums", "forum", "moderate")
+        create_RBAC_default(self, "forums", "moderate", "Block")
+        create_RBAC_action(
+            self,
+            "forums",
+            "forum",
+            "create",
+            "Can create a Post in the specified forum.",
+        )
+        create_RBAC_action(
+            self,
+            "forums",
+            "forum",
+            "delete",
+            "Can delete a Post in the specified forum.",
+        )
+        create_RBAC_action(
+            self,
+            "forums",
+            "forum",
+            "view",
+            "Can view a Post including Replies and Comments in the specified forum.",
+        )
+        create_RBAC_action(
+            self, "forums", "forum", "edit", "Can edit a Post in the specified forum."
+        )
+        create_RBAC_action(
+            self,
+            "forums",
+            "moderate",
+            "edit",
+            "Has moderator access to the specified forum.",
+        )
 
         # Forum admin
-        create_RBAC_default(self, "forums", "forumadmin", "Block")
-        create_RBAC_action(self, "forums", "forumadmin", "change")
+        create_RBAC_default(self, "forums", "admin", "Block")
+        create_RBAC_action(
+            self,
+            "forums",
+            "admin",
+            "edit",
+            "Has the ability to create, edit and delete forums.",
+        )
 
         # add myself as an admin and create tree and group
         # This lets us create admins who can create and delete forums
@@ -35,12 +68,12 @@ class Command(BaseCommand):
         group = create_RBAC_admin_group(
             self,
             "admin.abf.forums",
-            "forumadmin",
+            "admin",
             "Group to create users who can create, modify or delete forums",
         )
         create_RBAC_admin_tree(self, group, "admin.abf.forums")
         rbac_add_user_to_admin_group(group, user)
-        rbac_add_role_to_admin_group(group, app="forums", model="forumadmin")
+        rbac_add_role_to_admin_group(group, app="forums", model="admin")
 
         # grant writes to forums.forum
         # This creates admins who can make people moderators or block forum access

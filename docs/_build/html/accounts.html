@@ -261,7 +261,7 @@ users to login using either their email address or system_number.</p>
 <p>Meta data</p>
 <dl class="py attribute">
 <dt id="accounts.forms.BlurbUpdateForm.Meta.fields">
-<code class="sig-name descname">fields</code><em class="property"> = ['headline', 'about', 'pic']</em><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fields</code><em class="property"> = ['about', 'pic']</em><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -274,7 +274,7 @@ users to login using either their email address or system_number.</p>
 
 <dl class="py attribute">
 <dt id="accounts.forms.BlurbUpdateForm.base_fields">
-<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'headline': &lt;django.forms.fields.CharField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;}</em><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;}</em><a class="headerlink" href="#accounts.forms.BlurbUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -336,6 +336,46 @@ users to login using either their email address or system_number.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="accounts.forms.UserSettingsForm">
+<em class="property">class </em><code class="sig-prename descclassname">accounts.forms.</code><code class="sig-name descname">UserSettingsForm</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">instance=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#UserSettingsForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserSettingsForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<p>Used by Settings to update details</p>
+<dl class="py class">
+<dt id="accounts.forms.UserSettingsForm.Meta">
+<em class="property">class </em><code class="sig-name descname">Meta</code><a class="reference internal" href="_modules/accounts/forms.html#UserSettingsForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserSettingsForm.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta data</p>
+<dl class="py attribute">
+<dt id="accounts.forms.UserSettingsForm.Meta.fields">
+<code class="sig-name descname">fields</code><em class="property"> = ['username', 'receive_sms_results', 'receive_sms_reminders', 'receive_abf_newsletter', 'receive_marketing', 'receive_monthly_masterpoints_report', 'receive_payments_emails']</em><a class="headerlink" href="#accounts.forms.UserSettingsForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.forms.UserSettingsForm.Meta.model">
+<code class="sig-name descname">model</code><a class="headerlink" href="#accounts.forms.UserSettingsForm.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#accounts.models.User" title="accounts.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">accounts.models.User</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.forms.UserSettingsForm.base_fields">
+<code class="sig-name descname">base_fields</code><em class="property"> = {'receive_abf_newsletter': &lt;django.forms.fields.BooleanField object&gt;, 'receive_marketing': &lt;django.forms.fields.BooleanField object&gt;, 'receive_monthly_masterpoints_report': &lt;django.forms.fields.BooleanField object&gt;, 'receive_payments_emails': &lt;django.forms.fields.BooleanField object&gt;, 'receive_sms_reminders': &lt;django.forms.fields.BooleanField object&gt;, 'receive_sms_results': &lt;django.forms.fields.BooleanField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserSettingsForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.forms.UserSettingsForm.declared_fields">
+<code class="sig-name descname">declared_fields</code><em class="property"> = {}</em><a class="headerlink" href="#accounts.forms.UserSettingsForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="accounts.forms.UserSettingsForm.media">
+<em class="property">property </em><code class="sig-name descname">media</code><a class="headerlink" href="#accounts.forms.UserSettingsForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="accounts.forms.UserUpdateForm">
 <em class="property">class </em><code class="sig-prename descclassname">accounts.forms.</code><code class="sig-name descname">UserUpdateForm</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">files=None</em>, <em class="sig-param">auto_id='id_%s'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em class="sig-param">label_suffix=None</em>, <em class="sig-param">empty_permitted=False</em>, <em class="sig-param">instance=None</em>, <em class="sig-param">use_required_attribute=None</em>, <em class="sig-param">renderer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#UserUpdateForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.forms.UserUpdateForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.models.ModelForm</span></code></p>
@@ -347,7 +387,7 @@ users to login using either their email address or system_number.</p>
 <p>Meta data</p>
 <dl class="py attribute">
 <dt id="accounts.forms.UserUpdateForm.Meta.fields">
-<code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'dob', 'mobile', 'headline', 'about', 'pic', 'bbo_name']</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fields</code><em class="property"> = ['username', 'first_name', 'last_name', 'email', 'system_number', 'dob', 'mobile', 'about', 'pic', 'bbo_name']</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -360,7 +400,7 @@ users to login using either their email address or system_number.</p>
 
 <dl class="py attribute">
 <dt id="accounts.forms.UserUpdateForm.base_fields">
-<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'bbo_name': &lt;django.forms.fields.CharField object&gt;, 'dob': &lt;django.forms.fields.DateField object&gt;, 'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'headline': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.CharField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">base_fields</code><em class="property"> = {'about': &lt;django.forms.fields.CharField object&gt;, 'bbo_name': &lt;django.forms.fields.CharField object&gt;, 'dob': &lt;django.forms.fields.DateField object&gt;, 'email': &lt;django.forms.fields.EmailField object&gt;, 'first_name': &lt;django.forms.fields.CharField object&gt;, 'last_name': &lt;django.forms.fields.CharField object&gt;, 'mobile': &lt;django.forms.fields.CharField object&gt;, 'pic': &lt;django.forms.fields.ImageField object&gt;, 'system_number': &lt;django.forms.fields.IntegerField object&gt;, 'username': &lt;django.forms.fields.CharField object&gt;}</em><a class="headerlink" href="#accounts.forms.UserUpdateForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -414,6 +454,21 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.author">
+<code class="sig-name descname">author</code><a class="headerlink" href="#accounts.models.User.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.auto_amount">
 <code class="sig-name descname">auto_amount</code><a class="headerlink" href="#accounts.models.User.auto_amount" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
@@ -458,10 +513,40 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="accounts.models.User.congresspeople_set">
+<code class="sig-name descname">congresspeople_set</code><a class="headerlink" href="#accounts.models.User.congresspeople_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="accounts.models.User.dob">
 <code class="sig-name descname">dob</code><a class="headerlink" href="#accounts.models.User.dob" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.evententryplayer_set">
+<code class="sig-name descname">evententryplayer_set</code><a class="headerlink" href="#accounts.models.User.evententryplayer_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -517,13 +602,6 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="accounts.models.User.headline">
-<code class="sig-name descname">headline</code><a class="headerlink" href="#accounts.models.User.headline" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
 <dt id="accounts.models.User.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#accounts.models.User.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
@@ -533,6 +611,21 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="accounts.models.User.inappnotification_set">
 <code class="sig-name descname">inappnotification_set</code><a class="headerlink" href="#accounts.models.User.inappnotification_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.last_updated_by">
+<code class="sig-name descname">last_updated_by</code><a class="headerlink" href="#accounts.models.User.last_updated_by" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -660,6 +753,21 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="accounts.models.User.notificationmapping_set">
 <code class="sig-name descname">notificationmapping_set</code><a class="headerlink" href="#accounts.models.User.notificationmapping_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.organisation_set">
+<code class="sig-name descname">organisation_set</code><a class="headerlink" href="#accounts.models.User.organisation_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -802,6 +910,48 @@ many-to-one relation.</p>
 <p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
 <p>Most of the implementation is delegated to a dynamically defined manager
 class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_abf_newsletter">
+<code class="sig-name descname">receive_abf_newsletter</code><a class="headerlink" href="#accounts.models.User.receive_abf_newsletter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_marketing">
+<code class="sig-name descname">receive_marketing</code><a class="headerlink" href="#accounts.models.User.receive_marketing" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_monthly_masterpoints_report">
+<code class="sig-name descname">receive_monthly_masterpoints_report</code><a class="headerlink" href="#accounts.models.User.receive_monthly_masterpoints_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_payments_emails">
+<code class="sig-name descname">receive_payments_emails</code><a class="headerlink" href="#accounts.models.User.receive_payments_emails" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_sms_reminders">
+<code class="sig-name descname">receive_sms_reminders</code><a class="headerlink" href="#accounts.models.User.receive_sms_reminders" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="accounts.models.User.receive_sms_results">
+<code class="sig-name descname">receive_sms_results</code><a class="headerlink" href="#accounts.models.User.receive_sms_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1052,6 +1202,21 @@ parts of the system need a search function.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>HttpResponse - either a message or a list of users in HTML format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="accounts.views.user_settings">
+<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">user_settings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#user_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.user_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>User settings form.</p>
+<p>Allow user to chose preferences</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
 </dd></dl>

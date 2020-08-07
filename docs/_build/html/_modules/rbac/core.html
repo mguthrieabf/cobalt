@@ -179,11 +179,15 @@
 <span class="sd">        RBACGroup</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">obj</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="p">(</span>
-        <span class="n">name_qualifier</span><span class="o">=</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">name_item</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
-    <span class="p">)</span>
-    <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">obj</span></div>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">name_qualifier</span><span class="o">=</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">name_item</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">group</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="p">(</span>
+            <span class="n">name_qualifier</span><span class="o">=</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">name_item</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+        <span class="p">)</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">group</span></div>
 
 
 <div class="viewcode-block" id="rbac_delete_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_delete_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_delete_group</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
@@ -258,6 +262,25 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 
+<div class="viewcode-block" id="rbac_remove_admin_user_from_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_remove_admin_user_from_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_remove_admin_user_from_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Removes a user from an RBAC admin group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        member(User): standard user object</span>
+<span class="sd">        group(RBACAdminGroup): group to remove user from</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_group</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+        <span class="n">user_group</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
 <div class="viewcode-block" id="rbac_add_role_to_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_add_role_to_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_add_role_to_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">rule_type</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot; Adds a role to an RBAC group</span>
@@ -274,36 +297,26 @@
 <span class="sd">        RBACGroupRole</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">group_role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="p">()</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">rule_type</span> <span class="o">=</span> <span class="n">rule_type</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
-    <span class="n">group_role</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">group_role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
+        <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+        <span class="n">rule_type</span><span class="o">=</span><span class="n">rule_type</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">group_role</span><span class="p">:</span>
+        <span class="n">group_role</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="p">()</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">rule_type</span> <span class="o">=</span> <span class="n">rule_type</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
+        <span class="n">group_role</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">group_role</span></div>
-
-
-<span class="c1">#</span>
-<span class="c1"># def rbac_remove_role_from_group(group, role):</span>
-<span class="c1">#     &quot;&quot;&quot; Removes a role from an RBAC group</span>
-<span class="c1">#</span>
-<span class="c1">#     Args:</span>
-<span class="c1">#         group(RBACGroup): group</span>
-<span class="c1">#         role(str): role to remove from group</span>
-<span class="c1">#</span>
-<span class="c1">#     Returns:</span>
-<span class="c1">#         bool</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#</span>
-<span class="c1">#     try:</span>
-<span class="c1">#         group_role = RBACGroupRole.objects.filter(group=group, role=role)</span>
-<span class="c1">#         group_role.delete()</span>
-<span class="c1">#         return True</span>
-<span class="c1">#     except RBACGroupRole.DoesNotExist:</span>
-<span class="c1">#         return False</span>
 
 
 <div class="viewcode-block" id="rbac_user_has_role_exact"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_user_has_role_exact">[docs]</a><span class="k">def</span> <span class="nf">rbac_user_has_role_exact</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
@@ -405,11 +418,17 @@
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking defaults for this app&quot;</span><span class="p">)</span>
     <span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_instance</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span> <span class="o">=</span> <span class="n">role_to_parts</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
-    <span class="n">default</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">RBACModelDefault</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;default_behaviour&quot;</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">first</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">RBACModelDefault</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;default_behaviour&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">first</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;It looks like there is no default set up for app=</span><span class="si">%s</span><span class="s2"> model=</span><span class="si">%s</span><span class="s2">&quot;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">allow_to_boolean</span><span class="p">(</span><span class="n">default</span><span class="p">)</span></div>
 
 
@@ -572,33 +591,20 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True of False for user role</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;--&gt;user_is_group_admin: User is: </span><span class="si">%s</span><span class="s2">. Group is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-    <span class="p">)</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: Path is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
 
     <span class="n">group_list</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
 
     <span class="n">trees</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;--&gt;user_is_group_admin: Count of RBACAdminTree for this user is: </span><span class="si">%s</span><span class="s2">&quot;</span>
-        <span class="o">%</span> <span class="n">trees</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-    <span class="p">)</span>
     <span class="c1"># TODO: Tree is deeper than 2 levels - need to decide if we recurse the whole tree</span>
     <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: checking </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">tree</span> <span class="o">==</span> <span class="n">path</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: Matched </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: returning true&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="c1"># check for match on aaaaa.bbbbb.</span>
         <span class="n">partial</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">tree</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: checking patial match </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_group_admin: returning true&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="kc">False</span></div>
@@ -615,15 +621,8 @@
 <span class="sd">        bool: True of False for user role</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: User is: </span><span class="si">%s</span><span class="s2">. Role is: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">role</span><span class="p">))</span>
-
     <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: Looked up admin groups for </span><span class="si">%s</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="n">member</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  --&gt;&gt;user_is_role_admin: Found </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">groups</span><span class="p">)</span>
     <span class="n">matches</span> <span class="o">=</span> <span class="n">RBACAdminGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: Looked up roles for groups:&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  --&gt;user_is_role_admin: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
 
     <span class="c1"># look for specific rule</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
@@ -633,10 +632,7 @@
             <span class="n">m_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model_id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">m_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: role is: #</span><span class="si">%s</span><span class="s2">#&quot;</span> <span class="o">%</span> <span class="n">role_str</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: Checking #</span><span class="si">%s</span><span class="s2">#&quot;</span> <span class="o">%</span> <span class="n">m_str</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">m_str</span> <span class="o">==</span> <span class="n">role_str</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  --&gt;user_is_role_admin: Matched with </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
 
     <span class="c1"># change role org.org.15 --&gt; org.org</span>
@@ -645,20 +641,35 @@
         <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># look for general rule</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: No specific match found, next try general&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: General&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
             <span class="c1"># compare strings not objects</span>
             <span class="n">role_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">role</span>
             <span class="n">m_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: role is: #</span><span class="si">%s</span><span class="s2">#&quot;</span> <span class="o">%</span> <span class="n">role_str</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: Checking #</span><span class="si">%s</span><span class="s2">#&quot;</span> <span class="o">%</span> <span class="n">m_str</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">m_str</span> <span class="o">==</span> <span class="n">role_str</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;user_is_role_admin: Matched with </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">True</span>
     <span class="c1"># No match</span>
     <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="rbac_user_is_admin_for_admin_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_user_is_admin_for_admin_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_user_is_admin_for_admin_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; check if a user is an admin for an admin group. Any member of an</span>
+<span class="sd">    admin group is automatically an administrator for that group.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        member(User): standard user object</span>
+<span class="sd">        group(RBACAdminGroup): admin group to check</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True of False for user role</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">user_list</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">user_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="rbac_access_in_english"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_access_in_english">[docs]</a><span class="k">def</span> <span class="nf">rbac_access_in_english</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
@@ -706,19 +717,29 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">this_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">verb</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">action_word</span><span class="si">}</span><span class="s2"> in every </span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> in the application &#39;</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
 
+        <span class="c1"># some specific hard coding</span>
+        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">app</span> <span class="o">==</span> <span class="s2">&quot;payments&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;global&quot;</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">this_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">verb</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">action_word</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="si">}</span><span class="s2">.&quot;</span>
+
         <span class="n">english</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">english</span></div>
 
 
 <div class="viewcode-block" id="rbac_get_admins_for_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_get_admins_for_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_get_admins_for_group</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; returns a queryset of admins for a given group &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; returns a queryset of admins who can change users for a given group &quot;&quot;&quot;</span>
 
     <span class="n">path</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">trees</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">tree</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">trees</span></div>
+    <span class="c1"># Get the groups who have access to this part of the tree</span>
+    <span class="c1"># if path is rbac.abf.forums we also want to match on rbac.abf or rbac</span>
+    <span class="c1"># this needs a SQL query like WHERE &#39;rbac.abf.forums&#39; like tree||&#39;%&#39;</span>
+    <span class="c1"># Django can&#39;t do this so we need to use extra to add out own SQL</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">extra</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> LIKE tree||&#39;</span><span class="si">%%</span><span class="s2">&#39;&quot;</span><span class="p">],</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">path</span><span class="p">])</span>
+    <span class="n">tree_groups</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+    <span class="c1"># Get the members of the groups</span>
+    <span class="n">admins</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">tree_groups</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">admins</span></div>
 
 
 <div class="viewcode-block" id="rbac_add_user_to_admin_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_add_user_to_admin_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_add_user_to_admin_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
@@ -784,17 +805,41 @@
 
 <div class="viewcode-block" id="rbac_get_users_in_group"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_get_users_in_group">[docs]</a><span class="k">def</span> <span class="nf">rbac_get_users_in_group</span><span class="p">(</span><span class="n">groupname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; returns a list of users in a group or None &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">groupname</span><span class="p">)</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="n">groupname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="n">name_qualifier</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">name_item</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name_qualifier</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name_item</span><span class="p">)</span>
     <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
         <span class="n">name_qualifier</span><span class="o">=</span><span class="n">name_qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">name_item</span>
     <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rbac_get_users_with_role"><a class="viewcode-back" href="../../rbac.html#rbac.core.rbac_get_users_with_role">[docs]</a><span class="k">def</span> <span class="nf">rbac_get_users_with_role</span><span class="p">(</span><span class="n">role</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns a list of all users who have a role, either speicifically or</span>
+<span class="sd">    from having the equivalent generic role. E.g. forums.forum.5.view would</span>
+<span class="sd">    also return users with forums.forum.view or forums.forum.all &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_instance</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span> <span class="o">=</span> <span class="n">role_to_parts</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+    <span class="n">group_roles_specific</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="n">model_instance</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">model_instance</span><span class="p">:</span>  <span class="c1"># check for generic too</span>
+        <span class="n">group_roles_higher</span> <span class="o">=</span> <span class="n">RBACGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="kc">None</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">action</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">group_roles_higher</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">group_roles</span> <span class="o">=</span> <span class="n">group_roles_higher</span> <span class="o">|</span> <span class="n">group_roles_specific</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">group_roles</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)</span>
+
+    <span class="n">user_ids</span> <span class="o">=</span> <span class="n">RBACUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">groups</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">user_ids</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">users</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

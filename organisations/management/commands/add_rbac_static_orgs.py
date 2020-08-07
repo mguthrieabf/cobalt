@@ -43,8 +43,20 @@ class Command(BaseCommand):
 
         # Edit club details permissions
         create_RBAC_default(self, "orgs", "org", "Block")
-        create_RBAC_action(self, "orgs", "org", "edit")
-        create_RBAC_action(self, "orgs", "org", "view")
+        create_RBAC_action(
+            self,
+            "orgs",
+            "org",
+            "edit",
+            "Has the ability to edit details relating to the specified organisation.",
+        )
+        create_RBAC_action(
+            self,
+            "orgs",
+            "org",
+            "view",
+            "Has the ability to view details relating to the specified organisation.",
+        )
         group = create_RBAC_admin_group(
             self,
             "admin.abf.clubs",

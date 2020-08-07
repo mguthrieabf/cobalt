@@ -29,7 +29,7 @@ def create_RBAC_default(self, app, model, default_behaviour="Block"):
         self.stdout.write(self.style.SUCCESS("RBACModelDefault already exists - ok"))
 
 
-def create_RBAC_action(self, app, model, action):
+def create_RBAC_action(self, app, model, action, description):
     """ create an action for an app.model
 
     Args:
@@ -37,6 +37,7 @@ def create_RBAC_action(self, app, model, action):
         app(str): the application
         model(str): the model
         action(str): action to add
+        description(str): what this is for
 
     Returns: Nothing
     """
@@ -44,7 +45,9 @@ def create_RBAC_action(self, app, model, action):
     if not RBACAppModelAction.objects.filter(
         app=app, model=model, valid_action=action
     ).exists():
-        r = RBACAppModelAction(app=app, model=model, valid_action=action)
+        r = RBACAppModelAction(
+            app=app, model=model, valid_action=action, description=description
+        )
         r.save()
         self.stdout.write(
             self.style.SUCCESS(

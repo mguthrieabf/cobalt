@@ -155,6 +155,8 @@
     <span class="n">RBACAdminGroup</span><span class="p">,</span>
     <span class="n">RBACAdminGroupRole</span><span class="p">,</span>
     <span class="n">RBACAdminTree</span><span class="p">,</span>
+    <span class="n">RBACAppModelAction</span><span class="p">,</span>
+    <span class="n">RBACModelDefault</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">rbac_add_user_to_group</span><span class="p">,</span>
@@ -247,13 +249,111 @@
 <span class="c1">#     return render(request, &quot;rbac/admin-screen.html&quot;, {&quot;groups&quot;: data})</span>
 
 
+<div class="viewcode-block" id="generic_tree_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.generic_tree_screen">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">generic_tree_screen</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">detail_link</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Show full RBAC Tree for RBAC or Admin</span>
+
+<span class="sd">    build a list of the tree. We want to turn:</span>
+<span class="sd">     abf.people.fred          (id=34)</span>
+<span class="sd">     abf.people.john          (id=45)</span>
+<span class="sd">     abf.animals.dogs.rover   (id=2)</span>
+<span class="sd">     abf.animals.cats.felix   (id=21)</span>
+
+<span class="sd">    into:</span>
+<span class="sd">     items[&quot;abf&quot;]=[&quot;people&quot;, &quot;animals&quot;]</span>
+<span class="sd">     items[&quot;abf.people&quot;]=[&quot;fred&quot;, &quot;john&quot;]</span>
+<span class="sd">     items[&quot;abf.people.fred&quot;]=34</span>
+<span class="sd">     items[&quot;abf.people.john&quot;]=45</span>
+<span class="sd">     items[&quot;abf.animals&quot;]=[&quot;dogs&quot;, &quot;cats&quot;]</span>
+<span class="sd">     items[&quot;abf.animals.dogs&quot;]=[&quot;rover&quot;]</span>
+<span class="sd">     items[&quot;abf.animals.cats&quot;]=[&quot;felix&quot;]</span>
+<span class="sd">     items[&quot;abf.animals.dogs.rover&quot;]=2</span>
+<span class="sd">     items[&quot;abf.animals.cats.felix&quot;]=21</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">items_description</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">group</span><span class="o">.</span><span class="n">name_qualifier</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">group</span><span class="o">.</span><span class="n">name_item</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+
+            <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">):</span>  <span class="c1"># end of line</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">id</span>
+                <span class="n">items_description</span><span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">description</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># more left</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">child</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">items</span><span class="p">[</span><span class="n">string</span><span class="p">]:</span>
+                    <span class="n">items</span><span class="p">[</span><span class="n">string</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">items</span><span class="p">[</span><span class="n">string</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">child</span><span class="p">]</span>
+
+    <span class="c1"># sort the dictionary on keys</span>
+    <span class="n">sorted_items</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">items</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="sd">&quot;&quot;&quot; generate html - loop through the sorted dictionary and do 3 things:</span>
+<span class="sd">     1) if there is more below create a new ul</span>
+<span class="sd">     2) if we are the end of the tree (contents is an integer) print the link to the details</span>
+<span class="sd">     3) manage the stack so we close the right number of uls</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+
+    <span class="n">html_tree</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sorted_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">this_level</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># eg we are a.b.c level=a.b</span>
+
+        <span class="c1"># are we at the top?</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">depth</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_level</span><span class="p">)</span>
+
+        <span class="c1"># at the same level?</span>
+        <span class="k">elif</span> <span class="n">this_level</span> <span class="o">==</span> <span class="n">depth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># gone down?</span>
+        <span class="k">elif</span> <span class="n">this_level</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">depth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">depth</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_level</span><span class="p">)</span>
+
+        <span class="c1"># gone up? If so how far?</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">depth</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">this_level</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">html_tree</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/ul&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="c1"># now process line</span>
+        <span class="n">last_part</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">html_tree</span> <span class="o">+=</span> <span class="s2">&quot;&lt;li&gt;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">/&#39;&gt;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&lt;/a&gt;&lt;/li&gt;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">detail_link</span><span class="p">,</span>
+                <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">last_part</span><span class="p">,</span>
+                <span class="n">items_description</span><span class="p">[</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html_tree</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="s2">&quot;&lt;li&gt;&lt;span class=&#39;caret&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/span&gt;&lt;ul class=&#39;nested&#39;&gt;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">last_part</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/tree-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;html_tree&quot;</span><span class="p">:</span> <span class="n">html_tree</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">}</span>
+    <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="tree_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.tree_screen">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">tree_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Show full RBAC Tree &quot;&quot;&quot;</span>
     <span class="c1"># Get groups</span>
     <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/tree-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">generic_tree_screen</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="s2">&quot;/rbac/group/view/&quot;</span><span class="p">,</span> <span class="s2">&quot;Tree Viewer&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="admin_tree_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_tree_screen">[docs]</a><span class="nd">@login_required</span>
@@ -262,7 +362,18 @@
     <span class="c1"># Get groups</span>
     <span class="n">groups</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin-tree-screen.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="n">groups</span><span class="p">})</span></div>
+    <span class="k">return</span> <span class="n">generic_tree_screen</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="s2">&quot;/rbac/admin/group/view/&quot;</span><span class="p">,</span> <span class="s2">&quot;Admin Tree Viewer&quot;</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="role_view_screen"><a class="viewcode-back" href="../../rbac.html#rbac.views.role_view_screen">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">role_view_screen</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Show Roles &quot;&quot;&quot;</span>
+    <span class="c1"># Get groups</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;valid_action&quot;</span><span class="p">)</span>
+    <span class="n">defaults</span> <span class="o">=</span> <span class="n">RBACModelDefault</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/role_view.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;defaults&quot;</span><span class="p">:</span> <span class="n">defaults</span> <span class="p">})</span></div>
 
 
 <div class="viewcode-block" id="group_view"><a class="viewcode-back" href="../../rbac.html#rbac.views.group_view">[docs]</a><span class="nd">@login_required</span>
@@ -294,10 +405,15 @@
     <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
     <span class="n">users</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
     <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACAdminGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">user_list</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">user_list</span><span class="p">:</span>
+        <span class="n">is_admin</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_admin</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
         <span class="s2">&quot;rbac/admin_group_view.html&quot;</span><span class="p">,</span>
-        <span class="p">{</span><span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s2">&quot;is_admin&quot;</span><span class="p">:</span> <span class="n">is_admin</span><span class="p">},</span>
     <span class="p">)</span></div>
 
 
@@ -344,7 +460,7 @@
     <span class="sd">&quot;&quot;&quot; view to create a new group &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;rbac&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="n">group</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="p">(</span>
                 <span class="n">name_item</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
@@ -358,7 +474,7 @@
             <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:group_edit&quot;</span><span class="p">,</span> <span class="n">group_id</span><span class="o">=</span><span class="n">group</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;rbac&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/group_create.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
 
 
@@ -367,7 +483,7 @@
     <span class="sd">&quot;&quot;&quot; view to create a new admin group &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="n">group</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="p">(</span>
                 <span class="n">name_item</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
@@ -389,10 +505,10 @@
                     <span class="s2">&quot;Added you to group </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">,</span>
                     <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:rbac_admin&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;rbac:admin_group_view&quot;</span><span class="p">,</span> <span class="n">group_id</span><span class="o">=</span><span class="n">group</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;rbac/admin_group_create.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
 
 
@@ -405,7 +521,7 @@
         <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;You are not an admin for this group&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-            <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;rbac&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
                 <span class="n">group</span><span class="o">.</span><span class="n">name_item</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span>
                 <span class="n">group</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
@@ -418,7 +534,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;rbac&quot;</span><span class="p">)</span>
             <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">name_item</span>
             <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">description</span>
 
@@ -437,6 +553,53 @@
                 <span class="s2">&quot;admin_roles&quot;</span><span class="p">:</span> <span class="n">admin_roles</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="admin_group_edit"><a class="viewcode-back" href="../../rbac.html#rbac.views.admin_group_edit">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">admin_group_edit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; view to edit an admin group &quot;&quot;&quot;</span>
+
+    <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+
+    <span class="c1"># could use rbac_user_is_admin_for_admin_group but we need the</span>
+    <span class="c1"># users anyway so more efficient to do it here</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">user_list</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;member&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;You are not an admin for this admin group&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">name_item</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Admin Group successfully updated.&quot;</span><span class="p">,</span>
+                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AddGroup</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">name_item</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">description</span>
+
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">RBACAdminGroupRole</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">admin_roles</span> <span class="o">=</span> <span class="n">rbac_admin_all_rights</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;rbac/admin_group_edit.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+            <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+            <span class="s2">&quot;users&quot;</span><span class="p">:</span> <span class="n">users</span><span class="p">,</span>
+            <span class="s2">&quot;roles&quot;</span><span class="p">:</span> <span class="n">roles</span><span class="p">,</span>
+            <span class="s2">&quot;admin_roles&quot;</span><span class="p">:</span> <span class="n">admin_roles</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="rbac_admin"><a class="viewcode-back" href="../../rbac.html#rbac.views.rbac_admin">[docs]</a><span class="nd">@login_required</span>

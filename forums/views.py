@@ -11,7 +11,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rbac.core import (
     rbac_user_blocked_for_model,
     rbac_user_has_role,
-    rbac_user_has_role_exact,
     rbac_get_users_in_group,
     rbac_add_user_to_group,
 )
@@ -200,7 +199,12 @@ def post_detail(request, pk):
     )
 
     # for forums and moderate we can't call rbac_user_has_role as the default for forums is Allow
-    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)
+    #    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)
+    # oh yes we can
+
+    is_moderator = rbac_user_has_role(
+        request.user, "forums.moderate.%s.edit" % post.forum.id
+    )
 
     return render(
         request,
@@ -304,19 +308,20 @@ def post_new(request, forum_id=None):
     return render(request, "forums/post_edit.html", {"form": form, "forum": forum})
 
 
-def user_is_moderator_for_forum(user, forum_id):
-    """ check if user is a moderator for a forum.
-
-        For forums and moderate we can't call rbac_user_has_role as the default
-        for forums is Allow, so everyone gets in by default.
-    """
-
-    if rbac_user_has_role_exact(user, "forums.forum.%s.moderate" % forum_id):
-        return True
-    elif rbac_user_has_role_exact(user, "forums.forum.moderate"):
-        return True
-    else:
-        return False
+#
+# def user_is_moderator_for_forum(user, forum_id):
+#     """ check if user is a moderator for a forum.
+#
+#         For forums and moderate we can't call rbac_user_has_role as the default
+#         for forums is Allow, so everyone gets in by default.
+#     """
+#
+#     if rbac_user_has_role_exact(user, "forums.forum.%s.moderate" % forum_id):
+#         return True
+#     elif rbac_user_has_role_exact(user, "forums.forum.moderate"):
+#         return True
+#     else:
+#         return False
 
 
 @login_required()
@@ -331,8 +336,9 @@ def post_edit(request, post_id):
     # check access
     if not (
         (rbac_user_has_role(request.user, role) and post.author == request.user)
-        or user_is_moderator_for_forum(request.user, post.forum.id)
+        or rbac_user_has_role(request.user, "forums.moderate.%s.edit" % post.forum.id)
     ):
+
         return rbac_forbidden(request, role)
 
     else:
@@ -500,7 +506,7 @@ def forum_list(request):
 
         forums_all.append(detail)
 
-    if rbac_user_has_role(request.user, "forums.forumadmin.change"):
+    if rbac_user_has_role(request.user, "forums.admin.edit"):
         is_admin = True
     else:
         is_admin = False
@@ -633,8 +639,8 @@ def forum_create(request):
         HttpResponse
     """
 
-    if not rbac_user_has_role(request.user, "forums.forumadmin.change"):
-        return rbac_forbidden(request, "forums.forumadmin.change")
+    if not rbac_user_has_role(request.user, "forums.admin.edit"):
+        return rbac_forbidden(request, "forums.admin.edit")
 
     if request.method == "POST":
         form = ForumForm(request.POST)
@@ -669,8 +675,8 @@ def forum_delete_ajax(request, forum_id):
         HttpResponse
     """
 
-    if not rbac_user_has_role(request.user, "forums.forumadmin.change"):
-        rbac_forbidden(request.user, "forums.forumadmin.change")
+    if not rbac_user_has_role(request.user, "forums.admin.edit"):
+        rbac_forbidden(request.user, "forums.admin.edit")
 
     forum = get_object_or_404(Forum, pk=forum_id)
     forum.delete()
@@ -683,7 +689,10 @@ def comment_edit_common(request, comment):
     """ common code for editing c1 and c2 """
 
     role = "forums.forum.%s.create" % comment.post.forum.id
-    is_moderator = user_is_moderator_for_forum(request.user, comment.post.forum.id)
+
+    is_moderator = rbac_user_has_role(
+        request.user, "forums.moderate.%s.edit" % comment.post.forum.id
+    )
 
     # check access
     if not (
@@ -742,10 +751,10 @@ def forum_edit(request, forum_id):
 
     # Moderators or forum admins can do this
     if not (
-        rbac_user_has_role(request.user, "forums.forumadmin.change")
-        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+        rbac_user_has_role(request.user, "forums.admin.edit")
+        or rbac_user_has_role(request.user, f"forums.moderate.{forum_id}.edit")
     ):
-        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+        return rbac_forbidden(request, f"forums.moderate.{forum_id}.edit")
 
     forum = get_object_or_404(Forum, pk=forum_id)
 
@@ -785,10 +794,10 @@ def block_user(request, user_id, forum_id):
     """ stop a user from being able to post to a forum """
 
     if not (
-        rbac_user_has_role(request.user, "forums.forumadmin.change")
-        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+        rbac_user_has_role(request.user, "forums.admin.edit")
+        or rbac_user_has_role(request.user, f"forums.moderate.{forum_id}.edit")
     ):
-        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+        return rbac_forbidden(request, f"forums.moderate.{forum_id}.edit")
 
     user = get_object_or_404(User, pk=user_id)
     forum = get_object_or_404(Forum, pk=forum_id)
@@ -831,10 +840,10 @@ def unblock_user(request, user_id, forum_id):
     """ remove block on a user so they can post to a forum """
 
     if not (
-        rbac_user_has_role(request.user, "forums.forumadmin.change")
-        or rbac_user_has_role(request.user, f"forums.forum.{forum_id}.moderate")
+        rbac_user_has_role(request.user, "forums.admin.edit")
+        or rbac_user_has_role(request.user, f"forums.moderate.{forum_id}.edit")
     ):
-        return rbac_forbidden(request, f"forums.forum.{forum_id}.moderate")
+        return rbac_forbidden(request, f"forums.moderate.{forum_id}.edit")
 
     user = get_object_or_404(User, pk=user_id)
     forum = get_object_or_404(Forum, pk=forum_id)

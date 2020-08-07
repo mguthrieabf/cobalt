@@ -396,6 +396,11 @@
 <code class="sig-name descname">abstract</code><em class="property"> = False</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.abstract" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt id="forums.models.AbstractForum.Meta.ordering">
+<code class="sig-name descname">ordering</code><em class="property"> = ['-created_date']</em><a class="headerlink" href="#forums.models.AbstractForum.Meta.ordering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py attribute">
@@ -1467,14 +1472,6 @@ level (Comment1 or Comment2).</p>
 <dd class="field-even"><p>HttpResponse</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="forums.views.user_is_moderator_for_forum">
-<code class="sig-prename descclassname">forums.views.</code><code class="sig-name descname">user_is_moderator_for_forum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">forum_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/forums/views.html#user_is_moderator_for_forum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#forums.views.user_is_moderator_for_forum" title="Permalink to this definition">¶</a></dt>
-<dd><p>check if user is a moderator for a forum.</p>
-<p>For forums and moderate we can’t call rbac_user_has_role as the default
-for forums is Allow, so everyone gets in by default.</p>
 </dd></dl>
 
 </div>

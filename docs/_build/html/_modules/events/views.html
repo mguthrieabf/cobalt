@@ -144,13 +144,188 @@
            <div itemprop="articleBody">
             
   <h1>Source code for events.views</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
+<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Congress</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">CongressForm</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">,</span> <span class="n">rbac_user_has_role</span><span class="p">,</span> <span class="n">rbac_get_users_with_role</span>
+<span class="kn">from</span> <span class="nn">rbac.views</span> <span class="kn">import</span> <span class="n">rbac_forbidden</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
 
 
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../events.html#events.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/home.html&quot;</span><span class="p">)</span></div>
+    <span class="n">congresses</span> <span class="o">=</span> <span class="n">Congress</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/home.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congresses&quot;</span><span class="p">:</span> <span class="n">congresses</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="view_congress"><a class="viewcode-back" href="../../events.html#events.views.view_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">view_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; basic view of an event.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+<span class="sd">        congress_id(int): congress to view</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): page with details about the event</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/congress.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="preview_congress"><a class="viewcode-back" href="../../events.html#events.views.preview_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">preview_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; basic preview of an event. Doesn&#39;t use base.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+<span class="sd">        congress_id(int): congress to view</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): page with details about the event</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/congress.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;preview&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress"><a class="viewcode-back" href="../../events.html#events.views.create_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">create_congress</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; create a new congress</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): page to create congress</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get orgs that this user can manage congresses for</span>
+    <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;manage&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;org&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+            <span class="n">congress</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress created&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;events:edit_congress&quot;</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/edit_congress.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Create New Congress&quot;</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="edit_congress"><a class="viewcode-back" href="../../events.html#events.views.edit_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">edit_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; edit a new congress</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+<span class="sd">        congress_id(int): congress to view</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): page to create congress</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get orgs that this user can manage congresses for</span>
+    <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;manage&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="n">conveners</span> <span class="o">=</span> <span class="n">rbac_get_users_with_role</span><span class="p">(</span><span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+
+        <span class="c1"># we only process save or publish through here</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_location&quot;</span><span class="p">])</span>
+
+            <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;org&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+            <span class="n">congress</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">last_updated_by</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;Publish&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+                <span class="n">congress</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Published&quot;</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress published&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress saved&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;There are errors on this form&quot;</span><span class="p">,</span>
+                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-warning&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/edit_congress.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Edit Congress&quot;</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;conveners&quot;</span><span class="p">:</span> <span class="n">conveners</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_congress"><a class="viewcode-back" href="../../events.html#events.views.delete_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">delete_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; delete a congress</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard user request</span>
+<span class="sd">        congress_id(int): congress to delete</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        page(HTTPResponse): redirects to events</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="n">congress</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress deleted&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;events:events&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

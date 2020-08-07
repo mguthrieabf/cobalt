@@ -150,16 +150,22 @@
 <span class="kn">from</span> <span class="nn">django.template.loader</span> <span class="kn">import</span> <span class="n">render_to_string</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">RBACGroup</span><span class="p">,</span>
+    <span class="n">RBACAdminGroup</span><span class="p">,</span>
     <span class="n">RBACUserGroup</span><span class="p">,</span>
     <span class="n">RBACGroupRole</span><span class="p">,</span>
     <span class="n">RBACAppModelAction</span><span class="p">,</span>
+    <span class="n">RBACAdminGroupRole</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">rbac_add_user_to_group</span><span class="p">,</span>
     <span class="n">rbac_user_is_group_admin</span><span class="p">,</span>
+    <span class="n">rbac_user_is_admin_for_admin_group</span><span class="p">,</span>
     <span class="n">rbac_remove_user_from_group</span><span class="p">,</span>
+    <span class="n">rbac_remove_admin_user_from_group</span><span class="p">,</span>
     <span class="n">rbac_user_is_role_admin</span><span class="p">,</span>
     <span class="n">rbac_add_role_to_group</span><span class="p">,</span>
+    <span class="n">rbac_add_user_to_admin_group</span><span class="p">,</span>
+    <span class="n">rbac_add_role_to_admin_group</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 
@@ -232,10 +238,40 @@
 
         <span class="k">if</span> <span class="n">rbac_user_is_group_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
             <span class="n">rbac_add_user_to_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User </span><span class="si">%s</span><span class="s2"> added to group </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="rbac_add_user_to_admin_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_add_user_to_admin_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">rbac_add_user_to_admin_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to add a user to an admin group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: success, failure or error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">member_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;member_id&quot;</span><span class="p">]</span>
+        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
+
+        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rbac_user_is_admin_for_admin_group</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+            <span class="n">rbac_add_user_to_admin_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -305,6 +341,49 @@
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
 
 
+<div class="viewcode-block" id="rbac_add_role_to_admin_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_add_role_to_admin_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">rbac_add_role_to_admin_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to add a role to an admin group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: success, failure or error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;app&quot;</span><span class="p">]</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+        <span class="n">model_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;model_id&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">model_id</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="n">model_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model_id</span><span class="p">:</span>
+            <span class="n">role_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">app</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">model_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">role_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">app</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">rbac_user_is_role_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role_str</span><span class="p">):</span>
+            <span class="n">rbac_add_role_to_admin_group</span><span class="p">(</span>
+                <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+
+
 <div class="viewcode-block" id="rbac_get_action_for_model_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_get_action_for_model_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">rbac_get_action_for_model_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Ajax call to get the action types for a given app and model</span>
@@ -323,9 +402,6 @@
         <span class="n">actions</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span>
             <span class="s2">&quot;valid_action&quot;</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
         <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -373,6 +449,38 @@
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
 
 
+<div class="viewcode-block" id="rbac_delete_user_from_admin_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_delete_user_from_admin_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">rbac_delete_user_from_admin_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to delete an admin user from a group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: success, failure or error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">member_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;member_id&quot;</span><span class="p">]</span>
+        <span class="n">group_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;group_id&quot;</span><span class="p">]</span>
+
+        <span class="n">member</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">member_id</span><span class="p">)</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rbac_user_is_admin_for_admin_group</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+            <span class="n">rbac_remove_admin_user_from_group</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+
+
 <div class="viewcode-block" id="rbac_delete_role_from_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_delete_role_from_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">rbac_delete_role_from_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Ajax call to delete a role from a group</span>
@@ -400,6 +508,41 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Denied&quot;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid request&quot;</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="rbac_delete_role_from_admin_group_ajax"><a class="viewcode-back" href="../../rbac.html#rbac.ajax.rbac_delete_role_from_admin_group_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">rbac_delete_role_from_admin_group_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to delete a role from an admin group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request(HTTPRequest): standard request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HTTPResponse: success, failure or error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">role_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;role_id&quot;</span><span class="p">]</span>
+
+        <span class="n">role</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">RBACAdminGroupRole</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">role_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="p">:</span>
+            <span class="n">role_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">model_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">role_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">app</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">role</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">rbac_user_is_role_admin</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role_str</span><span class="p">):</span>
+            <span class="n">role</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Access Denied&quot;</span>
 
     <span class="k">else</span><span class="p">:</span>

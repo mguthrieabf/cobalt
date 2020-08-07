@@ -131,6 +131,9 @@ class RBACAppModelAction(models.Model):
     valid_action = models.CharField(max_length=15)
     """ valid actions for this combination """
 
+    description = models.CharField(max_length=100)
+    """ description of what this does """
+
 
 class RBACAdminGroup(models.Model):
     """ Admin Group definitions """

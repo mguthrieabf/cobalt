@@ -174,12 +174,7 @@
         <span class="n">max_length</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
         <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">phone_regex</span><span class="p">],</span>
     <span class="p">)</span>
-    <span class="n">headline</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
-        <span class="s2">&quot;Headline&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Not filled in&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span>
-    <span class="p">)</span>
-    <span class="n">about</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
-        <span class="s2">&quot;About Me&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Not filled in&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">800</span>
-    <span class="p">)</span>
+    <span class="n">about</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;About Me&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
     <span class="n">pic</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ImageField</span><span class="p">(</span>
         <span class="n">upload_to</span><span class="o">=</span><span class="s2">&quot;pic_folder/&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;pic_folder/default-avatar.png&quot;</span>
     <span class="p">)</span>
@@ -203,6 +198,17 @@
 
     <span class="n">stripe_auto_confirmed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
         <span class="s2">&quot;Stripe Auto Confirmed&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">AUTO_STATUS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Off&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">receive_sms_results</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="s2">&quot;Receive SMS Results&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">receive_sms_reminders</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="s2">&quot;Receive SMS Reminders&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">receive_abf_newsletter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="s2">&quot;Receive ABF Newsletter&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">receive_marketing</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="s2">&quot;Receive Marketing&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">receive_monthly_masterpoints_report</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="s2">&quot;Receive Monthly Masterpoints Report&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">receive_payments_emails</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="s2">&quot;Receive Payments Emails&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
 
     <span class="n">REQUIRED_FIELDS</span> <span class="o">=</span> <span class="p">[</span>

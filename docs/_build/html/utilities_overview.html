@@ -219,6 +219,20 @@ you can use:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="unsaved-changes">
+<h2>Unsaved Changes<a class="headerlink" href="#unsaved-changes" title="Permalink to this headline">¶</a></h2>
+<p>Lots of forms need to handle users navigating away from the page without saving
+changes. We have a JavaScript function to handle this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">script</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;{</span><span class="si">% s</span><span class="s2">tatic &quot;</span><span class="n">assets</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">cobalt</span><span class="o">-</span><span class="n">unsaved</span><span class="o">.</span><span class="n">js</span><span class="s2">&quot; %}&quot;</span><span class="o">&gt;&lt;/</span><span class="n">script</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>You also need to identify which buttons are <em>save</em> buttons and should be
+ignored if pressed (i.e. don’t warn the user about navigating away with unsaved
+changes). Do this using the class cobalt-save:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">button</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;submit&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Save&quot;</span> <span class="n">class</span><span class="o">=</span><span class="s2">&quot;cobalt-save btn btn-success&quot;</span><span class="o">&gt;</span><span class="n">Save</span><span class="o">&lt;/</span><span class="n">button</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 

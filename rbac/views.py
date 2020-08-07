@@ -9,6 +9,8 @@ from .models import (
     RBACAdminGroup,
     RBACAdminGroupRole,
     RBACAdminTree,
+    RBACAppModelAction,
+    RBACModelDefault,
 )
 from .core import (
     rbac_add_user_to_group,
@@ -216,6 +218,18 @@ def admin_tree_screen(request):
 
     return generic_tree_screen(
         request, groups, "/rbac/admin/group/view/", "Admin Tree Viewer"
+    )
+
+
+@login_required
+def role_view_screen(request):
+    """ Show Roles """
+    # Get groups
+    roles = RBACAppModelAction.objects.all().order_by("app", "model", "valid_action")
+    defaults = RBACModelDefault.objects.all().order_by("app", "model")
+
+    return render(
+        request, "rbac/role_view.html", {"roles": roles, "defaults": defaults}
     )
 
 

@@ -225,7 +225,7 @@
 <span id="organisations-models-module"></span><h2>organisations.models module<a class="headerlink" href="#module-organisations.models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="organisations.models.MemberOrganisation">
-<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">MemberOrganisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">organisation</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#MemberOrganisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.MemberOrganisation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">MemberOrganisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">organisation</span></em>, <em class="sig-param"><span class="n">home_club</span></em>, <em class="sig-param"><span class="n">home_state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#MemberOrganisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.MemberOrganisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <dl class="py exception">
 <dt id="organisations.models.MemberOrganisation.DoesNotExist">
@@ -237,6 +237,20 @@
 <dt id="organisations.models.MemberOrganisation.MultipleObjectsReturned">
 <em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#organisations.models.MemberOrganisation.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.MemberOrganisation.home_club">
+<code class="sig-name descname">home_club</code><a class="headerlink" href="#organisations.models.MemberOrganisation.home_club" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.MemberOrganisation.home_state">
+<code class="sig-name descname">home_state</code><a class="headerlink" href="#organisations.models.MemberOrganisation.home_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -291,7 +305,7 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 
 <dl class="py class">
 <dt id="organisations.models.Organisation">
-<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">Organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">org_id</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">address1</span></em>, <em class="sig-param"><span class="n">address2</span></em>, <em class="sig-param"><span class="n">suburb</span></em>, <em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">postcode</span></em>, <em class="sig-param"><span class="n">bank_bsb</span></em>, <em class="sig-param"><span class="n">bank_account</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#Organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.Organisation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">organisations.models.</code><code class="sig-name descname">Organisation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span></em>, <em class="sig-param"><span class="n">org_id</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">address1</span></em>, <em class="sig-param"><span class="n">address2</span></em>, <em class="sig-param"><span class="n">suburb</span></em>, <em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">postcode</span></em>, <em class="sig-param"><span class="n">bank_bsb</span></em>, <em class="sig-param"><span class="n">bank_account</span></em>, <em class="sig-param"><span class="n">last_updated_by</span></em>, <em class="sig-param"><span class="n">last_updated</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/models.html#Organisation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.models.Organisation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <dl class="py exception">
 <dt id="organisations.models.Organisation.DoesNotExist">
@@ -308,6 +322,11 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="organisations.models.Organisation.ORG_TYPE">
 <code class="sig-name descname">ORG_TYPE</code><em class="property"> = [('Club', 'Bridge Club'), ('State', 'State Association'), ('National', 'National Body'), ('Other', 'Other')]</em><a class="headerlink" href="#organisations.models.Organisation.ORG_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.account_regex">
+<code class="sig-name descname">account_regex</code><em class="property"> = &lt;django.core.validators.RegexValidator object&gt;</em><a class="headerlink" href="#organisations.models.Organisation.account_regex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -338,6 +357,36 @@ object the first time, the query is executed.</p>
 object the first time, the query is executed.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.bsb_regex">
+<code class="sig-name descname">bsb_regex</code><em class="property"> = &lt;django.core.validators.RegexValidator object&gt;</em><a class="headerlink" href="#organisations.models.Organisation.bsb_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.congress_set">
+<code class="sig-name descname">congress_set</code><a class="headerlink" href="#organisations.models.Organisation.congress_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="organisations.models.Organisation.get_next_by_last_updated">
+<code class="sig-name descname">get_next_by_last_updated</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_updated&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#organisations.models.Organisation.get_next_by_last_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="organisations.models.Organisation.get_previous_by_last_updated">
+<code class="sig-name descname">get_previous_by_last_updated</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: last_updated&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#organisations.models.Organisation.get_previous_by_last_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="organisations.models.Organisation.get_type_display">
 <code class="sig-name descname">get_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#organisations.models.Organisation.get_type_display" title="Permalink to this definition">¶</a></dt>
@@ -349,6 +398,31 @@ object the first time, the query is executed.</p>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.last_updated">
+<code class="sig-name descname">last_updated</code><a class="headerlink" href="#organisations.models.Organisation.last_updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.last_updated_by">
+<code class="sig-name descname">last_updated_by</code><a class="headerlink" href="#organisations.models.Organisation.last_updated_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="organisations.models.Organisation.last_updated_by_id">
+<code class="sig-name descname">last_updated_by_id</code><a class="headerlink" href="#organisations.models.Organisation.last_updated_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="organisations.models.Organisation.memberorganisation_set">
@@ -495,6 +569,20 @@ if the org number is invalid.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Json array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="organisations.views.org_edit">
+<code class="sig-prename descclassname">organisations.views.</code><code class="sig-name descname">org_edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">org_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/organisations/views.html#org_edit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#organisations.views.org_edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit details about an organisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- organisation to edit</strong> (<em>org_id</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse - page to edit organisation</p>
 </dd>
 </dl>
 </dd></dl>

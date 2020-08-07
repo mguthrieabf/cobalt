@@ -224,11 +224,11 @@ user has. Roles are hierarchical, and have a role_type of either “Allow” or
 </ul>
 <p>For example:</p>
 <ol class="arabic simple">
-<li><p>“forums.forum.moderate” “Allow”</p></li>
-<li><p>“forums.post.5.edit” “Block”</p></li>
-<li><p>“organisations.organisation.7.view” “Allow”</p></li>
+<li><p>“forums.moderate.edit” “Allow”</p></li>
+<li><p>“forums.forum.5.create” “Block”</p></li>
+<li><p>“orgs.org.7.view” “Allow”</p></li>
 </ol>
-<p>Example 1 says that this user is allowed to moderate all forums (RBAC doesn’t know
+<p>Example 1 says that this group is allowed to moderate all forums (RBAC doesn’t know
 what moderating is, it just handles the rules, it is up to each application
 to implement the required controls itself). We can break this down as follows:</p>
 <ul class="simple">
@@ -238,61 +238,21 @@ to implement the required controls itself). We can break this down as follows:</
 </ul>
 <p>Note that an application can choose to use this structure for anything, it doesn’t
 have to refer to a model, or even an application.</p>
-<p>Example 2 is more specific. It says that this user cannot edit the post with a
-primary key of 5. This relies on the fact that Django primary keys are unique and
+<p>Example 2 is more specific. It says that this group cannot create content in
+the forum with primary key of 5.
+This relies on the fact that Django primary keys are unique and
 never reused.</p>
 <p><strong>Specific rules take precedent over general rules</strong></p>
 <p>If there are two rules in place as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">payments</span><span class="o">.</span><span class="n">stripetransaction</span><span class="o">.</span><span class="n">view</span> <span class="s2">&quot;Allow&quot;</span>
-<span class="n">payments</span><span class="o">.</span><span class="n">stripetransaction</span><span class="o">.</span><span class="mf">27.</span><span class="n">view</span> <span class="s2">&quot;Block&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">payments</span><span class="o">.</span><span class="n">manage</span><span class="o">.</span><span class="n">view</span> <span class="s2">&quot;Allow&quot;</span>
+<span class="n">payments</span><span class="o">.</span><span class="n">manage</span><span class="o">.</span><span class="mf">27.</span><span class="n">view</span> <span class="s2">&quot;Block&quot;</span>
 </pre></div>
 </div>
-<p>Then a request for <em>payments.stripetransaction.27.view</em> will return Block.</p>
+<p>Then a request for <em>payments.manage.27.view</em> will return Block.</p>
 <div class="section" id="supported-roles">
 <h2>Supported Roles<a class="headerlink" href="#supported-roles" title="Permalink to this headline">¶</a></h2>
-<p>The following roles are currently supported:</p>
-<blockquote>
-<div><table class="docutils align-default">
-<colgroup>
-<col style="width: 37%" />
-<col style="width: 63%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Role</p></th>
-<th class="head"><p>Purpose</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>forums.forum.x</p></td>
-<td><p><em>Ability to do something in forum x</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>forums.forum</p></td>
-<td><p><em>Ability to do something in all forums</em></p></td>
-</tr>
-<tr class="row-even"><td><p>forums.forumadmin</p></td>
-<td><p><em>Make changes at the forum level</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>payments.view.x</p></td>
-<td><p><em>View payments for org x</em></p></td>
-</tr>
-<tr class="row-even"><td><p>payments.view</p></td>
-<td><p><em>View payments for any org</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>payments.manage.x</p></td>
-<td><p><em>Do things with payments for org x</em></p></td>
-</tr>
-<tr class="row-even"><td><p>payments.manage</p></td>
-<td><p><em>Do things with payments for any org</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>org.org.x</p></td>
-<td><p><em>Management of org x</em></p></td>
-</tr>
-<tr class="row-even"><td><p>org.org</p></td>
-<td><p><em>Management of all orgs</em></p></td>
-</tr>
-</tbody>
-</table>
-</div></blockquote>
+<p>The currently supported roles can be seen within the system, for example:
+<a class="reference external" href="https://test.abftech.com.au/rbac/role-view">ABF Test System RBAC Static</a>.</p>
 </div>
 <div class="section" id="default-behaviour">
 <h2>Default Behaviour<a class="headerlink" href="#default-behaviour" title="Permalink to this headline">¶</a></h2>
@@ -317,7 +277,8 @@ responsibility of the application.</p>
 <p>e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbac.models</span> <span class="kn">import</span> <span class="n">RBACAppModelAction</span>
 
-<span class="n">r</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">valid_action</span><span class="o">=</span><span class="s2">&quot;create&quot;</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">RBACAppModelAction</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="s2">&quot;forums&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;forum&quot;</span><span class="p">,</span> <span class="n">valid_action</span><span class="o">=</span><span class="s2">&quot;create&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Can create a Post in the specified forum.&quot;</span><span class="p">)</span>
 <span class="n">r</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -329,6 +290,7 @@ and unless there is good reason, the basic CRUD types should be named:</p>
 <li><p>view</p></li>
 <li><p>delete</p></li>
 </ul>
+<p>If a role only needs one type then use <strong>edit</strong>.</p>
 </div>
 <div class="section" id="the-all-action">
 <h2>The All Action<a class="headerlink" href="#the-all-action" title="Permalink to this headline">¶</a></h2>
@@ -386,6 +348,12 @@ disabled anyway.</p>
 </div>
 <div class="section" id="the-tree">
 <h2>The Tree<a class="headerlink" href="#the-tree" title="Permalink to this headline">¶</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>To avoid confusion between the RBAC tree and the Admin tree discussed later
+in this document, the RBAC tree always starts with <em>rbac.</em> and the Admin
+tree always starts with <em>admin.</em></p>
+</div>
 <p>From a security execution point of view the group name is largely irrelevant.
 Simplistically we get a list of groups for a user and a list of roles from those
 groups to decide whether or not to allow an action. However, with potentially
@@ -406,6 +374,8 @@ org.abf.abf (The ABF’s part of the tree)</p>
 </div></blockquote>
 <p>Note that there is nothing in the code to enforce this and the tree can
 evolve as we see fit.</p>
+<p>You can view the tree within the system. e.g.
+<a class="reference external" href="https://test.abftech.com.au/rbac/tree">ABF Test System RBAC Tree</a>.</p>
 </div>
 </div>
 <div class="section" id="admin">
@@ -525,9 +495,10 @@ whether your default settings are <em>Allow</em> or <em>Block</em>.</p>
 <div class="section" id="operating-checking-user-access">
 <h2>Operating – Checking User Access<a class="headerlink" href="#operating-checking-user-access" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_has_role" title="rbac.core.rbac_user_has_role"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_has_role()</span></code></a></p>
-<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_has_role_exact" title="rbac.core.rbac_user_has_role_exact"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_has_role_exact()</span></code></a> - internal</p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_has_role_exact" title="rbac.core.rbac_user_has_role_exact"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_has_role_exact()</span></code></a></p>
 <p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_blocked_for_model" title="rbac.core.rbac_user_blocked_for_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_blocked_for_model()</span></code></a></p>
 <p><a class="reference internal" href="rbac.html#rbac.core.rbac_user_allowed_for_model" title="rbac.core.rbac_user_allowed_for_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_user_allowed_for_model()</span></code></a></p>
+<p><a class="reference internal" href="rbac.html#rbac.core.rbac_get_users_with_role" title="rbac.core.rbac_get_users_with_role"><code class="xref py py-func docutils literal notranslate"><span class="pre">rbac.core.rbac_get_users_with_role()</span></code></a></p>
 </div>
 <div class="section" id="operating-checking-admin-access">
 <h2>Operating – Checking Admin Access<a class="headerlink" href="#operating-checking-admin-access" title="Permalink to this headline">¶</a></h2>

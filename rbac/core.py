@@ -173,26 +173,6 @@ def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
     return group_role
 
 
-#
-# def rbac_remove_role_from_group(group, role):
-#     """ Removes a role from an RBAC group
-#
-#     Args:
-#         group(RBACGroup): group
-#         role(str): role to remove from group
-#
-#     Returns:
-#         bool
-#     """
-#
-#     try:
-#         group_role = RBACGroupRole.objects.filter(group=group, role=role)
-#         group_role.delete()
-#         return True
-#     except RBACGroupRole.DoesNotExist:
-#         return False
-
-
 def rbac_user_has_role_exact(member, role):
     """ check if a user has an exact role
 
@@ -686,3 +666,34 @@ def rbac_get_users_in_group(groupname):
         name_qualifier=name_qualifier, name_item=name_item
     ).first()
     return RBACUserGroup.objects.filter(group=group).order_by("member")
+
+
+def rbac_get_users_with_role(role):
+    """ returns a list of all users who have a role, either speicifically or
+    from having the equivalent generic role. E.g. forums.forum.5.view would
+    also return users with forums.forum.view or forums.forum.all """
+
+    (app, model, model_instance, action) = role_to_parts(role)
+
+    group_roles_specific = RBACGroupRole.objects.filter(
+        app=app, model=model, model_id=model_instance
+    ).filter(Q(action=action) | Q(action="All"))
+
+    if model_instance:  # check for generic too
+        group_roles_higher = RBACGroupRole.objects.filter(
+            app=app, model=model, model_id=None
+        ).filter(Q(action=action) | Q(action="All"))
+    else:
+        group_roles_higher = None
+
+    group_roles = group_roles_higher | group_roles_specific
+
+    groups = group_roles.distinct("group").values("group")
+
+    user_ids = (
+        RBACUserGroup.objects.filter(id__in=groups).distinct("member").values("member")
+    )
+
+    users = User.objects.filter(id__in=user_ids)
+
+    return users

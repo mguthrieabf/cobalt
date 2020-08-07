@@ -166,13 +166,14 @@
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.views</span> <span class="kn">import</span> <span class="n">PasswordResetView</span>
 <span class="kn">import</span> <span class="nn">ipinfo</span>
-<span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">send_cobalt_email</span>
+<span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">send_cobalt_email</span><span class="p">,</span> <span class="n">notifications_in_english</span>
 <span class="kn">from</span> <span class="nn">logs.views</span> <span class="kn">import</span> <span class="n">get_client_ip</span><span class="p">,</span> <span class="n">log_event</span>
 <span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">MemberOrganisation</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">User</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">UserRegisterForm</span>
 <span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">account_activation_token</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">UserUpdateForm</span><span class="p">,</span> <span class="n">BlurbUpdateForm</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">UserRegisterForm</span><span class="p">,</span> <span class="n">UserUpdateForm</span><span class="p">,</span> <span class="n">BlurbUpdateForm</span><span class="p">,</span> <span class="n">UserSettingsForm</span>
+<span class="kn">from</span> <span class="nn">forums.models</span> <span class="kn">import</span> <span class="n">Post</span><span class="p">,</span> <span class="n">Comment1</span><span class="p">,</span> <span class="n">Comment2</span>
+<span class="kn">from</span> <span class="nn">cobalt.utils</span> <span class="kn">import</span> <span class="n">cobalt_paginator</span>
 
 
 <div class="viewcode-block" id="html_email_reset"><a class="viewcode-back" href="../../accounts.html#accounts.views.html_email_reset">[docs]</a><span class="k">def</span> <span class="nf">html_email_reset</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -582,7 +583,11 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">blurbform</span> <span class="o">=</span> <span class="n">BlurbUpdateForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+
     <span class="n">form</span> <span class="o">=</span> <span class="n">UserUpdateForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
         <span class="s2">&quot;blurbform&quot;</span><span class="p">:</span> <span class="n">blurbform</span><span class="p">,</span>
@@ -603,8 +608,95 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        HttpResponse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PAGE_SIZE</span> <span class="o">=</span> <span class="mi">30</span>
+
     <span class="n">pub_profile</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;accounts/public_profile.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;profile&quot;</span><span class="p">:</span> <span class="n">pub_profile</span><span class="p">})</span></div>
+
+    <span class="n">post_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">pub_profile</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+    <span class="n">comment1_list</span> <span class="o">=</span> <span class="n">Comment1</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">pub_profile</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;-created_date&quot;</span>
+    <span class="p">)</span>
+    <span class="n">comment2_list</span> <span class="o">=</span> <span class="n">Comment2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">pub_profile</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;-created_date&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get tab id from URL - this means we are on this tab</span>
+    <span class="k">if</span> <span class="s2">&quot;tab&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;tab&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">posts_active</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">comment1s_active</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">comment2s_active</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># if we are on a tab then get the right page for that tab and page 1 for the others</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tab</span> <span class="ow">or</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span>
+        <span class="n">posts_active</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;here&quot;</span><span class="p">)</span>
+        <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
+        <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;comment1s&quot;</span><span class="p">:</span>
+        <span class="n">comment1s_active</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
+        <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
+        <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span>
+        <span class="n">comment2s_active</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
+        <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;accounts/public_profile.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;profile&quot;</span><span class="p">:</span> <span class="n">pub_profile</span><span class="p">,</span>
+            <span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span>
+            <span class="s2">&quot;comment1s&quot;</span><span class="p">:</span> <span class="n">comment1s</span><span class="p">,</span>
+            <span class="s2">&quot;comment2s&quot;</span><span class="p">:</span> <span class="n">comment2s</span><span class="p">,</span>
+            <span class="s2">&quot;posts_active&quot;</span><span class="p">:</span> <span class="n">posts_active</span><span class="p">,</span>
+            <span class="s2">&quot;comment1s_active&quot;</span><span class="p">:</span> <span class="n">comment1s_active</span><span class="p">,</span>
+            <span class="s2">&quot;comment2s_active&quot;</span><span class="p">:</span> <span class="n">comment2s_active</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="user_settings"><a class="viewcode-back" href="../../accounts.html#accounts.views.user_settings">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">user_settings</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; User settings form.</span>
+
+<span class="sd">    Allow user to chose preferences</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request - standard request object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserSettingsForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Settings saved.&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserSettingsForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">notifications_list</span> <span class="o">=</span> <span class="n">notifications_in_english</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;accounts/user_settings.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;notifications_list&quot;</span><span class="p">:</span> <span class="n">notifications_list</span><span class="p">},</span>
+    <span class="p">)</span></div>
 </pre></div>
 
            </div>
