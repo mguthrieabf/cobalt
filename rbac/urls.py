@@ -14,6 +14,7 @@ urlpatterns = [
     path("group/delete/<int:group_id>/", views.group_delete, name="group_delete"),
     path("group/create", views.group_create, name="group_create"),
     path("admin", views.rbac_admin, name="rbac_admin"),
+    path("tests", views.rbac_tests, name="rbac_tests"),
     path("admin/tree", views.admin_tree_screen, name="admin_tree_screen"),
     path("admin/group/create", views.admin_group_create, name="admin_group_create"),
     path(

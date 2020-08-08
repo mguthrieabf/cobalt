@@ -209,6 +209,47 @@ def rbac_user_has_role_exact(member, role):
     return None
 
 
+def rbac_user_has_role_exact_explain(member, role):
+    """ check if a user has an exact role and explain why
+
+    Args:
+        member(User): standard user object
+        role(str): role to check
+
+    Returns:
+        string: "Allow", "Block", or None for no match
+        string: Role that matched
+        group: The group that matched
+    """
+    (app, model, model_instance, action) = role_to_parts(role)
+    # we also match against an action of all. e.g. if the role is:
+    #  forums.forum.5.create then we will also accept finding:
+    #  forums.forum.5.all.
+    if model_instance:
+        all_role = "%s.%s.%s.all" % (app, model, model_instance)
+    else:
+        all_role = "%s.%s.all" % (app, model)
+
+    groups = RBACUserGroup.objects.filter(member=member).values_list("group")
+    matches = RBACGroupRole.objects.filter(group__in=groups)
+
+    for m in matches:
+        if m.role == role:
+            print(m.rule_type)
+            print(m)
+            print(m.group)
+            return (m.rule_type, m, m.group)
+
+        if m.role == all_role:
+            print(m.rule_type)
+            print(m)
+            print(m.group)
+            return (m.rule_type, m, m.group)
+
+    # no match
+    return (None, None, None)
+
+
 def rbac_user_has_role(member, role, debug=False):
     """ check if a user has a specific role
 
@@ -221,25 +262,17 @@ def rbac_user_has_role(member, role, debug=False):
         bool: True or False for user role
     """
 
-    if debug:
-        print(f"Checking Member: {member} Role: {role}")
-
     # Is there a specific rule for this user and role
-    if debug:
-        print("Checking for specific rule for user")
     return_code = rbac_user_has_role_exact(member, role)
-    if debug:
-        print(f"-->{return_code}")
+
     if return_code:
         return allow_to_boolean(return_code)
 
     # Is there a specific rule for Everyone and this role
     everyone = User.objects.get(pk=RBAC_EVERYONE)
-    if debug:
-        print("Checking specific rule for EVERYONE")
+
     return_code = rbac_user_has_role_exact(everyone, role)
-    if debug:
-        print(f"-->{return_code}")
+
     if return_code:
         return allow_to_boolean(return_code)
 
@@ -250,27 +283,18 @@ def rbac_user_has_role(member, role, debug=False):
         role = "%s.%s.%s" % (parts[0], parts[1], parts[3])  # f.f.5.create -> f.f.create
 
         # next level rule for this user
-        if debug:
-            print(f"Checking higher rule for user: {role}")
-
         return_code = rbac_user_has_role_exact(member, role)
-        if debug:
-            print(f"-->{return_code}")
+
         if return_code:
             return allow_to_boolean(return_code)
 
         #  next level rule for everyone
-        if debug:
-            print(f"Checking higher rule for EVERYONE")
         return_code = rbac_user_has_role_exact(everyone, role)
-        if debug:
-            print(f"-->{return_code}")
+
         if return_code:
             return allow_to_boolean(return_code)
 
     # No match or no higher rule - use default
-    if debug:
-        print("Checking defaults for this app")
     (app, model, model_instance, action) = role_to_parts(role)
     try:
         default = (
@@ -284,6 +308,110 @@ def rbac_user_has_role(member, role, debug=False):
             % (app, model)
         )
     return allow_to_boolean(default)
+
+
+def rbac_user_has_role_explain(member, role):
+    """ check if a user has a specific role and explains why
+
+    Args:
+        member(User): standard user object
+        role(str): role to check
+
+    Returns:
+        bool: True or False for user role
+    """
+
+    log = f"Checking Member: {member} Role: {role}\n\n"
+
+    # Is there a specific rule for this user and role
+    (return_code, role_match, group) = rbac_user_has_role_exact_explain(member, role)
+    if return_code:
+        log += "There is a specific rule for this user\n"
+        log += "GroupRole: [id=%s] %s %s\n" % (
+            role_match.id,
+            role_match.role,
+            role_match.rule_type,
+        )
+        log += "Group: [%s] %s\n" % (group.id, group)
+        ret = f"{return_code}\n\n{log}"
+        return ret
+
+    log += "No specific rule for user\n"
+
+    # Is there a specific rule for Everyone and this role
+    everyone = User.objects.get(pk=RBAC_EVERYONE)
+    (return_code, role_match, group) = rbac_user_has_role_exact_explain(everyone, role)
+    if return_code:
+        log += "There is a specific rule for EVERYONE\n"
+        log += "GroupRole: [id=%s] %s %s\n" % (
+            role_match.id,
+            role_match.role,
+            role_match.rule_type,
+        )
+        log += "Group: [%s] %s\n" % (group.id, group)
+        ret = f"{return_code}\n\n{log}"
+        return ret
+
+    log += "No specific rule for EVERYONE\n"
+
+    # Is there a higher role. eg. for forums.forum.5 if no match then is there
+    # a rule for forums.forum. We only go one level up for performance reasons.
+    if role.count(".") == 3:  # 3 levels plus action
+        parts = role.split(".")
+        role = "%s.%s.%s" % (parts[0], parts[1], parts[3])  # f.f.5.create -> f.f.create
+
+        # next level rule for this user
+
+        (return_code, role_match, group) = rbac_user_has_role_exact_explain(
+            member, role
+        )
+        if return_code:
+            log += "There is a higher level rule for this user\n"
+            log += "GroupRole: [id=%s] %s %s\n" % (
+                role_match.id,
+                role_match.role,
+                role_match.rule_type,
+            )
+            log += "Group: [%s] %s\n" % (group.id, group)
+            ret = f"{return_code}\n\n{log}"
+            return ret
+
+        log += "No higher level rule for this user\n"
+
+        #  next level rule for everyone
+        (return_code, role_match, group) = rbac_user_has_role_exact_explain(
+            everyone, role
+        )
+        if return_code:
+            log += "There is a higher level rule for EVERYONE\n"
+            log += "GroupRole: [id=%s] %s %s\n" % (
+                role_match.id,
+                role_match.role,
+                role_match.rule_type,
+            )
+            log += "Group: [%s] %s\n" % (group.id, group)
+            ret = f"{return_code}\n\n{log}"
+            return ret
+
+        log += "No higher level rule for EVERYONE\n"
+
+    # No match or no higher rule - use default
+    log += "Checking defaults for this app\n"
+    (app, model, model_instance, action) = role_to_parts(role)
+    try:
+        default = (
+            RBACModelDefault.objects.filter(app=app, model=model)
+            .values_list("default_behaviour")
+            .first()[0]
+        )
+    except TypeError:
+        raise TypeError(
+            "It looks like there is no default set up for app=%s model=%s"
+            % (app, model)
+        )
+    log += "Using default: %s" % default
+    ret = f"{default}\n\n{log}"
+    return ret
 
 
 def allow_to_boolean(test_string):

@@ -206,6 +206,9 @@ def post_detail(request, pk):
         request.user, "forums.moderate.%s.edit" % post.forum.id
     )
 
+    print("ddddd")
+    print(is_moderator)
+
     return render(
         request,
         "forums/post_detail.html",

@@ -12,6 +12,7 @@ from .models import (
     RBACAppModelAction,
     RBACModelDefault,
 )
+from accounts.models import User
 from .core import (
     rbac_add_user_to_group,
     rbac_user_is_group_admin,
@@ -20,7 +21,13 @@ from .core import (
     rbac_get_admins_for_group,
     rbac_user_role_list,
     rbac_user_has_role,
+    rbac_user_has_role_explain,
+    rbac_user_has_role_exact,
     rbac_get_groups_for_role,
+    rbac_user_blocked_for_model,
+    rbac_user_allowed_for_model,
+    role_to_parts,
+    rbac_get_users_with_role,
 )
 from .forms import AddGroup
 from django.contrib import messages
@@ -479,4 +486,45 @@ def rbac_admin(request):
         request,
         "rbac/admin-screen.html",
         {"groups": groups, "roles": roles, "trees": trees},
+    )
+
+
+@login_required
+def rbac_tests(request):
+    """ easy way to underlying functions. Test only """
+
+    ans = None
+    userid = None
+    text = ""
+
+    if request.method == "POST":
+        userid = request.POST.get("id_user", 1)
+        print("####")
+        print(userid)
+        if userid:
+            print("####")
+            print(userid)
+            user = get_object_or_404(User, pk=userid)
+        text = request.POST.get("id_text", "")
+        if "user_has_role" in request.POST:
+            ans = rbac_user_has_role(user, text)
+        if "user_has_role_explain" in request.POST:
+            print("explain")
+            ans = rbac_user_has_role_explain(user, text)
+        if "user_access_in_english" in request.POST:
+            ans = rbac_access_in_english(user)
+        if "user_has_role_exact" in request.POST:
+            ans = rbac_user_has_role_exact(user, text)
+        if "user_blocked_for_model" in request.POST:
+            (app, model, model_instance, action) = role_to_parts(text)
+            ans = rbac_user_blocked_for_model(user, app, model, action)
+        if "user_allowed_for_model" in request.POST:
+            (app, model, model_instance, action) = role_to_parts(text)
+            ans = rbac_user_allowed_for_model(user, app, model, action)
+        if "get_users_with_role" in request.POST:
+            ans = rbac_get_users_with_role(text)
+
+    print(ans)
+    return render(
+        request, "rbac/tests.html", {"ans": ans, "member_id": userid, "text": text}
     )

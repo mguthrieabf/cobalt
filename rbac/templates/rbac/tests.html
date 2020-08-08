@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block header %}
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron">
+
+  <h1>Role Based Access Controls - Tests</h1>
+
+  Output:
+  <pre>
+{{ ans }}
+  </pre>
+
+{% include "generic_user_search_body.html" %}
+<button class="cobalt_generic_member btn btn-sm btn-primary" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search">Select User</button>
+<span id="id_user">
+  {% if member_id %}
+    = {{ member_id }}
+  {% else %}
+  Not Set (only required for functions involving users)
+  {% endif %}
+</span>
+<form method="POST">
+        {% csrf_token %}
+  <br>
+  <span id="hidden_user"><input type='hidden' id='id_user' name='id_user' value='{{ member_id }}'></span>
+  Text Input: <input type="text" id="id_text" name="id_text" value="{{ text }}">
+  <br>
+  <br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role">User Has Role</button>
+  Test if a user has access to a role.
+  <br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role_explain">User Has Role Explain</button>
+  Explain how RBAC decided whether a user has access or not.
+  <br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_blocked_for_model">User Blocked For Model</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success"name="user_allowed_for_model">User Allowed For Model</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_access_in_english">User Access in English</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_users_with_role">Get Users With Role</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_admins_for_group">Get Admins for Group</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_group_admin">User is Group Admin</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_role_admin">User is Role Admin</button><br>
+  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin">Admin</button>
+</form>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+{% include 'generic_user_search_footer.html' %}
+
+// Generic member search popup ok button pressed
+
+    function cobaltMemberSearchOk() {
+      clearModal();
+      $("#id_user").text(" = " + member_id);
+      $("#hidden_user").html("<input type='hidden' id='id_user' name='id_user' value='" + member_id + "'>");
+    }
+</script>
+{% endblock %}
