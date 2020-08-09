@@ -523,6 +523,23 @@ def rbac_tests(request):
             ans = rbac_user_allowed_for_model(user, app, model, action)
         if "get_users_with_role" in request.POST:
             ans = rbac_get_users_with_role(text)
+        if "get_admins_for_group" in request.POST:
+            parts = text.split(".")
+            name_qualifier = parts[:-1]
+            name_item = parts[-1]
+            group = RBACGroup.objects.filter(
+                name_qualifier=name_qualifier, name_item=name_item
+            ).first()
+            if group:
+                ans = rbac_get_admins_for_group(group)
+            else:
+                ans = "Group not found"
+        if "user_is_group_admin" in request.POST:
+            ans = rbac_user_is_group_admin(user, text)
+        # if "user_is_role_admin" in request.POST:
+        #     ans = rbac_user_is_role_admin(user, text)
+        if "admin" in request.POST:
+            ans = rbac_admin_all_rights(user)
 
     print(ans)
     return render(

@@ -396,7 +396,6 @@ def rbac_user_has_role_explain(member, role):
         log += "No higher level rule for EVERYONE\n"
 
     # No match or no higher rule - use default
-    log += "Checking defaults for this app\n"
     (app, model, model_instance, action) = role_to_parts(role)
     try:
         default = (
@@ -812,7 +811,7 @@ def rbac_get_users_with_role(role):
             app=app, model=model, model_id=None
         ).filter(Q(action=action) | Q(action="All"))
     else:
-        group_roles_higher = None
+        group_roles_higher = RBACGroupRole.objects.none()
 
     group_roles = group_roles_higher | group_roles_specific
 
