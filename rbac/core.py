@@ -576,11 +576,14 @@ def rbac_user_is_group_admin(member, group):
     path = group.name
 
     group_list = RBACAdminUserGroup.objects.filter(member=member).values_list("group")
+    print(group_list)
 
     trees = RBACAdminTree.objects.filter(group__in=group_list)
 
     # TODO: Tree is deeper than 2 levels - need to decide if we recurse the whole tree
     for tree in trees:
+        print(tree)
+        print(tree.tree)
         if tree.tree == path:
             return True
         # check for match on aaaaa.bbbbb.

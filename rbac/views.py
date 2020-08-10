@@ -21,6 +21,7 @@ from .core import (
     rbac_get_admins_for_group,
     rbac_user_role_list,
     rbac_user_has_role,
+    rbac_user_is_role_admin,
     rbac_user_has_role_explain,
     rbac_get_groups_for_role,
     rbac_user_blocked_for_model,
@@ -530,6 +531,8 @@ def rbac_tests(request):
 
         if "user_has_role" in request.POST:
             ans = rbac_user_has_role(user, text)
+            if not ans:
+                ans = "False"  # bool -> string so it shows on screen
             last_query = "User Has Role"
             role = text
 
@@ -546,17 +549,27 @@ def rbac_tests(request):
         if "user_blocked_for_model" in request.POST:
             (app, model, model_instance, action) = role_to_parts(text)
             ans = rbac_user_blocked_for_model(user, app, model, action)
+            if not ans:
+                ans = "Nothing found."
             last_query = "User Blocked for Model"
             role = text
 
         if "user_allowed_for_model" in request.POST:
             (app, model, model_instance, action) = role_to_parts(text)
             ans = rbac_user_allowed_for_model(user, app, model, action)
+            if not ans:
+                ans = "Nothing found."
             last_query = "User Allowed for Model"
             model = text
 
         if "get_users_with_role" in request.POST:
-            ans = rbac_get_users_with_role(text)
+            users = rbac_get_users_with_role(text)
+            if users:
+                ans = ""
+                for user_inst in users:
+                    ans += "%s\n" % user_inst
+            else:
+                ans = "Nothing found"
             last_query = "Get Users With Role"
             role = text
 
@@ -569,7 +582,10 @@ def rbac_tests(request):
                 name_qualifier=name_qualifier, name_item=name_item
             ).first()
             if group:
-                ans = rbac_get_admins_for_group(group)
+                admins = rbac_get_admins_for_group(group)
+                ans = ""
+                for admin in admins:
+                    ans += "%s\n" % admin.member
             else:
                 ans = "Group not found"
             group = text
@@ -579,21 +595,26 @@ def rbac_tests(request):
             parts = text.split(".")
             name_qualifier = ".".join(parts[:-1])
             name_item = parts[-1]
-            print(name_qualifier)
-            print(name_item)
             group = RBACGroup.objects.filter(
                 name_qualifier=name_qualifier, name_item=name_item
             ).first()
             if group:
                 ans = rbac_user_is_group_admin(user, group)
+                if not ans:
+                    ans = "False"  # bool -> string so it shows on screen
             else:
                 ans = "Group not found"
             group = text
-        # if "user_is_role_admin" in request.POST:
-        #     ans = rbac_user_is_role_admin(user, text)
+        if "user_is_role_admin" in request.POST:
+            ans = rbac_user_is_role_admin(user, text)
+            if not ans:
+                ans = "False"
+            last_query = "User Is Role Admin"
+            role = text
         if "admin" in request.POST:
             last_query = "Admin"
-            ans = rbac_admin_all_rights(user)
+            rights = rbac_admin_all_rights(user)
+            ans = "\n".join(rights)
 
     # Get trees
     groups = RBACGroup.objects.all().order_by("name_qualifier")
@@ -607,11 +628,19 @@ def rbac_tests(request):
     # Get roles
     roles = RBACAppModelAction.objects.all().order_by("app", "model", "valid_action")
 
+    # format ans for the Sweet Alert popup
+    # if ans.type() == 'str':
+    #     ans_swal = ans.replace("'", "")
+    #     ans_swal = ans_swal.replace("\n", "\\\n")
+    # else:
+    ans_swal = ans
+
     return render(
         request,
         "rbac/tests.html",
         {
             "ans": ans,
+            "ans_swal": ans_swal,
             "member_id": userid,
             "text": text,
             "tree": tree,
