@@ -4,6 +4,46 @@
 
 {% block header %}
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<style>
+ul, #myUL {
+  list-style-type: none;
+  font-size: 18px;
+}
+
+#myUL {
+  margin: 0;
+  padding: 0;
+}
+
+.caret {
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+}
+
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.caret-down::before {
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari */'
+  transform: rotate(90deg);
+}
+
+.nested {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,11 +52,106 @@
 
   <h1>Role Based Access Controls - Tests</h1>
 
-  Output:
-  <pre>
-{{ ans }}
-  </pre>
+  <p>You can use these tests to see what RBAC is doing.</p>
+  <p>There are a range of functions requiring different inputs. The required data is specified next to the
+    functions at the bottom of the screen.</p>
 
+{% if ans %}
+
+<div class="card">
+  <div class="card-header card-header-info">
+    <h3>Last Results</h3>
+    <h4>{{ last_query }}</h4>
+  </div>
+  <div class="card-body">
+    <table border>
+      <tr>
+        <td>User: <td>{{ user|default_if_none:"" }}
+      </tr>
+    <tr>
+    <td>Group: <td>{{ group|default_if_none:"" }}
+    </tr>
+    <tr>
+    <td>Model: <td>{{ model|default_if_none:"" }}
+    </tr>
+    <tr>
+    <td>Role: <td>{{ role|default_if_none:"" }}
+    </tr>
+    <tr>
+    <td class="align-top">Last Output:
+    <td><pre>{{ ans }}</pre>
+    </tr>
+  </table>
+  </div>
+</div>
+
+{% endif %}
+
+<div class="card col-8">
+  <div class="card-header card-header-success">
+    <h3>RBAC Tree</h3>
+  </div>
+  <div class="card-body">
+    <ul id="myUL">
+      {{ tree|safe}}
+    </ul>
+  </div>
+</div>
+
+<!-- <div class="card col-8">
+  <div class="card-header card-header-danger">
+    <h3>Admin Tree</h3>
+  </div>
+  <div class="card-body">
+    <ul id="myUL">
+      {{ admin_tree|safe}}
+    </ul>
+  </div>
+</div> -->
+
+<div class="card col-8">
+  <div class="card-header card-header-warning">
+    <h3>Roles</h3>
+  </div>
+  <div class="card-body">
+    <table class="table table-responsive">
+      <thead>
+        <th>Role</th>
+        <th>Action</th>
+        <th>Description</th>
+      </thead>
+      <tbody>
+    {% for role in roles %}
+    <tr>
+      <td class="py-0"><button class="tree-btn btn btn-sm btn-info" value="{{ role.app }}.{{ role.model }}.{{ role.valid_action }}">{{ role.app }}.{{ role.model }}</button>
+      <td class="py-0">{{ role.valid_action }}
+      <td class="py-0">{{ role.description }}
+    {% endfor %}
+    </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card col-8">
+  <div class="card-header card-header-warning">
+    <h3>Models</h3>
+  </div>
+  <div class="card-body">
+    <table class="table table-responsive">
+      <thead>
+        <th>Application-Model</th>
+      </thead>
+      <tbody>
+    {% for model in models %}
+    <tr>
+      <td class="py-0"><button class="tree-btn btn btn-sm btn-info" value="{{ model.app }}.{{ model.model }}">{{ model.app }}.{{ model.model }}</button>
+    {% endfor %}
+    </tbody>
+    </table>
+  </div>
+</div>
+
+<hr>
 {% include "generic_user_search_body.html" %}
 <button class="cobalt_generic_member btn btn-sm btn-primary" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search">Select User</button>
 <span id="id_user">
@@ -26,42 +161,71 @@
   Not Set (only required for functions involving users)
   {% endif %}
 </span>
+<br>
 <form method="POST">
         {% csrf_token %}
   <br>
-  <span id="hidden_user"><input type='hidden' id='id_user' name='id_user' value='{{ member_id }}'></span>
-  Text Input: <input type="text" id="id_text" name="id_text" value="{{ text }}">
-  <br>
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role">User Has Role</button>
-  Test if a user has access to a role.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role_explain">User Has Role Explain</button>
-  Explain how RBAC decided whether a user has access or not.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_blocked_for_model">User Blocked For Model</button>
-  List blocked items for a model (e.g. Forums.forum). Only for default Allow.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success"name="user_allowed_for_model">User Allowed For Model</button>
-List allowed items for a model (e.g. orgs.org). Only for default Block.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_access_in_english">User Access in English</button>
-Explain users access in English.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_users_with_role">Get Users With Role</button>
-Show which users have a role.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_admins_for_group">Get Admins for Group</button>
-Show who is an admin for a group.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_group_admin">User is Group Admin</button>
-Check if this user is an admin for this group.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_role_admin">User is Role Admin</button>
-Check if this user is an admin for this role.
-  <br>
-  <button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin">Admin</button>
-List all admin rights this user.
+
+  <span id="hidden_user"><input type='hidden' id='id_user' name='id_user' value='{{ member_id|default_if_none:"" }}'></span>
+  Group, Model or Role: <input type="text" id="id_text" name="id_text" value="{{ text }}">
+<br><br>
+<table>
+  <tr>
+    <th class="text-center">Required</th>
+    <th class="text-center">Function</th>
+    <th class="text-center">Description</th>
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Role</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role">User Has Role</button>
+    <td class="px-3">Test if a user has access to a role.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Role</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role_explain">User Has Role Explain</button>
+    <td class="px-3">Explain how RBAC decided whether a user has access or not.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Model</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_blocked_for_model">User Blocked For Model</button>
+    <td class="px-3">List blocked items for a model (e.g. Forums.forum). Only for default Allow.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Model</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success"name="user_allowed_for_model">User Allowed For Model</button>
+    <td class="px-3">List allowed items for a model (e.g. orgs.org). Only for default Block.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_access_in_english">User Access in English</button>
+    <td class="px-3">Explain users access in English.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>Role</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_users_with_role">Get Users With Allow Role</button>
+    <td class="px-3">Show which users have a role.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>Group</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="get_admins_for_group">Get Admins for Group</button>
+    <td class="px-3">Show who is an admin for a group.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Group</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_group_admin">User is Group Admin</button>
+    <td class="px-3">Check if this user is an admin for this group.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd> + <kbd>Role</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_is_role_admin">User is Role Admin</button>
+    <td class="px-3">Check if this user is an admin for this role.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin">Admin</button>
+    <td class="px-3">List all admin rights this user.
+  </tr>
+</table>
 </form>
 
 </div>
@@ -78,5 +242,35 @@ List all admin rights this user.
       $("#id_user").text(" = " + member_id);
       $("#hidden_user").html("<input type='hidden' id='id_user' name='id_user' value='" + member_id + "'>");
     }
+
+    var toggler = document.getElementsByClassName("caret");
+    var i;
+
+    for (i = 0; i < toggler.length; i++) {
+      toggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".nested").classList.toggle("active");
+        this.classList.toggle("caret-down");
+      });
+    }
+
+    $(document).ready(function() {
+
+// get tree value if clicked
+      $(".tree-btn").click(function(event){
+        var tr = $(this).val();
+        $("#id_text").val(tr);
+        $("#id_text").focus();
+      });
+
+{% if ans %}
+Swal.fire(
+  'Results',
+  '{{ ans }}',
+  'success'
+)
+{% endif %}
+
+    });
+
 </script>
 {% endblock %}

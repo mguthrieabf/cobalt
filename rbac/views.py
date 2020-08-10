@@ -22,7 +22,6 @@ from .core import (
     rbac_user_role_list,
     rbac_user_has_role,
     rbac_user_has_role_explain,
-    rbac_user_has_role_exact,
     rbac_get_groups_for_role,
     rbac_user_blocked_for_model,
     rbac_user_allowed_for_model,
@@ -110,9 +109,16 @@ def view_screen(request):
 #     return render(request, "rbac/admin-screen.html", {"groups": data})
 
 
-@login_required
-def generic_tree_screen(request, groups, detail_link, title):
-    """ Show full RBAC Tree for RBAC or Admin
+def generic_tree_builder(groups, detail_link=None, html_type="href"):
+    """ function to build an rbac tree for use with the tree viewer.
+
+    Args:
+        groups - queryset of RBACGroup or RBACAdminGroup
+        detail_link - str of link to follow
+        html_type - str to specify whether to generate <a> or <button>
+
+    Returns:
+        str - HTML string to insert into page
 
     build a list of the tree. We want to turn:
      abf.people.fred          (id=34)
@@ -192,16 +198,30 @@ def generic_tree_screen(request, groups, detail_link, title):
         # now process line
         last_part = key.split(".")[-1]
         if isinstance(value[0], int):
-            html_tree += "<li><a href='%s%s/'>%s (%s)</a></li>\n" % (
-                detail_link,
-                value[0],
-                last_part,
-                items_description[value[0]],
-            )
+            if html_type == "href":
+                html_tree += "<li><a href='%s%s/'>%s (%s)</a></li>\n" % (
+                    detail_link,
+                    value[0],
+                    last_part,
+                    items_description[value[0]],
+                )
+            elif html_type == "button":
+                html_tree += (
+                    "<li>%s (%s) <button value='%s' class='tree-btn btn btn-sm btn-primary'>Use</button></li>\n"
+                    % (last_part, items_description[value[0]], key)
+                )
         else:
             html_tree += (
                 "<li><span class='caret'>%s</span><ul class='nested'>\n" % last_part
             )
+
+    return html_tree
+
+
+def generic_tree_screen(request, groups, detail_link, title):
+    """ Show full RBAC Tree for RBAC or Admin """
+
+    html_tree = generic_tree_builder(groups, detail_link)
 
     return render(
         request, "rbac/tree-screen.html", {"html_tree": html_tree, "title": title}
@@ -495,37 +515,55 @@ def rbac_tests(request):
 
     ans = None
     userid = None
+    user = None
     text = ""
+    group = None
+    role = None
+    model = None
+    last_query = None
 
     if request.method == "POST":
-        userid = request.POST.get("id_user", 1)
-        print("####")
-        print(userid)
+        userid = request.POST.get("id_user")
         if userid:
-            print("####")
-            print(userid)
             user = get_object_or_404(User, pk=userid)
         text = request.POST.get("id_text", "")
+
         if "user_has_role" in request.POST:
             ans = rbac_user_has_role(user, text)
+            last_query = "User Has Role"
+            role = text
+
         if "user_has_role_explain" in request.POST:
-            print("explain")
             ans = rbac_user_has_role_explain(user, text)
+            last_query = "User Has Role Explain"
+            role = text
+
         if "user_access_in_english" in request.POST:
             ans = rbac_access_in_english(user)
-        if "user_has_role_exact" in request.POST:
-            ans = rbac_user_has_role_exact(user, text)
+            ans = "\n".join(ans)
+            last_query = "User Access in English"
+
         if "user_blocked_for_model" in request.POST:
             (app, model, model_instance, action) = role_to_parts(text)
             ans = rbac_user_blocked_for_model(user, app, model, action)
+            last_query = "User Blocked for Model"
+            role = text
+
         if "user_allowed_for_model" in request.POST:
             (app, model, model_instance, action) = role_to_parts(text)
             ans = rbac_user_allowed_for_model(user, app, model, action)
+            last_query = "User Allowed for Model"
+            model = text
+
         if "get_users_with_role" in request.POST:
             ans = rbac_get_users_with_role(text)
+            last_query = "Get Users With Role"
+            role = text
+
         if "get_admins_for_group" in request.POST:
+            last_query = "Get Admins for Group"
             parts = text.split(".")
-            name_qualifier = parts[:-1]
+            name_qualifier = ".".join(parts[:-1])
             name_item = parts[-1]
             group = RBACGroup.objects.filter(
                 name_qualifier=name_qualifier, name_item=name_item
@@ -534,14 +572,56 @@ def rbac_tests(request):
                 ans = rbac_get_admins_for_group(group)
             else:
                 ans = "Group not found"
+            group = text
+
         if "user_is_group_admin" in request.POST:
-            ans = rbac_user_is_group_admin(user, text)
+            last_query = "User Is Group Admin"
+            parts = text.split(".")
+            name_qualifier = ".".join(parts[:-1])
+            name_item = parts[-1]
+            print(name_qualifier)
+            print(name_item)
+            group = RBACGroup.objects.filter(
+                name_qualifier=name_qualifier, name_item=name_item
+            ).first()
+            if group:
+                ans = rbac_user_is_group_admin(user, group)
+            else:
+                ans = "Group not found"
+            group = text
         # if "user_is_role_admin" in request.POST:
         #     ans = rbac_user_is_role_admin(user, text)
         if "admin" in request.POST:
+            last_query = "Admin"
             ans = rbac_admin_all_rights(user)
 
-    print(ans)
+    # Get trees
+    groups = RBACGroup.objects.all().order_by("name_qualifier")
+    tree = generic_tree_builder(groups, html_type="button")
+    admin_groups = RBACAdminGroup.objects.all().order_by("name_qualifier")
+    admin_tree = generic_tree_builder(admin_groups, html_type="button")
+
+    # get models
+    models = RBACModelDefault.objects.all().order_by("app", "model")
+
+    # Get roles
+    roles = RBACAppModelAction.objects.all().order_by("app", "model", "valid_action")
+
     return render(
-        request, "rbac/tests.html", {"ans": ans, "member_id": userid, "text": text}
+        request,
+        "rbac/tests.html",
+        {
+            "ans": ans,
+            "member_id": userid,
+            "text": text,
+            "tree": tree,
+            "admin_tree": admin_tree,
+            "models": models,
+            "roles": roles,
+            "group": group,
+            "role": role,
+            "model": model,
+            "user": user,
+            "last_query": last_query,
+        },
     )
