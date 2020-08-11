@@ -1,3 +1,5 @@
+""" Functions to manipulate RBAC from command scripts """
+
 from rbac.models import (
     RBACModelDefault,
     RBACAppModelAction,

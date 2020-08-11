@@ -26,13 +26,7 @@ class Command(BaseCommand):
             "create",
             "Can create a Post in the specified forum.",
         )
-        create_RBAC_action(
-            self,
-            "forums",
-            "forum",
-            "delete",
-            "Can delete a Post in the specified forum.",
-        )
+
         create_RBAC_action(
             self,
             "forums",

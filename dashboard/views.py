@@ -95,7 +95,11 @@ def get_posts(request):
 
     # Otherwise load everything not blocked
     else:
-        posts_list = Post.objects.exclude(forum__in=blocked).order_by("-created_date")
+        posts_list = (
+            Post.objects.exclude(forum__in=blocked)
+            .filter(forum__forum_type="Discussion")
+            .order_by("-created_date")
+        )
 
     posts = cobalt_paginator(request, posts_list, 4)
 

@@ -168,8 +168,11 @@ def statement_common(user):
     qry = "%s/mps/%s" % (GLOBAL_MPSERVER, user.system_number)
     try:
         summary = requests.get(qry).json()[0]
-    except IndexError:
-        raise Http404
+    except IndexError:  # server down or some error
+        # raise Http404
+        summary = {}
+        summary["IsActive"] = False
+        summary["HomeClubID"] = 0
 
     # Set active to a boolean
     if summary["IsActive"] == "Y":
@@ -179,7 +182,10 @@ def statement_common(user):
 
     # Get home club name
     qry = "%s/club/%s" % (GLOBAL_MPSERVER, summary["HomeClubID"])
-    club = requests.get(qry).json()[0]["ClubName"]
+    try:
+        club = requests.get(qry).json()[0]["ClubName"]
+    except IndexError:  # server down or some error
+        club = "Unknown"
 
     # get balance
     last_tran = MemberTransaction.objects.filter(member=user).last()
@@ -198,6 +204,7 @@ def statement_common(user):
         "-created_date"
     )
 
+    print(summary)
     return (summary, club, balance, auto_button, events_list)
 
 

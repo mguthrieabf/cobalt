@@ -722,7 +722,7 @@ def rbac_get_admins_for_group(group):
     tree = RBACAdminTree.objects.extra(where=["%s LIKE tree||'%%'"], params=[path])
     tree_groups = tree.values("group")
     # Get the members of the groups
-    admins = RBACAdminUserGroup.objects.filter(group__in=tree_groups)
+    admins = RBACAdminUserGroup.objects.filter(group__in=tree_groups).distinct("member")
     return admins
 
 
