@@ -362,8 +362,18 @@ def group_create(request):
                 created_by=request.user,
             )
             group.save()
+            messages.success(
+                request,
+                "Group successfully created.",
+                extra_tags="cobalt-message-success",
+            )
             if form.cleaned_data["add_self"]:
                 rbac_add_user_to_group(request.user, group)
+                messages.success(
+                    request,
+                    "Added you to new group.",
+                    extra_tags="cobalt-message-success",
+                )
             return redirect("rbac:group_edit", group_id=group.id)
 
     else:
@@ -434,7 +444,7 @@ def group_edit(request, group_id):
         users = RBACUserGroup.objects.filter(group=group)
         admin_roles = rbac_admin_all_rights(request.user)
         roles = RBACGroupRole.objects.filter(group=group)
-        print(admin_roles)
+
         return render(
             request,
             "rbac/group_edit.html",

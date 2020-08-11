@@ -207,7 +207,7 @@ class RBACAdminGroupRole(models.Model):
 
 
 class RBACAdminTree(models.Model):
-    """ Control where in the tree a user can create groups """
+    """ Control where in the tree a member of a group can create groups """
 
     group = models.ForeignKey(RBACAdminGroup, on_delete=models.CASCADE)
     """ RBACGroup for this Role """

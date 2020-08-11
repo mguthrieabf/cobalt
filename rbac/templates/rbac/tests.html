@@ -50,10 +50,14 @@ ul, #myUL {
 
 <div>
 
+<div class="card">
+  <div class="card-header card-header-warning">
   <h1>Role Based Access Controls - Tests</h1>
 
   <p>You can use these tests to see what RBAC is doing.</p>
-
+  </div>
+  <div class="card-body">
+    <div class="container">
 {% if ans %}
 
 <div class="card">
@@ -124,7 +128,7 @@ ul, #myUL {
   </div>
 </div>
 
-<div id="group_box" class="card col-8" style="display: none;">
+<div id="group_box" class="card col-12" style="display: none;">
   <div class="card-header card-header-success">
     <h3>RBAC Tree (Groups)</h3>
   </div>
@@ -211,7 +215,7 @@ ul, #myUL {
 <br>
   <input type="text" style="width: 400px" id="id_text" name="id_text" value="{{ text }}">
   <br>
-  <i>You may want to include a model_id in the string above. e.g. forums.forum.1.edit</i>
+  <i><span id="id_role_text"></span></i>
 <br><br>
 <table>
   <tr>
@@ -277,6 +281,9 @@ ul, #myUL {
 </table>
 </form>
 
+</div>
+</div>
+</div>
 
 {% endblock %}
 
@@ -311,12 +318,15 @@ ul, #myUL {
 // set label
         if ($(this).hasClass("cobalt-rbac-tree")){
           $("#text_type").text("Group:");
+          $("#id_role_text").text("");
         }
         if ($(this).hasClass("cobalt-rbac-role")){
           $("#text_type").text("Role:");
+          $("#id_role_text").text("You may want to include a model_id in the string above. e.g. forums.forum.1.edit");
         }
         if ($(this).hasClass("cobalt-rbac-model")){
           $("#text_type").text("Model:");
+          $("#id_role_text").text("");
         }
 
 // set value
@@ -339,18 +349,21 @@ ul, #myUL {
         $("#group_box").hide()
         $("#model_box").hide()
         $("#role_box").show()
+        $("#id_role_text").text("");
       });
 
       $("#button_groups").click(function(event){
         $("#group_box").show()
         $("#model_box").hide()
         $("#role_box").hide()
+        $("#id_role_text").text("");
       });
 
       $("#button_models").click(function(event){
         $("#group_box").hide()
         $("#model_box").show()
         $("#role_box").hide()
+        $("#id_role_text").text("");
       });
 
 // select self as user

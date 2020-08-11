@@ -23,6 +23,8 @@
 
         <form method="POST">
           {% csrf_token %}
+          <input type="hidden" name="name_qualifier" id="id_name_qualifier" value="{{ f.name_qualifier }}">
+
           <div class="row">
             <div class="col-12">
               <div class="form-group">

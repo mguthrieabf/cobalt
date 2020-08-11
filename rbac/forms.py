@@ -23,61 +23,92 @@ class AddGroup(forms.Form):
 
     # We need the logged in user to get the RBACTreeUser values, add a parameter to init
     # This is so we can build the drop down list dynamically
+    # The drop down list also needs any exising sub parts of the tree.
+    # e.g. if a user has access to a.b.c then also show a.b.c.d if it already exists in tree
     def __init__(self, *args, **kwargs):
         # get user
         self.user = kwargs.pop("user", None)
+
         # get admin or normal
         self.environment = kwargs.pop("environment", None)
+
         # create form
         super(AddGroup, self).__init__(*args, **kwargs)
+
+        # build name_qualifier list for this user
         choices = []
+
+        # get their admin groups
         group_list = RBACAdminUserGroup.objects.filter(member=self.user).values_list(
             "group"
         )
-        queryset = RBACAdminTree.objects.filter(group__in=group_list)
+
+        # admintree is shared so filter out the parts we want
+        queryset = RBACAdminTree.objects.filter(group__in=group_list).order_by("tree")
         if self.environment == "admin":
             queryset = queryset.filter(tree__startswith="admin.")
         else:
             queryset = queryset.exclude(tree__startswith="admin.")
+
+        # load whole admin tree
+        whole_tree_qs = RBACAdminTree.objects.all().distinct("tree").values_list("tree")
+        whole_tree = []
+        for query in whole_tree_qs:
+            whole_tree.append(query[0])
+
+            whole_tree.sort()
+
         for item in queryset:
-            choices.append((item, item))
+            # add item and any existing lower parts of tree to choices
+            item = "%s" % item
+            for wtree in whole_tree:
+                print(wtree)
+                print(item)
+                if wtree.find(item) == 0:
+                    choices.append((wtree, wtree))
+
         self.fields["name_qualifier"] = forms.ChoiceField(
             label="Qualifier", choices=choices, required=False
         )
 
     def clean(self):
         """ We allow uses to put . into the name_item so here we split that
-            out and put the part before the . into name_qualifier """
+            out and put the part before the . into name_qualifier
+            but only on group creation. """
         super().clean()
 
         if not self.is_valid():
             return self.cleaned_data
 
-        string = "%s.%s" % (
-            self.cleaned_data["name_qualifier"],
-            self.cleaned_data["name_item"],
-        )
-        parts = string.split(".")
-        self.cleaned_data["name_qualifier"] = ".".join(parts[:-1])
-        self.cleaned_data["name_item"] = parts[-1]
+        qualifier = self.cleaned_data["name_qualifier"]
+        item = self.cleaned_data["name_item"]
 
-        # check for dupicates - this form is used by two models so load the right one
-        if self.environment == "admin":
-            dupe = RBACAdminGroup.objects.filter(
-                name_qualifier=self.cleaned_data["name_qualifier"],
-                name_item=self.cleaned_data["name_item"],
-            ).exists()
-        else:
-            dupe = RBACGroup.objects.filter(
-                name_qualifier=self.cleaned_data["name_qualifier"],
-                name_item=self.cleaned_data["name_item"],
-            ).exists()
-        if dupe:
-            msg = "%s.%s already taken" % (
-                self.cleaned_data["name_qualifier"],
-                self.cleaned_data["name_item"],
+        if qualifier == "" and "." in item:  # Update - no full stops
+            self._errors["name_item"] = self.error_class(
+                ["Full stops not permitted in name when editing group."]
             )
-            self._errors["name_qualifier"] = self.error_class([msg])
-            self._errors["name_item"] = self.error_class([msg])
+
+        else:
+
+            string = "%s.%s" % (qualifier, item)
+            parts = string.split(".")
+            qualifier = ".".join(parts[:-1])
+            item = parts[-1]
+
+            # check for dupicates - this form is used by two models so load the right one
+            if self.environment == "admin":
+                dupe = RBACAdminGroup.objects.filter(
+                    name_qualifier=qualifier, name_item=item,
+                ).exists()
+            else:
+                dupe = RBACGroup.objects.filter(
+                    name_qualifier=qualifier, name_item=item,
+                ).exists()
+            if dupe:
+                msg = "%s.%s already taken" % (qualifier, item)
+                self._errors["name_item"] = self.error_class([msg])
+
+        self.cleaned_data["name_qualifier"] = qualifier
+        self.cleaned_data["name_item"] = item
 
         return self.cleaned_data
