@@ -51,6 +51,8 @@
               // watch for user selecting member and change screen again
                 $(".cobalt-names").change(function(event){
                   var id=$(this).val();
+                  lastname.val();
+                  firstname.val();
                   showSingleMember(id);
                 });
             })

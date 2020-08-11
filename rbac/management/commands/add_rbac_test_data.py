@@ -254,7 +254,7 @@ class Command(BaseCommand):
         # FBC Payments
         print("\nFBC Payments")
         fbc_pay = rbac_create_group(
-            "rbac.orgs.clubs.act.fantasy_bridge_club(%s)" % fbc.id,
+            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
             "payments",
             "Payments for Fantasy Bridge Club",
         )

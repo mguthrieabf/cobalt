@@ -28,6 +28,7 @@ from .core import (
     rbac_user_allowed_for_model,
     role_to_parts,
     rbac_get_users_with_role,
+    rbac_admin_tree_access,
 )
 from .forms import AddGroup
 from django.contrib import messages
@@ -208,7 +209,7 @@ def generic_tree_builder(groups, detail_link=None, html_type="href"):
                 )
             elif html_type == "button":
                 html_tree += (
-                    "<li>%s (%s) <button value='%s' class='tree-btn btn btn-sm btn-primary'>Use</button></li>\n"
+                    "<li>%s (%s) <button value='%s' class='tree-btn cobalt-rbac-tree btn btn-sm btn-primary'>Use</button></li>\n"
                     % (last_part, items_description[value[0]], key)
                 )
         else:
@@ -290,6 +291,7 @@ def admin_group_view(request, group_id):
     group = get_object_or_404(RBACAdminGroup, pk=group_id)
     users = RBACAdminUserGroup.objects.filter(group=group)
     roles = RBACAdminGroupRole.objects.filter(group=group)
+    trees = RBACAdminTree.objects.filter(group=group)
     user_list = users.values_list("member", flat=True)
     if request.user.id in user_list:
         is_admin = True
@@ -298,7 +300,13 @@ def admin_group_view(request, group_id):
     return render(
         request,
         "rbac/admin_group_view.html",
-        {"users": users, "roles": roles, "group": group, "is_admin": is_admin},
+        {
+            "users": users,
+            "roles": roles,
+            "group": group,
+            "trees": trees,
+            "is_admin": is_admin,
+        },
     )
 
 
@@ -473,6 +481,7 @@ def admin_group_edit(request, group_id):
         form.fields["description"].initial = group.description
 
     roles = RBACAdminGroupRole.objects.filter(group=group)
+    trees = RBACAdminTree.objects.filter(group=group)
     admin_roles = rbac_admin_all_rights(request.user)
     return render(
         request,
@@ -482,6 +491,7 @@ def admin_group_edit(request, group_id):
             "group": group,
             "users": users,
             "roles": roles,
+            "trees": trees,
             "admin_roles": admin_roles,
         },
     )
@@ -572,6 +582,8 @@ def rbac_tests(request):
                 ans = "Nothing found"
             last_query = "Get Users With Role"
             role = text
+            user = None
+            user = None
 
         if "get_admins_for_group" in request.POST:
             last_query = "Get Admins for Group"
@@ -605,15 +617,24 @@ def rbac_tests(request):
             else:
                 ans = "Group not found"
             group = text
+
         if "user_is_role_admin" in request.POST:
             ans = rbac_user_is_role_admin(user, text)
             if not ans:
                 ans = "False"
             last_query = "User Is Role Admin"
             role = text
+
         if "admin" in request.POST:
             last_query = "Admin"
             rights = rbac_admin_all_rights(user)
+            ans = "\n".join(rights)
+            if not ans:
+                ans = "Nothing found."
+
+        if "admin-tree" in request.POST:
+            last_query = "Admin Tree"
+            rights = rbac_admin_tree_access(user)
             ans = "\n".join(rights)
             if not ans:
                 ans = "Nothing found."

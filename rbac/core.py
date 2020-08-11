@@ -807,12 +807,14 @@ def rbac_get_users_with_role(role):
 
     group_roles_specific = RBACGroupRole.objects.filter(
         app=app, model=model, model_id=model_instance
-    ).filter(Q(action=action) | Q(action="All"))
+    ).filter(Q(action=action) | Q(action="all"))
+
+    print(group_roles_specific)
 
     if model_instance:  # check for generic too
         group_roles_higher = RBACGroupRole.objects.filter(
             app=app, model=model, model_id=None
-        ).filter(Q(action=action) | Q(action="All"))
+        ).filter(Q(action=action) | Q(action="all"))
     else:
         group_roles_higher = RBACGroupRole.objects.none()
 
@@ -829,3 +831,23 @@ def rbac_get_users_with_role(role):
     users = User.objects.filter(id__in=user_ids)
 
     return users
+
+
+def rbac_admin_tree_access(user):
+    """ returns a list of where in the tree a user had admin access.
+
+    Args:
+        user(User): standard user object
+
+    Returns:
+        list:   list of trees
+    """
+
+    groups = RBACAdminUserGroup.objects.filter(member=user).values_list("group")
+    matches = (
+        RBACAdminTree.objects.filter(group__in=groups)
+        .distinct("tree")
+        .values_list("tree")
+    )
+    ret = [item for match in matches for item in match]
+    return ret

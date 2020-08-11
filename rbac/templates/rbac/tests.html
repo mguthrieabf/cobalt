@@ -88,29 +88,31 @@ ul, #myUL {
   <div class="card">
     <div class="card-header">
       <h4 class="card-title">Choose a Type</h4>
-      <p class="category">Work with Groups, Roles or Models.</p>
+      <p class="category">Work with Models, Roles or Groups.</p>
     </div>
     <div class="card-body">
+      <div class="form-check form-check-radio form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" name="inlineRadioOptions" type="radio" id="button_models"> Models
+          <span class="circle">
+              <span class="check"></span>
+          </span>
+        </label>
+      </div>
+
+
+      <div class="form-check form-check-radio form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" name="inlineRadioOptions" type="radio" id="button_roles"> Roles
+          <span class="circle">
+              <span class="check"></span>
+          </span>
+        </label>
+      </div>
 
         <div class="form-check form-check-radio form-check-inline">
           <label class="form-check-label">
             <input class="form-check-input" name="inlineRadioOptions" type="radio" id="button_groups"> Groups
-            <span class="circle">
-                <span class="check"></span>
-            </span>
-          </label>
-        </div>
-        <div class="form-check form-check-radio form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" name="inlineRadioOptions" type="radio" id="button_roles"> Roles
-            <span class="circle">
-                <span class="check"></span>
-            </span>
-          </label>
-        </div>
-        <div class="form-check form-check-radio form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" name="inlineRadioOptions" type="radio" id="button_models"> Models
             <span class="circle">
                 <span class="check"></span>
             </span>
@@ -147,6 +149,7 @@ ul, #myUL {
 <div id="role_box" class="card col-8" style="display: none;">
   <div class="card-header card-header-warning">
     <h3>Roles</h3>
+    <i>Most roles also take an optional model_id e.g. events.org.5.edit. You can add this below.</i>
   </div>
   <div class="card-body">
     <table class="table table-responsive">
@@ -157,7 +160,7 @@ ul, #myUL {
       <tbody>
     {% for role in roles %}
     <tr>
-      <td class="py-0"><button  style="width: 250px" class="tree-btn btn btn-sm btn-info" value="{{ role.app }}.{{ role.model }}.{{ role.valid_action }}">{{ role.app }}.{{ role.model }}.{{ role.valid_action }}</button>
+      <td class="py-0"><button  style="width: 250px" class="tree-btn cobalt-rbac-role btn btn-sm btn-info" value="{{ role.app }}.{{ role.model }}.{{ role.valid_action }}">{{ role.app }}.{{ role.model }}.{{ role.valid_action }}</button>
       <td class="py-0">{{ role.description }}
     {% endfor %}
     </tbody>
@@ -177,7 +180,7 @@ ul, #myUL {
       <tbody>
     {% for model in models %}
     <tr>
-      <td class="py-0"><button class="tree-btn btn btn-sm btn-info" value="{{ model.app }}.{{ model.model }}">{{ model.app }}.{{ model.model }}</button>
+      <td class="py-0"><button style="width: 250px" class="tree-btn cobalt-rbac-model btn btn-sm btn-info" value="{{ model.app }}.{{ model.model }}">{{ model.app }}.{{ model.model }}</button>
     {% endfor %}
     </tbody>
     </table>
@@ -204,7 +207,9 @@ ul, #myUL {
   <br>
 
   <span id="hidden_user"><input type='hidden' id='id_user' name='id_user' value='{{ member_id|default_if_none:"" }}'></span>
-  <strong>Group, Model or Role: </strong><input type="text" id="id_text" name="id_text" value="{{ text }}">
+  <strong><span id="text_type">Group, Model or Role: </span></strong>
+<br>
+  <input type="text" style="width: 400px" id="id_text" name="id_text" value="{{ text }}">
   <br>
   <i>You may want to include a model_id in the string above. e.g. forums.forum.1.edit</i>
 <br><br>
@@ -261,13 +266,18 @@ ul, #myUL {
   </tr>
   <tr>
     <td class="px-3"><kbd>User</kbd>
-    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin">Admin for User</button>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin">Admin Rights for User</button>
     <td class="px-3">List all admin rights for this user.
+  </tr>
+  <tr>
+    <td class="px-3"><kbd>User</kbd>
+    <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="admin-tree">Tree Rights for User</button>
+    <td class="px-3">List all places in the tree that this user can manage.
   </tr>
 </table>
 </form>
 
-</div>
+
 {% endblock %}
 
 {% block footer %}
@@ -297,6 +307,19 @@ ul, #myUL {
 
 // get tree value if clicked
       $(".tree-btn").click(function(event){
+
+// set label
+        if ($(this).hasClass("cobalt-rbac-tree")){
+          $("#text_type").text("Group:");
+        }
+        if ($(this).hasClass("cobalt-rbac-role")){
+          $("#text_type").text("Role:");
+        }
+        if ($(this).hasClass("cobalt-rbac-model")){
+          $("#text_type").text("Model:");
+        }
+
+// set value
         var tr = $(this).val();
         $("#id_text").val(tr);
         $("#id_text").focus();

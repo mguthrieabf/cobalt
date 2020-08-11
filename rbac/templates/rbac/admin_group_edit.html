@@ -164,6 +164,23 @@
   </div>
   <br>
 
+  <br>
+      <div class="card col-lg-9">
+        <div class="card-header card-header-info">
+          <h3 class="card-title">Tree</h3>
+        </div>
+        <div class="card-body" style="text-align: center">
+          <div class="container">
+            {% for tree in trees %}
+            <div class="row">
+              {{ tree.tree }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+
 </div>
 {% endblock %}
 
