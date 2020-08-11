@@ -615,6 +615,8 @@ def rbac_tests(request):
             last_query = "Admin"
             rights = rbac_admin_all_rights(user)
             ans = "\n".join(rights)
+            if not ans:
+                ans = "Nothing found."
 
     # Get trees
     groups = RBACGroup.objects.all().order_by("name_qualifier")

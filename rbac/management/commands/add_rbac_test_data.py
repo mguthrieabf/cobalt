@@ -23,6 +23,7 @@ from rbac.core import (
 )
 from forums.models import Post
 from organisations.models import MemberOrganisation
+from rbac.models import RBACModelDefault
 
 
 class Command(BaseCommand):
@@ -38,10 +39,22 @@ class Command(BaseCommand):
             "100",
             "Alan",
             "Admin",
-            "Global Admin for Everything, well as much as possible.",
+            "Global Admin for Everything, well as much as possible. Also member of secret forum 6.",
         )
-        bb = create_fake_user(self, "101", "Betty", "Bunting", "Forums Global Admin")
-        cc = create_fake_user(self, "102", "Colin", "Corgy", "Payments Global Admin")
+        bb = create_fake_user(
+            self,
+            "101",
+            "Betty",
+            "Bunting",
+            "Forums Global Admin. Member of secret forum 6.",
+        )
+        cc = create_fake_user(
+            self,
+            "102",
+            "Colin",
+            "Corgy",
+            "Payments Global Admin. Member of secret forum 6.",
+        )
         dd = create_fake_user(self, "103", "Debbie", "Dyson", "ABF Payments Officer")
         ee = create_fake_user(
             self, "104", "Eric", "Eastwood", "Owner of Fantasy Bridge Club"
@@ -62,6 +75,10 @@ class Command(BaseCommand):
             "Igloo",
             "Moderator on all public forums and ABF Payments Officer",
         )
+        jj = create_fake_user(
+            self, "109", "Janet", "Jumper", "Moderator and member of secret forum 6.",
+        )
+        kk = create_fake_user(self, "110", "Keith", "Kenneth", "Global Moderator.",)
 
         # create Orgs - ABF should be created first, then this.
         print("Creating Orgs")
@@ -83,6 +100,7 @@ class Command(BaseCommand):
         # Adding Members to Orgs
         print("Adding Members to clubs")
         MemberOrganisation(member=aa, organisation=fbc).save()
+        MemberOrganisation(member=aa, organisation=rbc).save()
         MemberOrganisation(member=bb, organisation=rbc).save()
         MemberOrganisation(member=cc, organisation=fbc).save()
         MemberOrganisation(member=dd, organisation=rbc).save()
@@ -91,6 +109,8 @@ class Command(BaseCommand):
         MemberOrganisation(member=gg, organisation=fbc).save()
         MemberOrganisation(member=hh, organisation=rbc).save()
         MemberOrganisation(member=ii, organisation=rbc).save()
+        MemberOrganisation(member=jj, organisation=fbc).save()
+        MemberOrganisation(member=kk, organisation=fbc).save()
 
         # create Forums
         print("Creating Forums")
@@ -253,7 +273,7 @@ class Command(BaseCommand):
         # Forum Admins
         print("\nGlobal Forum Admins")
         forum_admin = rbac_create_group(
-            "rbac.modules.forums.admins", "forum_admins", "Global admins for forums"
+            "rbac.modules.forums.admin", "forum_admins", "Global admins for forums"
         )
         print(forum_admin)
 
@@ -288,6 +308,10 @@ class Command(BaseCommand):
             public_mods, "forums", "moderate", "edit", "Allow", model_id=f4.id
         )
         print("Added/Checked role %s" % role)
+        role = rbac_add_role_to_group(
+            public_mods, "forums", "moderate", "edit", "Allow", model_id=f5.id
+        )
+        print("Added/Checked role %s" % role)
 
         rbac_add_user_to_group(ii, public_mods)
         print("added %s to group" % ii)
@@ -304,7 +328,7 @@ class Command(BaseCommand):
         print(block_all)
 
         role = rbac_add_role_to_group(
-            block_all, "forums", "forum", "all", "Block", model_id=f5.id
+            block_all, "forums", "forum", "all", "Block", model_id=f6.id
         )
         print("Added/Checked role %s" % role)
 
@@ -320,7 +344,7 @@ class Command(BaseCommand):
         print(allow_specific)
 
         role = rbac_add_role_to_group(
-            allow_specific, "forums", "forum", "all", "Allow", model_id=f5.id
+            allow_specific, "forums", "forum", "all", "Allow", model_id=f6.id
         )
         print("Added/Checked role %s" % role)
 
@@ -330,6 +354,42 @@ class Command(BaseCommand):
         print("added %s to group" % bb)
         rbac_add_user_to_group(cc, allow_specific)
         print("added %s to group" % cc)
+
+        # Secret Forum Moderator
+        print("\nSecret Forum - Special Moderator")
+
+        secret_mods = rbac_create_group(
+            "rbac.modules.forums.admin",
+            "secret_moderators",
+            "Moderators for Hidden Forum 6",
+        )
+        print(secret_mods)
+
+        role = rbac_add_role_to_group(
+            secret_mods, "forums", "moderate", "edit", "Allow", model_id=f6.id
+        )
+        print("Added/Checked role %s" % role)
+
+        rbac_add_user_to_group(jj, secret_mods)
+        print("added %s to group" % jj)
+
+        # Global Forum Moderator
+        print("\nGlobal Forum Moderators")
+
+        global_mods = rbac_create_group(
+            "rbac.modules.forums.admin",
+            "global_moderators",
+            "Moderators for all forums, even hidden.",
+        )
+        print(global_mods)
+
+        role = rbac_add_role_to_group(
+            global_mods, "forums", "moderate", "edit", "Allow"
+        )
+        print("Added/Checked role %s" % role)
+
+        rbac_add_user_to_group(kk, global_mods)
+        print("added %s to group" % kk)
 
         # ABF Payments
         print("\nABF Payments Officers")
@@ -348,4 +408,30 @@ class Command(BaseCommand):
         rbac_add_user_to_group(ii, abfp)
         print("added %s to group" % ii)
 
-        # fill out the tree a bit
+        #################################################################
+        # Admin Tree                                                    #
+        #################################################################
+
+        # Global Roles
+        ad_group = create_RBAC_admin_group(
+            self,
+            "admin.cobalt.global",
+            "system_gods",
+            "Highest level of admin to all functions.",
+        )
+        create_RBAC_admin_tree(self, ad_group, "rbac")
+        rbac_add_user_to_admin_group(ad_group, aa)
+        models = RBACModelDefault.objects.all()
+        for model in models:
+            rbac_add_role_to_admin_group(ad_group, app=model.app, model=model.model)
+
+        # Forums admin
+        f_group = create_RBAC_admin_group(
+            self, "admin.cobalt.global", "forums", "All forum admin",
+        )
+        create_RBAC_admin_tree(self, f_group, "rbac.modules.forums")
+        create_RBAC_admin_tree(self, f_group, "rbac.orgs")
+        rbac_add_user_to_admin_group(f_group, bb)
+        rbac_add_role_to_admin_group(f_group, app="forums", model="forum")
+        rbac_add_role_to_admin_group(f_group, app="forums", model="admin")
+        rbac_add_role_to_admin_group(f_group, app="forums", model="moderate")

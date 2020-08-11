@@ -214,11 +214,11 @@ ul, #myUL {
     <th class="text-center">Function</th>
     <th class="text-center">Description</th>
   </tr>
-  <tr>
+  <!-- <tr>
     <td class="px-3"><kbd>User</kbd> + <kbd>Role</kbd>
     <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role">User Has Role</button>
     <td class="px-3">Test if a user has access to a role.
-  </tr>
+  </tr> -->
   <tr>
     <td class="px-3"><kbd>User</kbd> + <kbd>Role</kbd>
     <td class="px-3"><button type="submit" style="width:300px" class="btn btn-sm btn-success" name="user_has_role_explain">User Has Role Explain</button>
@@ -303,13 +303,13 @@ ul, #myUL {
       });
 
 // answer pop up
-      {% if ans %}
-      Swal.fire(
-        'Results',
-        '{{ ans_swal }}',
-        'success'
-      )
-      {% endif %}
+      // {% if ans %}
+      // Swal.fire(
+      //   'Results',
+      //   ' ans_swal }}',
+      //   'success'
+      // )
+      // {% endif %}
 
 // reveal boxes
       $("#button_roles").click(function(event){

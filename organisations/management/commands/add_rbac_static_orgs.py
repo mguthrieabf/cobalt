@@ -59,10 +59,10 @@ class Command(BaseCommand):
         )
         group = create_RBAC_admin_group(
             self,
-            "admin.abf.clubs",
+            "admin.orgs.abf.clubs",
             "edit-orgs",
             "Group for admins who can grant access to edit orgs.",
         )
-        create_RBAC_admin_tree(self, group, "admin.abf.clubs.edit-orgs")
+        create_RBAC_admin_tree(self, group, "admin.orgs.abf.clubs.edit-orgs")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="orgs", model="org")

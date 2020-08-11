@@ -821,7 +821,9 @@ def rbac_get_users_with_role(role):
     groups = group_roles.distinct("group").values("group")
 
     user_ids = (
-        RBACUserGroup.objects.filter(id__in=groups).distinct("member").values("member")
+        RBACUserGroup.objects.filter(group__in=groups)
+        .distinct("member")
+        .values("member")
     )
 
     users = User.objects.filter(id__in=user_ids)

@@ -53,11 +53,11 @@ class Command(BaseCommand):
         user = User.objects.filter(username="Mark").first()
         group = create_RBAC_admin_group(
             self,
-            "admin.abf.abf_roles",
+            "admin.orgs.abf.abf_roles",
             "payments",
             "Group to manage access to payments for the ABF",
         )
-        create_RBAC_admin_tree(self, group, "rbac.abf")
+        create_RBAC_admin_tree(self, group, "rbac.orgs.abf")
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="payments", model="global")
 
