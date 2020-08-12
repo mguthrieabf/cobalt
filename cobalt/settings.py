@@ -1,3 +1,14 @@
+""" Cobalt Settings.py
+    ------------------
+
+This is the single settings.py for all Cobalt environments.
+
+We manage all configuration differences through environment variables.
+This provides security for confidential information in the online
+environments (Test, UAT and Production)
+"""
+
+
 import os
 from django.contrib.messages import constants as messages
 
@@ -80,6 +91,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.common.BrokenLinkEmailsMiddleware",
 ]
 
 ROOT_URLCONF = "cobalt.urls"
