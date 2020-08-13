@@ -48,7 +48,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
 ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]
-SERVER_EMAIL = "django@abftech.com.au"
+SERVER_EMAIL = "donotreply@drunkguthrie.com"
 
 # masterpoints server
 GLOBAL_MPSERVER = set_value("GLOBAL_MPSERVER")
@@ -147,7 +147,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.common.BrokenLinkEmailsMiddleware",
+    #    "django.middleware.common.BrokenLinkEmailsMiddleware",
 ]
 
 ROOT_URLCONF = "cobalt.urls"
@@ -283,23 +283,62 @@ RBAC_EVERYONE = 1
 # Org id for the system account
 GLOBAL_ORG_ID = 1
 
-ADDITIONAL_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        # The 'django' logger is the catch-all logger for messages in the Django hierarchy
-        # (cf. https://docs.djangoproject.com/en/1.11/topics/logging/#django)
-        'django': {
-            'handlers': ['console','mail_admin'],
-            'level': 'INFO',
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         },
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             'class': 'django.utils.log.AdminEmailHandler',
+#
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'propagate': True,
+#         },
+#         'django.request': {
+#             'handlers': ['mail_admins'],
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#     }
+# }
+
+# ADDITIONAL_LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         # The 'django' logger is the catch-all logger for messages in the Django hierarchy
+#         # (cf. https://docs.djangoproject.com/en/1.11/topics/logging/#django)
+#         'django': {
+#             'handlers': ['console','mail_admin'],
+#             'level': 'INFO',
+#         },
+#     },
+# }
 
 # logging
 # LOGGING = {
