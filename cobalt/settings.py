@@ -283,6 +283,24 @@ RBAC_EVERYONE = 1
 # Org id for the system account
 GLOBAL_ORG_ID = 1
 
+ADDITIONAL_LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        # The 'django' logger is the catch-all logger for messages in the Django hierarchy
+        # (cf. https://docs.djangoproject.com/en/1.11/topics/logging/#django)
+        'django': {
+            'handlers': ['console','mail_admin'],
+            'level': 'INFO',
+        },
+    },
+}
+
 # logging
 # LOGGING = {
 #     "version": 1,
