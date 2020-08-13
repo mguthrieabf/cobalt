@@ -30,7 +30,9 @@ def masterpoints_detail(request, system_number=None):
     qry = "%s/mps/%s" % (GLOBAL_MPSERVER, system_number)
     r = requests.get(qry).json()
     if len(r) == 0:
-        raise Http404("No entry found for %s" % system_number)
+        error_msg = "No entry found for %s" % system_number
+        error = {"cobalt_error_msg": error_msg}
+        raise Http404(error)
     summary = r[0]
 
     # Set active to a boolean

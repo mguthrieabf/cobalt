@@ -5,49 +5,103 @@ This is the single settings.py for all Cobalt environments.
 
 We manage all configuration differences through environment variables.
 This provides security for confidential information in the online
-environments (Test, UAT and Production)
-"""
+environments (Test, UAT and Production) which is managed by Elastic
+Beanstalk through settings which become environment at run-time.
 
+For development you also need to set environment variables or it
+won't work.
+
+readthedocs somehow runs the code as well in order to generate the
+documentation and this requires variables to defined so as well as importing
+the variables from the environment, we also have to define them (with dummy
+values) within this file.
+
+"""
 
 import os
 from django.contrib.messages import constants as messages
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
+###########################################
+# function to set values from environment #
+# variables.                              #
+###########################################
+def set_value(val_name, default="not-set"):
+    if val_name in os.environ:
+        return os.environ[val_name]
+    else:
+        return default
+
+
+###########################################
+# base settings that need to come first.  #
+###########################################
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+###########################################
+# Specific settings per environment.      #
+# Override through environment variables. #
+# Dummy values are required for read the  #
+# docs to work.                           #
+###########################################
+# basics
+SECRET_KEY = set_value("SECRET_KEY")
+DEBUG = set_value("DEBUG", False)
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
+# masterpoints server
+GLOBAL_MPSERVER = set_value("GLOBAL_MPSERVER")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "ci8v_@0l*@1@*ufho0kt4+wu6d7b(r!0-4k9p2c^a!rki%23dr"
+# email
+EMAIL_HOST = set_value("EMAIL_HOST")
+EMAIL_HOST_USER = set_value("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = set_value("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = set_value("DEFAULT_FROM_EMAIL", "notset@fake.com")
+SUPPORT_EMAIL = set_value("SUPPORT_EMAIL", "[m@rkguthrie.com]")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# stripe
+STRIPE_SECRET_KEY = set_value("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = set_value("STRIPE_PUBLISHABLE_KEY")
 
-ALLOWED_HOSTS = [
-    "test.abftech.com.au",
-    "uat.abftech.com.au",
-    "orange.abftech.com.au",
-    "127.0.0.1",
-    "cobalt-test-blue.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
-    "cobalt-test.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
-    "cobalt-test-green.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
-    "cobalt-uat-green.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
-]
+# aws
+AWS_ACCESS_KEY_ID = set_value("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = set_value("AWS_SECRET_ACCESS_KEY")
+
+# our hostname
+COBALT_HOSTNAME = set_value("COBALT_HOSTNAME", "127.0.0.1:8000")
+
+# database
+RDS_DB_NAME = set_value("RDS_DB_NAME")
+RDS_USERNAME = set_value("RDS_USERNAME")
+RDS_PASSWORD = set_value("RDS_PASSWORD")
+RDS_HOSTNAME = set_value("RDS_HOSTNAME")
+RDS_PORT = set_value("RDS_PORT")
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": RDS_DB_NAME,
+        "USER": RDS_USERNAME,
+        "PASSWORD": RDS_PASSWORD,
+        "HOST": RDS_HOSTNAME,
+        "PORT": RDS_PORT,
+    }
+}
+
+#########################################
+# Dynamic settings.                     #
+#########################################
+ALLOWED_HOSTS = ["test.abftech.com.au", "uat.abftech.com.au", "127.0.0.1"]
 
 # For AWS we also need to add the local IP address as this is used by the health checks
 # We do this dynamically
 # This gives an error on windows but it can be ignored
 local_ip = os.popen("hostname -I 2>/dev/null").read()
 ALLOWED_HOSTS.append(local_ip.strip())
-# try:
-#     local_ip = os.popen("hostname -I 2>/dev/null").read()
-#     ALLOWED_HOSTS.append(local_ip.strip())
-# except:
-#     pass
 
-# Application definition
+#########################################
+# Common settings for all environments  #
+#########################################
+AWS_REGION_NAME = "ap-southeast-2"
 
 INSTALLED_APPS = [
     "calendar_app",
@@ -117,47 +171,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 WSGI_APPLICATION = "cobalt.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    },
-}
-
-# Dummy settings required so read the docs will work
-GLOBAL_MPSERVER = "dummy"
-EMAIL_HOST = "smtp.com"
-EMAIL_HOST_USER = "Name <a@b.com>"
-EMAIL_HOST_PASSWORD = "password"
-DEFAULT_FROM_EMAIL = "donotreply@a.com"
-STRIPE_SECRET_KEY = "not-set"
-STRIPE_PUBLISHABLE_KEY = "not-set"
-AWS_ACCESS_KEY_ID = "not-set"
-AWS_SECRET_ACCESS_KEY = "not-set"
-COBALT_HOSTNAME = "127.0.0.1:8000"
-
-if "COBALT_HOSTNAME" in os.environ:
-    COBALT_HOSTNAME = os.environ["COBALT_HOSTNAME"]
-
-AWS_REGION_NAME = "ap-southeast-2"
-
-if "RDS_HOSTNAME" in os.environ:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "NAME": os.environ["RDS_DB_NAME"],
-            "USER": os.environ["RDS_USERNAME"],
-            "PASSWORD": os.environ["RDS_PASSWORD"],
-            "HOST": os.environ["RDS_HOSTNAME"],
-            "PORT": os.environ["RDS_PORT"],
-        }
-    }
-
 AUTH_USER_MODEL = "accounts.User"
-AUTHENTICATION_BACKENDS = ["accounts.backend.CobaltBackend"]
 
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+AUTHENTICATION_BACKENDS = ["accounts.backend.CobaltBackend"]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -171,16 +187,6 @@ AUTH_PASSWORD_VALIDATORS = [
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-SUPPORT_EMAIL = ["m@rkguthrie.com"]
-
-if "EMAIL_HOST" in os.environ:
-    EMAIL_HOST = os.environ["EMAIL_HOST"]
-    EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
-    EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
-    DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = "en-au"
 TIME_ZONE = "Australia/Sydney"
@@ -196,12 +202,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "cobalt/static/")]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # External reference point to find static
-STATIC_URL = "/static/"
-
-# STATICFILES_FINDERS = (
-#     "django.contrib.staticfiles.finders.FileSystemFinder",
-#     # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',    #causes verbose duplicate notifications in django 1.9
-# )
+# STATIC_URL = "/static/"
+STATIC_URL = "https://test.abftech.com.au/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
@@ -219,31 +221,14 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
-# Local settings for this Application
 GLOBAL_ORG = "ABF"
 GLOBAL_TITLE = "ABF Technology"
 GLOBAL_CONTACT = "https://abf.com.au"
 GLOBAL_ABOUT = "https://abf.com.au"
 GLOBAL_PRIVACY = "https://abf.com.au"
 GLOBAL_PRODUCTION = "abftech.com.au"
-GLOBAL_MPSERVER = "http://127.0.0.1:8081"
 GLOBAL_CURRENCY_SYMBOL = "$"
 GLOBAL_CURRENCY_NAME = "Dollar"
-
-if "GLOBAL_MPSERVER" in os.environ:
-    GLOBAL_MPSERVER = os.environ["GLOBAL_MPSERVER"]
-
-# Stripe is our payment gateway - for dev create your own free stripe
-# account and set your keys
-
-if "STRIPE_SECRET_KEY" in os.environ:
-    STRIPE_SECRET_KEY = os.environ["STRIPE_SECRET_KEY"]
-    STRIPE_PUBLISHABLE_KEY = os.environ["STRIPE_PUBLISHABLE_KEY"]
-
-# AWS keys are used to send SMS
-if "AWS_ACCESS_KEY_ID" in os.environ:
-    AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-    AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
 
 # Payments auto amounts
 AUTO_TOP_UP_LOW_LIMIT = 20

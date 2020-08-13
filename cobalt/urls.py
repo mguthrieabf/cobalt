@@ -29,3 +29,9 @@ urlpatterns = [
     path("summernote/", include("django_summernote.urls")),
     path("health/", include("health_check.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Error handlers
+handler404 = "cobalt.errors.not_found_404"
+handler500 = "cobalt.errors.server_error_500"
+handler403 = "cobalt.errors.permission_denied_403"
+handler400 = "cobalt.errors.bad_request_400"
