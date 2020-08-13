@@ -47,6 +47,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # basics
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
+ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]
 
 # masterpoints server
 GLOBAL_MPSERVER = set_value("GLOBAL_MPSERVER")
