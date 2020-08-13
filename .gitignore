@@ -1,18 +1,10 @@
 
-# Elastic Beanstalk Files
 .elasticbeanstalk/*
-#!.elasticbeanstalk/*.cfg.yml
-#!.elasticbeanstalk/*.global.yml
-### Django ###
 *.log
 *.pot
 *.pyc
 __pycache__/
-local_settings.py
 db.sqlite3*
 /media
-!default-avatar.png
-/htmlcov
 .DS_Store
-/env.sh
 .coverage
