@@ -19,6 +19,7 @@ values) within this file.
 """
 
 import os
+import ast
 from django.contrib.messages import constants as messages
 
 
@@ -47,7 +48,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # basics
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
-ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]
+admin_string = set_value("ADMINS", '("Mark Guthrie", "m@rkguthrie.com")')
+ADMINS = list(ast.literal_eval(admin_string))
 SERVER_EMAIL = set_value("SERVER_EMAIL", "notset@abftech.com.au")
 
 # masterpoints server
