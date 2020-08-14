@@ -44,7 +44,12 @@ class AddGroup(forms.Form):
         )
 
         # admintree is shared so filter out the parts we want
-        queryset = RBACAdminTree.objects.filter(group__in=group_list).order_by("tree")
+        queryset = (
+            RBACAdminTree.objects.filter(group__in=group_list)
+            .order_by("tree")
+            .distinct("tree")
+            .values_list("tree")
+        )
         if self.environment == "admin":
             queryset = queryset.filter(tree__startswith="admin.")
         else:
@@ -56,16 +61,16 @@ class AddGroup(forms.Form):
         for query in whole_tree_qs:
             whole_tree.append(query[0])
 
-            whole_tree.sort()
+        whole_tree.sort()
 
+        already_included = []
         for item in queryset:
             # add item and any existing lower parts of tree to choices
             item = "%s" % item
             for wtree in whole_tree:
-                print(wtree)
-                print(item)
-                if wtree.find(item) == 0:
+                if wtree.find(item) == 0 and wtree not in already_included:
                     choices.append((wtree, wtree))
+                    already_included.append(wtree)
 
         self.fields["name_qualifier"] = forms.ChoiceField(
             label="Qualifier", choices=choices, required=False

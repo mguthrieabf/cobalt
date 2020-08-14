@@ -48,7 +48,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # basics
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
-admin_string = set_value("ADMINS", '("Mark Guthrie", "m@rkguthrie.com")')
+
+# Open case with AWS to get this to pass with spaces
+admin_string = '("Mark Guthrie", "m@rkguthrie.com")'
 ADMINS = list(ast.literal_eval(admin_string))
 SERVER_EMAIL = set_value("SERVER_EMAIL", "notset@abftech.com.au")
 
