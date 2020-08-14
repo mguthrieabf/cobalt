@@ -30,7 +30,12 @@ def masterpoints_detail(request, system_number=None):
     qry = "%s/mps/%s" % (GLOBAL_MPSERVER, system_number)
     try:
         r = requests.get(qry).json()
-    except (IndexError, requests.exceptions.InvalidSchema, ConnectionError):
+    except (
+        IndexError,
+        requests.exceptions.InvalidSchema,
+        requests.exceptions.MissingSchema,
+        ConnectionError,
+    ):
         r = []
     if len(r) == 0:
         error_msg = "No entry found for %s" % system_number
@@ -281,7 +286,12 @@ def get_masterpoints(system_number):
         summary = requests.get("%s/mps/%s" % (GLOBAL_MPSERVER, system_number)).json()[0]
         points = summary["TotalMPs"]
         rank = summary["RankName"] + " Master"
-    except (IndexError, requests.exceptions.InvalidSchema, ConnectionError):
+    except (
+        IndexError,
+        requests.exceptions.InvalidSchema,
+        requests.exceptions.MissingSchema,
+        ConnectionError,
+    ):
         points = "Not found"
         rank = "Not found"
     return {"points": points, "rank": rank}
