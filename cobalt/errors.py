@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 def not_found_404(request, exception):
     print("404")
-    # print(exception)
+    print(exception)
     # try:
     #     if "cobalt_error_msg" in exception:
     #         print("ok")

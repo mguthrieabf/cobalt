@@ -48,6 +48,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # basics
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
+print("Debug is")
+print(DEBUG)
 
 # Open case with AWS to get this to pass with spaces
 ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]
@@ -210,8 +212,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "cobalt/static/")]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # External reference point to find static
-# STATIC_URL = "/static/"
-STATIC_URL = "https://test.abftech.com.au/static/"
+STATIC_URL = "/static/"
+# STATIC_URL = "https://test.abftech.com.au/static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
