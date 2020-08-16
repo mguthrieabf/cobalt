@@ -22,11 +22,25 @@ import os
 import ast
 from django.contrib.messages import constants as messages
 
+#
+# import sentry_sdk
+# from sentry_sdk.integrations.django import DjangoIntegration
+#
+# sentry_sdk.init(
+#     dsn="https://03fc58740fd4459889c627a99ab9b922@o434604.ingest.sentry.io/5391868",
+#     integrations=[DjangoIntegration()],
+#
+#     # If you wish to associate users to errors (assuming you are using
+#     # django.contrib.auth) you may enable sending PII data.
+#     send_default_pii=True
+# )
 
 ###########################################
 # function to set values from environment #
 # variables.                              #
 ###########################################
+
+
 def set_value(val_name, default="not-set"):
     if val_name in os.environ:
         return os.environ[val_name]
@@ -230,6 +244,8 @@ MESSAGE_TAGS = {
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
 }
+
+EMAIL_SUBJECT_PREFIX = "[%s] " % COBALT_HOSTNAME
 
 GLOBAL_ORG = "ABF"
 GLOBAL_TITLE = "ABF Technology"
