@@ -4,6 +4,7 @@
 
 from cobalt.settings import RBAC_EVERYONE
 from accounts.models import User
+from events.models import CongressMaster
 from django.core.management.base import BaseCommand
 from accounts.management.commands.accounts_core import create_fake_user
 from forums.management.commands.forums_core import create_forum
@@ -31,6 +32,8 @@ class Command(BaseCommand):
         print("Running add_rbac_test_data")
 
         EVERYONE = User.objects.filter(pk=RBAC_EVERYONE).first()
+        mark = User.objects.filter(system_number="620246").first()
+        julian = User.objects.filter(system_number="518891").first()
 
         # Create Users
         print("Creating Users")
@@ -233,7 +236,7 @@ class Command(BaseCommand):
         # FBC Staff
         print("\nFBC Staff")
         fbc_staff = rbac_create_group(
-            "rbac.orgs.clubs.act.fantasy_bridge_club(%s)" % fbc.id,
+            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
             "staff",
             "Staff at Fantasy Bridge Club",
         )
@@ -435,3 +438,79 @@ class Command(BaseCommand):
         rbac_add_role_to_admin_group(f_group, app="forums", model="forum")
         rbac_add_role_to_admin_group(f_group, app="forums", model="admin")
         rbac_add_role_to_admin_group(f_group, app="forums", model="moderate")
+
+        # Fantasy Bridge Club congresses
+        print("\nFantasy Bridge Club Congresses")
+        fbc_congress = rbac_create_group(
+            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
+            "congresses",
+            "Congress Conveners at Fantasy Bridge Club",
+        )
+        print(fbc_congress)
+
+        role = rbac_add_role_to_group(
+            fbc_congress, "events", "org", "all", "Allow", fbc.id
+        )
+        print("Added/Checked role %s" % role)
+
+        rbac_add_user_to_group(cc, fbc_congress)
+        print("added %s to group" % cc)
+        rbac_add_user_to_group(ee, fbc_congress)
+        print("added %s to group" % ee)
+        rbac_add_user_to_group(ff, fbc_congress)
+        print("added %s to group" % ff)
+        rbac_add_user_to_group(gg, fbc_congress)
+        print("added %s to group" % gg)
+        rbac_add_user_to_group(mark, fbc_congress)
+        print("added %s to group" % mark)
+        rbac_add_user_to_group(julian, fbc_congress)
+        print("added %s to group" % julian)
+
+        # Congress Master
+        congress_master = CongressMaster(name="Fantasy Annual Super Congress", org=fbc)
+        congress_master.save()
+        congress_master = CongressMaster(
+            name="Fantasy Easter Red Points Congress", org=fbc
+        )
+        congress_master.save()
+        congress_master = CongressMaster(
+            name="Fantasy Christmas Red Points Congress", org=fbc
+        )
+        congress_master.save()
+
+        # Rival Bridge Club congresses
+        print("\nRival Bridge Club Congresses")
+        rbc_congress = rbac_create_group(
+            "rbac.orgs.clubs.act.rival_bridge_club[%s]" % rbc.id,
+            "congresses",
+            "Congress Conveners at Rival Bridge Club",
+        )
+        print(rbc_congress)
+
+        role = rbac_add_role_to_group(
+            rbc_congress, "events", "org", "all", "Allow", rbc.id
+        )
+        print("Added/Checked role %s" % role)
+
+        rbac_add_user_to_group(bb, rbc_congress)
+        print("added %s to group" % bb)
+        rbac_add_user_to_group(dd, rbc_congress)
+        print("added %s to group" % dd)
+        rbac_add_user_to_group(hh, rbc_congress)
+        print("added %s to group" % hh)
+        rbac_add_user_to_group(mark, rbc_congress)
+        print("added %s to group" % mark)
+        rbac_add_user_to_group(julian, rbc_congress)
+        print("added %s to group" % julian)
+
+        # Congress Master
+        congress_master = CongressMaster(name="Rival Annual Super Congress", org=rbc)
+        congress_master.save()
+        congress_master = CongressMaster(
+            name="Rival Easter Red Points Congress", org=rbc
+        )
+        congress_master.save()
+        congress_master = CongressMaster(
+            name="Rival Christmas Red Points Congress", org=rbc
+        )
+        congress_master.save()

@@ -45,7 +45,11 @@
 <div class="">
   <div class="card">
     <div class="card-header card-header-warning">
-      <h2>{{ title }} - {{ congress.name }} {{ congress.status }}</h2>
+      {% if congress %}
+        <h2>{{ title }} - {{ congress.name }} {{ congress.status }}</h2>
+      {% else %}
+        <h2>{{ title }}</h2>
+      {% endif %}
     </div>
 
     <div class="card-body">
@@ -68,19 +72,27 @@
                   Organisation
                 </div>
                 <div class="col-7">
-                  {{ form.org|as_crispy_field }}
+                  <div id="div_id_org" class="form-group">
+                    <span class="cobalt-form-error" id="id_org_errors">{{ form.org.errors|striptags }}</span>
+                    {% render_field form.org class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Organisation", "All congresses must be associated with an organisation in order for payments and other things to work properly.");'>help</a>
                 </div>
               </div>
               <br><br>
-            {% for convener in conveners %}
-              {{ convener }}
-            {% endfor %}
+
+
+              <div class="container" id="conveners" style="display:none">
+                <h3>Convener Access</h3>
+                <div class="w-100" size="10" id="user_list">
+
+                </div>
           </div>
         </div>
       </div>
+    </div>
 
 <!-- End Organisation -->
 <a href="#" id="advanced_link">Advanced...</a>
@@ -126,19 +138,27 @@
                   Congress Master
                 </div>
                 <div class="col-7">
-                  {{ form.congress_master|as_crispy_field }}
+                  <div id="div_id_congress_master" class="form-group">
+                    <span class="cobalt-form-error" id="id_corngress_master_errors">{{ form.congress_master.errors|striptags }}</span>
+                    {% render_field form.congress_master class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
                 </div>
               </div>
+              <br>
 
               <div class="row">
                 <div class="col-3 justify-content-center align-self-center">
                   Year
                 </div>
                 <div class="col-7">
-                  {{ form.year|as_crispy_field }}
+                  <div id="div_id_name" class="form-group">
+                    <span class="cobalt-form-error" id="id_year_errors">{{ form.year.errors|striptags }}</span>
+                    {% render_field form.year class+="form-control" %}
+                  </div>
+
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
@@ -150,7 +170,10 @@
                   Name
                 </div>
                 <div class="col-7">
-                  {{ form.name|as_crispy_field }}
+                  <div id="div_id_name" class="form-group">
+                    <span class="cobalt-form-error" id="id_name_errors">{{ form.name.errors|striptags }}</span>
+                    {% render_field form.name class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Congress Name", "The name you wish to give this congress. Typically the Congress Master plus the Year.");'>help</a>
@@ -162,7 +185,10 @@
                   Dates
                 </div>
                 <div class="col-7">
-                  {{ form.date_string|as_crispy_field }}
+                  <div id="div_id_date_string" class="form-group">
+                    <span class="cobalt-form-error" id="id_date_string_errors">{{ form.date_string.errors|striptags }}</span>
+                    {% render_field form.date_string class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Date String", "Free format text for the dates of the congress. e.g. 23rd March 2021 to 29th March 2021.");'>help</a>
@@ -239,7 +265,10 @@
                   Venue Name
                 </div>
                 <div class="col-7">
-                  {{ form.venue_name|as_crispy_field }}
+                  <div id="div_id_venue_name" class="form-group">
+                    <span class="cobalt-form-error" id="id_venue_name_errors">{{ form.venue_name.errors|striptags }}</span>
+                    {% render_field form.venue_name class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Name", "The name of the venue hosting the event.");'>help</a>
@@ -256,7 +285,10 @@
                                     <button type="button" name="lookup_button" id="lookup_button" class="btn btn-sm btn-info">Lookup</button>
                 </div>
                 <div class="col-7">
-                  {{ form.venue_location|as_crispy_field }}
+                  <div id="div_id_venue_location" class="form-group">
+                    <span class="cobalt-form-error" id="id_venue_location_errors">{{ form.venue_location.errors|striptags }}</span>
+                    {% render_field form.venue_location class+="form-control" %}
+                  </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
                   <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue. <br><br>You can use the lookup button to search for this. If the lookup button does not work for you then you can open another window and search in there. Find your location in Google Maps and right click on it. Choose <b>Whats Here</b> and it will show you the coordinates.");'>help</a>
@@ -415,34 +447,27 @@
 
       });
 
+// when the org changes we update the conveners
+    $("#id_org").change(function(){
+      var id = $(this).val();
+      $.ajax({
+             url: "/events/congress/get-conveners/" + id,
+             headers: {
+               "Content-Type": "application/json",
+                "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+             },
+             type: "get",
+             success: function (response) {
+               $("#user_list").html(response.data);
+               $("#conveners").show();
+             }
+
+      });
     });
 
 
-// Get location
-//        var loc = $("#id_venue_lookup").val();
 
-// Stop anything firing by default
-//        event.preventDefault();
-
-// Stop inputs
-//        var $form = $(this);
-//        var $inputs = $form.find("input, select, button, textarea");
-//        $inputs.prop("disabled", true);
-
-// cursor
-//        document.body.style.cursor = 'wait';
-
-// Ajax get
-//         $.get("/utils/geo-location/" + loc)
-//         .done(response => {
-//           $("#id_venue_location").val(response.data.lat + "," + response.data.lon);
-//           googlemap(response.data.lat, response.data.lon);
-//         }).always(function () {
-// // enable inputs again
-//           $inputs.prop("disabled", false);
-// // cursor
-//           document.body.style.cursor = 'default';
-
+    });
 
 // update map if location changes
   $("#id_venue_location").change(function(){
@@ -464,7 +489,9 @@
 
 // Preview
   $("#id_preview").click(function(event){
+    {% if congress %}
     var win = window.open('{% url "events:preview_congress" congress_id=congress.id %}', '_blank');
+    {% endif %}
     if (win) {
         //Browser has allowed it to be opened
         win.focus();

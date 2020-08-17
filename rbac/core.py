@@ -490,7 +490,7 @@ def rbac_user_blocked_for_model(user, app, model, action):
 
 
 def rbac_user_allowed_for_model(user, app, model, action):
-    """ returns a list of model instances which the user can view
+    """ returns a tuple.
 
     Args:
         user(User): standard user object
@@ -499,7 +499,7 @@ def rbac_user_allowed_for_model(user, app, model, action):
         action(str):    action required
 
     Returns:
-        list:   list of model_instances explicitly allowed
+        tuple:  boolean - allowed for all, list - list of model_instances explicitly allowed
     """
     # TODO: This is not tested at all
 
@@ -511,6 +511,10 @@ def rbac_user_allowed_for_model(user, app, model, action):
     if default.default_behaviour == "Allow":
         raise ReferenceError("Only supported for default Block models")
 
+    # See if user has everything and return now if true
+    if rbac_user_has_role(user, "%s.%s.%s" % (app, model, action)):
+        return ("True", [])
+
     # get all rules first for both this user and everyone
     groups = RBACUserGroup.objects.filter(
         member__in=[user.id, RBAC_EVERYONE]
@@ -520,6 +524,8 @@ def rbac_user_allowed_for_model(user, app, model, action):
         group__in=groups, rule_type="Allow", action__in=[action, "all"]
     ).values_list("model_id")
 
+    everyone_matches = [em[0] for em in everyone_matches]  # strip tuple noise
+
     # get rules for this user that block
     user_groups = RBACUserGroup.objects.filter(member=user).values_list("group")
 
@@ -527,12 +533,14 @@ def rbac_user_allowed_for_model(user, app, model, action):
         group__in=user_groups, rule_type="Block", action__in=[action, "all"]
     ).values_list("model_id")
 
-    # block rules for this user override block rules for everyone
+    user_matches = [um[0] for um in user_matches]  # strip tuple noise
+
+    # allow rules for this user override block rules for everyone
     ret = []
     for m in everyone_matches:
-        if m not in user_matches:
-            ret.append(m[0])
-    return ret
+        if m and m not in user_matches:  # can get none in the list
+            ret.append(m)
+    return False, ret
 
 
 def rbac_admin_all_rights(user):
@@ -805,8 +813,6 @@ def rbac_get_users_with_role(role):
         app=app, model=model, model_id=model_instance
     ).filter(Q(action=action) | Q(action="all"))
 
-    print(group_roles_specific)
-
     if model_instance:  # check for generic too
         group_roles_higher = RBACGroupRole.objects.filter(
             app=app, model=model, model_id=None
@@ -824,7 +830,7 @@ def rbac_get_users_with_role(role):
         .values("member")
     )
 
-    users = User.objects.filter(id__in=user_ids)
+    users = User.objects.filter(id__in=user_ids).order_by("first_name")
 
     return users
 

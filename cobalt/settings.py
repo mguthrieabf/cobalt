@@ -62,8 +62,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # basics
 SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
-print("Debug is")
-print(DEBUG)
 
 # Open case with AWS to get this to pass with spaces
 ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]

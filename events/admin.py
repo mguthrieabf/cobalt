@@ -7,7 +7,6 @@ from .models import (
     EventEntry,
     EventEntryPlayer,
     CongressNewsItem,
-    CongressPeople,
     CongressDownload,
 )
 
@@ -18,5 +17,4 @@ admin.site.register(EventEntryType)
 admin.site.register(EventEntry)
 admin.site.register(EventEntryPlayer)
 admin.site.register(CongressNewsItem)
-admin.site.register(CongressPeople)
 admin.site.register(CongressDownload)

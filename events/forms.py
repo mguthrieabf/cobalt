@@ -1,18 +1,25 @@
 from django import forms
 from .models import Congress
 from organisations.models import Organisation
+from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
 
 
 class CongressForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
-        # Get valid orgs as parameter
-        valid_orgs = kwargs.pop("valid_orgs", None)
+        # Get valid orgs and congress master as parameter
+        valid_orgs = kwargs.pop("valid_orgs", [])
+        congress_masters = kwargs.pop("congress_masters", [])
         super(CongressForm, self).__init__(*args, **kwargs)
 
-        # Modify valid orgs if they were passed
-        self.fields["org"].queryset = Organisation.objects.filter(pk__in=valid_orgs)
+        # Modify valid orgs and congress master if they were passed
+        self.fields["org"].queryset = Organisation.objects.filter(
+            pk__in=valid_orgs
+        ).order_by("name")
+        self.fields["congress_master"].queryset = CongressMaster.objects.filter(
+            pk__in=congress_masters
+        ).order_by("name")
 
         # Hide the crispy labels
         self.fields["name"].label = False
@@ -112,3 +119,19 @@ class CongressForm(forms.ModelForm):
             "raw_html",
             "general_info",
         )
+
+
+class NewCongressForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+
+        # Get valid orgs as parameter
+        valid_orgs = kwargs.pop("valid_orgs", [])
+        super(NewCongressForm, self).__init__(*args, **kwargs)
+
+        org_queryset = Organisation.objects.filter(pk__in=valid_orgs).order_by("name")
+        choices = [("", "-----------")]
+        for item in org_queryset:
+            choices.append((item.pk, item.name))
+        self.fields["org"].choices = choices
+
+    org = forms.ChoiceField(label="Organisation", required=True)

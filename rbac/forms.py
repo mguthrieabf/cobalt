@@ -55,11 +55,21 @@ class AddGroup(forms.Form):
         else:
             queryset = queryset.exclude(tree__startswith="admin.")
 
-        # load whole admin tree
-        whole_tree_qs = RBACAdminTree.objects.all().distinct("tree").values_list("tree")
+        # load whole tree - where things are
+        whole_tree_qs = (
+            RBACGroup.objects.all()
+            .distinct("name_qualifier", "name_item")
+            .values_list("name_qualifier")
+        )
         whole_tree = []
         for query in whole_tree_qs:
             whole_tree.append(query[0])
+
+        # load whole admin tree - where things could be
+        whole_tree_qs = RBACAdminTree.objects.all().distinct("tree").values_list("tree")
+        for query in whole_tree_qs:
+            if query[0] not in whole_tree:
+                whole_tree.append(query[0])
 
         whole_tree.sort()
 
@@ -68,6 +78,7 @@ class AddGroup(forms.Form):
             # add item and any existing lower parts of tree to choices
             item = "%s" % item
             for wtree in whole_tree:
+                print("*** %s" % wtree)
                 if wtree.find(item) == 0 and wtree not in already_included:
                     choices.append((wtree, wtree))
                     already_included.append(wtree)

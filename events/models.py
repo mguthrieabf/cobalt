@@ -25,26 +25,38 @@ EVENT_TYPES = [
 
 class CongressMaster(models.Model):
     """ Master List of congresses. E.g. GCC. This is not an instance
-       of a congress, just a list of the regular recurring ones. """
+       of a congress, just a list of the regular recurring ones.
+       Congresses can only belong to one club at a time. Control for
+       who can setup a congress as an instance of a congress master
+       is handled by who is a convener for a club """
 
     name = models.CharField("Congress Master Name", max_length=100)
+    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class Congress(models.Model):
-    """ A specific congress including year """
+    """ A specific congress including year
 
-    name = models.CharField("Name", max_length=100)
+    We set all values to be optional so we can use the wizard format and
+    save partial data as we go. The validation for completeness of data
+    lies in the view. """
+
+    name = models.CharField("Name", max_length=100, null=True, blank=True)
     date_string = models.CharField("Dates", max_length=100, null=True, blank=True)
     congress_master = models.ForeignKey(
         CongressMaster, on_delete=models.CASCADE, null=True, blank=True
     )
-    year = models.IntegerField("Congress Year")
-    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
-    venue_name = models.CharField("Venue Name", max_length=100)
-    venue_location = models.CharField("Venue Location", max_length=100)
+    year = models.IntegerField("Congress Year", null=True, blank=True)
+    org = models.ForeignKey(
+        Organisation, on_delete=models.CASCADE, null=True, blank=True
+    )
+    venue_name = models.CharField("Venue Name", max_length=100, null=True, blank=True)
+    venue_location = models.CharField(
+        "Venue Location", max_length=100, null=True, blank=True
+    )
     venue_transport = models.TextField("Venue Transport", null=True, blank=True)
     venue_catering = models.TextField("Venue Catering", null=True, blank=True)
     venue_additional_info = models.TextField(
@@ -55,8 +67,10 @@ class Congress(models.Model):
     )
     raw_html = models.TextField("Raw HTML", null=True, blank=True)
     people = models.TextField("People", null=True, blank=True)
-    general_info = models.TextField("General Information")
-    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="author")
+    general_info = models.TextField("General Information", null=True, blank=True)
+    author = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name="author", null=True, blank=True
+    )
     created_date = models.DateTimeField(default=timezone.now)
     last_updated_by = models.ForeignKey(
         User,
@@ -105,9 +119,6 @@ class EventEntry(models.Model):
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     payment_status = models.CharField("Event Name", max_length=100)
-    venue_transport = models.CharField(
-        "Venue Location", max_length=400, null=True, blank=True
-    )
     max_entries = models.IntegerField("Maximum Entries", null=True, blank=True)
     payment_status = models.CharField(
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
@@ -133,6 +144,16 @@ class EventEntryPlayer(models.Model):
         return "%s - %s" % (self.event, self.player)
 
 
+class CongressLink(models.Model):
+    """ Link Items for Congresses """
+
+    congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
+    link = models.CharField("Congress Link", max_length=100)
+
+    def __str__(self):
+        return "%s" % (self.congress)
+
+
 class CongressNewsItem(models.Model):
     """ News Items for Congresses """
 
@@ -143,17 +164,18 @@ class CongressNewsItem(models.Model):
         return "%s" % (self.congress)
 
 
-class CongressPeople(models.Model):
-    """ Roles within a congress """
-
-    congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    user_role = models.CharField("User Role", max_length=50)
-    email = models.CharField("Email", max_length=50, null=True, blank=True)
-    phone = models.CharField("Phone Number", max_length=10, null=True, blank=True)
-
-    def __str__(self):
-        return "%s - %s" % (self.congress, self.user)
+#
+# class CongressPeople(models.Model):
+#     """ Roles within a congress """
+#
+#     congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     user_role = models.CharField("User Role", max_length=50)
+#     email = models.CharField("Email", max_length=50, null=True, blank=True)
+#     phone = models.CharField("Phone Number", max_length=10, null=True, blank=True)
+#
+#     def __str__(self):
+#         return "%s - %s" % (self.congress, self.user)
 
 
 class CongressDownload(models.Model):

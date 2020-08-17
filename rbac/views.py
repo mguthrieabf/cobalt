@@ -576,9 +576,12 @@ def rbac_tests(request):
 
         if "user_allowed_for_model" in request.POST:
             (app, model, model_instance, action) = role_to_parts(text)
-            ans = rbac_user_allowed_for_model(user, app, model, action)
-            if not ans:
-                ans = "Nothing found."
+            (everything, ans) = rbac_user_allowed_for_model(user, app, model, action)
+            if everything:
+                ans = "Allowed for all models"
+            else:
+                if not ans:
+                    ans = "Nothing found."
             last_query = "User Allowed for Model"
             model = text
 

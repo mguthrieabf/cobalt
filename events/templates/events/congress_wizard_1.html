@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block headerjs %}
+{% include "events/congress_wizard_include_header.html" %}
+{% endblock %}
+{% block content %}
+{% include "events/congress_wizard_include_body.html" %}
+
+<div class="container">
+  <div class="row">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h2>Create New Congress</h2>
+      </div>
+      <div class="card-body">
+
+          <h3>Choose an Organisation</h3>
+
+        <div class="col-7">
+          <div id="div_id_org" class="form-group">
+            <span class="cobalt-form-error" id="id_org_errors">{{ form.org.errors|striptags }}</span>
+            {% render_field form.org class+="form-control" %}
+          </div>
+        </div>
+        <div id="id_buttons" style="display:none">
+          <form method="post">
+            {% csrf_token %}
+            <button id="id_scratch" name="scratch" class="btn btn-success btn-sm">Create From Scratch</button>
+            <button id="id_copy" name="copy" class="btn btn-warning btn-sm">Copy Another</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+<script>
+
+$("#id_org").change(function(){
+  $("#id_buttons").show();
+});
+
+</script>
+{% endblock %}
