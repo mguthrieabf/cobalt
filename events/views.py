@@ -248,20 +248,32 @@ def get_conveners_ajax(request, org_id):
 def get_congress_master_ajax(request, org_id):
     """ returns a list of congress_masters as html for an organisation """
 
-    # org = get_object_or_404(Organisation, pk=org_id)
-    #
-    # qs = CongressMaster.objects.filter()
-    #
-    # ret = "<ul>"
-    # for con in conveners:
-    #     ret += "<li>%s" % con
-    # ret += (
-    #     "</ul><p>These can be changed from the <a href='/organisations/edit/%s' target='_blank'>Organisation Administration Page</p>"
-    #     % org_id
-    # )
-    #
-    # data_dict = {"data": ret}
-    # return JsonResponse(data=data_dict, safe=False)
+    org = get_object_or_404(Organisation, pk=org_id)
+
+    qs = CongressMaster.objects.filter(org=org)
+
+    ret = "<option value=''>-------"
+    for cm in qs:
+        ret += f"<option value='{cm.id}'>{cm.name}</option>"
+
+    data_dict = {"data": ret}
+    return JsonResponse(data=data_dict, safe=False)
+
+
+@login_required()
+def get_congress_ajax(request, congress_id):
+    """ returns a list of congresses as html for an congress_master """
+
+    master = get_object_or_404(CongressMaster, pk=congress_id)
+
+    qs = Congress.objects.filter(congress_master=master)
+
+    ret = "<option value=''>-------"
+    for cm in qs:
+        ret += f"<option value='{cm.id}'>{cm.name}</option>"
+
+    data_dict = {"data": ret}
+    return JsonResponse(data=data_dict, safe=False)
 
 
 @login_required()

@@ -16,20 +16,37 @@
       </div>
       <div class="card-body">
 
-          <h3>Choose an Organisation</h3>
+          <h3>First, choose an organisation</h3>
+          <i>All congresses belong to an organisation, please chose which organisation
+          you want to create this congress for.</i>
 
         <div class="col-7">
           <div id="div_id_org" class="form-group">
-            <span class="cobalt-form-error" id="id_org_errors">{{ form.org.errors|striptags }}</span>
+             <label class="bmd-label-floating">Organisation</label>
             {% render_field form.org class+="form-control" %}
           </div>
         </div>
         <div id="id_buttons" style="display:none">
-          <form method="post">
+          <forms method="post">
             {% csrf_token %}
+            <div class="col-7">
+              <div class="form-group" id="div_congress_master" style="display:none">
+                <label class="bmd-label-floating">Series</label>
+                <select name="congress_master" id="id_congress_master" class="form-control">
+                </select>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="form-group" id="div_congress" style="display:none">
+                <label class="bmd-label-floating">Congress to Copy</label>
+                <select name="congress" id="id_congress" class="form-control">
+                </select>
+              </div>
+            </div>
+
             <button id="id_scratch" name="scratch" class="btn btn-success btn-sm">Create From Scratch</button>
-            <button id="id_copy" name="copy" class="btn btn-warning btn-sm">Copy Another</button>
-          </form>
+            <button id="id_copy" type="button" name="copy" class="btn btn-warning btn-sm">Copy Another</button>
+          </forms>
         </div>
       </div>
     </div>
@@ -41,9 +58,53 @@
 {% block footer %}
 <script>
 
-$("#id_org").change(function(){
-  $("#id_buttons").show();
-});
+$(document).ready(function(){
+
+// show buttons once org selected
+  $("#id_org").change(function(){
+    $("#id_buttons").show();
+  });
+
+// copy button clicked - get congress masters
+  $("#id_copy").click(function(event){
+    event.preventDefault();
+    var id = $("#id_org").val();
+    $.ajax({
+           url: "/events/congress/create/get-congress-master/" + id,
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "get",
+           success: function (response) {
+             $("#id_congress_master").html(response.data);
+             $("#div_congress_master").show();
+           }
+
+    });
+    return false;
+  });
+
+// congress masters picked - get congress
+  $("#id_congress_master").change(function(event){
+    var id = $("#id_congress_master").val();
+    $.ajax({
+           url: "/events/congress/create/get-congress/" + id,
+           headers: {
+             "Content-Type": "application/json",
+              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
+           },
+           type: "get",
+           success: function (response) {
+             $("#id_congress").html(response.data);
+             $("#div_congress").show();
+           }
+
+    });
+    return false;
+  });
+
+}); // doc ready
 
 </script>
 {% endblock %}

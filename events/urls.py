@@ -43,4 +43,9 @@ urlpatterns = [
         views.get_congress_master_ajax,
         name="get_congress_master_ajax",
     ),
+    path(
+        "congress/create/get-congress/<int:congress_id>",
+        views.get_congress_ajax,
+        name="get_congress_ajax",
+    ),
 ]
