@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Congress, CongressMaster, Event
@@ -309,6 +310,8 @@ def create_congress_wizard(request, step=1, congress_id=None):
         return create_congress_wizard_5(request, step_list, congress)
     if step == 6:
         return create_congress_wizard_6(request, step_list, congress)
+    if step == 7:
+        return create_congress_wizard_7(request, step_list, congress)
 
 
 def create_congress_wizard_1(request, step_list):
@@ -353,10 +356,11 @@ def create_congress_wizard_1(request, step_list):
             valid_orgs = Organisation.objects.all().values_list("pk")
 
         form = NewCongressForm(valid_orgs=valid_orgs)
+
         return render(
             request,
             "events/congress_wizard_1.html",
-            {"form": form, "step_list": step_list, "congress": congress},
+            {"form": form, "step_list": step_list},
         )
 
 
@@ -545,6 +549,78 @@ def create_congress_wizard_6(request, step_list, congress):
     )
 
 
+def create_congress_wizard_7(request, step_list, congress):
+    """ wizard step 7 - publish """
+
+    if request.method == "POST":
+        if "Publish" in request.POST:
+            congress.status = "Published"
+            congress.save()
+            messages.success(
+                request, "Congress published", extra_tags="cobalt-message-success",
+            )
+            return redirect(request, "events:view_congress", congress_id=congress.id)
+
+        if "Delete" in request.POST:
+            congress.delete()
+            messages.success(
+                request, "Congress deleted", extra_tags="cobalt-message-success",
+            )
+            return redirect(request, "events:events")
+
+    url = "%s/%s/" % (reverse("events:create_congress_wizard"), congress.id)
+    errors = []
+    warnings = []
+
+    if not congress.name:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Congress name is missing"))
+    if not congress.default_email:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Default email is missing"))
+    if not congress.additional_info:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Additional is missing"))
+    if not congress.date_string:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Date string is missing"))
+    if not congress.year:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Year is missing"))
+    if not congress.general_info:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "General is missing"))
+    if not congress.people:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "People is missing"))
+    if not congress.venue_name:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 3, "Venue name is missing"))
+    if not congress.venue_location:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 3, "Venue location is missing"))
+    if not congress.venue_transport:
+        warnings.append(
+            "<a href='%s%s'>%s</a>" % (url, 3, "Venue transport is missing")
+        )
+    if not congress.venue_catering:
+        warnings.append("<a href='%s%s'>%s</a>" % (url, 3, "Venue catering is missing"))
+    if not congress.venue_additional_info:
+        warnings.append(
+            "<a href='%s%s'>%s</a>" % (url, 3, "Venue Additional info is missing")
+        )
+    if not congress.entry_open_date:
+        warnings.append(
+            "<a href='%s%s'>%s</a>" % (url, 2, "Entry open date is missing")
+        )
+    if not congress.entry_close_date:
+        warnings.append(
+            "<a href='%s%s'>%s</a>" % (url, 2, "Entry close date is missing")
+        )
+
+    return render(
+        request,
+        "events/congress_wizard_7.html",
+        {
+            "step_list": step_list,
+            "congress": congress,
+            "errors": errors,
+            "warnings": warnings,
+        },
+    )
+
+
 @login_required
 def create_event(request, congress_id):
     """ create an event within a congress """
@@ -579,3 +655,18 @@ def create_event(request, congress_id):
     return render(
         request, "events/create_event.html", {"form": form, "congress": congress},
     )
+
+
+@login_required()
+def delete_event_ajax(request):
+    """ Ajax call to delete an event from a congress """
+
+    if request.method == "GET":
+        event_id = request.GET["event_id"]
+
+    event = get_object_or_404(Event, pk=event_id)
+    event.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})

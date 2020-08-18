@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block headerjs %}
+{% include "events/congress_wizard_include_header.html" %}
+{% endblock %}
+{% block content %}
+{% include "events/congress_wizard_include_body.html" %}
+
+<div class="container">
+  <div class="row">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h2>Publish</h2>
+      </div>
+      <div class="card-body">
+        <div class="container">
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col">
+                {% if errors %}
+                  <h3>Errors</h3>
+                  <ul>
+                  {% for error in errors %}
+                    <li> {{ error|safe }}
+                 {% endfor %}
+                 </ul>
+                {% endif %}
+
+                {% if warnings %}
+                  <h3>Warnings</h3>
+                  <ul>
+                  {% for warning in warnings %}
+                    <li> {{ warning|safe }}
+                 {% endfor %}
+                  </ul>
+               {% endif %}
+
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+{% block footer %}
+{% include "events/congress_wizard_include_footer.html" %}
+
+{% endblock %}

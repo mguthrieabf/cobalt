@@ -24,32 +24,31 @@
 <div class="steps-form">
      <div class="steps-row setup-panel">
          <div class="steps-step">
-             <a href="#" type="button" class="btn {{ step_list.1 }} btn-circle">1</a>
-
+             <button class="btn {{ step_list.1 }} btn-circle">1</button>
              <p>Create</p>
          </div>
          <div class="steps-step">
-             <a href="{% url "" %}" type="button" class="btn {{ step_list.2 }} btn-circle" disabled="disabled">2</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" type="button" class="btn {{ step_list.2 }} btn-circle">2</a>
              <p>General</p>
          </div>
          <div class="steps-step">
-             <a href="#step-11" type="button" class="btn {{ step_list.3 }} btn-circle" disabled="disabled">3</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=3 %}" type="button" class="btn {{ step_list.3 }} btn-circle">3</a>
              <p>&nbsp;Venue&nbsp;</p>
          </div>
          <div class="steps-step">
-             <a href="#step-9" type="button" class="btn {{ step_list.4 }} btn-circle">4</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=4 %}" type="button" class="btn {{ step_list.4 }} btn-circle">4</a>
              <p>Sponsors</p>
          </div>
          <div class="steps-step">
-             <a href="#step-10" type="button" class="btn {{ step_list.5 }} btn-circle" disabled="disabled">5</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=5 %}" type="button" class="btn {{ step_list.5 }} btn-circle">5</a>
              <p>Options</p>
          </div>
          <div class="steps-step">
-             <a href="#step-11" type="button" class="btn {{ step_list.6 }} btn-circle" disabled="disabled">6</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" type="button" class="btn {{ step_list.6 }} btn-circle">6</a>
              <p>Events</p>
          </div>
          <div class="steps-step">
-             <a href="#step-11" type="button" class="btn {{ step_list.7 }} btn-circle" disabled="disabled">7</a>
+             <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=7 %}" type="button" class="btn {{ step_list.7 }} btn-circle">7</a>
              <p>Publish</p>
          </div>
      </div>

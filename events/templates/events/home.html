@@ -14,7 +14,7 @@
       {% for congress in congresses %}
         <li>
           <a href="{% url "events:view_congress" congress_id=congress.id %}">{{ congress }} {{ congress.status }}</a>
-          <a href="{% url "events:edit_congress" congress_id=congress.id %}" class="btn btn-sm btn-success">Edit</a>
+          <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-success">Edit</a>
 
         </li>
       {% endfor %}

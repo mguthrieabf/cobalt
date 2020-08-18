@@ -53,4 +53,9 @@ urlpatterns = [
         views.create_event,
         name="create_event",
     ),
+    path(
+        "congress/create/delete-event",
+        views.delete_event_ajax,
+        name="delete_event_ajax",
+    ),
 ]
