@@ -1,5 +1,5 @@
 from django import forms
-from .models import Congress
+from .models import Congress, Event
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
@@ -34,17 +34,36 @@ class CongressForm(forms.ModelForm):
         self.fields["venue_catering"].label = False
         self.fields["venue_additional_info"].label = False
         self.fields["additional_info"].label = False
+        self.fields["default_email"].label = False
+        self.fields["payment_method_system_dollars"].label = False
+        self.fields["payment_method_bank_transfer"].label = False
+        self.fields["payment_method_cash"].label = False
+        self.fields["payment_method_cheques"].label = False
+        self.fields["entry_open_date"].label = False
+        self.fields["entry_close_date"].label = False
+        self.fields["allow_partnership_desk"].label = False
 
         # mark fields as optional
+        self.fields["name"].required = False
+        self.fields["year"].required = False
+        self.fields["date_string"].required = False
+        self.fields["org"].required = False
+        self.fields["people"].required = False
+        self.fields["general_info"].required = False
+        self.fields["venue_name"].required = False
+        self.fields["venue_location"].required = False
         self.fields["venue_transport"].required = False
         self.fields["venue_catering"].required = False
         self.fields["venue_additional_info"].required = False
         self.fields["additional_info"].required = False
-        self.fields["raw_html"].required = False
-
-    # name = forms.CharField(
-    #     widget=forms.TextInput(attrs={"class": "cobalt-min-width-100"})
-    # )
+        self.fields["default_email"].required = False
+        self.fields["payment_method_system_dollars"].required = False
+        self.fields["payment_method_bank_transfer"].required = False
+        self.fields["payment_method_cash"].required = False
+        self.fields["payment_method_cheques"].required = False
+        self.fields["entry_open_date"].required = False
+        self.fields["entry_close_date"].required = False
+        self.fields["allow_partnership_desk"].required = False
 
     general_info = forms.CharField(
         widget=SummernoteInplaceWidget(
@@ -118,6 +137,14 @@ class CongressForm(forms.ModelForm):
             "people",
             "raw_html",
             "general_info",
+            "payment_method_system_dollars",
+            "payment_method_bank_transfer",
+            "payment_method_cash",
+            "payment_method_cheques",
+            "entry_open_date",
+            "entry_close_date",
+            "allow_partnership_desk",
+            "default_email",
         )
 
 
@@ -134,4 +161,20 @@ class NewCongressForm(forms.Form):
             choices.append((item.pk, item.name))
         self.fields["org"].choices = choices
 
-    org = forms.ChoiceField(label="Organisation", required=True)
+    org = forms.ChoiceField(label="Organisation", required=False)
+    congress_master = forms.IntegerField(label="Organisation", required=False)
+    congress = forms.IntegerField(label="Organisation", required=False)
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = (
+            "event_name",
+            "description",
+            "max_entries",
+            "event_type",
+            "entry_open_date",
+            "entry_close_date",
+            "player_format",
+        )

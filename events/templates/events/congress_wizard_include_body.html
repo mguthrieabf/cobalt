@@ -14,7 +14,11 @@
 <script type="text/javascript" src="{% static "forums/summernote/summernote-bs4.min.js" %}"></script>
 <script type="text/javascript" src="{% static "forums/summernote/ResizeSensor.js" %}"></script>
 
-<h1>Congress Setup</h1>
+<h1>Congress Setup
+  {% if congress.name %}
+  - {{ congress.name }}
+  {% endif %}
+</h1>
 <br>
 
 <div class="steps-form">

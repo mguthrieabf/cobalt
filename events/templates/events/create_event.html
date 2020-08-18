@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Add Event to {{ congress }}</h2>
+      </div>
+      <div class="card-body">
+        <div class="container">
+          <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
+
+
+             <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
+                  <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
+                  <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
+                </div>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-3 justify-content-center align-self-center">
+                Event Name
+              </div>
+              <div class="col-7">
+                <div id="div_id_event_name" class="form-group">
+                  <span class="cobalt-form-error" id="id_event_name_errors">{{ form.event_name.errors|striptags }}</span>
+                  {% render_field form.event_name class+="form-control" %}
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Event Name", "The short name of this event.");'>help</a>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-3 justify-content-center align-self-center">
+                Description
+              </div>
+              <div class="col-7">
+                <div id="div_id_description" class="form-group">
+                  <span class="cobalt-form-error" id="id_description_errors">{{ form.description.errors|striptags }}</span>
+                  {% render_field form.description class+="form-control" %}
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-3 justify-content-center align-self-center">
+                Maximum Entries
+              </div>
+              <div class="col-7">
+                <div id="div_id_max_entries" class="form-group">
+                  <span class="cobalt-form-error" id="id_max_entries_errors">{{ form.max_entries.errors|striptags }}</span>
+                  {% render_field form.max_entries class+="form-control" %}
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-3 justify-content-center align-self-center">
+                Event Type
+              </div>
+              <div class="col-7">
+                <div id="div_id_event_type" class="form-group">
+                  <span class="cobalt-form-error" id="id_event_type_errors">{{ form.event_type.errors|striptags }}</span>
+                  {% render_field form.event_type class+="form-control" %}
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Event Type", "Classification of who can enter.");'>help</a>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-3 justify-content-center align-self-center">
+                Player Format
+              </div>
+              <div class="col-7">
+                <div id="div_id_player_format" class="form-group">
+                  <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
+                  {% render_field form.player_format class+="form-control" %}
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col text-center">
+                <button class="btn btn-info btn-sm cobalt-save">Save</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+{% block footer %}
+{% include "events/congress_wizard_include_footer.html" %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY"></script>
+<script>
+  // Google map
+function googlemap(lat,lon){
+  var myLatlng = new google.maps.LatLng(lat,lon);
+  var mapOptions = {
+    zoom: 15,
+    center: myLatlng,
+    scrollwheel: false,
+  }
+
+  var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+
+  var marker = new google.maps.Marker({
+    position: myLatlng,
+    title: "Venue Location"
+  });
+
+  marker.setMap(map);
+  $("#the_map").show()
+}
+
+$(document).ready(function() {
+
+// lookup geo location info
+  $("#lookup_button").click(function(event){
+
+    Swal.fire({
+      title: 'Enter location address',
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Look up',
+      showLoaderOnConfirm: true,
+      preConfirm: (login) => {
+        return fetch(`/utils/geo-location/${login}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(response.statusText)
+            }
+            return response.json()
+          })
+          .catch(error => {
+            Swal.showValidationMessage(
+              `Request failed: ${error}`
+            )
+          })
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+      if (result.value) {
+        console.log(result.value);
+         $("#id_venue_location").val(result.value.data.lat + "," + result.value.data.lon);
+         googlemap(result.value.data.lat, result.value.data.lon);
+
+      }
+    })
+  });
+
+// set map at start if we have coordinates
+
+{% if form.venue_location.value %}
+  var venue_location = "{{ form.venue_location.value }}"
+  var parts = venue_location.split(',');
+  googlemap(parts[0], parts[1]);
+{% endif %}
+
+});
+
+</script>
+
+{% endblock %}

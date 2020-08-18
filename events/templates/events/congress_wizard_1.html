@@ -16,9 +16,9 @@
       </div>
       <div class="card-body">
 
-          <h3>First, choose an organisation</h3>
-          <i>All congresses belong to an organisation, please chose which organisation
-          you want to create this congress for.</i>
+          <h3><span id="main_title">First, choose an organisation</span></h3>
+          <span id="subtitle">All congresses belong to an organisation, please chose which organisation
+          you want to create this congress for.</span>
 
         <div class="col-7">
           <div id="div_id_org" class="form-group">
@@ -26,28 +26,29 @@
             {% render_field form.org class+="form-control" %}
           </div>
         </div>
-        <div id="id_buttons" style="display:none">
-          <forms method="post">
-            {% csrf_token %}
-            <div class="col-7">
-              <div class="form-group" id="div_congress_master" style="display:none">
-                <label class="bmd-label-floating">Series</label>
-                <select name="congress_master" id="id_congress_master" class="form-control">
-                </select>
-              </div>
-            </div>
-            <div class="col-7">
-              <div class="form-group" id="div_congress" style="display:none">
-                <label class="bmd-label-floating">Congress to Copy</label>
-                <select name="congress" id="id_congress" class="form-control">
-                </select>
-              </div>
-            </div>
 
-            <button id="id_scratch" name="scratch" class="btn btn-success btn-sm">Create From Scratch</button>
-            <button id="id_copy" type="button" name="copy" class="btn btn-warning btn-sm">Copy Another</button>
-          </forms>
+        <div class="col-7" id="id_cm_div" style="display:none">
+          <div class="form-group" id="div_congress_master" style="display:none">
+            <label class="bmd-label-floating">Series</label>
+            <select name="congress_master_form" id="id_congress_master_form" class="form-control">
+            </select>
+          </div>
         </div>
+        <div class="col-7">
+          <div class="form-group" id="div_congress" style="display:none">
+            <label class="bmd-label-floating">Congress to Copy</label>
+            <select name="congress_form" id="id_congress_form" class="form-control">
+            </select>
+          </div>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="congress_master" id="id_congress_master" value="">
+          <input type="hidden" name="congress" id="id_congress" value="">
+          <button id="id_copy" name="copy" class="btn btn-info btn-sm" style="display:none">Copy</button>
+          <button id="id_scratch" name="scratch" class="btn btn-success btn-sm" style="display:none">Or Create From Scratch</button>
+        </form>
+
       </div>
     </div>
   </div>
@@ -60,14 +61,9 @@
 
 $(document).ready(function(){
 
-// show buttons once org selected
+// org selected - get congress master
   $("#id_org").change(function(){
-    $("#id_buttons").show();
-  });
-
-// copy button clicked - get congress masters
-  $("#id_copy").click(function(event){
-    event.preventDefault();
+    $("#id_cm_div").show();
     var id = $("#id_org").val();
     $.ajax({
            url: "/events/congress/create/get-congress-master/" + id,
@@ -77,32 +73,41 @@ $(document).ready(function(){
            },
            type: "get",
            success: function (response) {
-             $("#id_congress_master").html(response.data);
+             $("#id_congress_master_form").html(response.data);
              $("#div_congress_master").show();
            }
-
     });
-    return false;
+    $("#main_title").text("Next, choose which congress series to copy.")
+    $("#subtitle").text("Select from the list below. If the list is empty then you don\'t have any access.")
   });
 
 // congress masters picked - get congress
-  $("#id_congress_master").change(function(event){
-    var id = $("#id_congress_master").val();
+  $("#id_congress_master_form").change(function(event){
+    $("#id_scratch").show();
+    var id = $("#id_congress_master_form").val();
+    $("#id_congress_master").val(id);
     $.ajax({
            url: "/events/congress/create/get-congress/" + id,
            headers: {
              "Content-Type": "application/json",
-              "X-CSRFToken": $.cookie("csrftoken")  // This is needed to pass xsite scripting errors
            },
            type: "get",
            success: function (response) {
-             $("#id_congress").html(response.data);
+             $("#id_congress_form").html(response.data);
              $("#div_congress").show();
+             $("#main_title").text("Finally, select the year to copy.")
+             $("#subtitle").text("If the list is empty then you need to create from scratch.")
            }
 
     });
-    return false;
   });
+
+// congress picked. Enable submit.
+  $("#id_congress_form").change(function(event){
+    $("#id_copy").show()
+    $("#id_congress").val($("#id_congress_form").val())
+  });
+
 
 }); // doc ready
 

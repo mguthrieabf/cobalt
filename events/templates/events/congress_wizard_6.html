@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block headerjs %}
+{% include "events/congress_wizard_include_header.html" %}
+{% endblock %}
+{% block content %}
+{% include "events/congress_wizard_include_body.html" %}
+
+<div class="container">
+  <div class="row">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h2>Events</h2>
+      </div>
+      <div class="card-body">
+        <div class="container">
+          <form method="POST">
+            {% csrf_token %}
+
+<div class="row justify-content-center">
+            <div class="card col-lg-9">
+              <div class="card-header card-header-warning">
+                <h3 class="card-title">Event List</h3>
+              </div>
+              <div class="card-body" style="text-align: center">
+                <div class="container">
+                  <select class="w-100" size="10" id="user_list">
+                  {% for event in events %}
+                    <option value="{{ event.id }}">{{ event.event_name }}</option>
+                  {% endfor %}
+
+
+                  </select>
+                </div>
+
+                <div class="d-flex">
+                  <div>
+                    <a href="{% url "events:create_event" congress_id=congress.id %}" class="btn btn-success btn-sm" >Add</a>
+                  </div>
+                  <div class="ml-auto">
+                    <button class="btn btn-info btn-sm" onclick="deleteEvent();">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>
+            <div class="row">
+              <div class="col text-center">
+                <button class="btn btn-info btn-sm cobalt-save">Next</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+{% block footer %}
+{% include "events/congress_wizard_include_footer.html" %}
+
+<script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
+<script>
+
+  $(document).ready(function() {
+    // initialise Datetimepicker and Sliders
+    md.initFormExtendedDatetimepickers();
+
+  });
+</script>
+{% endblock %}

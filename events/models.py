@@ -21,6 +21,11 @@ EVENT_TYPES = [
     ("Senior", "Senior"),
     ("Youth", "Youth"),
 ]
+EVENT_PLAYER_FORMAT = [
+    ("Individual", "Individual"),
+    ("Pairs", "Pairs"),
+    ("Teams", "Teams"),
+]
 
 
 class CongressMaster(models.Model):
@@ -45,6 +50,9 @@ class Congress(models.Model):
     lies in the view. """
 
     name = models.CharField("Name", max_length=100, null=True, blank=True)
+    default_email = models.CharField(
+        "Default Email Address", max_length=100, null=True, blank=True
+    )
     date_string = models.CharField("Dates", max_length=100, null=True, blank=True)
     congress_master = models.ForeignKey(
         CongressMaster, on_delete=models.CASCADE, null=True, blank=True
@@ -68,6 +76,14 @@ class Congress(models.Model):
     raw_html = models.TextField("Raw HTML", null=True, blank=True)
     people = models.TextField("People", null=True, blank=True)
     general_info = models.TextField("General Information", null=True, blank=True)
+    payment_method_system_dollars = models.BooleanField(default=True)
+    payment_method_bank_transfer = models.BooleanField(default=False)
+    payment_method_cash = models.BooleanField(default=False)
+    payment_method_cheques = models.BooleanField(default=False)
+    # Open and close dates can be overriden at the event level
+    entry_open_date = models.DateTimeField(null=True, blank=True)
+    entry_close_date = models.DateTimeField(null=True, blank=True)
+    allow_partnership_desk = models.BooleanField(default=False)
     author = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="author", null=True, blank=True
     )
@@ -93,10 +109,20 @@ class Event(models.Model):
 
     congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
     event_name = models.CharField("Event Name", max_length=100)
-    description = models.CharField("Description", max_length=400)
+    description = models.CharField("Description", max_length=400, null=True, blank=True)
     max_entries = models.IntegerField("Maximum Entries", null=True, blank=True)
     event_type = models.CharField(
         "Event Type", max_length=14, choices=EVENT_TYPES, null=True, blank=True
+    )
+    # Open and close dates can be overriden at the event level
+    entry_open_date = models.DateTimeField(null=True, blank=True)
+    entry_close_date = models.DateTimeField(null=True, blank=True)
+    player_format = models.CharField(
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):

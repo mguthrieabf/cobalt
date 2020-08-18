@@ -48,4 +48,9 @@ urlpatterns = [
         views.get_congress_ajax,
         name="get_congress_ajax",
     ),
+    path(
+        "congress/create/add-event/<int:congress_id>",
+        views.create_event,
+        name="create_event",
+    ),
 ]
