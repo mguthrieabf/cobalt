@@ -356,7 +356,7 @@ def create_congress_wizard_1(request, step_list):
         return render(
             request,
             "events/congress_wizard_1.html",
-            {"form": form, "step_list": step_list},
+            {"form": form, "step_list": step_list, "congress": congress},
         )
 
 

@@ -24,6 +24,7 @@
           <br>
           <form method="POST">
             {% csrf_token %}
+
             <div class="row">
               <div class="col-3 justify-content-center align-self-center">
                 Year
@@ -33,7 +34,6 @@
                   <span class="cobalt-form-error" id="id_year_errors">{{ form.year.errors|striptags }}</span>
                   {% render_field form.year class+="form-control" %}
                 </div>
-
               </div>
               <div class="col-2 justify-content-center align-self-center">
                 <a href="#" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
@@ -123,11 +123,6 @@
                 {{ form.additional_info|as_crispy_field }}
               </div>
             </div>
-
-
-
-
-
             <div class="row">
               <div class="col text-center">
                 <button class="btn btn-info btn-sm cobalt-save">Next</button>
@@ -137,8 +132,6 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </div>
 
@@ -146,4 +139,15 @@
 {% endblock %}
 {% block footer %}
 {% include "events/congress_wizard_include_footer.html" %}
+
+<script>
+$(document).ready(function(){
+  $("#id_year").change(function(){
+    var name_id=$("#id_name");
+    if (name_id.val()=="") {
+      name_id.val("{{ congress.congress_master.name }} " + $("#id_year").val())
+    }
+  });
+});
+</script>
 {% endblock %}
