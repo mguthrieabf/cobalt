@@ -24,6 +24,8 @@ class CongressForm(forms.ModelForm):
         # Hide the crispy labels
         self.fields["name"].label = False
         self.fields["year"].label = False
+        self.fields["start_date"].label = False
+        self.fields["end_date"].label = False
         self.fields["date_string"].label = False
         self.fields["org"].label = False
         self.fields["people"].label = False
@@ -47,6 +49,8 @@ class CongressForm(forms.ModelForm):
         # mark fields as optional
         self.fields["name"].required = False
         self.fields["year"].required = False
+        self.fields["start_date"].required = False
+        self.fields["end_date"].required = False
         self.fields["date_string"].required = False
         self.fields["org"].required = False
         self.fields["people"].required = False
@@ -128,6 +132,8 @@ class CongressForm(forms.ModelForm):
             "congress_master",
             "year",
             "name",
+            "start_date",
+            "end_date",
             "date_string",
             "org",
             "venue_name",
@@ -172,11 +178,11 @@ class NewCongressForm(forms.Form):
 class EventForm(forms.ModelForm):
     entry_open_date = forms.DateField()
 
-    def __init__(self, *args, **kwargs):
-        super(EventForm, self).__init__(*args, **kwargs)
-        print(self.fields["entry_open_date"].initial)
-        self.fields["entry_open_date"].initial = "12/08/2001"
-        print(self.fields["entry_open_date"].initial)
+    # def __init__(self, *args, **kwargs):
+    #     super(EventForm, self).__init__(*args, **kwargs)
+    #     print(self.fields["entry_open_date"].initial)
+    #     self.fields["entry_open_date"].initial = "12/08/2001"
+    #     print(self.fields["entry_open_date"].initial)
 
     class Meta:
         model = Event

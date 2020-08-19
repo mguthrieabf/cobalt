@@ -127,8 +127,20 @@
 <script>
 
   $(document).ready(function() {
-    // initialise Datetimepicker and Sliders
-    md.initFormExtendedDatetimepickers();
+
+        $('#id_entry_open_date').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
+        $('#id_entry_close_date').datetimepicker({
+            format: 'DD/MM/YYYY',
+            useCurrent: false
+        });
+        $("#id_entry_open_date").on("dp.change", function (e) {
+            $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
+        });
+        $("#id_entry_close_date").on("dp.change", function (e) {
+            $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
+        });
 
   });
 </script>

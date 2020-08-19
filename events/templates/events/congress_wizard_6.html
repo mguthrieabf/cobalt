@@ -35,11 +35,11 @@
 
                   <div class="d-flex">
                     <div>
-                      <a href="{% url "events:create_event" congress_id=congress.id %}" class="btn btn-success btn-sm colbalt-save" >Add</a>
-                      <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" >Edit</button>
+                      <a href="{% url "events:create_event" congress_id=congress.id %}" class="btn btn-success btn-sm cobalt-save" >Add</a>
+                      <button id="edit_button" class="btn btn-primary btn-sm cobalt-save" disabled>Edit</button>
                     </div>
                     <div class="ml-auto">
-                      <button class="btn btn-danger btn-sm cobalt-save" onclick="deleteEvent();return false">Delete</button>
+                      <button class="btn btn-danger btn-sm cobalt-save" disabled id="delete_button" onclick="deleteEvent();return false">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -96,8 +96,16 @@
 
 
   $(document).ready(function() {
-    // initialise Datetimepicker and Sliders
-    md.initFormExtendedDatetimepickers();
+    $("#event_list").change(function(){
+      $("#edit_button").prop('disabled', false);
+      $("#delete_button").prop('disabled', false);
+    });
+
+    $("#edit_button").click(function(){
+      var event_id = $("#event_list").val();
+      window.location = "/events/congress/create/edit-event/{{congress.id}}/" + event_id;
+      return false;
+    });
 
   });
 </script>

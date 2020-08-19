@@ -121,8 +121,19 @@
 <script>
 
   $(document).ready(function() {
-    // initialise Datetimepicker and Sliders
-    md.initFormExtendedDatetimepickers();
+    $('#id_from_date').datetimepicker({
+        format: 'DD/MM/YYYY'
+    });
+    $('#id_to_date').datetimepicker({
+        format: 'DD/MM/YYYY',
+        useCurrent: false
+    });
+    $("#id_from_date").on("dp.change", function (e) {
+        $('#id_to_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_to_date").on("dp.change", function (e) {
+        $('#id_from_date').data("DateTimePicker").maxDate(e.date);
+    });
 
   });
 </script>

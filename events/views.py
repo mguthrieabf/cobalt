@@ -18,7 +18,10 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    return render(request, "events/home.html", {"congresses": congresses})
+    return render(request, "events/soon.html", {"congresses": congresses})
+
+
+#    return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -374,6 +377,8 @@ def create_congress_wizard_2(request, step_list, congress):
             congress.year = form.cleaned_data["year"]
             congress.name = form.cleaned_data["name"]
             congress.date_string = form.cleaned_data["date_string"]
+            congress.start_date = form.cleaned_data["start_date"]
+            congress.end_date = form.cleaned_data["end_date"]
             congress.general_info = form.cleaned_data["general_info"]
             congress.people = form.cleaned_data["people"]
             congress.people_array = form.cleaned_data["people_array"]
@@ -390,6 +395,8 @@ def create_congress_wizard_2(request, step_list, congress):
     form.fields["default_email"].required = True
     form.fields["year"].required = True
     form.fields["name"].required = True
+    form.fields["start_date"].required = True
+    form.fields["end_date"].required = True
     form.fields["date_string"].required = True
     form.fields["general_info"].required = True
     form.fields["people"].required = True
@@ -581,6 +588,10 @@ def create_congress_wizard_7(request, step_list, congress):
         errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Default email is missing"))
     if not congress.additional_info:
         warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Additional is missing"))
+    if not congress.start_date:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Start date is missing"))
+    if not congress.end_date:
+        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "End date is missing"))
     if not congress.date_string:
         warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Date string is missing"))
     if not congress.year:
@@ -684,10 +695,19 @@ def edit_event(request, congress_id, event_id):
             print(form.errors)
 
     else:
-        form = EventForm(instance=event)
+        # datepicker is very fussy about format
+        initial = {}
+        if event.entry_open_date:
+            initial["entry_open_date"] = event.entry_open_date.strftime("%d/%m/%Y")
+        if event.entry_close_date:
+            initial["entry_close_date"] = event.entry_close_date.strftime("%d/%m/%Y")
+        form = EventForm(instance=event, initial=initial)
 
     # override date format
-    #    form.fields["entry_open_date"].initial = event.entry_open_date.strftime("%d/%m/%Y")
+
+    # print(form.fields["entry_open_date"].initial )
+    # print(form.fields["event_name"].initial )
+    # form.fields["entry_open_date"].initial = event.entry_open_date.strftime("%d/%m/%Y")
 
     return render(
         request,
@@ -736,6 +756,45 @@ def create_session(request, event_id):
     )
 
 
+@login_required
+def edit_session(request, event_id, session_id):
+    """ edit session within an event  """
+
+    event = get_object_or_404(Event, pk=event_id)
+    session = get_object_or_404(Session, pk=session_id)
+
+    if request.method == "POST":
+        form = SessionForm(request.POST, instance=session)
+        if form.is_valid():
+            session.session_date = form.cleaned_data["session_date"]
+            session.session_start = form.cleaned_data["session_start"]
+            session.session_end = form.cleaned_data["session_end"]
+            session.save()
+
+            messages.success(
+                request, "Session Updated", extra_tags="cobalt-message-success"
+            )
+            return redirect(
+                "events:edit_event", event_id=event_id, congress_id=event.congress.id
+            )
+        else:
+            print(form.errors)
+
+    else:
+        # datepicker is very fussy about format
+        initial = {}
+        if session.session_date:
+            initial["session_date"] = session.session_date.strftime("%d/%m/%Y")
+        if session.session_start:
+            initial["session_start"] = session.session_start.strftime("%I:%M %p")
+        if session.session_end:
+            initial["session_end"] = session.session_end.strftime("%I:%M %p")
+
+        form = SessionForm(instance=event, initial=initial)
+
+    return render(request, "events/edit_session.html", {"form": form, "event": event},)
+
+
 @login_required()
 def delete_event_ajax(request):
     """ Ajax call to delete an event from a congress """
@@ -745,6 +804,21 @@ def delete_event_ajax(request):
 
     event = get_object_or_404(Event, pk=event_id)
     event.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def delete_session_ajax(request):
+    """ Ajax call to delete a session from a congress """
+
+    if request.method == "GET":
+        session_id = request.GET["session_id"]
+
+    session = get_object_or_404(Session, pk=session_id)
+    session.delete()
 
     response_data = {}
     response_data["message"] = "Success"

@@ -2,10 +2,6 @@
 {% load widget_tweaks %}
 {% load static %}
 
-{% block header %}
-<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
-{% endblock %}
-
 {% block content %}
 
 <div class="jumbotron">
@@ -188,6 +184,7 @@
 
 {% block footer %}
 <script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 {% include 'generic_user_search_footer.html' %}
 
   function addUser(member_id){

@@ -402,15 +402,14 @@ def profile(request):
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
 
-    access_token = "70691e3380c3b2"
-    handler = ipinfo.getHandler(access_token)
-    ip_address = get_client_ip(request)
-    ip_details = handler.getDetails(ip_address)
+    # access_token = "70691e3380c3b2"
+    # handler = ipinfo.getHandler(access_token)
+    # ip_address = get_client_ip(request)
+    # ip_details = handler.getDetails(ip_address)
 
     context = {
         "form": form,
         "blurbform": blurbform,
-        "ip_details": ip_details,
     }
     return render(request, "accounts/profile.html", context)
 

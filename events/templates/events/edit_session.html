@@ -9,7 +9,7 @@
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url "events:create_congress_wizard" congress_id=event.congress.id step=6 %}">{{ event.congress.name }}</a></li>
     <li class="breadcrumb-item"><a href="{% url "events:edit_event" event_id=event.id congress_id=event.congress.id %}">{{ event.event_name }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Add Session</li>
+    <li class="breadcrumb-item active" aria-current="page">Edit Session - Starts ({{ session.session_date }} {{ session.session_start }})</li>
   </ol>
 </nav>
 
@@ -81,18 +81,10 @@ $(document).ready(function() {
         format: 'LT'
     });
     $('#id_session_end').datetimepicker({
-        format: 'LT',
-        useCurrent: false
+        format: 'LT'
     });
+ });
 
-    $("#id_session_start").on("dp.change", function (e) {
-         $('#id_session_end').data("DateTimePicker").minDate(e.date);
-     });
-     $("#id_session_end").on("dp.change", function (e) {
-         $('#id_session_start').data("DateTimePicker").maxDate(e.date);
-     });
-
-});
 </script>
 
 {% endblock %}

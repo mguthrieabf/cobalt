@@ -216,6 +216,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 DATE_FORMAT = "j M Y"
+TIME_FORMAT = "g:I A"
 DATE_INPUT_FORMATS = ["%d %b %Y", "%d/%m/%Y", "%d %b %Y"]
 TIME_INPUT_FORMATS = [
     "%I:%M %p",

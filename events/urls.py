@@ -64,8 +64,18 @@ urlpatterns = [
         name="create_session",
     ),
     path(
+        "congress/create/edit-session/<int:event_id>/<int:session_id>",
+        views.edit_session,
+        name="edit_session",
+    ),
+    path(
         "congress/create/delete-event",
         views.delete_event_ajax,
         name="delete_event_ajax",
+    ),
+    path(
+        "congress/create/delete-session",
+        views.delete_session_ajax,
+        name="delete_session_ajax",
     ),
 ]
