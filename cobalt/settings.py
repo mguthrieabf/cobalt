@@ -215,6 +215,11 @@ TIME_ZONE = "Australia/Sydney"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+DATE_FORMAT = "j M Y"
+DATE_INPUT_FORMATS = ["%d %b %Y", "%d/%m/%Y", "%d %b %Y"]
+TIME_INPUT_FORMATS = [
+    "%I:%M %p",
+]
 
 # app specific static lives in app_name/static/app_name
 # general static lives in STATICFILES_DIRS

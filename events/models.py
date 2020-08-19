@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
@@ -75,6 +76,11 @@ class Congress(models.Model):
     )
     raw_html = models.TextField("Raw HTML", null=True, blank=True)
     people = models.TextField("People", null=True, blank=True)
+    people_array = ArrayField(
+        ArrayField(models.CharField(max_length=30, null=True, blank=True)),
+        null=True,
+        blank=True,
+    )
     general_info = models.TextField("General Information", null=True, blank=True)
     payment_method_system_dollars = models.BooleanField(default=True)
     payment_method_bank_transfer = models.BooleanField(default=False)
@@ -127,6 +133,15 @@ class Event(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.congress, self.event_name)
+
+
+class Session(models.Model):
+    """ A session within an event """
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    session_date = models.DateField()
+    session_start = models.TimeField()
+    session_end = models.TimeField(null=True, blank=True)
 
 
 class EventEntryType(models.Model):

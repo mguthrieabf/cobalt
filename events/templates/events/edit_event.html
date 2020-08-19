@@ -8,7 +8,7 @@
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}">{{ congress.name }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Add Event</li>
+    <li class="breadcrumb-item active" aria-current="page">Event: {{ event.event_name }}</li>
   </ol>
 </nav>
 
@@ -16,10 +16,17 @@
   <div class="row">
     <div class="card">
       <div class="card-header card-header-warning">
-        <h2>Add Event to {{ congress }}</h2>
+        <h2>Edit Event: {{ event.event_name }}</h2>
+        <h4>Congress: {{ congress.name }}</h4>
       </div>
       <div class="card-body">
         <div class="container">
+          <div class="card">
+            <div class="card-header card-header-danger">
+              <h3>Event Details</h3>
+            </div>
+            <div class="card-body">
+
           <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
@@ -119,14 +126,46 @@
             <br>
             <div class="row">
               <div class="col text-center">
-                <button class="btn btn-primary btn-sm cobalt-save">Save</button>
-                <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Cancel</a>
+                <button class="btn btn-success btn-sm cobalt-save">Save</button>
+                <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
               </div>
             </div>
           </form>
+          </div>
+        </div>
+      </div>
+
+    <a href="#" id="show_sessions">Show Sessions...</a>
+
+      <div class="row justify-content-center" id="sessions_div" style="display:none">
+        <div class="card col-lg-9">
+          <div class="card-header card-header-success">
+            <h3 class="card-title">Sessions</h3>
+            <h4>Sessions are optional. Add sessions if your event requires them.</h4>
+          </div>
+          <div class="card-body" style="text-align: center">
+            <div class="container">
+              <select class="w-100" size="10" id="event_list">
+              {% for session in sessions %}
+                <option value="{{ session.id }}">{{ session.session_date }} - {{ session.session_start }}</option>
+              {% endfor %}
+              </select>
+            </div>
+
+            <div class="d-flex">
+              <div>
+                <a href="{% url "events:create_session" event_id=event.id %}" class="btn btn-success btn-sm colbalt-save" >Add</a>
+                <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" >Edit</button>
+              </div>
+              <div class="ml-auto">
+                <button class="btn btn-danger btn-sm cobalt-save" onclick="deleteEvent();return false">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -139,18 +178,13 @@
 
 $(document).ready(function() {
 
-    $('#id_entry_open_date').datetimepicker({
-        format: 'DD/MM/YYYY'
+    md.initFormExtendedDatetimepickers();
+
+    $("#show_sessions").click(function(){
+        $("#sessions_div").show();
+        $("#show_sessions").hide();
     });
 
-    $('#id_entry_close_date').datetimepicker({
-        format: 'DD/MM/YYYY'
-    });
-
-
-
-});
-
+  });
 </script>
-
 {% endblock %}

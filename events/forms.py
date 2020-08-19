@@ -1,5 +1,5 @@
 from django import forms
-from .models import Congress, Event
+from .models import Congress, Event, Session
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
@@ -27,6 +27,7 @@ class CongressForm(forms.ModelForm):
         self.fields["date_string"].label = False
         self.fields["org"].label = False
         self.fields["people"].label = False
+        self.fields["people_array"].label = False
         self.fields["general_info"].label = False
         self.fields["venue_name"].label = False
         self.fields["venue_location"].label = False
@@ -49,6 +50,7 @@ class CongressForm(forms.ModelForm):
         self.fields["date_string"].required = False
         self.fields["org"].required = False
         self.fields["people"].required = False
+        self.fields["people_array"].required = False
         self.fields["general_info"].required = False
         self.fields["venue_name"].required = False
         self.fields["venue_location"].required = False
@@ -135,6 +137,7 @@ class CongressForm(forms.ModelForm):
             "venue_additional_info",
             "additional_info",
             "people",
+            "people_array",
             "raw_html",
             "general_info",
             "payment_method_system_dollars",
@@ -167,6 +170,14 @@ class NewCongressForm(forms.Form):
 
 
 class EventForm(forms.ModelForm):
+    entry_open_date = forms.DateField()
+
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        print(self.fields["entry_open_date"].initial)
+        self.fields["entry_open_date"].initial = "12/08/2001"
+        print(self.fields["entry_open_date"].initial)
+
     class Meta:
         model = Event
         fields = (
@@ -177,4 +188,14 @@ class EventForm(forms.ModelForm):
             "entry_open_date",
             "entry_close_date",
             "player_format",
+        )
+
+
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = (
+            "session_date",
+            "session_start",
+            "session_end",
         )

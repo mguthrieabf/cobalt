@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import Congress, CongressMaster, Event
-from .forms import CongressForm, NewCongressForm, EventForm
+from .models import Congress, CongressMaster, Event, Session
+from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_user_has_role,
@@ -376,6 +376,7 @@ def create_congress_wizard_2(request, step_list, congress):
             congress.date_string = form.cleaned_data["date_string"]
             congress.general_info = form.cleaned_data["general_info"]
             congress.people = form.cleaned_data["people"]
+            congress.people_array = form.cleaned_data["people_array"]
             congress.additional_info = form.cleaned_data["additional_info"]
             congress.save()
             return redirect(
@@ -392,6 +393,7 @@ def create_congress_wizard_2(request, step_list, congress):
     form.fields["date_string"].required = True
     form.fields["general_info"].required = True
     form.fields["people"].required = True
+    form.fields["people_array"].required = True
 
     return render(
         request,
@@ -410,6 +412,7 @@ def create_congress_wizard_3(request, step_list, congress):
             congress.venue_location = form.cleaned_data["venue_location"]
             congress.venue_transport = form.cleaned_data["venue_transport"]
             congress.venue_catering = form.cleaned_data["venue_catering"]
+            congress.venue_additional_info = form.cleaned_data["venue_additional_info"]
             congress.venue_additional_info = form.cleaned_data["venue_additional_info"]
             congress.save()
             return redirect(
@@ -621,6 +624,21 @@ def create_congress_wizard_7(request, step_list, congress):
     )
 
 
+def _update_event(request, form, event, congress, msg):
+    """ common shared function to update an event with form data """
+
+    event.congress = congress
+    event.event_name = form.cleaned_data["event_name"]
+    event.description = form.cleaned_data["description"]
+    event.max_entries = form.cleaned_data["max_entries"]
+    event.event_type = form.cleaned_data["event_type"]
+    event.entry_open_date = form.cleaned_data["entry_open_date"]
+    event.entry_close_date = form.cleaned_data["entry_close_date"]
+    event.player_format = form.cleaned_data["player_format"]
+    event.save()
+    messages.success(request, msg, extra_tags="cobalt-message-success")
+
+
 @login_required
 def create_event(request, congress_id):
     """ create an event within a congress """
@@ -628,23 +646,14 @@ def create_event(request, congress_id):
     congress = get_object_or_404(Congress, pk=congress_id)
 
     if request.method == "POST":
+
         form = EventForm(request.POST)
+
         if form.is_valid():
             event = Event()
-            event.congress = congress
-            event.event_name = form.cleaned_data["event_name"]
-            event.description = form.cleaned_data["description"]
-            event.max_entries = form.cleaned_data["max_entries"]
-            event.event_type = form.cleaned_data["event_type"]
-            event.entry_open_date = form.cleaned_data["entry_open_date"]
-            event.entry_close_date = form.cleaned_data["entry_close_date"]
-            event.player_format = form.cleaned_data["player_format"]
-            event.save()
-            messages.success(
-                request, "Event Added", extra_tags="cobalt-message-success"
-            )
+            _update_event(request, form, event, congress, "Event added")
             return redirect(
-                "events:create_congress_wizard", step=6, congress_id=congress.id
+                "events:edit_event", event_id=event.id, congress_id=congress_id
             )
         else:
             print(form.errors)
@@ -654,6 +663,76 @@ def create_event(request, congress_id):
 
     return render(
         request, "events/create_event.html", {"form": form, "congress": congress},
+    )
+
+
+@login_required
+def edit_event(request, congress_id, event_id):
+    """ edit an event within a congress """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+    event = get_object_or_404(Event, pk=event_id)
+    sessions = Session.objects.filter(event=event)
+
+    if request.method == "POST":
+
+        form = EventForm(request.POST, instance=event)
+
+        if form.is_valid():
+            _update_event(request, form, event, congress, "Event updated")
+        else:
+            print(form.errors)
+
+    else:
+        form = EventForm(instance=event)
+
+    # override date format
+    #    form.fields["entry_open_date"].initial = event.entry_open_date.strftime("%d/%m/%Y")
+
+    return render(
+        request,
+        "events/edit_event.html",
+        {"form": form, "congress": congress, "event": event, "sessions": sessions},
+    )
+
+
+@login_required
+def create_session(request, event_id):
+    """ create session within an event  """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    if request.method == "POST":
+        form = SessionForm(request.POST)
+        print(request.POST.get("session_date"))
+        print(request.POST.get("session_start"))
+        if form.is_valid():
+            session = Session()
+            session.event = event
+            session.session_date = form.cleaned_data["session_date"]
+            session.session_start = form.cleaned_data["session_start"]
+            session.session_end = form.cleaned_data["session_end"]
+            session.save()
+
+            # Fix DOB format for browser - expects DD/MM/YYYY
+            # if request.user.dob:
+            #     request.user.dob = request.user.dob.strftime("%d/%m/%Y")
+            #
+
+            messages.success(
+                request, "Session Added", extra_tags="cobalt-message-success"
+            )
+            return redirect(
+                "events:edit_event", event_id=event_id, congress_id=event.congress.id
+            )
+        else:
+            print(form.errors)
+
+    else:
+        form = SessionForm()
+
+    return render(
+        request, "events/create_session.html", {"form": form, "event": event},
     )
 
 

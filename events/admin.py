@@ -3,6 +3,7 @@ from .models import (
     CongressMaster,
     Congress,
     Event,
+    Session,
     EventEntryType,
     EventEntry,
     EventEntryPlayer,
@@ -13,6 +14,7 @@ from .models import (
 admin.site.register(CongressMaster)
 admin.site.register(Congress)
 admin.site.register(Event)
+admin.site.register(Session)
 admin.site.register(EventEntryType)
 admin.site.register(EventEntry)
 admin.site.register(EventEntryPlayer)
