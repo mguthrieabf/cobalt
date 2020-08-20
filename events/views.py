@@ -18,8 +18,8 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    #    return render(request, "events/soon.html", {"congresses": congresses})
-    return render(request, "events/home.html", {"congresses": congresses})
+    return render(request, "events/soon.html", {"congresses": congresses})
+    # return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -44,151 +44,151 @@ def view_congress(request, congress_id, fullscreen=False):
     )
 
 
-@login_required()
-def create_congress(request):
-    """ create a new congress
+# @login_required()
+# def create_congress(request):
+#     """ create a new congress
+#
+#     Args:
+#         request(HTTPRequest): standard user request
+#
+#     Returns:
+#         page(HTTPResponse): page to create congress
+#     """
+#     # get orgs that this user can manage congresses for
+#     everything, valid_orgs = rbac_user_allowed_for_model(
+#         user=request.user, app="events", model="org", action="edit"
+#     )
+#
+#     if everything:
+#         valid_orgs = Organisation.objects.all().values_list("pk")
+#
+#     # get CongressMasters that this user can manage
+#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
+#         "pk"
+#     )
+#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
+#
+#     if request.method == "POST":
+#         form = CongressForm(
+#             request.POST, valid_orgs=valid_orgs, congress_masters=congress_masters
+#         )
+#         if form.is_valid():
+#             role = "events.org.%s.edit" % form.cleaned_data["org"].id
+#             if not rbac_user_has_role(request.user, role):
+#                 return rbac_forbidden(request, role)
+#
+#             congress = form.save(commit=False)
+#             congress.author = request.user
+#             congress.save()
+#
+#             messages.success(
+#                 request, "Congress created", extra_tags="cobalt-message-success"
+#             )
+#             return redirect("events:edit_congress", congress_id=congress.id)
+#         else:
+#             messages.error(
+#                 request,
+#                 "There are errors on this form",
+#                 extra_tags="cobalt-message-error",
+#             )
+#     else:
+#         form = CongressForm(valid_orgs=valid_orgs, congress_masters=congress_masters)
+#
+#     return render(
+#         request,
+#         "events/edit_congress.html",
+#         {"form": form, "title": "Create New Congress"},
+#     )
 
-    Args:
-        request(HTTPRequest): standard user request
 
-    Returns:
-        page(HTTPResponse): page to create congress
-    """
-    # get orgs that this user can manage congresses for
-    everything, valid_orgs = rbac_user_allowed_for_model(
-        user=request.user, app="events", model="org", action="edit"
-    )
-
-    if everything:
-        valid_orgs = Organisation.objects.all().values_list("pk")
-
-    # get CongressMasters that this user can manage
-    congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
-        "pk"
-    )
-    congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
-
-    if request.method == "POST":
-        form = CongressForm(
-            request.POST, valid_orgs=valid_orgs, congress_masters=congress_masters
-        )
-        if form.is_valid():
-            role = "events.org.%s.edit" % form.cleaned_data["org"].id
-            if not rbac_user_has_role(request.user, role):
-                return rbac_forbidden(request, role)
-
-            congress = form.save(commit=False)
-            congress.author = request.user
-            congress.save()
-
-            messages.success(
-                request, "Congress created", extra_tags="cobalt-message-success"
-            )
-            return redirect("events:edit_congress", congress_id=congress.id)
-        else:
-            messages.error(
-                request,
-                "There are errors on this form",
-                extra_tags="cobalt-message-error",
-            )
-    else:
-        form = CongressForm(valid_orgs=valid_orgs, congress_masters=congress_masters)
-
-    return render(
-        request,
-        "events/edit_congress.html",
-        {"form": form, "title": "Create New Congress"},
-    )
-
-
-@login_required()
-def edit_congress(request, congress_id):
-    """ edit a new congress
-
-    Args:
-        request(HTTPRequest): standard user request
-        congress_id(int): congress to view
-
-    Returns:
-        page(HTTPResponse): page to create congress
-    """
-
-    # get orgs that this user can manage congresses for
-    everything, valid_orgs = rbac_user_allowed_for_model(
-        user=request.user, app="events", model="org", action="edit"
-    )
-
-    if everything:
-        valid_orgs = Organisation.objects.all().values_list("pk")
-
-    # get CongressMasters that this user can manage
-    congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
-        "pk"
-    )
-    congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
-
-    congress = get_object_or_404(Congress, pk=congress_id)
-
-    role = "events.org.%s.edit" % congress.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
-
-    conveners = rbac_get_users_with_role("events.org.%s.edit" % congress.org.id)
-
-    if request.method == "POST":
-
-        # we only process save or publish through here
-
-        form = CongressForm(
-            request.POST,
-            instance=congress,
-            valid_orgs=valid_orgs,
-            congress_masters=congress_masters,
-        )
-        if form.is_valid():
-
-            print(form.cleaned_data["venue_location"])
-
-            role = "events.org.%s.edit" % form.cleaned_data["org"].id
-            if not rbac_user_has_role(request.user, role):
-                return rbac_forbidden(request, role)
-
-            congress = form.save(commit=False)
-            congress.last_updated_by = request.user
-            congress.last_updated = timezone.localtime()
-
-            if "Publish" in request.POST:
-                congress.status = "Published"
-                messages.success(
-                    request, "Congress published", extra_tags="cobalt-message-success",
-                )
-
-            congress.save()
-            messages.success(
-                request, "Congress saved", extra_tags="cobalt-message-success"
-            )
-        else:
-            messages.error(
-                request,
-                "There are errors on this form",
-                extra_tags="cobalt-message-error",
-            )
-
-    else:
-        form = CongressForm(
-            instance=congress, valid_orgs=valid_orgs, congress_masters=congress_masters
-        )
-
-    return render(
-        request,
-        "events/edit_congress.html",
-        {
-            "form": form,
-            "title": "Edit Congress",
-            "congress": congress,
-            "conveners": conveners,
-        },
-    )
+# @login_required()
+# def edit_congress(request, congress_id):
+#     """ edit a new congress
+#
+#     Args:
+#         request(HTTPRequest): standard user request
+#         congress_id(int): congress to view
+#
+#     Returns:
+#         page(HTTPResponse): page to create congress
+#     """
+#
+#     # get orgs that this user can manage congresses for
+#     everything, valid_orgs = rbac_user_allowed_for_model(
+#         user=request.user, app="events", model="org", action="edit"
+#     )
+#
+#     if everything:
+#         valid_orgs = Organisation.objects.all().values_list("pk")
+#
+#     # get CongressMasters that this user can manage
+#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
+#         "pk"
+#     )
+#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
+#
+#     congress = get_object_or_404(Congress, pk=congress_id)
+#
+#     role = "events.org.%s.edit" % congress.org.id
+#     if not rbac_user_has_role(request.user, role):
+#         return rbac_forbidden(request, role)
+#
+#     conveners = rbac_get_users_with_role("events.org.%s.edit" % congress.org.id)
+#
+#     if request.method == "POST":
+#
+#         # we only process save or publish through here
+#
+#         form = CongressForm(
+#             request.POST,
+#             instance=congress,
+#             valid_orgs=valid_orgs,
+#             congress_masters=congress_masters,
+#         )
+#         if form.is_valid():
+#
+#             print(form.cleaned_data["venue_location"])
+#
+#             role = "events.org.%s.edit" % form.cleaned_data["org"].id
+#             if not rbac_user_has_role(request.user, role):
+#                 return rbac_forbidden(request, role)
+#
+#             congress = form.save(commit=False)
+#             congress.last_updated_by = request.user
+#             congress.last_updated = timezone.localtime()
+#
+#             if "Publish" in request.POST:
+#                 congress.status = "Published"
+#                 messages.success(
+#                     request, "Congress published", extra_tags="cobalt-message-success",
+#                 )
+#
+#             congress.save()
+#             messages.success(
+#                 request, "Congress saved", extra_tags="cobalt-message-success"
+#             )
+#         else:
+#             messages.error(
+#                 request,
+#                 "There are errors on this form",
+#                 extra_tags="cobalt-message-error",
+#             )
+#
+#     else:
+#         form = CongressForm(
+#             instance=congress, valid_orgs=valid_orgs, congress_masters=congress_masters
+#         )
+#
+#     return render(
+#         request,
+#         "events/edit_congress.html",
+#         {
+#             "form": form,
+#             "title": "Edit Congress",
+#             "congress": congress,
+#             "conveners": conveners,
+#         },
+#     )
 
 
 @login_required()
@@ -378,6 +378,7 @@ def create_congress_wizard_2(request, step_list, congress):
             congress.start_date = form.cleaned_data["start_date"]
             congress.end_date = form.cleaned_data["end_date"]
             congress.general_info = form.cleaned_data["general_info"]
+            congress.links = form.cleaned_data["links"]
             congress.people = form.cleaned_data["people"]
             congress.people_array = form.cleaned_data["people_array"]
             congress.additional_info = form.cleaned_data["additional_info"]
@@ -388,7 +389,13 @@ def create_congress_wizard_2(request, step_list, congress):
         else:
             print(form.errors)
     else:
-        form = CongressForm(instance=congress)
+        # datepicker is very fussy about format
+        initial = {}
+        if congress.start_date:
+            initial["start_date"] = congress.start_date.strftime("%d/%m/%Y")
+        if congress.entry_close_date:
+            initial["end_date"] = congress.end_date.strftime("%d/%m/%Y")
+        form = CongressForm(instance=congress, initial=initial)
 
     form.fields["default_email"].required = True
     form.fields["year"].required = True
@@ -397,6 +404,7 @@ def create_congress_wizard_2(request, step_list, congress):
     form.fields["end_date"].required = True
     form.fields["date_string"].required = True
     form.fields["general_info"].required = True
+    form.fields["links"].required = True
     form.fields["people"].required = True
     form.fields["people_array"].required = True
 

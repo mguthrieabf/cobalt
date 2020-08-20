@@ -85,6 +85,7 @@ class Congress(models.Model):
         blank=True,
     )
     general_info = models.TextField("General Information", null=True, blank=True)
+    links = models.TextField("Links", null=True, blank=True)
     payment_method_system_dollars = models.BooleanField(default=True)
     payment_method_bank_transfer = models.BooleanField(default=False)
     payment_method_cash = models.BooleanField(default=False)

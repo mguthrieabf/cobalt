@@ -118,6 +118,9 @@
             </div>
             <hr>
 
+
+
+
             <div class="row">
               <div class="col-10 justify-content-center align-self-center">
                 <h3>People</h3>
@@ -125,10 +128,45 @@
               <div class="col-2 justify-content-center align-self-center">
                 <a href="#" onclick='help("People", "List people and contact details.");'>help</a>
               </div>
+            </div>
+
+            <div class="row">
               <div class="col-12">
-                {{ form.people|as_crispy_field }}
+                <div class="form-check form-check-radio form-check-inline">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="people_options" id="inlineRadio1" value="simple" checked> Simple
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                  </label>
+                </div>
+                <div class="form-check form-check-radio form-check-inline">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="people_options" id="inlineRadio2" value="custom"> Custom
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div id="people_preview">
+                <h5>Preview</h5>
+                <div style="border:1px solid black;">
+                {{ form.people.value|safe }}
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+                {{ form.people|as_crispy_field }}
+            </div>
+          </div>
             <hr>
 
             <div class="row">
@@ -140,6 +178,19 @@
               </div>
               <div class="col-12">
                 {{ form.general_info|as_crispy_field }}
+              </div>
+            </div>
+            <hr>
+
+            <div class="row">
+              <div class="col-10 justify-content-center align-self-center">
+                <h3>Links</h3>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Links", "Here you can add links to useful information. We suggest using a bullet list.");'>help</a>
+              </div>
+              <div class="col-12">
+                {{ form.links|as_crispy_field }}
               </div>
             </div>
             <hr>
@@ -209,6 +260,10 @@ function generate_date_string(){
 }
 
 $(document).ready(function(){
+
+  console.log($("#id_people").val());
+  $("#id_people").val("<h3>Stuff</h3>");
+  console.log($("#id_people").val());
 
   $('#id_start_date').datetimepicker({
       format: 'DD/MM/YYYY'

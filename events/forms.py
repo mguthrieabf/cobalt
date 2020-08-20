@@ -26,6 +26,7 @@ class CongressForm(forms.ModelForm):
         self.fields["people"].label = False
         self.fields["people_array"].label = False
         self.fields["general_info"].label = False
+        self.fields["links"].label = False
         self.fields["venue_name"].label = False
         self.fields["venue_location"].label = False
         self.fields["venue_transport"].label = False
@@ -52,6 +53,7 @@ class CongressForm(forms.ModelForm):
         self.fields["sponsors"].required = False
         self.fields["people_array"].required = False
         self.fields["general_info"].required = False
+        self.fields["links"].required = False
         self.fields["venue_name"].required = False
         self.fields["venue_location"].required = False
         self.fields["venue_transport"].required = False
@@ -73,6 +75,17 @@ class CongressForm(forms.ModelForm):
                 "summernote": {
                     "height": "250",
                     "placeholder": "<br><br>Enter basic information about the congress.",
+                }
+            }
+        )
+    )
+
+    links = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>Enter links to useful information. This looks good as a list.",
                 }
             }
         )
@@ -152,6 +165,7 @@ class CongressForm(forms.ModelForm):
             "people_array",
             "raw_html",
             "general_info",
+            "links",
             "sponsors",
             "payment_method_system_dollars",
             "payment_method_bank_transfer",
