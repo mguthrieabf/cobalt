@@ -14,4 +14,4 @@ def rebuild(request):
     f = open("/tmp/trigger.txt", "w")
     f.write("ok")
     f.close()
-    return HttpResponse("Request initiated.")
+    return render(request, "support/rebuild.html")
