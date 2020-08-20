@@ -1,6 +1,6 @@
 #!/bin/sh
 
-psql -f support/rebuild_test_data.sql
+./manage.py dbshell <support/rebuild_test_data.sql
 ./manage.py migrate
 ./manage.py createsu
 ./manage.py create_abf
