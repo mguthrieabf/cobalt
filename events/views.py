@@ -18,10 +18,8 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    return render(request, "events/soon.html", {"congresses": congresses})
-
-
-#    return render(request, "events/home.html", {"congresses": congresses})
+    #    return render(request, "events/soon.html", {"congresses": congresses})
+    return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -303,6 +301,11 @@ def create_congress_wizard(request, step=1, congress_id=None):
     # all subsequent steps need the congress
     congress = get_object_or_404(Congress, pk=congress_id)
 
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     if step == 2:
         return create_congress_wizard_2(request, step_list, congress)
     if step == 3:
@@ -320,13 +323,22 @@ def create_congress_wizard(request, step=1, congress_id=None):
 def create_congress_wizard_1(request, step_list):
     """ congress wizard step 1 - create """
     if request.method == "POST":
+
         form = NewCongressForm(request.POST)
+
         if form.is_valid():
+
             if "scratch" in request.POST:
                 congress_master_id = form.cleaned_data["congress_master"]
                 congress_master = get_object_or_404(
                     CongressMaster, pk=congress_master_id
                 )
+
+                # check access
+                role = "events.org.%s.edit" % congress_master.org.id
+                if not rbac_user_has_role(request.user, role):
+                    return rbac_forbidden(request, role)
+
                 congress = Congress()
                 congress.congress_master = congress_master
                 congress.save()
@@ -656,6 +668,11 @@ def create_event(request, congress_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     if request.method == "POST":
 
         form = EventForm(request.POST)
@@ -682,8 +699,16 @@ def edit_event(request, congress_id, event_id):
     """ edit an event within a congress """
 
     congress = get_object_or_404(Congress, pk=congress_id)
+
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     event = get_object_or_404(Event, pk=event_id)
-    sessions = Session.objects.filter(event=event)
+    sessions = Session.objects.filter(event=event).order_by(
+        "session_date", "session_start"
+    )
 
     if request.method == "POST":
 
@@ -703,12 +728,6 @@ def edit_event(request, congress_id, event_id):
             initial["entry_close_date"] = event.entry_close_date.strftime("%d/%m/%Y")
         form = EventForm(instance=event, initial=initial)
 
-    # override date format
-
-    # print(form.fields["entry_open_date"].initial )
-    # print(form.fields["event_name"].initial )
-    # form.fields["entry_open_date"].initial = event.entry_open_date.strftime("%d/%m/%Y")
-
     return render(
         request,
         "events/edit_event.html",
@@ -722,6 +741,11 @@ def create_session(request, event_id):
 
     event = get_object_or_404(Event, pk=event_id)
 
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     if request.method == "POST":
         form = SessionForm(request.POST)
         print(request.POST.get("session_date"))
@@ -733,11 +757,6 @@ def create_session(request, event_id):
             session.session_start = form.cleaned_data["session_start"]
             session.session_end = form.cleaned_data["session_end"]
             session.save()
-
-            # Fix DOB format for browser - expects DD/MM/YYYY
-            # if request.user.dob:
-            #     request.user.dob = request.user.dob.strftime("%d/%m/%Y")
-            #
 
             messages.success(
                 request, "Session Added", extra_tags="cobalt-message-success"
@@ -762,6 +781,11 @@ def edit_session(request, event_id, session_id):
 
     event = get_object_or_404(Event, pk=event_id)
     session = get_object_or_404(Session, pk=session_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
@@ -803,6 +827,12 @@ def delete_event_ajax(request):
         event_id = request.GET["event_id"]
 
     event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     event.delete()
 
     response_data = {}
@@ -818,6 +848,12 @@ def delete_session_ajax(request):
         session_id = request.GET["session_id"]
 
     session = get_object_or_404(Session, pk=session_id)
+
+    # check access
+    role = "events.org.%s.edit" % session.event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
     session.delete()
 
     response_data = {}

@@ -141,13 +141,18 @@
         <div class="card col-lg-9">
           <div class="card-header card-header-success">
             <h3 class="card-title">Sessions</h3>
-            <h4>Sessions are optional. Add sessions if your event requires them.</h4>
+            <i>If you only have a single session, you can create a session with a date and start time (end time is optional).
+            For events with multiple sessions please create an entry for each session.</i>
           </div>
           <div class="card-body" style="text-align: center">
             <div class="container">
               <select class="w-100" size="10" id="session_list">
               {% for session in sessions %}
-                <option value="{{ session.id }}">{{ session.session_date }} - {{ session.session_start }}</option>
+                <option value="{{ session.id }}">{{ session.session_date|date:"l jS F Y" }} Session starts at {{ session.session_start }}
+                {% if session.session_end %}
+                  Ends at {{ session.session_end }}
+                {% endif %}
+                </option>
               {% endfor %}
               </select>
             </div>
@@ -163,6 +168,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="row justify-content-center">
+        <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
       </div>
     </div>
   </div>
