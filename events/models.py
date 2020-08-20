@@ -61,9 +61,9 @@ class Congress(models.Model):
         CongressMaster, on_delete=models.CASCADE, null=True, blank=True
     )
     year = models.IntegerField("Congress Year", null=True, blank=True)
-    org = models.ForeignKey(
-        Organisation, on_delete=models.CASCADE, null=True, blank=True
-    )
+    # org = models.ForeignKey(
+    #     Organisation, on_delete=models.CASCADE, null=True, blank=True
+    # )
     venue_name = models.CharField("Venue Name", max_length=100, null=True, blank=True)
     venue_location = models.CharField(
         "Venue Location", max_length=100, null=True, blank=True
@@ -73,6 +73,7 @@ class Congress(models.Model):
     venue_additional_info = models.TextField(
         "Venue Additional Information", null=True, blank=True
     )
+    sponsors = models.TextField("Sponsors", null=True, blank=True)
     additional_info = models.TextField(
         "Congress Additional Information", null=True, blank=True
     )
@@ -205,20 +206,6 @@ class CongressNewsItem(models.Model):
 
     def __str__(self):
         return "%s" % (self.congress)
-
-
-#
-# class CongressPeople(models.Model):
-#     """ Roles within a congress """
-#
-#     congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     user_role = models.CharField("User Role", max_length=50)
-#     email = models.CharField("Email", max_length=50, null=True, blank=True)
-#     phone = models.CharField("Phone Number", max_length=10, null=True, blank=True)
-#
-#     def __str__(self):
-#         return "%s - %s" % (self.congress, self.user)
 
 
 class CongressDownload(models.Model):

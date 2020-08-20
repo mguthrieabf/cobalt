@@ -8,15 +8,11 @@ from django_summernote.widgets import SummernoteInplaceWidget
 class CongressForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
-        # Get valid orgs and congress master as parameter
-        valid_orgs = kwargs.pop("valid_orgs", [])
+        # Get allowed congress masters as parameter
         congress_masters = kwargs.pop("congress_masters", [])
         super(CongressForm, self).__init__(*args, **kwargs)
 
-        # Modify valid orgs and congress master if they were passed
-        self.fields["org"].queryset = Organisation.objects.filter(
-            pk__in=valid_orgs
-        ).order_by("name")
+        # Modify and congress master if  passed
         self.fields["congress_master"].queryset = CongressMaster.objects.filter(
             pk__in=congress_masters
         ).order_by("name")
@@ -27,7 +23,6 @@ class CongressForm(forms.ModelForm):
         self.fields["start_date"].label = False
         self.fields["end_date"].label = False
         self.fields["date_string"].label = False
-        self.fields["org"].label = False
         self.fields["people"].label = False
         self.fields["people_array"].label = False
         self.fields["general_info"].label = False
@@ -38,6 +33,7 @@ class CongressForm(forms.ModelForm):
         self.fields["venue_additional_info"].label = False
         self.fields["additional_info"].label = False
         self.fields["default_email"].label = False
+        self.fields["sponsors"].label = False
         self.fields["payment_method_system_dollars"].label = False
         self.fields["payment_method_bank_transfer"].label = False
         self.fields["payment_method_cash"].label = False
@@ -52,8 +48,8 @@ class CongressForm(forms.ModelForm):
         self.fields["start_date"].required = False
         self.fields["end_date"].required = False
         self.fields["date_string"].required = False
-        self.fields["org"].required = False
         self.fields["people"].required = False
+        self.fields["sponsors"].required = False
         self.fields["people_array"].required = False
         self.fields["general_info"].required = False
         self.fields["venue_name"].required = False
@@ -77,6 +73,17 @@ class CongressForm(forms.ModelForm):
                 "summernote": {
                     "height": "250",
                     "placeholder": "<br><br>Enter basic information about the congress.",
+                }
+            }
+        )
+    )
+
+    sponsors = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>(Optional) Enter information about sponsors and upload pictures and logos.",
                 }
             }
         )
@@ -135,7 +142,6 @@ class CongressForm(forms.ModelForm):
             "start_date",
             "end_date",
             "date_string",
-            "org",
             "venue_name",
             "venue_location",
             "venue_transport",
@@ -146,6 +152,7 @@ class CongressForm(forms.ModelForm):
             "people_array",
             "raw_html",
             "general_info",
+            "sponsors",
             "payment_method_system_dollars",
             "payment_method_bank_transfer",
             "payment_method_cash",
@@ -176,13 +183,8 @@ class NewCongressForm(forms.Form):
 
 
 class EventForm(forms.ModelForm):
-    entry_open_date = forms.DateField()
 
-    # def __init__(self, *args, **kwargs):
-    #     super(EventForm, self).__init__(*args, **kwargs)
-    #     print(self.fields["entry_open_date"].initial)
-    #     self.fields["entry_open_date"].initial = "12/08/2001"
-    #     print(self.fields["entry_open_date"].initial)
+    entry_open_date = forms.DateField()
 
     class Meta:
         model = Event

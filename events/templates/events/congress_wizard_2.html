@@ -172,6 +172,7 @@
 {% block footer %}
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
 {% include "events/congress_wizard_include_footer.html" %}
 
 <script>
@@ -237,6 +238,19 @@ $(document).ready(function(){
   $("#id_date_string").focus(function(){
     generate_date_string();
   });
+
+  if (typeof $.cookie('congress-previewmsg-{{ congress.id }}') === 'undefined'){
+    $.cookie('congress-previewmsg-{{ congress.id }}', 'set', { expires:10000, domain: '', path: '' });
+
+    Swal.fire({
+      title: 'Hint: Preview',
+      html: 'At any time after saving your data you can go to <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=7 %}">Step 7 - Publish</a> to preview your page.',
+      // imageUrl: 'https://unsplash.it/400/200',
+      // imageWidth: 400,
+      // imageHeight: 200,
+      // imageAlt: 'Custom image',
+    });
+  }
 
 });
 </script>

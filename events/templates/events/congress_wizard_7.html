@@ -21,13 +21,15 @@
 
             <div class="row">
               <div class="col">
+                <h3>Errors</h3>
                 {% if errors %}
-                  <h3>Errors</h3>
                   <ul>
                   {% for error in errors %}
                     <li> {{ error|safe }}
-                 {% endfor %}
-                 </ul>
+                  {% endfor %}
+                  </ul>
+                 {% else %}
+                  <h4>No errors found. You are good to publish.</h4>
                 {% endif %}
 
                 {% if warnings %}
@@ -41,6 +43,16 @@
 
               </div>
             </div>
+
+            <i>Previews will appear in another broswer tab.</i>
+            <div class="row">
+              <div class="col text-center">
+                <button class="btn btn-success btn-sm" id="id_preview">Preview</button>
+                <button class="btn btn-success btn-sm" id="id_preview_full">Preview (Full screen)</button>
+                <button class="btn btn-info btn-sm cobalt-save">Publish</button>
+              </div>
+            </div>
+
           </form>
         </div>
       </div>
@@ -52,5 +64,34 @@
 {% endblock %}
 {% block footer %}
 {% include "events/congress_wizard_include_footer.html" %}
+<script>
+$(document).ready(function(){
 
+  // Preview
+    $("#id_preview").click(function(event){
+      event.preventDefault();
+      var win = window.open('{% url "events:view_congress" congress_id=congress.id %}', '_blank');
+      if (win) {
+          //Browser has allowed it to be opened
+          win.focus();
+      } else {
+          //Browser has blocked it
+          alert('Please allow popups for this website');
+      }
+    });
+
+  // Preview fullscreen
+    $("#id_preview_full").click(function(event){
+      event.preventDefault();
+      var win = window.open('{% url "events:view_congress" congress_id=congress.id fullscreen=1 %}', '_blank');
+      if (win) {
+          //Browser has allowed it to be opened
+          win.focus();
+      } else {
+          //Browser has blocked it
+          alert('Please allow popups for this website');
+      }
+    });
+});
+</script>
 {% endblock %}

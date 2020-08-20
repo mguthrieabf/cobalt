@@ -23,29 +23,13 @@ def home(request):
 
 
 @login_required()
-def view_congress(request, congress_id):
+def view_congress(request, congress_id, fullscreen=False):
     """ basic view of an event.
 
     Args:
         request(HTTPRequest): standard user request
         congress_id(int): congress to view
-
-    Returns:
-        page(HTTPResponse): page with details about the event
-    """
-
-    congress = get_object_or_404(Congress, pk=congress_id)
-
-    return render(request, "events/congress.html", {"congress": congress})
-
-
-@login_required()
-def preview_congress(request, congress_id):
-    """ basic preview of an event. Doesn't use base.html
-
-    Args:
-        request(HTTPRequest): standard user request
-        congress_id(int): congress to view
+        fullscreen(boolean): if true shows just the page, not the standard surrounds
 
     Returns:
         page(HTTPResponse): page with details about the event
@@ -54,7 +38,9 @@ def preview_congress(request, congress_id):
     congress = get_object_or_404(Congress, pk=congress_id)
 
     return render(
-        request, "events/congress.html", {"congress": congress, "preview": True}
+        request,
+        "events/congress.html",
+        {"congress": congress, "fullscreen": fullscreen},
     )
 
 
@@ -460,6 +446,7 @@ def create_congress_wizard_4(request, step_list, congress):
     if request.method == "POST":
         form = CongressForm(request.POST)
         if form.is_valid():
+            congress.sponsors = form.cleaned_data["sponsors"]
             congress.save()
             return redirect(
                 "events:create_congress_wizard", step=5, congress_id=congress.id
