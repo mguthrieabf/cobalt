@@ -1,10 +1,5 @@
 #!/bin/sh
 
-FILE=/tmp/trigger.txt
-if test -f "$FILE"; then
-
-rm $FILE
-
 ./manage.py dbshell <support/rebuild_test_data.sql
 ./manage.py migrate
 ./manage.py createsu
@@ -17,5 +12,3 @@ rm $FILE
 ./manage.py create_states
 #./manage.py createdummyusers
 ./manage.py importclubs
-
-fi
