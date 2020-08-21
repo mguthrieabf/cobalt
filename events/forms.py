@@ -198,7 +198,7 @@ class NewCongressForm(forms.Form):
 
 class EventForm(forms.ModelForm):
 
-    entry_open_date = forms.DateField()
+#    entry_open_date = forms.DateField()
 
     class Meta:
         model = Event

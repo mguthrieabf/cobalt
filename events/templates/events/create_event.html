@@ -28,12 +28,14 @@
              <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
+                  <span class="cobalt-form-error" id="id_entry_open_date_errors">{{ form.entry_open_date.errors|striptags }}</span>
                   <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
                   <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
+                  <span class="cobalt-form-error" id="id_entry_close_date_errors">{{ form.entry_close_date.errors|striptags }}</span>
                   <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
                   <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
                 </div>

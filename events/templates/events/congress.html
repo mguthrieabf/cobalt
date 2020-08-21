@@ -7,6 +7,7 @@
 {% else %}
 
 
+
 <div class="col-lg-12 col-md-12">
   <div class="card">
     <div class="card-header card-header-warning">
@@ -144,107 +145,31 @@
       <h4 class="card-title">Program</h4>
     </div>
     <div class="card-body table-responsive">
-    <div class="table-responsive">
-        <table border class="table">
-            <thead class="text-primary">
-              <th>Event</th>
-              <th>Day</th>
-              <th>Time</th>
-              <th>Action</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span>Royal Bluebell Matchpoint Swiss Pairs</span></td>
-                    <td>Friday</td>
-                    <td>04-10-2019 - 10am &amp; 2pm</td>
-                    <td><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-                 <tr>
-                    <td><span class="title">Spider Orchid Novice &amp; Restricted Matchpoint Swiss Pairs</span></td>
-                    <td>Friday</td>
-                    <td>04-10-2019 - 10am &amp; 2pm</td>
-                    <td><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-                <tr>
-                    <td rowspan="2"><span class="title">Golden Wattle Open Teams</span></td>
-                    <td>Saturday </td>
-                    <td>05-10-2019 - 10am &amp; 2.20pm</td>
-                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
 
 
-                </tr>
 
-                <tr>
-                    <td>Sunday</td>
-                    <td>06-10-2019 - 10am</td>
+      <div class="table-responsive">
+          <table border class="table">
+              <thead class="text-primary">
+                <th>Event</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Action</th>
+              </thead>
+              <tbody>
+      {% for program in program_list %}
+        <tr>
+          {{ program.event|safe }}
+          {{ program.day|safe }}
+          {{ program.time|safe }}
+          {{ program.links|safe }}
+        </tr>
+      {% endfor %}
+            </tbody>
+        </table>
+        </div>
 
 
-                </tr>
-
-                <tr>
-                    <td rowspan="2"><span class="title">Val &amp; John Brockwell Mixed Teams Qualifying<br /><br />NEW EVENT</span></td>
-                    <td>Saturday </td>
-                    <td>05-10-2019 - 10am &amp; 2.20pm</td>
-
-                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-
-                <tr>
-                    <td>Sunday</td>
-                    <td>06-10-2019 - 10am</td>
-
-                </tr>
-
-                <tr>
-                    <td rowspan="2"><span class="title">Val &amp; John Brockwell Mixed Teams Finals</span></td>
-                    <td>Sunday</td>
-                    <td>06-10-2019 - 2.15pm</td>
-
-                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-
-                <tr>
-                    <td>Monday</td>
-                    <td>07-10-2019 - 10am</td>
-
-                </tr>
-
-                <tr>
-                    <td rowspan="2"><span class="title">Canberra Bells Swiss Pairs</span>
-                    </td>
-                    <td>Sunday</td>
-                    <td>06-10-2019 - 2.15pm </td>
-
-                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-                <tr>
-                    <td>Monday</td>
-                    <td>07-10-2019 - 10am &amp; 2.15pm</td>
-
-                    </tr>
-                <tr>
-                    <td rowspan="2"><span class="title">Federation Rose Novice &amp; Restricted Swiss Pairs</span>
-                    </td>
-                    <td>Sunday</td>
-                    <td>06-10-2019 - 2.15pm </td>
-
-                    <td rowspan="2"><a href="./enter-enter-event.html">Enter</a>
-                    <br><a href="./view-event.html">View Entries</a></td>
-                </tr>
-                <tr>
-                    <td>Monday</td>
-                    <td>07-10-2019 - 10am &amp; 2.15pm</td>
-
-                </tr>
-                </tbody>
-            </table>
-          </div>
   {{ congress.additional_info|safe }}
 
 
