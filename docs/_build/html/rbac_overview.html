@@ -366,11 +366,13 @@ lot of admin is done at the club level, some at the state level and some at the
 highest level (in our case the ABF), so it makes sense to use this as part of the
 tree. e.g.:</p>
 <blockquote>
-<div><p>org.abf.nsw.north-shore-bridge-club (NSWBA’s part of the tree)
-org.abf.nsw.trumps (Trumps part of the tree)
-org.abf.sa.saba (SABA’s part of the tree)
-org.abf.nsw.nswba (NSWBA’s part of the tree)
-org.abf.abf (The ABF’s part of the tree)</p>
+<div><ul class="simple">
+<li><p>rbac.abf.nsw.north-shore-bridge-club (NSWBA’s part of the tree)</p></li>
+<li><p>rbac.abf.nsw.trumps (Trumps part of the tree)</p></li>
+<li><p>rbac.abf.sa.saba (SABA’s part of the tree)</p></li>
+<li><p>rbac.abf.nsw.nswba (NSWBA’s part of the tree)</p></li>
+<li><p>rbac.abf.abf (The ABF’s part of the tree)</p></li>
+</ul>
 </div></blockquote>
 <p>Note that there is nothing in the code to enforce this and the tree can
 evolve as we see fit.</p>
@@ -388,7 +390,7 @@ that administrators can only do things they are supposed to do.</p>
 Every group is created with a location in the tree. The tree is similar to the
 roles, it is a hierarchical dot based model.</p>
 <p>Lets start with a simple example.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACGroup</span><span class="p">:</span> <span class="n">org</span><span class="o">.</span><span class="n">abf</span><span class="o">.</span><span class="n">qld</span><span class="o">.</span><span class="n">surfers</span><span class="o">.</span><span class="n">directors</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBACGroup</span><span class="p">:</span> <span class="n">rbac</span><span class="o">.</span><span class="n">abf</span><span class="o">.</span><span class="n">qld</span><span class="o">.</span><span class="n">surfers</span><span class="o">.</span><span class="n">directors</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Bob</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Jane</span>
 <span class="n">RBACUserGroup</span><span class="p">:</span> <span class="n">Alice</span>

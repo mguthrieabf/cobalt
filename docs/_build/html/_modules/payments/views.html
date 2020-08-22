@@ -314,8 +314,11 @@
     <span class="n">qry</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/mps/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">system_number</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">summary</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">Http404</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>  <span class="c1"># server down or some error</span>
+        <span class="c1"># raise Http404</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;IsActive&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;HomeClubID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Set active to a boolean</span>
     <span class="k">if</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;IsActive&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span>
@@ -325,7 +328,10 @@
 
     <span class="c1"># Get home club name</span>
     <span class="n">qry</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/club/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;HomeClubID&quot;</span><span class="p">])</span>
-    <span class="n">club</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;ClubName&quot;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">club</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;ClubName&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>  <span class="c1"># server down or some error</span>
+        <span class="n">club</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span>
 
     <span class="c1"># get balance</span>
     <span class="n">last_tran</span> <span class="o">=</span> <span class="n">MemberTransaction</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span>
@@ -344,6 +350,7 @@
         <span class="s2">&quot;-created_date&quot;</span>
     <span class="p">)</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">club</span><span class="p">,</span> <span class="n">balance</span><span class="p">,</span> <span class="n">auto_button</span><span class="p">,</span> <span class="n">events_list</span><span class="p">)</span></div>
 
 

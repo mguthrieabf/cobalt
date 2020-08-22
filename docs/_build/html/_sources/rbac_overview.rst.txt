@@ -268,11 +268,11 @@ lot of admin is done at the club level, some at the state level and some at the
 highest level (in our case the ABF), so it makes sense to use this as part of the
 tree. e.g.:
 
-  org.abf.nsw.north-shore-bridge-club (NSWBA's part of the tree)
-  org.abf.nsw.trumps (Trumps part of the tree)
-  org.abf.sa.saba (SABA's part of the tree)
-  org.abf.nsw.nswba (NSWBA's part of the tree)
-  org.abf.abf (The ABF's part of the tree)
+  * rbac.abf.nsw.north-shore-bridge-club (NSWBA's part of the tree)
+  * rbac.abf.nsw.trumps (Trumps part of the tree)
+  * rbac.abf.sa.saba (SABA's part of the tree)
+  * rbac.abf.nsw.nswba (NSWBA's part of the tree)
+  * rbac.abf.abf (The ABF's part of the tree)
 
 Note that there is nothing in the code to enforce this and the tree can
 evolve as we see fit.
@@ -296,7 +296,7 @@ Lets start with a simple example.
 
 .. code-block:: python
 
-  RBACGroup: org.abf.qld.surfers.directors
+  RBACGroup: rbac.abf.qld.surfers.directors
   RBACUserGroup: Bob
   RBACUserGroup: Jane
   RBACUserGroup: Alice

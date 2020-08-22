@@ -174,9 +174,19 @@
 
     <span class="c1"># Get summary data</span>
     <span class="n">qry</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/mps/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">system_number</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qry</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">except</span> <span class="p">(</span>
+        <span class="ne">IndexError</span><span class="p">,</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidSchema</span><span class="p">,</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MissingSchema</span><span class="p">,</span>
+        <span class="ne">ConnectionError</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;No entry found for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">system_number</span><span class="p">)</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;No entry found for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">system_number</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cobalt_error_msg&quot;</span><span class="p">:</span> <span class="n">error_msg</span><span class="p">}</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
     <span class="n">summary</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># Set active to a boolean</span>
@@ -422,7 +432,12 @@
         <span class="n">summary</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/mps/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_MPSERVER</span><span class="p">,</span> <span class="n">system_number</span><span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">points</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;TotalMPs&quot;</span><span class="p">]</span>
         <span class="n">rank</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s2">&quot;RankName&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; Master&quot;</span>
-    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="p">(</span>
+        <span class="ne">IndexError</span><span class="p">,</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidSchema</span><span class="p">,</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">MissingSchema</span><span class="p">,</span>
+        <span class="ne">ConnectionError</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="n">points</span> <span class="o">=</span> <span class="s2">&quot;Not found&quot;</span>
         <span class="n">rank</span> <span class="o">=</span> <span class="s2">&quot;Not found&quot;</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="n">points</span><span class="p">,</span> <span class="s2">&quot;rank&quot;</span><span class="p">:</span> <span class="n">rank</span><span class="p">}</span></div>

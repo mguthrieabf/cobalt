@@ -234,6 +234,66 @@ changes). Do this using the class cobalt-save:</p>
 </div>
 </div>
 </div>
+<div class="section" id="batch-jobs">
+<h1>Batch Jobs<a class="headerlink" href="#batch-jobs" title="Permalink to this headline">¶</a></h1>
+<p>Cobalt uses django-extensions
+<a class="reference external" href="https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html">django-extensions</a>.
+to handle batch jobs. This allows us to have batch jobs defined within the applications
+to which they correspond.</p>
+<p>Django-extensions creates a structure for us, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cobalt</span>\
+      <span class="n">events</span>\
+            <span class="n">jobs</span>\
+              <span class="n">hourly</span>\
+                <span class="n">hourly_job_1</span><span class="o">.</span><span class="n">py</span>
+                <span class="n">hourly_job_2</span><span class="o">.</span><span class="n">py</span>
+              <span class="n">daily</span>\
+                <span class="n">my_daily_job</span><span class="o">.</span><span class="n">py</span>
+              <span class="n">weekly</span>\
+              <span class="n">monthly</span>\
+              <span class="n">yearly</span>\
+</pre></div>
+</div>
+<p>You can follow the examples to create new jobs.</p>
+<div class="section" id="multi-node-environments">
+<h2>Multi-Node Environments<a class="headerlink" href="#multi-node-environments" title="Permalink to this headline">¶</a></h2>
+<p>We generally only want the batch to run once so in a multi-node environment
+such as AWS we need to make sure the batch doesn’t run on all nodes. We can
+do this with a Cobalt utility:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">utils.views</span> <span class="kn">import</span> <span class="n">CobaltBatch</span>
+<span class="kn">from</span> <span class="nn">django_extensions.management.jobs</span> <span class="kn">import</span> <span class="n">DailyJob</span>
+
+<span class="k">class</span> <span class="nc">Job</span><span class="p">(</span><span class="n">DailyJob</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s2">&quot;Cache (db) cleanup Job&quot;</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+      <span class="n">batch</span> <span class="o">=</span> <span class="n">CobaltBatch</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;My batch run&quot;</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">schedule</span><span class="o">=</span><span class="s2">&quot;Hourly&quot;</span> <span class="n">rerun</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># instance is optional and only needed if you run multiple times per day</span>
+
+      <span class="k">if</span> <span class="n">batch</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+
+<span class="c1"># run your commands</span>
+
+        <span class="n">batch</span><span class="o">.</span><span class="n">finished</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;Success&quot;</span><span class="p">)</span>
+<span class="c1">#        batch.finished(status=&quot;Failed&quot;)</span>
+</pre></div>
+</div>
+<p>As well as recording the start and end times of the batch job, CobaltBatch
+ensures that only one job per day per instance can be run. It does this by
+sleeping for a random time to avoid conflict and returning false for any
+subsequent job that tries to start. You can override this by specifying
+rerun=True (I don’t know how yet!).</p>
+</div>
+<div class="section" id="running-batch-jobs">
+<h2>Running Batch Jobs<a class="headerlink" href="#running-batch-jobs" title="Permalink to this headline">¶</a></h2>
+<p>You need to run batch jobs from cron:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">runjobs</span> <span class="n">daily</span>
+</pre></div>
+</div>
+<p>For Elastic Beanstalk this can be set up with an install script.</p>
+</div>
+</div>
 
 
            </div>

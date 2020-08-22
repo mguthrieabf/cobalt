@@ -548,15 +548,14 @@
         <span class="n">form</span> <span class="o">=</span> <span class="n">UserUpdateForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="n">blurbform</span> <span class="o">=</span> <span class="n">BlurbUpdateForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
-    <span class="n">access_token</span> <span class="o">=</span> <span class="s2">&quot;70691e3380c3b2&quot;</span>
-    <span class="n">handler</span> <span class="o">=</span> <span class="n">ipinfo</span><span class="o">.</span><span class="n">getHandler</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
-    <span class="n">ip_address</span> <span class="o">=</span> <span class="n">get_client_ip</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-    <span class="n">ip_details</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">getDetails</span><span class="p">(</span><span class="n">ip_address</span><span class="p">)</span>
+    <span class="c1"># access_token = &quot;70691e3380c3b2&quot;</span>
+    <span class="c1"># handler = ipinfo.getHandler(access_token)</span>
+    <span class="c1"># ip_address = get_client_ip(request)</span>
+    <span class="c1"># ip_details = handler.getDetails(ip_address)</span>
 
     <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
         <span class="s2">&quot;blurbform&quot;</span><span class="p">:</span> <span class="n">blurbform</span><span class="p">,</span>
-        <span class="s2">&quot;ip_details&quot;</span><span class="p">:</span> <span class="n">ip_details</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;accounts/profile.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
 

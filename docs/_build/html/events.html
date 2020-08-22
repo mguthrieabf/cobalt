@@ -205,6 +205,9 @@
 <em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">Congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Congress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>A specific congress including year</p>
+<p>We set all values to be optional so we can use the wizard format and
+save partial data as we go. The validation for completeness of data
+lies in the view.</p>
 <dl class="py exception">
 <dt id="events.models.Congress.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.Congress.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -220,6 +223,13 @@
 <dl class="py attribute">
 <dt id="events.models.Congress.additional_info">
 <code class="sig-name descname">additional_info</code><a class="headerlink" href="#events.models.Congress.additional_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.allow_partnership_desk">
+<code class="sig-name descname">allow_partnership_desk</code><a class="headerlink" href="#events.models.Congress.allow_partnership_desk" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -276,8 +286,8 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.congressnewsitem_set">
-<code class="sig-name descname">congressnewsitem_set</code><a class="headerlink" href="#events.models.Congress.congressnewsitem_set" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.Congress.congresslink_set">
+<code class="sig-name descname">congresslink_set</code><a class="headerlink" href="#events.models.Congress.congresslink_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -291,8 +301,8 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.congresspeople_set">
-<code class="sig-name descname">congresspeople_set</code><a class="headerlink" href="#events.models.Congress.congresspeople_set" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.Congress.congressnewsitem_set">
+<code class="sig-name descname">congressnewsitem_set</code><a class="headerlink" href="#events.models.Congress.congressnewsitem_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -315,6 +325,34 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.Congress.date_string">
 <code class="sig-name descname">date_string</code><a class="headerlink" href="#events.models.Congress.date_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.default_email">
+<code class="sig-name descname">default_email</code><a class="headerlink" href="#events.models.Congress.default_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.end_date">
+<code class="sig-name descname">end_date</code><a class="headerlink" href="#events.models.Congress.end_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.entry_close_date">
+<code class="sig-name descname">entry_close_date</code><a class="headerlink" href="#events.models.Congress.entry_close_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.entry_open_date">
+<code class="sig-name descname">entry_open_date</code><a class="headerlink" href="#events.models.Congress.entry_open_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -399,6 +437,13 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="events.models.Congress.links">
+<code class="sig-name descname">links</code><a class="headerlink" href="#events.models.Congress.links" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="events.models.Congress.name">
 <code class="sig-name descname">name</code><a class="headerlink" href="#events.models.Congress.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
@@ -411,22 +456,32 @@ object the first time, the query is executed.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.org">
-<code class="sig-name descname">org</code><a class="headerlink" href="#events.models.Congress.org" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+<dt id="events.models.Congress.payment_method_bank_transfer">
+<code class="sig-name descname">payment_method_bank_transfer</code><a class="headerlink" href="#events.models.Congress.payment_method_bank_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.org_id">
-<code class="sig-name descname">org_id</code><a class="headerlink" href="#events.models.Congress.org_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="events.models.Congress.payment_method_cash">
+<code class="sig-name descname">payment_method_cash</code><a class="headerlink" href="#events.models.Congress.payment_method_cash" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.payment_method_cheques">
+<code class="sig-name descname">payment_method_cheques</code><a class="headerlink" href="#events.models.Congress.payment_method_cheques" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.payment_method_system_dollars">
+<code class="sig-name descname">payment_method_system_dollars</code><a class="headerlink" href="#events.models.Congress.payment_method_system_dollars" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="events.models.Congress.people">
@@ -436,8 +491,29 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="events.models.Congress.people_array">
+<code class="sig-name descname">people_array</code><a class="headerlink" href="#events.models.Congress.people_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="events.models.Congress.raw_html">
 <code class="sig-name descname">raw_html</code><a class="headerlink" href="#events.models.Congress.raw_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.sponsors">
+<code class="sig-name descname">sponsors</code><a class="headerlink" href="#events.models.Congress.sponsors" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.start_date">
+<code class="sig-name descname">start_date</code><a class="headerlink" href="#events.models.Congress.start_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -550,11 +626,70 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt id="events.models.CongressLink">
+<em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">CongressLink</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#CongressLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.CongressLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<p>Link Items for Congresses</p>
+<dl class="py exception">
+<dt id="events.models.CongressLink.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.CongressLink.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="events.models.CongressLink.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#events.models.CongressLink.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressLink.congress">
+<code class="sig-name descname">congress</code><a class="headerlink" href="#events.models.CongressLink.congress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressLink.congress_id">
+<code class="sig-name descname">congress_id</code><a class="headerlink" href="#events.models.CongressLink.congress_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressLink.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#events.models.CongressLink.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressLink.link">
+<code class="sig-name descname">link</code><a class="headerlink" href="#events.models.CongressLink.link" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressLink.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.CongressLink.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="events.models.CongressMaster">
 <em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">CongressMaster</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#CongressMaster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.CongressMaster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
 <p>Master List of congresses. E.g. GCC. This is not an instance
-of a congress, just a list of the regular recurring ones.</p>
+of a congress, just a list of the regular recurring ones.
+Congresses can only belong to one club at a time. Control for
+who can setup a congress as an instance of a congress master
+is handled by who is a convener for a club</p>
 <dl class="py exception">
 <dt id="events.models.CongressMaster.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.CongressMaster.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -599,6 +734,24 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.CongressMaster.objects">
 <code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.CongressMaster.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressMaster.org">
+<code class="sig-name descname">org</code><a class="headerlink" href="#events.models.CongressMaster.org" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.CongressMaster.org_id">
+<code class="sig-name descname">org_id</code><a class="headerlink" href="#events.models.CongressMaster.org_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -660,94 +813,6 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="events.models.CongressPeople">
-<em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">CongressPeople</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#CongressPeople"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.CongressPeople" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
-<p>Roles within a congress</p>
-<dl class="py exception">
-<dt id="events.models.CongressPeople.DoesNotExist">
-<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.CongressPeople.DoesNotExist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="events.models.CongressPeople.MultipleObjectsReturned">
-<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#events.models.CongressPeople.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.congress">
-<code class="sig-name descname">congress</code><a class="headerlink" href="#events.models.CongressPeople.congress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.congress_id">
-<code class="sig-name descname">congress_id</code><a class="headerlink" href="#events.models.CongressPeople.congress_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.email">
-<code class="sig-name descname">email</code><a class="headerlink" href="#events.models.CongressPeople.email" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.id">
-<code class="sig-name descname">id</code><a class="headerlink" href="#events.models.CongressPeople.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.objects">
-<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.CongressPeople.objects" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.phone">
-<code class="sig-name descname">phone</code><a class="headerlink" href="#events.models.CongressPeople.phone" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.user">
-<code class="sig-name descname">user</code><a class="headerlink" href="#events.models.CongressPeople.user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related object on the forward side of a many-to-one or
-one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.user_id">
-<code class="sig-name descname">user_id</code><a class="headerlink" href="#events.models.CongressPeople.user_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.CongressPeople.user_role">
-<code class="sig-name descname">user_role</code><a class="headerlink" href="#events.models.CongressPeople.user_role" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt id="events.models.Event">
 <em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">Event</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
@@ -785,6 +850,20 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt id="events.models.Event.description">
 <code class="sig-name descname">description</code><a class="headerlink" href="#events.models.Event.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.entry_close_date">
+<code class="sig-name descname">entry_close_date</code><a class="headerlink" href="#events.models.Event.entry_close_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.entry_open_date">
+<code class="sig-name descname">entry_open_date</code><a class="headerlink" href="#events.models.Event.entry_open_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -853,6 +932,11 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <code class="sig-name descname">get_event_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: event_type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.Event.get_event_type_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="events.models.Event.get_player_format_display">
+<code class="sig-name descname">get_player_format_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: player_format&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.Event.get_player_format_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="events.models.Event.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#events.models.Event.id" title="Permalink to this definition">¶</a></dt>
@@ -871,6 +955,28 @@ object the first time, the query is executed.</p>
 <dt id="events.models.Event.objects">
 <code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.Event.objects" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.player_format">
+<code class="sig-name descname">player_format</code><a class="headerlink" href="#events.models.Event.player_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.session_set">
+<code class="sig-name descname">session_set</code><a class="headerlink" href="#events.models.Event.session_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -936,13 +1042,6 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.EventEntry.payment_status">
 <code class="sig-name descname">payment_status</code><a class="headerlink" href="#events.models.EventEntry.payment_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.EventEntry.venue_transport">
-<code class="sig-name descname">venue_transport</code><a class="headerlink" href="#events.models.EventEntry.venue_transport" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -1109,6 +1208,86 @@ object the first time, the query is executed.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="events.models.Session">
+<em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">Session</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<p>A session within an event</p>
+<dl class="py exception">
+<dt id="events.models.Session.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.Session.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="events.models.Session.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#events.models.Session.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.event">
+<code class="sig-name descname">event</code><a class="headerlink" href="#events.models.Session.event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.event_id">
+<code class="sig-name descname">event_id</code><a class="headerlink" href="#events.models.Session.event_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="events.models.Session.get_next_by_session_date">
+<code class="sig-name descname">get_next_by_session_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateField: session_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.Session.get_next_by_session_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="events.models.Session.get_previous_by_session_date">
+<code class="sig-name descname">get_previous_by_session_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateField: session_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.Session.get_previous_by_session_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#events.models.Session.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.Session.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.session_date">
+<code class="sig-name descname">session_date</code><a class="headerlink" href="#events.models.Session.session_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.session_end">
+<code class="sig-name descname">session_end</code><a class="headerlink" href="#events.models.Session.session_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Session.session_start">
+<code class="sig-name descname">session_start</code><a class="headerlink" href="#events.models.Session.session_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-events.tests">
 <span id="events-tests-module"></span><h2>events.tests module<a class="headerlink" href="#module-events.tests" title="Permalink to this headline">¶</a></h2>
@@ -1119,20 +1298,66 @@ object the first time, the query is executed.</p>
 <div class="section" id="module-events.views">
 <span id="events-views-module"></span><h2>events.views module<a class="headerlink" href="#module-events.views" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="events.views.create_congress">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress" title="Permalink to this definition">¶</a></dt>
-<dd><p>create a new congress</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>request</strong> (<em>HTTPRequest</em>) – standard user request</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>page to create congress</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>page(HTTPResponse)</p>
-</dd>
-</dl>
+<dt id="events.views.create_congress_wizard">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">congress_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a new congress using a wizard format.</p>
+<p>There are a number of steps. Step 1 creates a congress either from
+scratch or by copying another one. All other steps edit data on the
+congress. The last steps allows the congress to be published.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_1">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>congress wizard step 1 - create</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_2">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_2" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 2 - general</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_3">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_3" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 3 - venue</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_4">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_4</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_4" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 3 - sponsor</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_5">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_5</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_5" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 5 - options</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_6">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_6</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_6" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 6 - events</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_congress_wizard_7">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard_7</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step_list</span></em>, <em class="sig-param"><span class="n">congress</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard_7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard_7" title="Permalink to this definition">¶</a></dt>
+<dd><p>wizard step 7 - publish</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_event">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>create an event within a congress</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.create_session">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>create session within an event</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1156,23 +1381,45 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="events.views.edit_congress">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_congress" title="Permalink to this definition">¶</a></dt>
-<dd><p>edit a new congress</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard user request</p></li>
-<li><p><strong>congress_id</strong> (<em>int</em>) – congress to view</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>page to create congress</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>page(HTTPResponse)</p>
-</dd>
-</dl>
+<dt id="events.views.delete_event_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">delete_event_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#delete_event_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.delete_event_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to delete an event from a congress</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.delete_session_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">delete_session_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#delete_session_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.delete_session_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to delete a session from a congress</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.edit_event">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em>, <em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>edit an event within a congress</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.edit_session">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">event_id</span></em>, <em class="sig-param"><span class="n">session_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>edit session within an event</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.get_congress_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_congress_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_congress_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_congress_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of congresses as html for an congress_master</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.get_congress_master_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_congress_master_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">org_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_congress_master_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_congress_master_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of congress_masters as html for an organisation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.get_conveners_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_conveners_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">org_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_conveners_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_conveners_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of conveners as html for an organisation</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1181,34 +1428,15 @@ object the first time, the query is executed.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="events.views.preview_congress">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">preview_congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#preview_congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.preview_congress" title="Permalink to this definition">¶</a></dt>
-<dd><p>basic preview of an event. Doesn’t use base.html</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard user request</p></li>
-<li><p><strong>congress_id</strong> (<em>int</em>) – congress to view</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>page with details about the event</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>page(HTTPResponse)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt id="events.views.view_congress">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">view_congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#view_congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.view_congress" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">view_congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em>, <em class="sig-param"><span class="n">fullscreen</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#view_congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.view_congress" title="Permalink to this definition">¶</a></dt>
 <dd><p>basic view of an event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard user request</p></li>
 <li><p><strong>congress_id</strong> (<em>int</em>) – congress to view</p></li>
+<li><p><strong>fullscreen</strong> (<em>boolean</em>) – if true shows just the page, not the standard surrounds</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

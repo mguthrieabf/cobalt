@@ -241,7 +241,11 @@
 
     <span class="c1"># Otherwise load everything not blocked</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">posts_list</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+        <span class="n">posts_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">forum__in</span><span class="o">=</span><span class="n">blocked</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">forum__forum_type</span><span class="o">=</span><span class="s2">&quot;Discussion&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 

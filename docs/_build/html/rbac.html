@@ -553,6 +553,23 @@ the tree), and also be an admin for the role thay are adding.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="rbac.core.rbac_admin_tree_access">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_admin_tree_access</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_admin_tree_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_admin_tree_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of where in the tree a user had admin access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard user object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of trees</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rbac.core.rbac_create_group">
 <code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_create_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name_qualifier</span></em>, <em class="sig-param"><span class="n">name_item</span></em>, <em class="sig-param"><span class="n">description</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_create_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_create_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an RBAC group</p>
@@ -662,7 +679,7 @@ also return users with forums.forum.view or forums.forum.all</p>
 <dl class="py function">
 <dt id="rbac.core.rbac_user_allowed_for_model">
 <code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_user_allowed_for_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em>, <em class="sig-param"><span class="n">app</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_user_allowed_for_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_user_allowed_for_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a list of model instances which the user can view</p>
+<dd><p>returns a tuple.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -673,10 +690,10 @@ also return users with forums.forum.view or forums.forum.all</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of model_instances explicitly allowed</p>
+<dd class="field-even"><p>boolean - allowed for all, list - list of model_instances explicitly allowed</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
 </dd></dl>
@@ -745,6 +762,48 @@ something. This function only checks at the most specific level.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.core.rbac_user_has_role_exact_explain">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_user_has_role_exact_explain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">role</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_user_has_role_exact_explain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_user_has_role_exact_explain" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if a user has an exact role and explain why</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard user object</p></li>
+<li><p><strong>role</strong> (<em>str</em>) – role to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>“Allow”, “Block”, or None for no match
+string: Role that matched
+group: The group that matched</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.core.rbac_user_has_role_explain">
+<code class="sig-prename descclassname">rbac.core.</code><code class="sig-name descname">rbac_user_has_role_explain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">role</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/core.html#rbac_user_has_role_explain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.core.rbac_user_has_role_explain" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if a user has a specific role and explains why</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>member</strong> (<a class="reference internal" href="accounts.html#accounts.models.User" title="accounts.models.User"><em>User</em></a>) – standard user object</p></li>
+<li><p><strong>role</strong> (<em>str</em>) – role to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True or False for user role</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -863,7 +922,8 @@ model_ids and actions that a user can perform. For example, if you provide:</p>
 <dt id="rbac.forms.AddGroup.clean">
 <code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/forms.html#AddGroup.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.forms.AddGroup.clean" title="Permalink to this definition">¶</a></dt>
 <dd><p>We allow uses to put . into the name_item so here we split that
-out and put the part before the . into name_qualifier</p>
+out and put the part before the . into name_qualifier
+but only on group creation.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1080,7 +1140,7 @@ object the first time, the query is executed.</p>
 <dt id="rbac.models.RBACAdminTree">
 <em class="property">class </em><code class="sig-prename descclassname">rbac.models.</code><code class="sig-name descname">RBACAdminTree</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/models.html#RBACAdminTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.models.RBACAdminTree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
-<p>Control where in the tree a user can create groups</p>
+<p>Control where in the tree a member of a group can create groups</p>
 <dl class="py exception">
 <dt id="rbac.models.RBACAdminTree.DoesNotExist">
 <em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#rbac.models.RBACAdminTree.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -1583,9 +1643,21 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="rbac.views.generic_tree_screen">
-<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">generic_tree_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">groups</span></em>, <em class="sig-param"><span class="n">detail_link</span></em>, <em class="sig-param"><span class="n">title</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#generic_tree_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.generic_tree_screen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Show full RBAC Tree for RBAC or Admin</p>
+<dt id="rbac.views.generic_tree_builder">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">generic_tree_builder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">groups</span></em>, <em class="sig-param"><span class="n">detail_link</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">html_type</span><span class="o">=</span><span class="default_value">'href'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#generic_tree_builder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.generic_tree_builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to build an rbac tree for use with the tree viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- queryset of RBACGroup</strong><strong> or </strong><strong>RBACAdminGroup</strong> (<em>groups</em>) – </p></li>
+<li><p><strong>- str of link to follow</strong> (<em>detail_link</em>) – </p></li>
+<li><p><strong>- str to specify whether to generate &lt;a&gt;</strong><strong> or </strong><strong>&lt;button&gt;</strong> (<em>html_type</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>str - HTML string to insert into page</p>
+</dd>
+</dl>
 <dl class="simple">
 <dt>build a list of the tree. We want to turn:</dt><dd><p>abf.people.fred          (id=34)
 abf.people.john          (id=45)
@@ -1603,6 +1675,12 @@ items[“abf.animals.dogs.rover”]=2
 items[“abf.animals.cats.felix”]=21</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.views.generic_tree_screen">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">generic_tree_screen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">groups</span></em>, <em class="sig-param"><span class="n">detail_link</span></em>, <em class="sig-param"><span class="n">title</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#generic_tree_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.generic_tree_screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show full RBAC Tree for RBAC or Admin</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1646,6 +1724,12 @@ items[“abf.animals.cats.felix”]=21</p>
 <code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">rbac_forbidden</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">role</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#rbac_forbidden"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.rbac_forbidden" title="Permalink to this definition">¶</a></dt>
 <dd><p>RBAC screen for fobidden access - gives the user more info than a
 normal error screen</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbac.views.rbac_tests">
+<code class="sig-prename descclassname">rbac.views.</code><code class="sig-name descname">rbac_tests</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rbac/views.html#rbac_tests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rbac.views.rbac_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>easy way to underlying functions. Test only</p>
 </dd></dl>
 
 <dl class="py function">

@@ -129,25 +129,26 @@ do this with a Cobalt utility::
       def execute(self):
 
         batch = CobaltBatch(name="My batch run", instance=5, schedule="Hourly" rerun=False)
-          # instance is optional and only needed if you run multiple times per day
+  # instance is optional and only needed if you run multiple times per day
 
-          if batch:
+        if batch.start():
 
-            # run your commands
+  # run your commands
 
-              batch.finish(status="Success")
+          batch.finished(status="Success")
+  #        batch.finished(status="Failed")
 
-  As well as recording the start and end times of the batch job, CobaltBatch
-  ensures that only one job per day per instance can be run. It does this by
-  sleeping for a random time to avoid conflict and returning false for any
-  subsequent job that tries to start. You can override this by specifying
-  rerun=True (I don't know how yet!).
+As well as recording the start and end times of the batch job, CobaltBatch
+ensures that only one job per day per instance can be run. It does this by
+sleeping for a random time to avoid conflict and returning false for any
+subsequent job that tries to start. You can override this by specifying
+rerun=True (I don't know how yet!).
 
-  Running Batch Jobs
-  ------------------
+Running Batch Jobs
+------------------
 
-  You need to run batch jobs from cron::
+You need to run batch jobs from cron::
 
-    manage.py runjobs daily
+  manage.py runjobs daily
 
-  For Elastic Beanstalk this can be set up with an install script.
+For Elastic Beanstalk this can be set up with an install script.

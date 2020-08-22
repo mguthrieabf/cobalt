@@ -353,7 +353,7 @@
 
 
 <div class="viewcode-block" id="RBACAdminTree"><a class="viewcode-back" href="../../rbac.html#rbac.models.RBACAdminTree">[docs]</a><span class="k">class</span> <span class="nc">RBACAdminTree</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Control where in the tree a user can create groups &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Control where in the tree a member of a group can create groups &quot;&quot;&quot;</span>
 
     <span class="n">group</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">RBACAdminGroup</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot; RBACGroup for this Role &quot;&quot;&quot;</span>

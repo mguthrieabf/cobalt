@@ -88,8 +88,11 @@ STRIPE_PUBLISHABLE_KEY = set_value("STRIPE_PUBLISHABLE_KEY")
 AWS_ACCESS_KEY_ID = set_value("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = set_value("AWS_SECRET_ACCESS_KEY")
 
-# our hostname
+# our logical hostname (dev, test, uat, prod)
 COBALT_HOSTNAME = set_value("COBALT_HOSTNAME", "127.0.0.1:8000")
+
+# Hostname set by AWS
+HOSTNAME = set_value("HOSTNAME", "Unknown")
 
 # database
 RDS_DB_NAME = set_value("RDS_DB_NAME")

@@ -169,62 +169,109 @@
 
     <span class="c1"># We need the logged in user to get the RBACTreeUser values, add a parameter to init</span>
     <span class="c1"># This is so we can build the drop down list dynamically</span>
+    <span class="c1"># The drop down list also needs any exising sub parts of the tree.</span>
+    <span class="c1"># e.g. if a user has access to a.b.c then also show a.b.c.d if it already exists in tree</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># get user</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="c1"># get admin or normal</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="c1"># create form</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AddGroup</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># build name_qualifier list for this user</span>
         <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># get their admin groups</span>
         <span class="n">group_list</span> <span class="o">=</span> <span class="n">RBACAdminUserGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">member</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span>
             <span class="s2">&quot;group&quot;</span>
         <span class="p">)</span>
-        <span class="n">queryset</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
+
+        <span class="c1"># admintree is shared so filter out the parts we want</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group__in</span><span class="o">=</span><span class="n">group_list</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;tree&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;tree&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;tree&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;admin&quot;</span><span class="p">:</span>
             <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">tree__startswith</span><span class="o">=</span><span class="s2">&quot;admin.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">tree__startswith</span><span class="o">=</span><span class="s2">&quot;admin.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># load whole tree - where things are</span>
+        <span class="n">whole_tree_qs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">,</span> <span class="s2">&quot;name_item&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">whole_tree</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">whole_tree_qs</span><span class="p">:</span>
+            <span class="n">whole_tree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># load whole admin tree - where things could be</span>
+        <span class="n">whole_tree_qs</span> <span class="o">=</span> <span class="n">RBACAdminTree</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;tree&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;tree&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">whole_tree_qs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">whole_tree</span><span class="p">:</span>
+                <span class="n">whole_tree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">whole_tree</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="n">already_included</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">queryset</span><span class="p">:</span>
-            <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
+            <span class="c1"># add item and any existing lower parts of tree to choices</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">item</span>
+            <span class="k">for</span> <span class="n">wtree</span> <span class="ow">in</span> <span class="n">whole_tree</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">wtree</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">wtree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">wtree</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">already_included</span><span class="p">:</span>
+                    <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">wtree</span><span class="p">,</span> <span class="n">wtree</span><span class="p">))</span>
+                    <span class="n">already_included</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wtree</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Qualifier&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="AddGroup.clean"><a class="viewcode-back" href="../../rbac.html#rbac.forms.AddGroup.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; We allow uses to put . into the name_item so here we split that</span>
-<span class="sd">            out and put the part before the . into name_qualifier &quot;&quot;&quot;</span>
+<span class="sd">            out and put the part before the . into name_qualifier</span>
+<span class="sd">            but only on group creation. &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span>
 
-        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">qualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">]</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span>
 
-        <span class="c1"># check for dupicates - this form is used by two models so load the right one</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;admin&quot;</span><span class="p">:</span>
-            <span class="n">dupe</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-                <span class="n">name_qualifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">],</span>
-                <span class="n">name_item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dupe</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-                <span class="n">name_qualifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">],</span>
-                <span class="n">name_item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">dupe</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> already taken&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">],</span>
+        <span class="k">if</span> <span class="n">qualifier</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>  <span class="c1"># Update - no full stops</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;Full stops not permitted in name when editing group.&quot;</span><span class="p">]</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">([</span><span class="n">msg</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">([</span><span class="n">msg</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qualifier</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">qualifier</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># check for dupicates - this form is used by two models so load the right one</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">==</span> <span class="s2">&quot;admin&quot;</span><span class="p">:</span>
+                <span class="n">dupe</span> <span class="o">=</span> <span class="n">RBACAdminGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">name_qualifier</span><span class="o">=</span><span class="n">qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dupe</span> <span class="o">=</span> <span class="n">RBACGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">name_qualifier</span><span class="o">=</span><span class="n">qualifier</span><span class="p">,</span> <span class="n">name_item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">dupe</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2"> already taken&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qualifier</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">([</span><span class="n">msg</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_qualifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qualifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name_item&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span></div></div>
 </pre></div>

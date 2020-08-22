@@ -146,12 +146,21 @@
   <h1>Source code for support.views</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
-<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
-<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
+<span class="c1"># from django.http import HttpResponse</span>
+<span class="c1"># from django.utils import timezone</span>
+
 
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../support.html#support.views.home">[docs]</a><span class="nd">@login_required</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;support/home.html&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;support/home.html&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rebuild"><a class="viewcode-back" href="../../support.html#support.views.rebuild">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">rebuild</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/trigger.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;support/rebuild.html&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

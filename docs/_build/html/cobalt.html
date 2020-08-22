@@ -190,6 +190,25 @@
 </div>
 <div class="section" id="module-cobalt.settings">
 <span id="cobalt-settings-module"></span><h2>cobalt.settings module<a class="headerlink" href="#module-cobalt.settings" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Cobalt Settings.py</dt><dd></dd>
+</dl>
+<p>This is the single settings.py for all Cobalt environments.</p>
+<p>We manage all configuration differences through environment variables.
+This provides security for confidential information in the online
+environments (Test, UAT and Production) which is managed by Elastic
+Beanstalk through settings which become environment at run-time.</p>
+<p>For development you also need to set environment variables or it
+won’t work.</p>
+<p>readthedocs somehow runs the code as well in order to generate the
+documentation and this requires variables to defined so as well as importing
+the variables from the environment, we also have to define them (with dummy
+values) within this file.</p>
+<dl class="py function">
+<dt id="cobalt.settings.set_value">
+<code class="sig-prename descclassname">cobalt.settings.</code><code class="sig-name descname">set_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val_name</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">'not-set'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cobalt/settings.html#set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cobalt.settings.set_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-cobalt.urls">
 <span id="cobalt-urls-module"></span><h2>cobalt.urls module<a class="headerlink" href="#module-cobalt.urls" title="Permalink to this headline">¶</a></h2>

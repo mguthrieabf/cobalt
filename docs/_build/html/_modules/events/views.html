@@ -145,28 +145,37 @@
             
   <h1>Source code for events.views</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">reverse</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
-<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Congress</span>
-<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">CongressForm</span>
-<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">,</span> <span class="n">rbac_user_has_role</span><span class="p">,</span> <span class="n">rbac_get_users_with_role</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Congress</span><span class="p">,</span> <span class="n">CongressMaster</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">CongressForm</span><span class="p">,</span> <span class="n">NewCongressForm</span><span class="p">,</span> <span class="n">EventForm</span><span class="p">,</span> <span class="n">SessionForm</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rbac_user_allowed_for_model</span><span class="p">,</span>
+    <span class="n">rbac_user_has_role</span><span class="p">,</span>
+    <span class="n">rbac_get_users_with_role</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">rbac.views</span> <span class="kn">import</span> <span class="n">rbac_forbidden</span>
+<span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">Organisation</span>
 <span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
 
 
 <div class="viewcode-block" id="home"><a class="viewcode-back" href="../../events.html#events.views.home">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="n">congresses</span> <span class="o">=</span> <span class="n">Congress</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="c1"># return render(request, &quot;events/soon.html&quot;, {&quot;congresses&quot;: congresses})</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/home.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congresses&quot;</span><span class="p">:</span> <span class="n">congresses</span><span class="p">})</span></div>
 
 
 <div class="viewcode-block" id="view_congress"><a class="viewcode-back" href="../../events.html#events.views.view_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">view_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">view_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">,</span> <span class="n">fullscreen</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; basic view of an event.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        request(HTTPRequest): standard user request</span>
 <span class="sd">        congress_id(int): congress to view</span>
+<span class="sd">        fullscreen(boolean): if true shows just the page, not the standard surrounds</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        page(HTTPResponse): page with details about the event</span>
@@ -174,135 +183,223 @@
 
     <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/congress.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">})</span></div>
+<span class="c1"># We need to build a table for the program from events that has</span>
+<span class="c1"># rowspans for the number of days. This is too complex for the</span>
+<span class="c1"># template so we build it here.</span>
+<span class="c1">#</span>
+<span class="c1"># basic structure:</span>
+<span class="c1">#</span>
+<span class="c1"># &lt;tr&gt;&lt;td&gt;Simple Pairs Event&lt;td&gt;Monday&lt;td&gt;12/09/2025 10am&lt;td&gt;Links&lt;/tr&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># &lt;tr&gt;&lt;td rowspan=2&gt;Long Teams Event&lt;td&gt;Monday &lt;td&gt;13/09/2025 10am&lt;td rowspan=2&gt;Links&lt;/tr&gt;</span>
+<span class="c1"># &lt;tr&gt; !Nothing!                    &lt;td&gt;Tuesday&lt;td&gt;14/09/2025 10am !Nothing! &lt;/tr&gt;</span>
 
+<span class="c1"># get all events for this congress so we can build the program table</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">congress</span><span class="o">.</span><span class="n">event_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 
-<div class="viewcode-block" id="preview_congress"><a class="viewcode-back" href="../../events.html#events.views.preview_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">preview_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; basic preview of an event. Doesn&#39;t use base.html</span>
+<span class="c1"># program_list will be passed to the template, each entry is a &lt;tr&gt; element</span>
+    <span class="n">program_list</span><span class="o">=</span><span class="p">[]</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard user request</span>
-<span class="sd">        congress_id(int): congress to view</span>
+<span class="c1"># every day of an event gets its own row so we use rowspan for event name and links</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+        <span class="n">program</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        page(HTTPResponse): page with details about the event</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1"># get all sessions for this event plus days and number of rows (# of days)</span>
+        <span class="n">sessions</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">session_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="n">sessions</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;session_date&quot;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">days</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
-    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+<span class="c1"># day td</span>
+        <span class="n">first_row_for_event</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">day</span> <span class="ow">in</span> <span class="n">days</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">first_row_for_event</span><span class="p">:</span>
+                <span class="n">program</span><span class="p">[</span><span class="s1">&#39;event&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;td rowspan=&#39;</span><span class="si">{</span><span class="n">rows</span><span class="si">}</span><span class="s2">&#39;&gt;&lt;span class=&#39;title&#39;&gt;</span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">event_name</span><span class="si">}</span><span class="s2">&lt;/span&gt;&lt;/td&gt;&quot;</span>
+                <span class="n">program</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;td rowspan=&#39;</span><span class="si">{</span><span class="n">rows</span><span class="si">}</span><span class="s2">&#39;&gt;Links go here&lt;/td&gt;&quot;</span>
+                <span class="n">first_row_for_event</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">program</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;td&gt;</span><span class="si">%s</span><span class="s2">&lt;/td&gt;&quot;</span> <span class="o">%</span> <span class="n">day</span><span class="o">.</span><span class="n">session_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%A&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
-        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/congress.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;preview&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-    <span class="p">)</span></div>
+<span class="c1"># handle multiple times on same day</span>
+<span class="c1"># time needs a bit of manipulation as %-I not supported (maybe just Windows?)</span>
+            <span class="n">session_start_hour</span> <span class="o">=</span> <span class="n">day</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%I&quot;</span><span class="p">)</span>
+            <span class="n">session_start_hour</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">session_start_hour</span><span class="p">)</span>
+            <span class="n">session_minutes</span> <span class="o">=</span> <span class="n">day</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">session_minutes</span> <span class="o">==</span> <span class="s2">&quot;00&quot;</span><span class="p">:</span>
+                <span class="n">time_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">day</span><span class="o">.</span><span class="n">session_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">),</span> <span class="n">session_start_hour</span><span class="p">,</span> <span class="n">day</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%p&quot;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">day</span><span class="o">.</span><span class="n">session_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">),</span> <span class="n">session_start_hour</span><span class="p">,</span> <span class="n">day</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M%p&quot;</span><span class="p">))</span>
 
+            <span class="n">times</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">event__pk</span><span class="o">=</span><span class="n">day</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">session_date</span><span class="o">=</span><span class="n">day</span><span class="o">.</span><span class="n">session_date</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;session_start&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="create_congress"><a class="viewcode-back" href="../../events.html#events.views.create_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">create_congress</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; create a new congress</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">day</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">day</span><span class="o">.</span><span class="n">event</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard user request</span>
+            <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">session_start_hour</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%I&quot;</span><span class="p">)</span>
+                <span class="n">session_start_hour</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">session_start_hour</span><span class="p">)</span>
+                <span class="n">session_minutes</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">session_minutes</span> <span class="o">==</span> <span class="s2">&quot;00&quot;</span><span class="p">:</span>
+                    <span class="n">time_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_str</span><span class="p">,</span> <span class="n">session_start_hour</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%p&quot;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">time_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_str</span><span class="p">,</span> <span class="n">session_start_hour</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%M%p&quot;</span><span class="p">))</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        page(HTTPResponse): page to create congress</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># get orgs that this user can manage congresses for</span>
-    <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span>
-        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;manage&quot;</span>
-    <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-            <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;org&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
-
-            <span class="n">congress</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">congress</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
-            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
-            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
-                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress created&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;events:edit_congress&quot;</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
-        <span class="n">request</span><span class="p">,</span>
-        <span class="s2">&quot;events/edit_congress.html&quot;</span><span class="p">,</span>
-        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Create New Congress&quot;</span><span class="p">},</span>
-    <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="edit_congress"><a class="viewcode-back" href="../../events.html#events.views.edit_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">edit_congress</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; edit a new congress</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        request(HTTPRequest): standard user request</span>
-<span class="sd">        congress_id(int): congress to view</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        page(HTTPResponse): page to create congress</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># get orgs that this user can manage congresses for</span>
-    <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span>
-        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;manage&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
-
-    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
-
-    <span class="n">conveners</span> <span class="o">=</span> <span class="n">rbac_get_users_with_role</span><span class="p">(</span><span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
-
-        <span class="c1"># we only process save or publish through here</span>
-
-        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
-
-            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_location&quot;</span><span class="p">])</span>
-
-            <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;org&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
-
-            <span class="n">congress</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">congress</span><span class="o">.</span><span class="n">last_updated_by</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
-            <span class="n">congress</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="s2">&quot;Publish&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
-                <span class="n">congress</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Published&quot;</span>
-                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
-                    <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress published&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
-                <span class="p">)</span>
-
-            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
-                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress saved&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="n">request</span><span class="p">,</span>
-                <span class="s2">&quot;There are errors on this form&quot;</span><span class="p">,</span>
-                <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-warning&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">,</span> <span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+                <span class="c1">#    time_str = &quot;%s &amp; %s:%s&quot; % (time_str, session_start_hour, day.session_start.strftime(&quot;%M%p&quot;))</span>
+            <span class="n">program</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;td&gt;</span><span class="si">%s</span><span class="s2">&lt;/td&gt;&quot;</span> <span class="o">%</span> <span class="n">time_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="c1"># AM -&gt; pm</span>
+            <span class="n">program_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
+            <span class="n">program</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
-        <span class="s2">&quot;events/edit_congress.html&quot;</span><span class="p">,</span>
-        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Edit Congress&quot;</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;conveners&quot;</span><span class="p">:</span> <span class="n">conveners</span><span class="p">},</span>
+        <span class="s2">&quot;events/congress.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="n">fullscreen</span><span class="p">,</span> <span class="s2">&quot;program_list&quot;</span><span class="p">:</span> <span class="n">program_list</span><span class="p">},</span>
     <span class="p">)</span></div>
+
+
+<span class="c1"># @login_required()</span>
+<span class="c1"># def create_congress(request):</span>
+<span class="c1">#     &quot;&quot;&quot; create a new congress</span>
+<span class="c1">#</span>
+<span class="c1">#     Args:</span>
+<span class="c1">#         request(HTTPRequest): standard user request</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns:</span>
+<span class="c1">#         page(HTTPResponse): page to create congress</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     # get orgs that this user can manage congresses for</span>
+<span class="c1">#     everything, valid_orgs = rbac_user_allowed_for_model(</span>
+<span class="c1">#         user=request.user, app=&quot;events&quot;, model=&quot;org&quot;, action=&quot;edit&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#</span>
+<span class="c1">#     if everything:</span>
+<span class="c1">#         valid_orgs = Organisation.objects.all().values_list(&quot;pk&quot;)</span>
+<span class="c1">#</span>
+<span class="c1">#     # get CongressMasters that this user can manage</span>
+<span class="c1">#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(</span>
+<span class="c1">#         &quot;pk&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise</span>
+<span class="c1">#</span>
+<span class="c1">#     if request.method == &quot;POST&quot;:</span>
+<span class="c1">#         form = CongressForm(</span>
+<span class="c1">#             request.POST, valid_orgs=valid_orgs, congress_masters=congress_masters</span>
+<span class="c1">#         )</span>
+<span class="c1">#         if form.is_valid():</span>
+<span class="c1">#             role = &quot;events.org.%s.edit&quot; % form.cleaned_data[&quot;org&quot;].id</span>
+<span class="c1">#             if not rbac_user_has_role(request.user, role):</span>
+<span class="c1">#                 return rbac_forbidden(request, role)</span>
+<span class="c1">#</span>
+<span class="c1">#             congress = form.save(commit=False)</span>
+<span class="c1">#             congress.author = request.user</span>
+<span class="c1">#             congress.save()</span>
+<span class="c1">#</span>
+<span class="c1">#             messages.success(</span>
+<span class="c1">#                 request, &quot;Congress created&quot;, extra_tags=&quot;cobalt-message-success&quot;</span>
+<span class="c1">#             )</span>
+<span class="c1">#             return redirect(&quot;events:edit_congress&quot;, congress_id=congress.id)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             messages.error(</span>
+<span class="c1">#                 request,</span>
+<span class="c1">#                 &quot;There are errors on this form&quot;,</span>
+<span class="c1">#                 extra_tags=&quot;cobalt-message-error&quot;,</span>
+<span class="c1">#             )</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         form = CongressForm(valid_orgs=valid_orgs, congress_masters=congress_masters)</span>
+<span class="c1">#</span>
+<span class="c1">#     return render(</span>
+<span class="c1">#         request,</span>
+<span class="c1">#         &quot;events/edit_congress.html&quot;,</span>
+<span class="c1">#         {&quot;form&quot;: form, &quot;title&quot;: &quot;Create New Congress&quot;},</span>
+<span class="c1">#     )</span>
+
+
+<span class="c1"># @login_required()</span>
+<span class="c1"># def edit_congress(request, congress_id):</span>
+<span class="c1">#     &quot;&quot;&quot; edit a new congress</span>
+<span class="c1">#</span>
+<span class="c1">#     Args:</span>
+<span class="c1">#         request(HTTPRequest): standard user request</span>
+<span class="c1">#         congress_id(int): congress to view</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns:</span>
+<span class="c1">#         page(HTTPResponse): page to create congress</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     # get orgs that this user can manage congresses for</span>
+<span class="c1">#     everything, valid_orgs = rbac_user_allowed_for_model(</span>
+<span class="c1">#         user=request.user, app=&quot;events&quot;, model=&quot;org&quot;, action=&quot;edit&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#</span>
+<span class="c1">#     if everything:</span>
+<span class="c1">#         valid_orgs = Organisation.objects.all().values_list(&quot;pk&quot;)</span>
+<span class="c1">#</span>
+<span class="c1">#     # get CongressMasters that this user can manage</span>
+<span class="c1">#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(</span>
+<span class="c1">#         &quot;pk&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise</span>
+<span class="c1">#</span>
+<span class="c1">#     congress = get_object_or_404(Congress, pk=congress_id)</span>
+<span class="c1">#</span>
+<span class="c1">#     role = &quot;events.org.%s.edit&quot; % congress.org.id</span>
+<span class="c1">#     if not rbac_user_has_role(request.user, role):</span>
+<span class="c1">#         return rbac_forbidden(request, role)</span>
+<span class="c1">#</span>
+<span class="c1">#     conveners = rbac_get_users_with_role(&quot;events.org.%s.edit&quot; % congress.org.id)</span>
+<span class="c1">#</span>
+<span class="c1">#     if request.method == &quot;POST&quot;:</span>
+<span class="c1">#</span>
+<span class="c1">#         # we only process save or publish through here</span>
+<span class="c1">#</span>
+<span class="c1">#         form = CongressForm(</span>
+<span class="c1">#             request.POST,</span>
+<span class="c1">#             instance=congress,</span>
+<span class="c1">#             valid_orgs=valid_orgs,</span>
+<span class="c1">#             congress_masters=congress_masters,</span>
+<span class="c1">#         )</span>
+<span class="c1">#         if form.is_valid():</span>
+<span class="c1">#</span>
+<span class="c1">#             print(form.cleaned_data[&quot;venue_location&quot;])</span>
+<span class="c1">#</span>
+<span class="c1">#             role = &quot;events.org.%s.edit&quot; % form.cleaned_data[&quot;org&quot;].id</span>
+<span class="c1">#             if not rbac_user_has_role(request.user, role):</span>
+<span class="c1">#                 return rbac_forbidden(request, role)</span>
+<span class="c1">#</span>
+<span class="c1">#             congress = form.save(commit=False)</span>
+<span class="c1">#             congress.last_updated_by = request.user</span>
+<span class="c1">#             congress.last_updated = timezone.localtime()</span>
+<span class="c1">#</span>
+<span class="c1">#             if &quot;Publish&quot; in request.POST:</span>
+<span class="c1">#                 congress.status = &quot;Published&quot;</span>
+<span class="c1">#                 messages.success(</span>
+<span class="c1">#                     request, &quot;Congress published&quot;, extra_tags=&quot;cobalt-message-success&quot;,</span>
+<span class="c1">#                 )</span>
+<span class="c1">#</span>
+<span class="c1">#             congress.save()</span>
+<span class="c1">#             messages.success(</span>
+<span class="c1">#                 request, &quot;Congress saved&quot;, extra_tags=&quot;cobalt-message-success&quot;</span>
+<span class="c1">#             )</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             messages.error(</span>
+<span class="c1">#                 request,</span>
+<span class="c1">#                 &quot;There are errors on this form&quot;,</span>
+<span class="c1">#                 extra_tags=&quot;cobalt-message-error&quot;,</span>
+<span class="c1">#             )</span>
+<span class="c1">#</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         form = CongressForm(</span>
+<span class="c1">#             instance=congress, valid_orgs=valid_orgs, congress_masters=congress_masters</span>
+<span class="c1">#         )</span>
+<span class="c1">#</span>
+<span class="c1">#     return render(</span>
+<span class="c1">#         request,</span>
+<span class="c1">#         &quot;events/edit_congress.html&quot;,</span>
+<span class="c1">#         {</span>
+<span class="c1">#             &quot;form&quot;: form,</span>
+<span class="c1">#             &quot;title&quot;: &quot;Edit Congress&quot;,</span>
+<span class="c1">#             &quot;congress&quot;: congress,</span>
+<span class="c1">#             &quot;conveners&quot;: conveners,</span>
+<span class="c1">#         },</span>
+<span class="c1">#     )</span>
 
 
 <div class="viewcode-block" id="delete_congress"><a class="viewcode-back" href="../../events.html#events.views.delete_congress">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
@@ -319,13 +416,659 @@
 
     <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
 
-    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.manage&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
 
     <span class="n">congress</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
     <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress deleted&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;events:events&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_conveners_ajax"><a class="viewcode-back" href="../../events.html#events.views.get_conveners_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_conveners_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns a list of conveners as html for an organisation &quot;&quot;&quot;</span>
+
+    <span class="n">conveners</span> <span class="o">=</span> <span class="n">rbac_get_users_with_role</span><span class="p">(</span><span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">org_id</span><span class="p">)</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="s2">&quot;&lt;ul&gt;&quot;</span>
+    <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">conveners</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="s2">&quot;&lt;li&gt;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">con</span>
+    <span class="n">ret</span> <span class="o">+=</span> <span class="p">(</span>
+        <span class="s2">&quot;&lt;/ul&gt;&lt;p&gt;These can be changed from the &lt;a href=&#39;/organisations/edit/</span><span class="si">%s</span><span class="s2">&#39; target=&#39;_blank&#39;&gt;Organisation Administration Page&lt;/p&gt;&quot;</span>
+        <span class="o">%</span> <span class="n">org_id</span>
+    <span class="p">)</span>
+
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">ret</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_congress_master_ajax"><a class="viewcode-back" href="../../events.html#events.views.get_congress_master_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_congress_master_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">org_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns a list of congress_masters as html for an organisation &quot;&quot;&quot;</span>
+
+    <span class="n">org</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Organisation</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">org_id</span><span class="p">)</span>
+
+    <span class="n">qs</span> <span class="o">=</span> <span class="n">CongressMaster</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">org</span><span class="o">=</span><span class="n">org</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="s2">&quot;&lt;option value=&#39;&#39;&gt;-----------&quot;</span>
+    <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">qs</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;option value=&#39;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">pk</span><span class="si">}</span><span class="s2">&#39;&gt;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/option&gt;&quot;</span>
+
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">ret</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_congress_ajax"><a class="viewcode-back" href="../../events.html#events.views.get_congress_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">get_congress_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; returns a list of congresses as html for an congress_master &quot;&quot;&quot;</span>
+
+    <span class="n">master</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">CongressMaster</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="n">qs</span> <span class="o">=</span> <span class="n">Congress</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">congress_master</span><span class="o">=</span><span class="n">master</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="s2">&quot;&lt;option value=&#39;&#39;&gt;-----------&quot;</span>
+    <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">qs</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;&lt;option value=&#39;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&#39;&gt;</span><span class="si">{</span><span class="n">cm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/option&gt;&quot;</span>
+
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">ret</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">create_congress_wizard</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; create a new congress using a wizard format.</span>
+
+<span class="sd">    There are a number of steps. Step 1 creates a congress either from</span>
+<span class="sd">    scratch or by copying another one. All other steps edit data on the</span>
+<span class="sd">    congress. The last steps allows the congress to be published.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># handle stepper on screen</span>
+    <span class="n">step_list</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+        <span class="n">step_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;btn-default&quot;</span>
+    <span class="n">step_list</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;btn-primary&quot;</span>
+
+    <span class="c1"># Step 1 - Create</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_1</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">)</span>
+
+    <span class="c1"># all subsequent steps need the congress</span>
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_2</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_3</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_4</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_5</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_6</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">create_congress_wizard_7</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_1"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_1">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_1</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; congress wizard step 1 - create &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">NewCongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+            <span class="k">if</span> <span class="s2">&quot;scratch&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+                <span class="n">congress_master_id</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;congress_master&quot;</span><span class="p">]</span>
+                <span class="n">congress_master</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+                    <span class="n">CongressMaster</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_master_id</span>
+                <span class="p">)</span>
+
+                <span class="c1"># check access</span>
+                <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+                <span class="n">congress</span> <span class="o">=</span> <span class="n">Congress</span><span class="p">()</span>
+                <span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span> <span class="o">=</span> <span class="n">congress_master</span>
+                <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress Created&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                    <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;copy&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+                <span class="n">congress_id</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;congress&quot;</span><span class="p">]</span>
+                <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+                <span class="n">congress</span><span class="o">.</span><span class="n">pk</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress Copied&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                    <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+                <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># valid orgs</span>
+        <span class="n">everything</span><span class="p">,</span> <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">rbac_user_allowed_for_model</span><span class="p">(</span>
+            <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="s2">&quot;events&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;org&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;edit&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">everything</span><span class="p">:</span>
+            <span class="n">valid_orgs</span> <span class="o">=</span> <span class="n">Organisation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">)</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">NewCongressForm</span><span class="p">(</span><span class="n">valid_orgs</span><span class="o">=</span><span class="n">valid_orgs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;events/congress_wizard_1.html&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_2"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_2">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_2</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 2 - general &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">default_email</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;default_email&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">date_string</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;date_string&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">start_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">end_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;end_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">general_info</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;general_info&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">links</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">people</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;people&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">people_array</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;people_array&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">additional_info</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;additional_info&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># datepicker is very fussy about format</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">congress</span><span class="o">.</span><span class="n">start_date</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">congress</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">congress</span><span class="o">.</span><span class="n">entry_close_date</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;end_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">congress</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">)</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;default_email&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;start_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;end_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;date_string&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;general_info&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;people&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;people_array&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_2.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_3"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_3">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_3</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 3 - venue &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_name</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_name&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_location</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_location&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_transport</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_transport&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_catering</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_catering&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_additional_info</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_additional_info&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">venue_additional_info</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;venue_additional_info&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;venue_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;venue_location&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;venue_transport&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;venue_catering&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_3.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_4"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_4">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_4</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 3 - sponsor &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">sponsors</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;sponsors&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_4.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_5"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_5">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_5</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 5 - options &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_system_dollars</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_system_dollars&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_bank_transfer</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_bank_transfer&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_cash</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;payment_method_cash&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_cheques</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_cheques&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">entry_open_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">entry_close_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">allow_partnership_desk</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;allow_partnership_desk&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_system_dollars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_bank_transfer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_cash&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_cheques&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;allow_partnership_desk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_5.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_6"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_6">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_6</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 6 - events &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_system_dollars</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_system_dollars&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_bank_transfer</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_bank_transfer&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_cash</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;payment_method_cash&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">payment_method_cheques</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;payment_method_cheques&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">entry_open_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">entry_close_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">allow_partnership_desk</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span>
+                <span class="s2">&quot;allow_partnership_desk&quot;</span>
+            <span class="p">]</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CongressForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_system_dollars&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_bank_transfer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_cash&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;payment_method_cheques&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;allow_partnership_desk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">congress</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_6.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_congress_wizard_7"><a class="viewcode-back" href="../../events.html#events.views.create_congress_wizard_7">[docs]</a><span class="k">def</span> <span class="nf">create_congress_wizard_7</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">step_list</span><span class="p">,</span> <span class="n">congress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; wizard step 7 - publish &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;Publish&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Published&quot;</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress published&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events:view_congress&quot;</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;Delete&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+            <span class="n">congress</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Congress deleted&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events:events&quot;</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">/&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;events:create_congress_wizard&quot;</span><span class="p">),</span> <span class="n">congress</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Congress name is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">default_email</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Default email is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">additional_info</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Additional is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">start_date</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Start date is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">end_date</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;End date is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">date_string</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Date string is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">year</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Year is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">general_info</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;General is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">people</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;People is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">venue_name</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Venue name is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">venue_location</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Venue location is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">venue_transport</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Venue transport is missing&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">venue_catering</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Venue catering is missing&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">venue_additional_info</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Venue Additional info is missing&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">entry_open_date</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Entry open date is missing&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">congress</span><span class="o">.</span><span class="n">entry_close_date</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Entry close date is missing&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">events</span> <span class="o">=</span> <span class="n">Event</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">congress</span><span class="o">=</span><span class="n">congress</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">events</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;a href=&#39;</span><span class="si">%s%s</span><span class="s2">&#39;&gt;</span><span class="si">%s</span><span class="s2">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;This congress has no events defined&quot;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/congress_wizard_7.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;step_list&quot;</span><span class="p">:</span> <span class="n">step_list</span><span class="p">,</span>
+            <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span>
+            <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">errors</span><span class="p">,</span>
+            <span class="s2">&quot;warnings&quot;</span><span class="p">:</span> <span class="n">warnings</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_update_event</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">congress</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; common shared function to update an event with form data &quot;&quot;&quot;</span>
+
+    <span class="n">event</span><span class="o">.</span><span class="n">congress</span> <span class="o">=</span> <span class="n">congress</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">event_name</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;event_name&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">max_entries</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;max_entries&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">event_type</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;event_type&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">entry_open_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">entry_close_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">player_format</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;player_format&quot;</span><span class="p">]</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_event"><a class="viewcode-back" href="../../events.html#events.views.create_event">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">create_event</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; create an event within a congress &quot;&quot;&quot;</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EventForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+            <span class="n">_update_event</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;Event added&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:edit_event&quot;</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">congress_id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EventForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/create_event.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="edit_event"><a class="viewcode-back" href="../../events.html#events.views.edit_event">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">edit_event</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">congress_id</span><span class="p">,</span> <span class="n">event_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; edit an event within a congress &quot;&quot;&quot;</span>
+
+    <span class="n">congress</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">congress_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="n">event</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+    <span class="n">sessions</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+        <span class="s2">&quot;session_date&quot;</span><span class="p">,</span> <span class="s2">&quot;session_start&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EventForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">_update_event</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;Event updated&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># datepicker is very fussy about format</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">entry_open_date</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;entry_open_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">entry_open_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">entry_close_date</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;entry_close_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">entry_close_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">EventForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;events/edit_event.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;congress&quot;</span><span class="p">:</span> <span class="n">congress</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">event</span><span class="p">,</span> <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="n">sessions</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_session"><a class="viewcode-back" href="../../events.html#events.views.create_session">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">event_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; create session within an event  &quot;&quot;&quot;</span>
+
+    <span class="n">event</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SessionForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_date&quot;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_start&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">event</span> <span class="o">=</span> <span class="n">event</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_date&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_start</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_start&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_end</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_end&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Session Added&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:edit_event&quot;</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SessionForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/create_session.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">event</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="edit_session"><a class="viewcode-back" href="../../events.html#events.views.edit_session">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">edit_session</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">event_id</span><span class="p">,</span> <span class="n">session_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; edit session within an event  &quot;&quot;&quot;</span>
+
+    <span class="n">event</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Session</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">session_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SessionForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_date</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_date&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_start</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_start&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_end</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;session_end&quot;</span><span class="p">]</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Session Updated&quot;</span><span class="p">,</span> <span class="n">extra_tags</span><span class="o">=</span><span class="s2">&quot;cobalt-message-success&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
+                <span class="s2">&quot;events:edit_event&quot;</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">,</span> <span class="n">congress_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">id</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># datepicker is very fussy about format</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">session_date</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;session_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">session_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">session_start</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;session_start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">session_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%I:%M %p&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">session_end</span><span class="p">:</span>
+            <span class="n">initial</span><span class="p">[</span><span class="s2">&quot;session_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">session_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%I:%M %p&quot;</span><span class="p">)</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SessionForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">event</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;events/edit_session.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">event</span><span class="p">},)</span></div>
+
+
+<div class="viewcode-block" id="delete_event_ajax"><a class="viewcode-back" href="../../events.html#events.views.delete_event_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">delete_event_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to delete an event from a congress &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">event_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;event_id&quot;</span><span class="p">]</span>
+
+    <span class="n">event</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="n">event</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="delete_session_ajax"><a class="viewcode-back" href="../../events.html#events.views.delete_session_ajax">[docs]</a><span class="nd">@login_required</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">delete_session_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Ajax call to delete a session from a congress &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s2">&quot;session_id&quot;</span><span class="p">]</span>
+
+    <span class="n">session</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Session</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">session_id</span><span class="p">)</span>
+
+    <span class="c1"># check access</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">session</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
+
+    <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">response_data</span><span class="p">})</span></div>
 </pre></div>
 
            </div>

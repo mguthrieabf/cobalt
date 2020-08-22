@@ -157,7 +157,6 @@
 <span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">rbac_user_blocked_for_model</span><span class="p">,</span>
     <span class="n">rbac_user_has_role</span><span class="p">,</span>
-    <span class="n">rbac_user_has_role_exact</span><span class="p">,</span>
     <span class="n">rbac_get_users_in_group</span><span class="p">,</span>
     <span class="n">rbac_add_user_to_group</span><span class="p">,</span>
 <span class="p">)</span>
@@ -346,10 +345,15 @@
     <span class="p">)</span>
 
     <span class="c1"># for forums and moderate we can&#39;t call rbac_user_has_role as the default for forums is Allow</span>
-<span class="c1">#    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)</span>
-<span class="c1"># oh yes we can</span>
+    <span class="c1">#    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)</span>
+    <span class="c1"># oh yes we can</span>
 
-    <span class="n">is_moderator</span> <span class="o">=</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.moderate.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="n">is_moderator</span> <span class="o">=</span> <span class="n">rbac_user_has_role</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.moderate.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ddddd&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">is_moderator</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
@@ -452,6 +456,7 @@
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;forums/post_edit.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s2">&quot;forum&quot;</span><span class="p">:</span> <span class="n">forum</span><span class="p">})</span></div>
 
+
 <span class="c1">#</span>
 <span class="c1"># def user_is_moderator_for_forum(user, forum_id):</span>
 <span class="c1">#     &quot;&quot;&quot; check if user is a moderator for a forum.</span>
@@ -480,8 +485,9 @@
     <span class="c1"># check access</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span> <span class="ow">and</span> <span class="n">post</span><span class="o">.</span><span class="n">author</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="n">user_is_moderator_for_forum</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.moderate.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
     <span class="p">):</span>
+
         <span class="k">return</span> <span class="n">rbac_forbidden</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -832,7 +838,10 @@
     <span class="sd">&quot;&quot;&quot; common code for editing c1 and c2 &quot;&quot;&quot;</span>
 
     <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;forums.forum.</span><span class="si">%s</span><span class="s2">.create&quot;</span> <span class="o">%</span> <span class="n">comment</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span>
-    <span class="n">is_moderator</span> <span class="o">=</span> <span class="n">user_is_moderator_for_forum</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">comment</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="n">is_moderator</span> <span class="o">=</span> <span class="n">rbac_user_has_role</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;forums.moderate.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="n">comment</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">forum</span><span class="o">.</span><span class="n">id</span>
+    <span class="p">)</span>
 
     <span class="c1"># check access</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>

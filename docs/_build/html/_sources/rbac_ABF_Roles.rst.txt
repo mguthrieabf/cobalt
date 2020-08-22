@@ -5,6 +5,13 @@
  :width: 300
  :alt: Cobalt Chemical Symbol
 
+ .. important::
+
+   This document has largely been replaced by a screen within Cobalt that
+   shows the data dynamically. Information in here is likely out of date.
+
+   `ABF Test System RBAC Static <https://test.abftech.com.au/rbac/role-view>`_.
+
 RBAC ABF Roles
 ==============
 

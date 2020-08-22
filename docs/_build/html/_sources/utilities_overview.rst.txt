@@ -88,3 +88,67 @@ ignored if pressed (i.e. don't warn the user about navigating away with unsaved
 changes). Do this using the class cobalt-save::
 
     <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
+
+Batch Jobs
+==========
+
+Cobalt uses django-extensions
+`django-extensions <https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html>`_.
+to handle batch jobs. This allows us to have batch jobs defined within the applications
+to which they correspond.
+
+Django-extensions creates a structure for us, e.g.::
+
+  cobalt\
+        events\
+              jobs\
+                hourly\
+                  hourly_job_1.py
+                  hourly_job_2.py
+                daily\
+                  my_daily_job.py
+                weekly\
+                monthly\
+                yearly\
+
+You can follow the examples to create new jobs.
+
+Multi-Node Environments
+-----------------------
+
+We generally only want the batch to run once so in a multi-node environment
+such as AWS we need to make sure the batch doesn't run on all nodes. We can
+do this with a Cobalt utility::
+
+  from utils.views import CobaltBatch
+  from django_extensions.management.jobs import DailyJob
+
+  class Job(DailyJob):
+      help = "Cache (db) cleanup Job"
+
+      def execute(self):
+
+        batch = CobaltBatch(name="My batch run", instance=5, schedule="Hourly" rerun=False)
+  # instance is optional and only needed if you run multiple times per day
+
+        if batch.start():
+
+  # run your commands
+
+          batch.finished(status="Success")
+  #        batch.finished(status="Failed")
+
+As well as recording the start and end times of the batch job, CobaltBatch
+ensures that only one job per day per instance can be run. It does this by
+sleeping for a random time to avoid conflict and returning false for any
+subsequent job that tries to start. You can override this by specifying
+rerun=True (I don't know how yet!).
+
+Running Batch Jobs
+------------------
+
+You need to run batch jobs from cron::
+
+  manage.py runjobs daily
+
+For Elastic Beanstalk this can be set up with an install script.
