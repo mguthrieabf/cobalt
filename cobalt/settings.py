@@ -119,9 +119,10 @@ ALLOWED_HOSTS = ["test.abftech.com.au", "uat.abftech.com.au", "127.0.0.1"]
 
 # For AWS we also need to add the local IP address as this is used by the health checks
 # We do this dynamically
-# This gives an error on windows but it can be ignored
-local_ip = os.popen("hostname -I 2>/dev/null").read()
-ALLOWED_HOSTS.append(local_ip.strip())
+# Windows doesn't support this and isn't used on AWS so skip unless Unix
+if os.name == "posix":
+    local_ip = os.popen("hostname -I 2>/dev/null").read()
+    ALLOWED_HOSTS.append(local_ip.strip())
 
 #########################################
 # Common settings for all environments  #

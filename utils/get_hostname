@@ -1,0 +1,6 @@
+#!/bin/sh
+# This is a shim for the hostname command.
+# This is the bash version which returns the IP address.
+# The windows version (get_hostname.bat) is only present 
+# to avoid errors in the development environment.
+hostname -I 2>/dev/null
