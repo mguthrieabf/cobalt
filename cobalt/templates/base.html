@@ -21,20 +21,20 @@
 
 
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
-  <link href="{% static "assets/css/font-awesome.4.7.min.css" %} rel="stylesheet" />
+  <link href="{% static "assets/css/font-awesome.4.7.min.css" %} rel=" stylesheet" />
   <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
   <link href="{% static "assets/css/cobalt.css" %}" rel="stylesheet" />
 
-{% block headerjs %}
-<!-- These can cause problems, for example in forums with Summernote so we allow them to be overridden -->
+  {% block headerjs %}
+  <!-- These can cause problems, for example in forums with Summernote so we allow them to be overridden -->
   <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
   <script src="{% static "assets/js/core/popper.min.js" %}"></script>
   <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
   <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
-{% endblock %}
+  {% endblock %}
 
-{% block header %}
-{% endblock %}
+  {% block header %}
+  {% endblock %}
 </head>
 
 <body class="">
@@ -43,9 +43,9 @@
       <div class="logo text-center">
         <a href="/" class="simple-text logo-normal">
           {% if request.META_HTTP_HOST == GLOBAL_PRODUCTION %}
-            {{ GLOBAL_TITLE }}
+          {{ GLOBAL_TITLE }}
           {% else %}
-            {{ request.META.HTTP_HOST }}
+          {{ request.META.HTTP_HOST }}
           {% endif %}
           <br>
           <img src="{% static "/assets/img/logo.gif" %}">
@@ -102,19 +102,19 @@
           <hr>
 
           {% if request.user.is_superuser %}
-            <li class="nav-item {% if request.path|slice:":5" == "/logs" %}active{% endif %} ">
-              <a class="nav-link" href="/logs">
-                <i class="material-icons">build</i>
-                <p>Logs</p>
-              </a>
-          {% endif %}
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url "rbac:main_admin_screen" %}">
-                <i class="material-icons">recent_actors</i>
-                <p>Admin</p>
-              </a>
-            </li>
+          <li class="nav-item {% if request.path|slice:":5" == "/logs" %}active{% endif %} ">
+            <a class="nav-link" href="/logs">
+              <i class="material-icons">build</i>
+              <p>Logs</p>
+            </a>
+            {% endif %}
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "rbac:main_admin_screen" %}">
+              <i class="material-icons">recent_actors</i>
+              <p>Admin</p>
+            </a>
+          </li>
 
 
           </li>
@@ -143,11 +143,11 @@
         <div class="container-fluid">
           <div class="navbar-wrapper">
             <span>
-            Hi
+              Hi
               {% if request.user.first_name %}
-                {{ request.user.first_name }}
+              {{ request.user.first_name }}
               {% else %}
-                {{ request.user.username }}
+              {{ request.user.username }}
               {% endif %}
             </span>
           </div>
@@ -169,7 +169,7 @@
             </form>
 
             <ul class="navbar-nav">
-            {% if notifications %}
+              {% if notifications %}
 
               <li class="nav-item dropdown">
 
@@ -184,12 +184,12 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                   {% for msg in notifications %}
-                       <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
+                  <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
                 </div>
 
               </li>
-            {% endif %}
+              {% endif %}
 
               <li class="nav-item dropdown">
                 <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -206,26 +206,18 @@
                 </div>
               </li>
             </ul>
-
-
-
-
-
-
-
-
           </div>
         </div>
       </nav>
       <!-- End Navbar -->
-    <div class="content" style="margin-top:20px;">
+      <div class="content" style="margin-top:20px;">
 
-      {% include 'messages.html' %}
+        {% include 'messages.html' %}
 
-      {% block content %}
-      {% endblock %}
+        {% block content %}
+        {% endblock %}
 
-    </div>
+      </div>
       <footer class="footer">
         <div class="container-fluid">
           <nav class="float-left">
@@ -260,10 +252,11 @@
   {% endblock %}
 
   <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
-    <script src="{% static "assets/js/polyfill.core-js.2.4.1.js" %}">
-  <!-- Library for adding dinamically elements -->
+  <script src="{% static "assets/js/polyfill.core-js.2.4.1.js" %}">
+    <!-- Library for adding dinamically elements
+    -->
   <script src="{% static "assets/js/plugins/arrive.min.js" %}"></script>
-    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="{% static "assets/js/material-dashboard.js" %}?v=2.1.1" type="text/javascript"></script>
 
 </body>

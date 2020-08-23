@@ -45,7 +45,8 @@
                 </div>
               </div>
               <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Venue Location", "The latitude and longitude of the venue. <br><br>You can use the lookup button to search for this. If the lookup button does not work for you then you can open another window and search in there. Find your location in Google Maps and right click on it. Choose <b>Whats Here</b> and it will show you the coordinates.");'>help</a>
+                <a href="#"
+                  onclick='help("Venue Location", "The latitude and longitude of the venue. <br><br>You can use the lookup button to search for this. If the lookup button does not work for you then you can open another window and search in there. Find your location in Google Maps and right click on it. Choose <b>Whats Here</b> and it will show you the coordinates.");'>help</a>
               </div>
             </div>
 
@@ -92,8 +93,6 @@
               </div>
             </div>
 
-
-
             <div class="row">
               <div class="col text-center">
                 <button class="btn btn-info btn-sm cobalt-save">Next</button>
@@ -106,81 +105,83 @@
   </div>
 </div>
 
-
 {% endblock %}
 {% block footer %}
 {% include "events/congress_wizard_include_footer.html" %}
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY"></script>
 <script>
   // Google map
-function googlemap(lat,lon){
-  var myLatlng = new google.maps.LatLng(lat,lon);
-  var mapOptions = {
-    zoom: 15,
-    center: myLatlng,
-    scrollwheel: false,
+  function googlemap(lat, lon) {
+    var myLatlng = new google.maps.LatLng(lat, lon);
+    var mapOptions = {
+      zoom: 15,
+      center: myLatlng,
+      scrollwheel: false,
+    }
+
+    var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+
+    var marker = new google.maps.Marker({
+      position: myLatlng,
+      title: "Venue Location"
+    });
+
+    marker.setMap(map);
+    $("#the_map").show()
   }
 
-  var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
+  $(document).ready(function() {
 
-  var marker = new google.maps.Marker({
-    position: myLatlng,
-    title: "Venue Location"
+    // lookup geo location info
+    $("#lookup_button").click(function(event) {
+
+      Swal.fire({
+        title: 'Enter location address',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Look up',
+        showLoaderOnConfirm: true,
+        preConfirm: (login) => {
+          return fetch(`/utils/geo-location/${login}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(response.statusText)
+              }
+              return response.json()
+            })
+            .catch(error => {
+              Swal.showValidationMessage(
+                `Request failed: ${error}`
+              )
+            })
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      }).then((result) => {
+        if (result.value) {
+          console.log(result.value);
+          $("#id_venue_location").val(result.value.data.lat + "," + result.value.data.lon);
+          googlemap(result.value.data.lat, result.value.data.lon);
+
+        }
+      })
+    });
+
+    // set map at start if we have coordinates
+
+    {
+      %
+      if form.venue_location.value %
+    }
+    var venue_location = "{{ form.venue_location.value }}"
+    var parts = venue_location.split(',');
+    googlemap(parts[0], parts[1]); {
+      % endif %
+    }
+
   });
-
-  marker.setMap(map);
-  $("#the_map").show()
-}
-
-$(document).ready(function() {
-
-// lookup geo location info
-  $("#lookup_button").click(function(event){
-
-    Swal.fire({
-      title: 'Enter location address',
-      input: 'text',
-      inputAttributes: {
-        autocapitalize: 'off'
-      },
-      showCancelButton: true,
-      confirmButtonText: 'Look up',
-      showLoaderOnConfirm: true,
-      preConfirm: (login) => {
-        return fetch(`/utils/geo-location/${login}`)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(response.statusText)
-            }
-            return response.json()
-          })
-          .catch(error => {
-            Swal.showValidationMessage(
-              `Request failed: ${error}`
-            )
-          })
-      },
-      allowOutsideClick: () => !Swal.isLoading()
-    }).then((result) => {
-      if (result.value) {
-        console.log(result.value);
-         $("#id_venue_location").val(result.value.data.lat + "," + result.value.data.lon);
-         googlemap(result.value.data.lat, result.value.data.lon);
-
-      }
-    })
-  });
-
-// set map at start if we have coordinates
-
-{% if form.venue_location.value %}
-  var venue_location = "{{ form.venue_location.value }}"
-  var parts = venue_location.split(',');
-  googlemap(parts[0], parts[1]);
-{% endif %}
-
-});
-
 </script>
 
 {% endblock %}

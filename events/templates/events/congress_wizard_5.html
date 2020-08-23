@@ -19,31 +19,31 @@
           <form method="POST">
             {% csrf_token %}
 
-           <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
-                <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
+                  <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
+                  <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
+                </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
-                <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
-              </div>
-            </div>
-          </div>
 
 
             <div class="row">
               <div class="col-6">
                 <div class="form-check">
                   <label class="form-check-label">
-                        <input class="form-check-input" id="id_payment_method_system_dollars" name="payment_method_system_dollars" type="checkbox" {% if form.payment_method_system_dollars.value %}checked="Checked"{% endif %}>
-                        Accept {{ GLOBAL_ORG }} Dollars
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
+                    <input class="form-check-input" id="id_payment_method_system_dollars" name="payment_method_system_dollars" type="checkbox" {% if form.payment_method_system_dollars.value %}checked="Checked" {% endif %}>
+                    Accept {{ GLOBAL_ORG }} Dollars
+                    <span class="form-check-sign">
+                      <span class="check"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -53,11 +53,11 @@
               <div class="col-6">
                 <div class="form-check">
                   <label class="form-check-label">
-                        <input class="form-check-input" id="id_payment_method_bank_transfer" name="payment_method_bank_transfer" type="checkbox" {% if form.payment_method_bank_transfer.value %}checked="Checked"{% endif %}>
-                        Accept Bank Transfers
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
+                    <input class="form-check-input" id="id_payment_method_bank_transfer" name="payment_method_bank_transfer" type="checkbox" {% if form.payment_method_bank_transfer.value %}checked="Checked" {% endif %}>
+                    Accept Bank Transfers
+                    <span class="form-check-sign">
+                      <span class="check"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -67,11 +67,11 @@
               <div class="col-6">
                 <div class="form-check">
                   <label class="form-check-label">
-                        <input class="form-check-input" id="id_payment_method_cash" name="payment_method_cash" type="checkbox" {% if form.payment_method_cash.value %}checked="Checked"{% endif %}>
-                        Accept Cash
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
+                    <input class="form-check-input" id="id_payment_method_cash" name="payment_method_cash" type="checkbox" {% if form.payment_method_cash.value %}checked="Checked" {% endif %}>
+                    Accept Cash
+                    <span class="form-check-sign">
+                      <span class="check"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -81,11 +81,11 @@
               <div class="col-6">
                 <div class="form-check">
                   <label class="form-check-label">
-                        <input class="form-check-input" id="id_payment_method_cheques" name="payment_method_cheques" type="checkbox" {% if form.payment_method_cheques.value %}checked="Checked"{% endif %}>
-                        Accept Cheques
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
+                    <input class="form-check-input" id="id_payment_method_cheques" name="payment_method_cheques" type="checkbox" {% if form.payment_method_cheques.value %}checked="Checked" {% endif %}>
+                    Accept Cheques
+                    <span class="form-check-sign">
+                      <span class="check"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -95,11 +95,11 @@
               <div class="col-6">
                 <div class="form-check">
                   <label class="form-check-label">
-                        <input class="form-check-input" id="id_allow_partnership_desk" name="allow_partnership_desk" type="checkbox" {% if form.allow_partnership_desk.value %}checked="Checked"{% endif %}>
-                        Run Partnership Desk
-                        <span class="form-check-sign">
-                            <span class="check"></span>
-                        </span>
+                    <input class="form-check-input" id="id_allow_partnership_desk" name="allow_partnership_desk" type="checkbox" {% if form.allow_partnership_desk.value %}checked="Checked" {% endif %}>
+                    Run Partnership Desk
+                    <span class="form-check-sign">
+                      <span class="check"></span>
+                    </span>
                   </label>
                 </div>
               </div>
@@ -125,22 +125,21 @@
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
-
   $(document).ready(function() {
 
-        $('#id_entry_open_date').datetimepicker({
-            format: 'DD/MM/YYYY'
-        });
-        $('#id_entry_close_date').datetimepicker({
-            format: 'DD/MM/YYYY',
-            useCurrent: false
-        });
-        $("#id_entry_open_date").on("dp.change", function (e) {
-            $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
-        });
-        $("#id_entry_close_date").on("dp.change", function (e) {
-            $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
-        });
+    $('#id_entry_open_date').datetimepicker({
+      format: 'DD/MM/YYYY'
+    });
+    $('#id_entry_close_date').datetimepicker({
+      format: 'DD/MM/YYYY',
+      useCurrent: false
+    });
+    $("#id_entry_open_date").on("dp.change", function(e) {
+      $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_entry_close_date").on("dp.change", function(e) {
+      $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
+    });
 
   });
 </script>

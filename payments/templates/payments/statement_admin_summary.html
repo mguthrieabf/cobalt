@@ -41,11 +41,11 @@
         </div>
       </div>
       <br>
-          <div class="card">
-            <div class="card-header card-header-success">
-              <h2>Organisations</h2>
-            </div>
-            <div class="card-body">
+      <div class="card">
+        <div class="card-header card-header-success">
+          <h2>Organisations</h2>
+        </div>
+        <div class="card-body">
           <table>
             <tr>
               <td>Total Organisations:</td>
@@ -102,22 +102,27 @@
 
 {% block footer %}
 <script>
-{% include 'generic_user_search_footer.html' %}
-{% include 'generic_org_search_footer.html' %}
-function cobaltMemberSearchOk() {
-// clear the form
-  clearModal();
+  {
+    % include 'generic_user_search_footer.html' %
+  } {
+    % include 'generic_org_search_footer.html' %
+  }
 
-// Go to member statement
-  window.location.href = 'statement-admin-view/' + member_id ;
-}
-function cobaltOrgSearchOk() {
-// clear the form
-  clearModalOrg();
+  function cobaltMemberSearchOk() {
+    // clear the form
+    clearModal();
 
-// Go to org statement
-  window.location.href = 'statement-org/' + org_id ;
-}
+    // Go to member statement
+    window.location.href = 'statement-admin-view/' + member_id;
+  }
+
+  function cobaltOrgSearchOk() {
+    // clear the form
+    clearModalOrg();
+
+    // Go to org statement
+    window.location.href = 'statement-org/' + org_id;
+  }
 </script>
 
 

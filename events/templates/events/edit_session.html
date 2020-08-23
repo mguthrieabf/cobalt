@@ -25,7 +25,7 @@
             {% csrf_token %}
             <input type="hidden" name="event" id="id_event" value="{{ event.id }}">
 
-             <div class="row">
+            <div class="row">
               <div class="col-md-4">
                 <span class="cobalt-form-error" id="id_session_date_errors">{{ form.session_date.errors|striptags }}</span>
                 <div class="form-group">
@@ -69,22 +69,20 @@
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 
 <script>
+  $(document).ready(function() {
 
-$(document).ready(function() {
-
-//    md.initFormExtendedDatetimepickers();
+    //    md.initFormExtendedDatetimepickers();
 
     $('#id_session_date').datetimepicker({
-        format: 'DD/MM/YYYY'
+      format: 'DD/MM/YYYY'
     });
     $('#id_session_start').datetimepicker({
-        format: 'LT'
+      format: 'LT'
     });
     $('#id_session_end').datetimepicker({
-        format: 'LT'
+      format: 'LT'
     });
- });
-
+  });
 </script>
 
 {% endblock %}

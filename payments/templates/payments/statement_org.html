@@ -5,16 +5,16 @@
 {% block header %}
 <link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
 <script src="{% static "assets/js/bootstrap4-toggle.min.js" %}"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
 <style>
-.cobalt-left {
-  text-align: left;
-  padding-right: 20px;
-}
+  .cobalt-left {
+    text-align: left;
+    padding-right: 20px;
+  }
 
-.cobalt-table {
-  margin: 0px auto;
-}
+  .cobalt-table {
+    margin: 0px auto;
+  }
 </style>
 {% endblock %}
 
@@ -45,8 +45,8 @@
         </div>
       </div>
       <div class="row">
-        <div  id="summary_table">
-{% include 'payments/statement_org_summary_ajax.html' %}
+        <div id="summary_table">
+          {% include 'payments/statement_org_summary_ajax.html' %}
         </div>
       </div>
       <hr>
@@ -54,7 +54,7 @@
       <div class="container-flex">
         <div class="row">
           <div class="col-12">
-            <a href="{% url 'payments:statement_csv_org' org_id=org.id %}"<button class="text-center btn btn-primary btn-round float-right" style="width: 170px">
+            <a href="{% url 'payments:statement_csv_org' org_id=org.id %}" <button class="text-center btn btn-primary btn-round float-right" style="width: 170px">
               <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
               </button>
             </a>
@@ -65,8 +65,8 @@
 
       <hr>
 
-{% include 'payments/statement_org_list.html' %}
-{% include 'pagination_footer.html' %}
+      {% include 'payments/statement_org_list.html' %}
+      {% include 'pagination_footer.html' %}
 
 
     </div>
@@ -80,26 +80,26 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
 <script>
-$( document ).ready(function() {
+  $(document).ready(function() {
 
 
-// change to range
-  $(function() {
-    $('#id_summary').change(function() {
-      var range = $('#id_summary').val();
-      // can't use url as we generate one value dynamically
-      var strURL = "/payments/statement-org-summary/{{ org.id }}/" + range;
+    // change to range
+    $(function() {
+      $('#id_summary').change(function() {
+        var range = $('#id_summary').val();
+        // can't use url as we generate one value dynamically
+        var strURL = "/payments/statement-org-summary/{{ org.id }}/" + range;
 
-      $.ajax({
+        $.ajax({
           url: strURL,
           context: document.body,
-          success: function(txt){
+          success: function(txt) {
             $("#summary_table").html(txt);
           }
+        });
       });
     });
   });
-});
 </script>
 
 {% endblock %}

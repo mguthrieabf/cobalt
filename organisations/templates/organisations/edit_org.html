@@ -16,11 +16,11 @@
         {% csrf_token %}
 
 
-{{ form|crispy }}
+        {{ form|crispy }}
 
-          <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
-          <button class="btn btn-info" onclick="window.location.href='/'; return false;">Cancel</button>
-        </form>
+        <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
+        <button class="btn btn-info" onclick="window.location.href='/'; return false;">Cancel</button>
+      </form>
     </div>
   </div>
 </div>
@@ -31,8 +31,13 @@
 <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
-  function help(title, html){
-    swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+  function help(title, html) {
+    swal.fire({
+      title: title,
+      html: html,
+      icon: "info",
+      buttonsStyling: false
+    })
     return false;
   }
 </script>

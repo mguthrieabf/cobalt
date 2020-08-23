@@ -55,37 +55,26 @@
               </div>
             </div>
 
-
-
-
             <div class="row">
               <div class="col-2 justify-content-center align-self-center">
                 Dates
               </div>
-             <div class="col-md-4">
-               <div class="form-group">
-                 <label class="bmd-label-float" style="font-size:11px">Start</label>
-                 <input type="text" name="start_date" id="id_start_date" class="form-control datepicker" value="{{ form.start_date.value|default_if_none:'' }}">
-               </div>
-             </div>
-             <div class="col-md-4">
-               <div class="form-group">
-                 <label class="bmd-label-float" style="font-size:11px">End</label>
-                 <input type="text" name="end_date" id="id_end_date" class="form-control datepicker" value="{{ form.end_date.value|default_if_none:'' }}">
-               </div>
-             </div>
-             <div class="col-2 justify-content-center align-self-center">
-               <a href="#" onclick='help("Dates", "First and last day of congress.");'>help</a>
-             </div>
-           </div>
-
-
-
-
-
-
-
-
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">Start</label>
+                  <input type="text" name="start_date" id="id_start_date" class="form-control datepicker" value="{{ form.start_date.value|default_if_none:'' }}">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="bmd-label-float" style="font-size:11px">End</label>
+                  <input type="text" name="end_date" id="id_end_date" class="form-control datepicker" value="{{ form.end_date.value|default_if_none:'' }}">
+                </div>
+              </div>
+              <div class="col-2 justify-content-center align-self-center">
+                <a href="#" onclick='help("Dates", "First and last day of congress.");'>help</a>
+              </div>
+            </div>
 
             <div class="row">
               <div class="col-2 justify-content-center align-self-center">
@@ -118,9 +107,6 @@
             </div>
             <hr>
 
-
-
-
             <div class="row">
               <div class="col-10 justify-content-center align-self-center">
                 <h3>People</h3>
@@ -136,7 +122,7 @@
                   <label class="form-check-label">
                     <input class="form-check-input" type="radio" name="people_options" id="inlineRadio1" value="simple" checked> Simple
                     <span class="circle">
-                        <span class="check"></span>
+                      <span class="check"></span>
                     </span>
                   </label>
                 </div>
@@ -144,29 +130,29 @@
                   <label class="form-check-label">
                     <input class="form-check-input" type="radio" name="people_options" id="inlineRadio2" value="custom"> Custom
                     <span class="circle">
-                        <span class="check"></span>
+                      <span class="check"></span>
                     </span>
                   </label>
                 </div>
               </div>
-          </div>
+            </div>
 
-          <div class="row">
-            <div class="col-12">
-              <div id="people_preview">
-                <h5>Preview</h5>
-                <div style="border:1px solid black;">
-                {{ form.people.value|safe }}
+            <div class="row">
+              <div class="col-12">
+                <div id="people_preview">
+                  <h5>Preview</h5>
+                  <div style="border:1px solid black;">
+                    {{ form.people.value|safe }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col-12">
+            <div class="row">
+              <div class="col-12">
                 {{ form.people|as_crispy_field }}
+              </div>
             </div>
-          </div>
             <hr>
 
             <div class="row">
@@ -227,86 +213,89 @@
 {% include "events/congress_wizard_include_footer.html" %}
 
 <script>
+  function generate_date_string() {
 
-function generate_date_string(){
+    if ($("#id_start_date").val() != "" & $("#id_end_date").val() != "") {
 
-  if ($("#id_start_date").val()!="" & $("#id_end_date").val()!=""){
+      var start_day = $('#id_start_date').data("DateTimePicker").viewDate().format("Do");
+      var start_month = $('#id_start_date').data("DateTimePicker").viewDate().format("MMMM");
+      var start_year = $('#id_start_date').data("DateTimePicker").viewDate().format("YYYY");
+      var end_day = $('#id_end_date').data("DateTimePicker").viewDate().format("Do");
+      var end_month = $('#id_end_date').data("DateTimePicker").viewDate().format("MMMM");
+      var end_year = $('#id_end_date').data("DateTimePicker").viewDate().format("YYYY");
+      var end_date = $('#id_end_date').data("DateTimePicker").viewDate().format("Do MMMM YYYY");
 
-    var start_day = $('#id_start_date').data("DateTimePicker").viewDate().format("Do");
-    var start_month = $('#id_start_date').data("DateTimePicker").viewDate().format("MMMM");
-    var start_year = $('#id_start_date').data("DateTimePicker").viewDate().format("YYYY");
-    var end_day = $('#id_end_date').data("DateTimePicker").viewDate().format("Do");
-    var end_month = $('#id_end_date').data("DateTimePicker").viewDate().format("MMMM");
-    var end_year = $('#id_end_date').data("DateTimePicker").viewDate().format("YYYY");
-    var end_date = $('#id_end_date').data("DateTimePicker").viewDate().format("Do MMMM YYYY");
-
-    if (start_year==end_year){
-      start_year = "";
-    }
-
-    if (start_month==end_month){
-      start_month = "";
-    } else {
-      start_month = " " + start_month;
-      if (start_year != ""){
-        start_year = " " + start_year;
+      if (start_year == end_year) {
+        start_year = "";
       }
+
+      if (start_month == end_month) {
+        start_month = "";
+      } else {
+        start_month = " " + start_month;
+        if (start_year != "") {
+          start_year = " " + start_year;
+        }
+      }
+
+      var display_date = start_day + start_month + start_year + " to " + end_date;
+
+      $("#id_date_string").val(display_date);
     }
-
-    var display_date = start_day + start_month + start_year + " to " + end_date;
-
-    $("#id_date_string").val(display_date);
   }
-}
 
-$(document).ready(function(){
+  $(document).ready(function() {
 
-  console.log($("#id_people").val());
-  $("#id_people").val("<h3>Stuff</h3>");
-  console.log($("#id_people").val());
+    console.log($("#id_people").val());
+    $("#id_people").val("<h3>Stuff</h3>");
+    console.log($("#id_people").val());
 
-  $('#id_start_date').datetimepicker({
+    $('#id_start_date').datetimepicker({
       format: 'DD/MM/YYYY'
-  });
-  $('#id_end_date').datetimepicker({
+    });
+    $('#id_end_date').datetimepicker({
       format: 'DD/MM/YYYY',
       useCurrent: false
-  });
-  $("#id_start_date").on("dp.change", function (e) {
-      $('#id_end_date').data("DateTimePicker").minDate(e.date);
-  });
-  $("#id_end_date").on("dp.change", function (e) {
-      $('#id_start_date').data("DateTimePicker").maxDate(e.date);
-  });
-
-  $("#id_year").change(function(){
-    var name_id=$("#id_name");
-    if (name_id.val()=="") {
-      name_id.val("{{ congress.congress_master.name }} " + $("#id_year").val())
-    }
-  });
-
-  $("#id_start_date").change(function(){
-    generate_date_string();
-  });
-
-  $("#id_date_string").focus(function(){
-    generate_date_string();
-  });
-
-  if (typeof $.cookie('congress-previewmsg-{{ congress.id }}') === 'undefined'){
-    $.cookie('congress-previewmsg-{{ congress.id }}', 'set', { expires:10000, domain: '', path: '' });
-
-    Swal.fire({
-      title: 'Hint: Preview',
-      html: 'At any time after saving your data you can go to <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=7 %}">Step 7 - Publish</a> to preview your page.',
-      // imageUrl: 'https://unsplash.it/400/200',
-      // imageWidth: 400,
-      // imageHeight: 200,
-      // imageAlt: 'Custom image',
     });
-  }
+    $("#id_start_date").on("dp.change", function(e) {
+      $('#id_end_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_end_date").on("dp.change", function(e) {
+      $('#id_start_date').data("DateTimePicker").maxDate(e.date);
+    });
 
-});
+    $("#id_year").change(function() {
+      var name_id = $("#id_name");
+      if (name_id.val() == "") {
+        name_id.val("{{ congress.congress_master.name }} " + $("#id_year").val())
+      }
+    });
+
+    $("#id_start_date").change(function() {
+      generate_date_string();
+    });
+
+    $("#id_date_string").focus(function() {
+      generate_date_string();
+    });
+
+    if (typeof $.cookie('congress-previewmsg-{{ congress.id }}') === 'undefined') {
+      $.cookie('congress-previewmsg-{{ congress.id }}', 'set', {
+        expires: 10000,
+        domain: '',
+        path: ''
+      });
+
+      Swal.fire({
+        title: 'Hint: Preview',
+        html: 'At any time after saving your data you can go to <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=7 %}">Step 7 - Publish</a> to preview your page.',
+        // imageUrl: 'https://unsplash.it/400/200',
+        // imageWidth: 400,
+        // imageHeight: 200,
+        // imageAlt: 'Custom image',
+      });
+    }
+
+  });
 </script>
 {% endblock %}

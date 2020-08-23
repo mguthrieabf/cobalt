@@ -40,7 +40,7 @@
       </div>
     </div>
   </div>
-<br>
+  <br>
   <div>
     <div class="card col-lg-9">
       <div class="card-header card-header-warning">
@@ -79,14 +79,14 @@
               </thead>
               <tbody>
                 {% for role in roles %}
-                  <tr>
-                    <td>{{ role.id }}</td>
-                    <td>{{ role.app }}</td>
-                    <td>{{ role.model }}</td>
-                    <td>{{ role.model_id|default_if_none:"" }}</td>
-                    <td>{{ role.action }}</td>
-                    <td>{{ role.rule_type }}</td>
-                  </tr>
+                <tr>
+                  <td>{{ role.id }}</td>
+                  <td>{{ role.app }}</td>
+                  <td>{{ role.model }}</td>
+                  <td>{{ role.model_id|default_if_none:"" }}</td>
+                  <td>{{ role.action }}</td>
+                  <td>{{ role.rule_type }}</td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table><br>
@@ -104,9 +104,9 @@
       <div class="card-body">
         <div class="container">
           <ul>
-          {% for admin in admins %}
-        <li><a href="{% url "accounts:public_profile" pk=admin.member.id %}">{{ admin.member.full_name }}</a>
-          {% endfor %}
+            {% for admin in admins %}
+            <li><a href="{% url "accounts:public_profile" pk=admin.member.id %}">{{ admin.member.full_name }}</a>
+              {% endfor %}
           </ul>
         </div>
       </div>

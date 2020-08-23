@@ -22,14 +22,14 @@
             </tr>
           </thead>
           <tbody>
-          {% for group in groups %}
+            {% for group in groups %}
             <tr>
               <td><a href="{% url "rbac:admin_group_view" group_id=group.id %}">{{ group.name }}</a></td>
               <td>{{ group.description }}</td>
               <td>{{ group.created_by }}</td>
               <td>{{ group.created_date }}</td>
             </tr>
-          {% endfor %}
+            {% endfor %}
           </tbody>
         </table>
       </div>

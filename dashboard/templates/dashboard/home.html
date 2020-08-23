@@ -5,203 +5,206 @@
 {% block content %}
 
 <div class="container">
-<div class="row">
+  <div class="row">
 
-  <div class="col-lg-4 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-header card-header-success card-header-icon">
-        <div class="card-icon">
-          <i class="material-icons">attach_money</i>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+      <div class="card card-stats">
+        <div class="card-header card-header-success card-header-icon">
+          <div class="card-icon">
+            <i class="material-icons">attach_money</i>
+          </div>
+          <p class="card-category">Account Balance</p>
+          <a href=' {% url "payments:payments" %}'>
+            <h3 class="card-title"> {{ payments.balance }}</h3>
+          </a>
         </div>
-        <p class="card-category">Account Balance</p>
-      <a href=' {% url "payments:payments" %}'>  <h3 class="card-title"> {{ payments.balance }}</h3></a>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-          <i class="material-icons">date_range</i>
-          {% if payments.last_top_up %}
-          Last event:
-          {% endif %}
-          {{ payments.last_top_up|default_if_none:"No History" }}
+        <div class="card-footer">
+          <div class="stats">
+            <i class="material-icons">date_range</i>
+            {% if payments.last_top_up %}
+            Last event:
+            {% endif %}
+            {{ payments.last_top_up|default_if_none:"No History" }}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-lg-4 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-header card-header-warning card-header-icon">
-        <div class="card-icon">
-          <i class="material-icons">list_alt</i>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+      <div class="card card-stats">
+        <div class="card-header card-header-warning card-header-icon">
+          <div class="card-icon">
+            <i class="material-icons">list_alt</i>
+          </div>
+          <p class="card-category">Booked Events</p>
+          <h3 class="card-title">0</h3>
         </div>
-        <p class="card-category">Booked Events</p>
-        <h3 class="card-title">0</h3>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-          <i class="material-icons">local_offer</i>
+        <div class="card-footer">
+          <div class="stats">
+            <i class="material-icons">local_offer</i>
             Events
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+      <div class="card card-stats">
+        <div class="card-header card-header-info card-header-icon">
+          <div class="card-icon">
+            <i class="material-icons">call_made</i>
+          </div>
+          <p class="card-category">Masterpoints</p>
+          <a href="./masterpoints/view/{{ request.user.system_number }}">
+            <h3 class="card-title"> <span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
+          </a>
+        </div>
+        <div class="card-footer">
+          <div class="stats">
+            <i class="material-icons">stars</i> {{ mp.rank }}
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="col-lg-4 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-header card-header-info card-header-icon">
-        <div class="card-icon">
-          <i class="material-icons">call_made</i>
+
+
+  <div class="row">
+    <div class="col-lg-6 col-md-12">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">Your Recent Results</h4>
         </div>
-        <p class="card-category">Masterpoints</p>
-        <a href="./masterpoints/view/{{ request.user.system_number }}">
-        <h3 class="card-title"> <span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span> </h3></a>
-      </div>
-      <div class="card-footer">
-        <div class="stats">
-          <i class="material-icons">stars</i> {{ mp.rank }}
+        <div class="card-body table-responsive">
+          Coming Soon!
         </div>
       </div>
     </div>
-  </div>
-</div>
+
+    <div class="col-lg-6 col-md-12">
+      <div class="card">
+        <div class="card-header card-header-warning">
+          <h4 class="card-title">Your Upcoming Events</h4>
+        </div>
 
 
-<div class="row">
-  <div class="col-lg-6 col-md-12">
-    <div class="card">
-      <div class="card-header card-header-primary">
-        <h4 class="card-title">Your Recent Results</h4>
-      </div>
-      <div class="card-body table-responsive">
-        Coming Soon!
-      </div>
-    </div>
-  </div>
-
-  <div class="col-lg-6 col-md-12">
-    <div class="card">
-      <div class="card-header card-header-warning">
-        <h4 class="card-title">Your Upcoming Events</h4>
-      </div>
-
-
-      <div class="card-body table-responsive">
-        Coming Soon!
+        <div class="card-body table-responsive">
+          Coming Soon!
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Forum posts -->
+  <!-- Forum posts -->
 
-<div class="row">
+  <div class="row">
 
-  <div class="col-lg-6 col-md-12">
-    <div class="card">
-      <div class="card-header card-header-danger">
+    <div class="col-lg-6 col-md-12">
+      <div class="card">
+        <div class="card-header card-header-danger">
           <h2 class="text-center"><i class="material-icons align-center" style="font-size:27px;">campaign</i>&nbsp;Announcements</h2>
-      </div>
-      <div class="card-body">
-        <div class="infinite-container2">
-          {% for post in posts2 %}
-          <div class="infinite-item2">
-            <div class="container mt-2 bg-light">
-              <div class="row h-100">
-                <div class="col-2 my-auto">
-                  <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
-                </div>
-                <div class="col-12">
-                  <div class="container">
+        </div>
+        <div class="card-body">
+          <div class="infinite-container2">
+            {% for post in posts2 %}
+            <div class="infinite-item2">
+              <div class="container mt-2 bg-light">
+                <div class="row h-100">
+                  <div class="col-2 my-auto">
+                    <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
+                  </div>
+                  <div class="col-12">
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-10">
+                          <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
+                          <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
+                          <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
+                          <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
                     <div class="row">
                       <div class="col-10">
-                        <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
-                        <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
-                        <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
-                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        {{ post.text|truncatewords_html:50|safe }}
                       </div>
                     </div>
                   </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-10">
-                      {{ post.text|truncatewords_html:50|safe }}
+                </div>
+
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% if posts2.has_next %}
+        <a class="infinite-more-link2" href="scroll2?page={{ posts2.next_page_number }}">More</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-md-12">
+      <div class="card">
+        <div class="card-header card-header-success">
+          <h2 class="text-center"><i class="material-icons align-center" style="font-size:27px;">people_alt</i>&nbsp;Discussions</h2>
+        </div>
+        <div class="card-body">
+          <div class="infinite-container">
+            {% for post in posts %}
+            <div class="infinite-item">
+              <div class="container mt-2 bg-light">
+                <div class="row h-100">
+                  <div class="col-2 my-auto">
+                    <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
+                  </div>
+                  <div class="col-10">
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-10">
+                          <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
+                          <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
+                          <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
+                          <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        </div>
+                        <div class="col-2 my-auto p-0 m-0">
+                          <div class="text-center display-3">
+                            {{ post.comment_count }}
+                          </div>
+                          <div class="text-center" style="font-size:12px">
+                            comment{{ post.comment_count|pluralize}}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
         </div>
+        {% if posts.has_next %}
+        <a class="infinite-more-link" href="scroll1?page={{ posts.next_page_number }}">More</a>
+        {% endif %}
       </div>
-{% if posts2.has_next %}
-  <a class="infinite-more-link2" href="scroll2?page={{ posts2.next_page_number }}">More</a>
-{% endif %}
     </div>
   </div>
-
-  <div class="col-lg-6 col-md-12">
-    <div class="card">
-      <div class="card-header card-header-success">
-        <h2 class="text-center"><i class="material-icons align-center" style="font-size:27px;">people_alt</i>&nbsp;Discussions</h2>
-      </div>
-      <div class="card-body">
-        <div class="infinite-container">
-          {% for post in posts %}
-          <div class="infinite-item">
-            <div class="container mt-2 bg-light">
-              <div class="row h-100">
-                <div class="col-2 my-auto">
-                  <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
-                </div>
-                <div class="col-10">
-                  <div class="container">
-                    <div class="row">
-                      <div class="col-10">
-                        <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
-                        <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
-                        <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
-                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
-                      </div>
-                      <div class="col-2 my-auto p-0 m-0">
-                        <div class="text-center display-3">
-                          {{ post.comment_count }}
-                        </div>
-                        <div class="text-center" style="font-size:12px">
-                          comment{{ post.comment_count|pluralize}}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-{% if posts.has_next %}
-<a class="infinite-more-link" href="scroll1?page={{ posts.next_page_number }}">More</a>
-{% endif %}
-    </div>
-  </div>
-</div>
 
 </div>
 
 
 
 
-  <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
-  <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
+<script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
+<script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
 
 <script>
   var infinite = new Waypoint.Infinite({
     element: $('.infinite-container')[0],
     items: '.infinite-item',
-    onBeforePageLoad: function () {
+    onBeforePageLoad: function() {
       $('.loading').show();
     },
-    onAfterPageLoad: function ($items) {
+    onAfterPageLoad: function($items) {
       $('.loading').hide();
     }
   });
@@ -210,10 +213,10 @@
     element: $('.infinite-container2')[0],
     items: '.infinite-item2',
     more: '.infinite-more-link2',
-    onBeforePageLoad: function () {
+    onBeforePageLoad: function() {
       $('.loading').show();
     },
-    onAfterPageLoad: function ($items) {
+    onAfterPageLoad: function($items) {
       $('.loading').hide();
     }
   });

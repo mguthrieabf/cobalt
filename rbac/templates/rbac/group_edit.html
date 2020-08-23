@@ -24,7 +24,7 @@
           <div class="row">
             <div class="col-12">
               <div class="form-group">
-                <label  class="bmd-label-static">Location in Tree:</label>
+                <label class="bmd-label-static">Location in Tree:</label>
                 {{ group.name_qualifier }}
               </div>
             </div>
@@ -64,7 +64,7 @@
       </div>
     </div>
   </div>
-<br>
+  <br>
   <div>
     <div class="card col-lg-9">
       <div class="card-header card-header-warning">
@@ -73,15 +73,15 @@
       <div class="card-body" style="text-align: center">
         <div class="container">
           <select class="w-100" size="10" id="user_list">
-          {% for user in users %}
+            {% for user in users %}
             <option value="{{ user.member.id }}"><a href="{% url "accounts:public_profile" pk=user.member.id %}">{{ user.member }}</a></option>
-          {% endfor %}
+            {% endfor %}
 
 
           </select>
         </div>
 
-{% include "generic_user_search_body.html" %}
+        {% include "generic_user_search_body.html" %}
 
         <div class="d-flex">
           <div>
@@ -106,15 +106,14 @@
       <div class="card-body" style="text-align: center">
         <div class="container">
           <select class="w-100" size="10" id="role_list">
-          {% for role in roles %}
+            {% for role in roles %}
             <option value="{{ role.id }}">{{ role.app }}.{{ role.model }}.{{ role.model_id|default_if_none:"*" }} - {{ role.action }} {{ role.rule_type }}</option>
-          {% endfor %}
+            {% endfor %}
           </select>
         </div>
 
- <!-- Roles popup dialog -->
-        <div class="modal fade" id="cobalt_add_roles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-          aria-hidden="true">
+        <!-- Roles popup dialog -->
+        <div class="modal fade" id="cobalt_add_roles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header text-center">
@@ -164,7 +163,7 @@
             </div>
           </div>
         </div>
-<!-- End roles popup dialog  -->
+        <!-- End roles popup dialog  -->
 
         <div class="d-flex">
           <div>
@@ -183,8 +182,10 @@
 {% endblock %}
 
 {% block footer %}
-<script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+<script>
+
 {% include 'generic_user_search_footer.html' %}
 
   function addUser(member_id){

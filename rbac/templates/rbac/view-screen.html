@@ -4,7 +4,7 @@
 
 <h1>Role Based Access Controls</h1>
 <p>Groups control security within
-the system. This shows the groups you are a member of.</p>
+  the system. This shows the groups you are a member of.</p>
 
 {% if groups %}
 
@@ -30,13 +30,13 @@ the system. This shows the groups you are a member of.</p>
             </thead>
             <tbody>
               {% for v in value %}
-                <tr>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
-                  <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
-                </tr>
+              <tr>
+                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
+                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
+                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
+                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
+                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
+              </tr>
               {% endfor %}
             </tbody>
           </table><br>
@@ -70,12 +70,12 @@ the system. This shows the groups you are a member of.</p>
             </thead>
             <tbody>
               {% for role in roles %}
-                <tr>
-                  <td class="text-left">{{ role.id }}</td>
-                  <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
-                  <td class="text-left">{{ role.role }}</td>
-                  <td class="text-left">{{ role.rule_type }}</td>
-                </tr>
+              <tr>
+                <td class="text-left">{{ role.id }}</td>
+                <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
+                <td class="text-left">{{ role.role }}</td>
+                <td class="text-left">{{ role.rule_type }}</td>
+              </tr>
               {% endfor %}
             </tbody>
           </table><br>
@@ -94,9 +94,9 @@ the system. This shows the groups you are a member of.</p>
     <div class="card-body" style="text-align: left">
       <p>This explains rules specific to you.</p>
       <ul>
-      {% for e in english %}
+        {% for e in english %}
         <li>{{ e }}
-      {% endfor %}
+          {% endfor %}
       </ul>
     </div>
   </div>

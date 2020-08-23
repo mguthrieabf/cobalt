@@ -10,9 +10,9 @@
     </div>
     <div class="card-body">
       <ul>
-      <li><a href="/admin">Django Admin Pages</a>
-      <li><a href="/utils/batch">Batch Job Status</a>
-      <li><a href="/logs">System Logs</a>
+        <li><a href="/admin">Django Admin Pages</a>
+        <li><a href="/utils/batch">Batch Job Status</a>
+        <li><a href="/logs">System Logs</a>
       </ul>
     </div>
   </div>
@@ -65,46 +65,44 @@
     </div>
     <div class="card-body">
       <ul>
-      <li><a href="/forums/forum/create">Add Forum</a>
+        <li><a href="/forums/forum/create">Add Forum</a>
       </ul>
     </div>
   </div>
 </div>
 {% if payments_admin %}
-  <div class="card col-lg-9">
-    <div class="card-header card-header-info">
-      <h3 class="card-title">Payments for Organisations</h3>
-    </div>
-    <div class="card-body" style="text-align: left">
-      <div class="container">
-        <div class="row">
+<div class="card col-lg-9">
+  <div class="card-header card-header-info">
+    <h3 class="card-title">Payments for Organisations</h3>
+  </div>
+  <div class="card-body" style="text-align: left">
+    <div class="container">
+      <div class="row">
         <ul>
           {% for org in payments_admin %}
           <li><a href="{% url "payments:statement_org" org_id=org.id %}">{{org}}</a></li>
           {% endfor %}
         </ul>
-        </div>
       </div>
     </div>
   </div>
+</div>
 {% endif %}
 {% if payments_site_admin %}
-  <div class="card col-lg-9">
-    <div class="card-header card-header-info">
-      <h3 class="card-title">Global Payments</h3>
-    </div>
-    <div class="card-body" style="text-align: left">
-      <div class="container">
-        <div class="row">
+<div class="card col-lg-9">
+  <div class="card-header card-header-info">
+    <h3 class="card-title">Global Payments</h3>
+  </div>
+  <div class="card-body" style="text-align: left">
+    <div class="container">
+      <div class="row">
         <ul>
           <li><a href="{% url "payments:statement_admin_summary" %}">{{ GLOBAL_ORG}} Payments</a></li>
           <li><a href="{% url "payments:stripe_pending" %}">Stripe Transactions</a></li>
         </ul>
-        </div>
       </div>
     </div>
   </div>
+</div>
 {% endif %}
-
-<div>
 {% endblock %}

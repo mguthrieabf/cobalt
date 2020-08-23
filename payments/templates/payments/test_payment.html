@@ -20,11 +20,11 @@
         <h5>System Low Balance Trigger: ${{ lowbalance|floatformat:2|intcomma  }}</h5>
       </div>
       <form action="test-payment" method="post">
-          {% csrf_token %}
-          <table>
+        {% csrf_token %}
+        <table>
           {{ form.as_table }}
-          </table>
-  			   <input type="submit" value="Submit" onclick="this.disabled=true,this.form.submit();" class="btn btn-block">
+        </table>
+        <input type="submit" value="Submit" onclick="this.disabled=true,this.form.submit();" class="btn btn-block">
 
       </form>
 
@@ -39,14 +39,14 @@
   <ol>
     <li>Your balance is above the system top up threshold - no further action</li>
     <li>Your balance is below the system top up threshold</li>
+    <ul>
+      <li>Auto top up is enabled</li>
       <ul>
-        <li>Auto top up is enabled</li>
-        <ul>
-          <li>Auto top up is successful</li>
-          <li>Auto top up fails</li>
-        </ul>
-        <li>Auto top up is not enabled - no further action</li>
+        <li>Auto top up is successful</li>
+        <li>Auto top up fails</li>
       </ul>
+      <li>Auto top up is not enabled - no further action</li>
+    </ul>
   </ol>
   <li>You have insufficient funds</li>
   <ol>

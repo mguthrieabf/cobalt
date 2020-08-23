@@ -7,22 +7,42 @@
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
-  <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
-  <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
-  <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
+<script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
+<link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
+<script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 
-  <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+<link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
 
-<style> /* remove bug from summernote height in codeview mode */
-  .note-codable { min-height: 600px !important; }
+<style>
+  /* remove bug from summernote height in codeview mode */
+  .note-codable {
+    min-height: 600px !important;
+  }
+
   .note-editable {
-  line-height: 1.0;
-  background-color: {{ forum.bg_colour }} !important; color: {{ forum.fg_colour }} !important;
-}
-.cobalt-min-width-100 {
-  min-width: 100%;
-}
+    line-height: 1.0;
+
+    background-color: {
+        {
+        forum.bg_colour
+      }
+    }
+
+     !important;
+
+    color: {
+        {
+        forum.fg_colour
+      }
+    }
+
+     !important;
+  }
+
+  .cobalt-min-width-100 {
+    min-width: 100%;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -43,39 +63,39 @@
 
 <div class="content container">
   <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header card-header-success">
-            <div class="card-title">
-              {% if edit %}
-              <h2>Edit Post by {{ request.user.full_name }} in {{ forum }}</h2>
-              {% else %}
-              <h2>New Post by {{ request.user.full_name }} in {{ forum }}</h2>
-              {% endif %}
-            </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header card-header-success">
+          <div class="card-title">
+            {% if edit %}
+            <h2>Edit Post by {{ request.user.full_name }} in {{ forum }}</h2>
+            {% else %}
+            <h2>New Post by {{ request.user.full_name }} in {{ forum }}</h2>
+            {% endif %}
           </div>
-          <div class="card-body">
+        </div>
+        <div class="card-body">
 
-            <form method="POST" class="post-form">
-              {% csrf_token %}
+          <form method="POST" class="post-form">
+            {% csrf_token %}
 
-              <!-- <div class="form-group row">
+            <!-- <div class="form-group row">
                 <label for="id_forum" class="col-sm-2">Forum</label>
                 <div class="col-sm-10">
                   {{ form.forum|as_crispy_field }}
                 </div>
               </div> -->
 
-              <input type="hidden" name="forum" id="id_forum" value="{{ forum.id }}">
+            <input type="hidden" name="forum" id="id_forum" value="{{ forum.id }}">
 
-              <div class="form-group row">
-                <label for="id_title" class="col-sm-2">Title</label>
-                <div class="col-sm-10">
-                  {{ form.title|as_crispy_field }}
-                </div>
+            <div class="form-group row">
+              <label for="id_title" class="col-sm-2">Title</label>
+              <div class="col-sm-10">
+                {{ form.title|as_crispy_field }}
               </div>
+            </div>
 
-          {{ form.text|as_crispy_field }}
+            {{ form.text|as_crispy_field }}
 
             <div class="form-group row">
               <button type="submit" class="save btn btn-primary btn-sm" name="publish">Publish</button>
@@ -84,10 +104,10 @@
               {% endif %}
               <button type="cancel" class="save btn btn-info btn-sm" onclick="history.back();" name="cancel">Cancel</button>
             </div>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
+    </div>
   </div>
 </div>
 
@@ -104,20 +124,20 @@
 {% block footer %}
 <script>
   $(document).ready(function() {
-    $("#id_forum").change(function(){
+    $("#id_forum").change(function() {
       var forum = $('#id_forum').val();
       var strURL = "/forums/forum-colours/" + forum;
 
       $.ajax({
-          url: strURL,
-          context: document.body,
-          success: function(txt){
-            console.log(txt);
-//            $(".card-header").css("backgroundColor", "yellow");
-//            $(".note-editable").css({"backgroundColor": "black !important", "color": "white !important"});
-//            $(".note-editable").css("line-height", "5.0");
-//            $(".note-editable").css("color", "white");
-          }
+        url: strURL,
+        context: document.body,
+        success: function(txt) {
+          console.log(txt);
+          //            $(".card-header").css("backgroundColor", "yellow");
+          //            $(".note-editable").css({"backgroundColor": "black !important", "color": "white !important"});
+          //            $(".note-editable").css("line-height", "5.0");
+          //            $(".note-editable").css("color", "white");
+        }
       });
     });
   });

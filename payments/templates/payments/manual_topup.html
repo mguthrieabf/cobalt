@@ -15,37 +15,37 @@
     </div>
     <div class="card-body" style="text-align: center">
       <form id="submitForm" method="post">
-          {% csrf_token %}
+        {% csrf_token %}
 
-          <div class="row justify-content-center">
-            <div class="form-group">
-              <span class="cobalt-form-error" id="id_amount_errors">{{ form.amount.errors|striptags }}</span><br>
-              <label for="id_amount" class="bmd-label-floating">Amount {{ GLOBAL_CURRENCY_SYMBOL }}</label>
-              {% render_field form.amount class+="form-control" %}
-            </div>
+        <div class="row justify-content-center">
+          <div class="form-group">
+            <span class="cobalt-form-error" id="id_amount_errors">{{ form.amount.errors|striptags }}</span><br>
+            <label for="id_amount" class="bmd-label-floating">Amount {{ GLOBAL_CURRENCY_SYMBOL }}</label>
+            {% render_field form.amount class+="form-control" %}
           </div>
+        </div>
 
-          {% if user.stripe_auto_confirmed == "On" %}
+        {% if user.stripe_auto_confirmed == "On" %}
 
-          <div class="row justify-content-center">
-            <div class="form-group">
-             <select name="card_choice" id="id_card_choice" style="width: 200px">
-             <option value="Existing" >&nbsp;Use Registered Card</option>
-             <option value="Another">&nbsp;Use Another Card</option>
-             </select>
-            </div>
+        <div class="row justify-content-center">
+          <div class="form-group">
+            <select name="card_choice" id="id_card_choice" style="width: 200px">
+              <option value="Existing">&nbsp;Use Registered Card</option>
+              <option value="Another">&nbsp;Use Another Card</option>
+            </select>
           </div>
+        </div>
 
-          {% endif %}
+        {% endif %}
 
-           <div class="d-flex">
-            <div>
-              <input type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success center-text">
-            </div>
-            <div class="ml-auto">
-             <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
-            </div>
+        <div class="d-flex">
+          <div>
+            <input type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success center-text">
           </div>
+          <div class="ml-auto">
+            <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+          </div>
+        </div>
 
 
       </form>
@@ -63,12 +63,20 @@
     const amount = $("#id_amount");
     const amount_err = $("#id_amount_errors");
     amount_err.html("");
-    if (amount.val()<{{ AUTO_TOP_UP_MIN_AMT }}){
+    if (amount.val() < {
+        {
+          AUTO_TOP_UP_MIN_AMT
+        }
+      }) {
       amount_err.html("Insufficient amount. Minimum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.");
       amount.focus();
       return false;
     }
-    if (amount.val()>{{ AUTO_TOP_UP_MAX_AMT }}){
+    if (amount.val() > {
+        {
+          AUTO_TOP_UP_MAX_AMT
+        }
+      }) {
       amount_err.html("Too large. Maximum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }}.");
       amount.focus();
       return false;
@@ -87,13 +95,11 @@
     const amount_err = $("#id_amount_errors");
 
 
-  // validate amount
+    // validate amount
     amount.blur(function(e) {
       checkAmt();
     });
   });
-
-
 </script>
 
 {% endblock %}

@@ -23,27 +23,25 @@
               <div class="col">
                 <h3>Errors</h3>
                 {% if errors %}
-                  <ul>
+                <ul>
                   {% for error in errors %}
-                    <li> {{ error|safe }}
-                  {% endfor %}
-                  </ul>
-                 {% else %}
-                  <h4>No errors found. You are good to publish.</h4>
+                  <li> {{ error|safe }}
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <h4>No errors found. You are good to publish.</h4>
                 {% endif %}
 
                 {% if warnings %}
-                  <h3>Warnings</h3>
-                  <ul>
+                <h3>Warnings</h3>
+                <ul>
                   {% for warning in warnings %}
-                    <li> {{ warning|safe }}
-                 {% endfor %}
-                  </ul>
-               {% endif %}
-
+                  <li> {{ warning|safe }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
               </div>
             </div>
-
             <i>Previews will appear in another browser tab.</i>
             <div class="row">
               <div class="col text-center">
@@ -53,7 +51,6 @@
                 <button class="btn btn-danger btn-sm cobalt-save">Delete</button>
               </div>
             </div>
-
           </form>
         </div>
       </div>
@@ -61,38 +58,37 @@
   </div>
 </div>
 
-
 {% endblock %}
 {% block footer %}
 {% include "events/congress_wizard_include_footer.html" %}
 <script>
-$(document).ready(function(){
+  $(document).ready(function() {
 
-  // Preview
-    $("#id_preview").click(function(event){
+    // Preview
+    $("#id_preview").click(function(event) {
       event.preventDefault();
       var win = window.open('{% url "events:view_congress" congress_id=congress.id %}', '_blank');
       if (win) {
-          //Browser has allowed it to be opened
-          win.focus();
+        //Browser has allowed it to be opened
+        win.focus();
       } else {
-          //Browser has blocked it
-          alert('Please allow popups for this website');
+        //Browser has blocked it
+        alert('Please allow popups for this website');
       }
     });
 
-  // Preview fullscreen
-    $("#id_preview_full").click(function(event){
+    // Preview fullscreen
+    $("#id_preview_full").click(function(event) {
       event.preventDefault();
       var win = window.open('{% url "events:view_congress" congress_id=congress.id fullscreen=1 %}', '_blank');
       if (win) {
-          //Browser has allowed it to be opened
-          win.focus();
+        //Browser has allowed it to be opened
+        win.focus();
       } else {
-          //Browser has blocked it
-          alert('Please allow popups for this website');
+        //Browser has blocked it
+        alert('Please allow popups for this website');
       }
     });
-});
+  });
 </script>
 {% endblock %}

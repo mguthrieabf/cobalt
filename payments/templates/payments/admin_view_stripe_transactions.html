@@ -11,69 +11,68 @@
     </div>
 
     <div class="card-body table-responsive">
-<form method="post">
-  {% csrf_token %}
+      <form method="post">
+        {% csrf_token %}
 
-      <div class="row">
-       <div class="col-md-6">
-         <div class="form-group">
-           <label class="bmd-label-static" style="font-size:11px">Start Date</label>
-           <input type="text" name="from_date" id="id_from_date" class="form-control datepicker" value="{{ form.from_date.value|default_if_none:'' }}">
-         </div>
-       </div>
-       <div class="col-md-6">
-         <div class="form-group">
-           <label class="bmd-label-static" style="font-size:11px">End Date</label>
-           <input type="text" name="to_date" id="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
-         </div>
-       </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="bmd-label-static" style="font-size:11px">Start Date</label>
+              <input type="text" name="from_date" id="id_from_date" class="form-control datepicker" value="{{ form.from_date.value|default_if_none:'' }}">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="bmd-label-static" style="font-size:11px">End Date</label>
+              <input type="text" name="to_date" id="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
+            </div>
+          </div>
 
-{% if stripes %}
+          {% if stripes %}
 
-  <div class="card">
-    <div class="card-header card-header-success">
-      <h2>Stripe Transactions</h2>
-      <h4>There are more details in the CSV download</h4>
-    </div>
-    <div class="card-body">
-  <table class="table table-responsive">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Member</th>
-        <th>Description</th>
-        <th>Stripe Reference</th>
-        <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
-        <th>Due Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for stripe in stripes %}
-      <tr>
-        <td>{{ stripe.created_date }}</td>
-        <td>{{ stripe.member }}</td>
-        <td>{{ stripe.description }}</td>
-        <td>{{ stripe.stripe_reference }}</td>
-        <td class="text-right">{{ stripe.amount|intcomma }}</td>
-        <td class="text-right">{{ stripe.amount_settle|floatformat:2|intcomma }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  </div>
-{% else %}
-<br><br><br><br><br><br><br><br><br><br><br>
-{% endif %}
+          <div class="card">
+            <div class="card-header card-header-success">
+              <h2>Stripe Transactions</h2>
+              <h4>There are more details in the CSV download</h4>
+            </div>
+            <div class="card-body">
+              <table class="table table-responsive">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Description</th>
+                    <th>Stripe Reference</th>
+                    <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                    <th>Due Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for stripe in stripes %}
+                  <tr>
+                    <td>{{ stripe.created_date }}</td>
+                    <td>{{ stripe.member }}</td>
+                    <td>{{ stripe.description }}</td>
+                    <td>{{ stripe.stripe_reference }}</td>
+                    <td class="text-right">{{ stripe.amount|intcomma }}</td>
+                    <td class="text-right">{{ stripe.amount_settle|floatformat:2|intcomma }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% else %}
+          <br><br><br><br><br><br><br><br><br><br><br>
+          {% endif %}
 
-<button type="submit" class="btn btn-primary" name="show">Show</button>
-<button type="submit" class="btn btn-success" name="export">CSV Download</button>
-</form>
+          <button type="submit" class="btn btn-primary" name="show">Show</button>
+          <button type="submit" class="btn btn-success" name="export">CSV Download</button>
+      </form>
 
     </div>
   </div>
 </div>
-
 
 {% endblock %}
 
@@ -81,21 +80,20 @@
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
-
   $(document).ready(function() {
 
     $('#id_from_date').datetimepicker({
-        format: 'DD/MM/YYYY'
+      format: 'DD/MM/YYYY'
     });
     $('#id_to_date').datetimepicker({
-        format: 'DD/MM/YYYY',
-        useCurrent: false
+      format: 'DD/MM/YYYY',
+      useCurrent: false
     });
-    $("#id_from_date").on("dp.change", function (e) {
-        $('#id_to_date').data("DateTimePicker").minDate(e.date);
+    $("#id_from_date").on("dp.change", function(e) {
+      $('#id_to_date').data("DateTimePicker").minDate(e.date);
     });
-    $("#id_to_date").on("dp.change", function (e) {
-        $('#id_from_date').data("DateTimePicker").maxDate(e.date);
+    $("#id_to_date").on("dp.change", function(e) {
+      $('#id_from_date').data("DateTimePicker").maxDate(e.date);
     });
   });
 </script>

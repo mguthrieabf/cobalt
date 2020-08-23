@@ -16,8 +16,8 @@
   </thead>
   <tbody>
     {% for thing in things %}
-      <tr>
-        <td><a href="#" onclick="
+    <tr>
+      <td><a href="#" onclick="
                         swal.fire({
                                   title: '{{ thing.type }}',
                                   showClass: {
@@ -55,14 +55,14 @@
                                   confirmButtonText: 'Dismiss'
                                 })">
           <i class="material-icons">info</i></a></td>
-        <td>{{ thing.created_date|date:"d M Y" }}</td>
-        <td>{{ thing.other_member|default_if_none:"" }}{{ thing.organisation|default_if_none:"" }}</td>
-        <td>{{ thing.type }}</td>
-        <td>
-          {% if thing.stripe_transaction.stripe_receipt_url %}
-              <a href="{{ thing.stripe_transaction.stripe_receipt_url }}">
+      <td>{{ thing.created_date|date:"d M Y" }}</td>
+      <td>{{ thing.other_member|default_if_none:"" }}{{ thing.organisation|default_if_none:"" }}</td>
+      <td>{{ thing.type }}</td>
+      <td>
+        {% if thing.stripe_transaction.stripe_receipt_url %}
+        <a href="{{ thing.stripe_transaction.stripe_receipt_url }}">
 
-                Payment from <img height="16px;" src="
+          Payment from <img height="16px;" src="
                 {% if thing.stripe_transaction.stripe_brand == "visa" %}
                   {% static 'assets/img/cards/visa-dark.png' %}
                 {% elif thing.stripe_transaction.stripe_brand == "mastercard" %}
@@ -72,22 +72,22 @@
                 {% endif %}
                 ">
 
-                ending {{ thing.stripe_transaction.stripe_last4 }}
-              </a>
-          {% else %}
-                {{ thing.description }}
-          {% endif %}
-        </td>
-        {% if thing.amount >= 0 %}
-          <td class="text-right">{{ thing.amount|floatformat:2|intcomma }}</td>
-          <td></td>
+          ending {{ thing.stripe_transaction.stripe_last4 }}
+        </a>
         {% else %}
-          <td></td>
-          <td class="text-right">{{ thing.amount|floatformat:2|intcomma|slice:"1:" }}</td>
+        {{ thing.description }}
         {% endif %}
-        <td class="text-right">{{ thing.balance|floatformat:2|intcomma }}</td>
+      </td>
+      {% if thing.amount >= 0 %}
+      <td class="text-right">{{ thing.amount|floatformat:2|intcomma }}</td>
+      <td></td>
+      {% else %}
+      <td></td>
+      <td class="text-right">{{ thing.amount|floatformat:2|intcomma|slice:"1:" }}</td>
+      {% endif %}
+      <td class="text-right">{{ thing.balance|floatformat:2|intcomma }}</td>
 
-      </tr>
+    </tr>
     {% endfor %}
   </tbody>
 </table>

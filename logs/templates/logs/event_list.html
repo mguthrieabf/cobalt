@@ -31,10 +31,10 @@
         </thead>
         <tbody>
           {% for thing in things %}
-            <tr>
-              <td title="{{ thing.event_date }}">{{ thing.event_date|timesince }} ago</td>
-              <td>{{ thing.ip }}</td>
-              <td class="
+          <tr>
+            <td title="{{ thing.event_date }}">{{ thing.event_date|timesince }} ago</td>
+            <td>{{ thing.ip }}</td>
+            <td class="
 
               {% if thing.severity == "DEBUG" %}bg-white{% endif %}
               {% if thing.severity == "INFO" %}bg-light{% endif %}
@@ -44,11 +44,11 @@
               {% if thing.severity == "CRITICAL" %}bg-dark text-white font-weight-bold{% endif %}
 
               ">{{ thing.severity }}</td>
-              <td>{{ thing.user }}</td>
-              <td>{{ thing.source }}</td>
-              <td>{{ thing.sub_source }}</td>
-              <td>{{ thing.message }}</td>
-            </tr>
+            <td>{{ thing.user }}</td>
+            <td>{{ thing.source }}</td>
+            <td>{{ thing.sub_source }}</td>
+            <td>{{ thing.message }}</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>

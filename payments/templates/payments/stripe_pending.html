@@ -17,8 +17,8 @@
 
               <h2>Manual Checkout Pending</h2>
               <p>A status of pending for manual checkouts means that a user has made a
-              payment which has been confirmed back to them by Stripe, but Stripe has not
-              sent us formal confirmation. This should not happen and needs to be investigated.</p>
+                payment which has been confirmed back to them by Stripe, but Stripe has not
+                sent us formal confirmation. This should not happen and needs to be investigated.</p>
             </div>
             <div class="card-body table-responsive">
               <div class="container">
@@ -44,8 +44,8 @@
                   {% endfor %}
                 </table>
                 {% else %}
-                  <br>
-                  <h4>No current errors</h4>
+                <br>
+                <h4>No current errors</h4>
                 {% endif %}
               </div>
             </div>
@@ -56,7 +56,7 @@
 
               <h2>Manual Checkout Intent</h2>
               <p>A status of intent for manual checkouts means that a user has gone to the
-              checkout screen but not completed the payment. This is normal behaviour.</p>
+                checkout screen but not completed the payment. This is normal behaviour.</p>
             </div>
             <div class="card-body table-responsive">
               <div class="container">
@@ -90,8 +90,8 @@
 
               <h2>Auto Checkout Pending</h2>
               <p>A status of pending for auto top up means that a user has set up
-              auto top up which has been confirmed back to them by Stripe, but Stripe has not
-              sent us formal confirmation. This should not happen and needs to be investigated.</p>
+                auto top up which has been confirmed back to them by Stripe, but Stripe has not
+                sent us formal confirmation. This should not happen and needs to be investigated.</p>
             </div>
             {% if stripe_auto_pending %}
             <div class="card-body table-responsive">

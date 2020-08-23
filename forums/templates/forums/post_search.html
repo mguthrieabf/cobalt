@@ -20,12 +20,12 @@
               {% render_field filter.form.author class+="form-control" %}
             </div>
             <div class="col-3">
-              <label  class="bmd-label-static">{{ filter.form.forum.label_tag }}</label>
+              <label class="bmd-label-static">{{ filter.form.forum.label_tag }}</label>
               <span class="cobalt-form-error">{{ filter.form.forum.errors|striptags }}</span>
               {% render_field filter.form.forum class+="form-control" %}
             </div>
             <div class="col-3">
-              <label  class="bmd-label-static">{{ filter.form.title.label_tag }}</label>
+              <label class="bmd-label-static">{{ filter.form.title.label_tag }}</label>
               <span class="cobalt-form-error">{{ filter.form.title.errors|striptags }}</span>
               {% render_field filter.form.title class+="form-control" %}
             </div>
@@ -38,8 +38,6 @@
         </div>
       </form>
 
-
-
       <table class="table table-hover">
         <thead>
           <th>Post</th>
@@ -48,14 +46,18 @@
         </thead>
         <tbody>
           {% for post in things %}
-            <tr><td><a href="{% url "forums:post_detail" pk=post.id %}">{{ post.title }}</a><td>{{ post.author }}<td>{{ post.forum }}</tr>
+          <tr>
+            <td><a href="{% url "forums:post_detail" pk=post.id %}">{{ post.title }}</a>
+            <td>{{ post.author }}
+            <td>{{ post.forum }}
+          </tr>
           {% empty %}
-            No Results
+          No Results
           {% endfor %}
         </tbody>
       </table>
 
-{% include "pagination_footer.html" %}
+      {% include "pagination_footer.html" %}
 
     </div>
   </div>

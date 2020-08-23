@@ -5,16 +5,16 @@
 {% block header %}
 <link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
 <script src="{% static "assets/js/bootstrap4-toggle.min.js" %}"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
 <style>
-.cobalt-left {
-  text-align: left;
-  padding-right: 20px;
-}
+  .cobalt-left {
+    text-align: left;
+    padding-right: 20px;
+  }
 
-.cobalt-table {
-  margin: 0px auto;
-}
+  .cobalt-table {
+    margin: 0px auto;
+  }
 </style>
 {% endblock %}
 
@@ -27,67 +27,65 @@
       <h3>{% if summary.IsActive %}{{club}}{% else %}Inactive - Used to play at {{club}}{% endif %}</h3>
       <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}{{ balance|intcomma }}</h2>
 
-          <div class="float-left">
+      <div class="float-left">
 
-              <b>Auto Top Up</b>
-              {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
-              <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm"
-              {% if auto_button %} checked {% endif %}
-               >
-              {% if auto_button %}
-                &nbsp;<a class="btn btn-sm btn-secondary" href="{% url "payments:setup_autotopup" %}">Update</a>
-              {% endif %}
-              <div id="console-event"></div>
-          </div>
+        <b>Auto Top Up</b>
+        {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
+        <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm" {% if auto_button %} checked {% endif %}>
+        {% if auto_button %}
+        &nbsp;<a class="btn btn-sm btn-secondary" href="{% url "payments:setup_autotopup" %}">Update</a>
+        {% endif %}
+        <div id="console-event"></div>
+      </div>
 
     </div>
     <div class="card-body table-responsive">
       {% if admin_view %}
-        <div class="col-6 col-md-6 col-lg-4 text-center">
-          <a href="{% url 'payments:statement_csv' member_id=user.id %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
-            <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
-            </button>
-          </a>
-        </div>
+      <div class="col-6 col-md-6 col-lg-4 text-center">
+        <a href="{% url 'payments:statement_csv' member_id=user.id %}" <button class="text-center btn btn-primary btn-round" style="width: 170px">
+          <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
+          </button>
+        </a>
+      </div>
       {% else %}
-        <div class="container">
-          <div class="row">
-            <div class="col-6 col-md-6 col-lg-4 text-center">
-              <a href="{% url 'payments:member_transfer' %}"<button class="text-center btn btn-dark btn-round" style="width: 170px">
-                <i class="material-icons">people_alt</i>&nbsp;Transfer
+      <div class="container">
+        <div class="row">
+          <div class="col-6 col-md-6 col-lg-4 text-center">
+            <a href="{% url 'payments:member_transfer' %}" <button class="text-center btn btn-dark btn-round" style="width: 170px">
+              <i class="material-icons">people_alt</i>&nbsp;Transfer
               </button>
-              </a>
-            </div>
-            <div class="col-6 col-md-6 col-lg-4 text-center">
-              <a href="{% url 'payments:manual_topup' %}"<button class="text-center btn btn-success btn-round" style="width: 170px">
-                <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
+            </a>
+          </div>
+          <div class="col-6 col-md-6 col-lg-4 text-center">
+            <a href="{% url 'payments:manual_topup' %}" <button class="text-center btn btn-success btn-round" style="width: 170px">
+              <i class="material-icons">attach_money</i>&nbsp;Top Up Balance
               </button>
-              </a>
-            </div>
-            <div class="col-6 col-md-6 col-lg-4 text-center">
-              <a href="{% url 'payments:statement_csv' %}"<button class="text-center btn btn-primary btn-round" style="width: 170px">
-                <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
-                </button>
-              </a>
-            </div>
-            <!-- <div class="col-6 col-md-6 col-lg-3 text-center">
+            </a>
+          </div>
+          <div class="col-6 col-md-6 col-lg-4 text-center">
+            <a href="{% url 'payments:statement_csv' %}" <button class="text-center btn btn-primary btn-round" style="width: 170px">
+              <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
+              </button>
+            </a>
+          </div>
+          <!-- <div class="col-6 col-md-6 col-lg-3 text-center">
               <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
                 <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
                 </button>
             </a> -->
-            </div>
-          </div>
-        {% endif %}
+        </div>
       </div>
-
-      <hr>
-
-{% include 'payments/statement_list.html' %}
-{% include 'pagination_footer.html' %}
-
-
+      {% endif %}
     </div>
+
+    <hr>
+
+    {% include 'payments/statement_list.html' %}
+    {% include 'pagination_footer.html' %}
+
+
   </div>
+</div>
 </div>
 
 {% endblock %}
@@ -97,21 +95,23 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
 <script>
-$( document ).ready(function() {
-  if(window.performance.navigation.type === 2) {
-     // the page was navigated to via the forward or back button
-     // refresh to make sure auto top up status is correct
-     location.reload();
-  }
-});
+  $(document).ready(function() {
+    if (window.performance.navigation.type === 2) {
+      // the page was navigated to via the forward or back button
+      // refresh to make sure auto top up status is correct
+      location.reload();
+    }
+  });
 
-// change to auto top up toggle
+  // change to auto top up toggle
   $(function() {
     $('#auto-button').change(function() {
       if ($(this).prop('checked')) {
-        window.location.href = "{% url "payments:setup_autotopup" %}";
+        window.location.href = "{% url "
+        payments: setup_autotopup " %}";
       } else {
-        window.location.href = "{% url "payments:cancel_autotopup" %}";
+        window.location.href = "{% url "
+        payments: cancel_autotopup " %}";
       }
     })
   })

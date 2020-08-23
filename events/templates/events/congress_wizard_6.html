@@ -28,15 +28,15 @@
                 <div class="card-body" style="text-align: center">
                   <div class="container">
                     <select class="w-100" size="10" id="event_list">
-                    {% for event in events %}
+                      {% for event in events %}
                       <option value="{{ event.id }}">{{ event.event_name }}</option>
-                    {% endfor %}
+                      {% endfor %}
                     </select>
                   </div>
 
                   <div class="d-flex">
                     <div>
-                      <a href="{% url "events:create_event" congress_id=congress.id %}" class="btn btn-success btn-sm cobalt-save" >Add</a>
+                      <a href="{% url "events:create_event" congress_id=congress.id %}" class="btn btn-success btn-sm cobalt-save">Add</a>
                       <button id="edit_button" class="btn btn-primary btn-sm cobalt-save" disabled>Edit</button>
                     </div>
                     <div class="ml-auto">
@@ -58,7 +58,6 @@
   </div>
 </div>
 
-
 {% endblock %}
 {% block footer %}
 {% include "events/congress_wizard_include_footer.html" %}
@@ -66,7 +65,6 @@
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
-
   function deleteEvent() {
     Swal.fire({
       title: 'Are you sure?',
@@ -79,30 +77,41 @@
     }).then((result) => {
       if (result.value) {
         event_id = $('#event_list').val();
-        $.get("{% url "events:delete_event_ajax" %}?event_id=" + event_id)
-            .done(response => {
-              msg = response['data']['message'];
-              if (msg == 'Success'){
-                swal.fire({ title:"Event Deleted", html: "Success. Event deleted from congress.", icon: "success", buttonsStyling: false})
+        $.get("{% url "
+            events: delete_event_ajax " %}?event_id=" + event_id)
+          .done(response => {
+            msg = response['data']['message'];
+            if (msg == 'Success') {
+              swal.fire({
+                  title: "Event Deleted",
+                  html: "Success. Event deleted from congress.",
+                  icon: "success",
+                  buttonsStyling: false
+                })
                 .then((result) => {
                   location.reload();
                 });
-              } else {
-                swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
-              }
-            });
-        }
+            } else {
+              swal.fire({
+                title: "Error",
+                html: msg,
+                icon: "error",
+                buttonsStyling: false
+              })
+            }
+          });
+      }
     })
   }
 
 
   $(document).ready(function() {
-    $("#event_list").change(function(){
+    $("#event_list").change(function() {
       $("#edit_button").prop('disabled', false);
       $("#delete_button").prop('disabled', false);
     });
 
-    $("#edit_button").click(function(){
+    $("#edit_button").click(function() {
       var event_id = $("#event_list").val();
       window.location = "/events/congress/create/edit-event/{{congress.id}}/" + event_id;
       return false;

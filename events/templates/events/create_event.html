@@ -25,7 +25,7 @@
             <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
 
 
-             <div class="row">
+            <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <span class="cobalt-form-error" id="id_entry_open_date_errors">{{ form.entry_open_date.errors|striptags }}</span>
@@ -41,7 +41,6 @@
                 </div>
               </div>
             </div>
-
 
             <div class="row">
               <div class="col-3 justify-content-center align-self-center">
@@ -132,31 +131,28 @@
   </div>
 </div>
 
-
 {% endblock %}
 {% block footer %}
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
-
-$(document).ready(function() {
+  $(document).ready(function() {
 
     $('#id_entry_open_date').datetimepicker({
-        format: 'DD/MM/YYYY'
+      format: 'DD/MM/YYYY'
     });
     $('#id_entry_close_date').datetimepicker({
-        format: 'DD/MM/YYYY',
-        useCurrent: false
+      format: 'DD/MM/YYYY',
+      useCurrent: false
     });
-    $("#id_entry_open_date").on("dp.change", function (e) {
-        $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
+    $("#id_entry_open_date").on("dp.change", function(e) {
+      $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
     });
-    $("#id_entry_close_date").on("dp.change", function (e) {
-        $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
+    $("#id_entry_close_date").on("dp.change", function(e) {
+      $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
     });
 
-});
-
+  });
 </script>
 
 {% endblock %}

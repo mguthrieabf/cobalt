@@ -26,154 +26,153 @@
               <h3>Event Details</h3>
             </div>
             <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
 
-          <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
-
-
-             <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
-                  <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
+                      <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
+                      <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
-                  <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
+
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Event Name
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_event_name" class="form-group">
+                      <span class="cobalt-form-error" id="id_event_name_errors">{{ form.event_name.errors|striptags }}</span>
+                      {% render_field form.event_name class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Event Name", "The short name of this event.");'>help</a>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-
-            <div class="row">
-              <div class="col-3 justify-content-center align-self-center">
-                Event Name
-              </div>
-              <div class="col-7">
-                <div id="div_id_event_name" class="form-group">
-                  <span class="cobalt-form-error" id="id_event_name_errors">{{ form.event_name.errors|striptags }}</span>
-                  {% render_field form.event_name class+="form-control" %}
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Description
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_description" class="form-group">
+                      <span class="cobalt-form-error" id="id_description_errors">{{ form.description.errors|striptags }}</span>
+                      {% render_field form.description class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Event Name", "The short name of this event.");'>help</a>
-              </div>
-            </div>
 
-            <div class="row">
-              <div class="col-3 justify-content-center align-self-center">
-                Description
-              </div>
-              <div class="col-7">
-                <div id="div_id_description" class="form-group">
-                  <span class="cobalt-form-error" id="id_description_errors">{{ form.description.errors|striptags }}</span>
-                  {% render_field form.description class+="form-control" %}
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Maximum Entries
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_max_entries" class="form-group">
+                      <span class="cobalt-form-error" id="id_max_entries_errors">{{ form.max_entries.errors|striptags }}</span>
+                      {% render_field form.max_entries class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
-              </div>
-            </div>
+                <br>
 
-            <div class="row">
-              <div class="col-3 justify-content-center align-self-center">
-                Maximum Entries
-              </div>
-              <div class="col-7">
-                <div id="div_id_max_entries" class="form-group">
-                  <span class="cobalt-form-error" id="id_max_entries_errors">{{ form.max_entries.errors|striptags }}</span>
-                  {% render_field form.max_entries class+="form-control" %}
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Event Type
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_event_type" class="form-group">
+                      <span class="cobalt-form-error" id="id_event_type_errors">{{ form.event_type.errors|striptags }}</span>
+                      {% render_field form.event_type class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Event Type", "Classification of who can enter.");'>help</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
-              </div>
-            </div>
-            <br>
-            <div class="row">
-              <div class="col-3 justify-content-center align-self-center">
-                Event Type
-              </div>
-              <div class="col-7">
-                <div id="div_id_event_type" class="form-group">
-                  <span class="cobalt-form-error" id="id_event_type_errors">{{ form.event_type.errors|striptags }}</span>
-                  {% render_field form.event_type class+="form-control" %}
+                <br>
+
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Player Format
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_player_format" class="form-group">
+                      <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
+                      {% render_field form.player_format class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Event Type", "Classification of who can enter.");'>help</a>
-              </div>
-            </div>
-            <br>
-            <div class="row">
-              <div class="col-3 justify-content-center align-self-center">
-                Player Format
-              </div>
-              <div class="col-7">
-                <div id="div_id_player_format" class="form-group">
-                  <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
-                  {% render_field form.player_format class+="form-control" %}
+
+                <br>
+                <div class="row">
+                  <div class="col text-center">
+                    <button class="btn btn-success btn-sm cobalt-save">Save</button>
+                    <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
+                  </div>
                 </div>
-              </div>
-              <div class="col-2 justify-content-center align-self-center">
-                <a href="#" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
-              </div>
-            </div>
-
-            <br>
-            <div class="row">
-              <div class="col text-center">
-                <button class="btn btn-success btn-sm cobalt-save">Save</button>
-                <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
-              </div>
-            </div>
-          </form>
-          </div>
-        </div>
-      </div>
-
-    <a href="#" id="show_sessions">Show Sessions...</a>
-
-      <div class="row justify-content-center" id="sessions_div" style="display:none">
-        <div class="card col-lg-9">
-          <div class="card-header card-header-success">
-            <h3 class="card-title">Sessions</h3>
-            <i>If you only have a single session, you can create a session with a date and start time (end time is optional).
-            For events with multiple sessions please create an entry for each session.</i>
-          </div>
-          <div class="card-body" style="text-align: center">
-            <div class="container">
-              <select class="w-100" size="10" id="session_list">
-              {% for session in sessions %}
-                <option value="{{ session.id }}">{{ session.session_date|date:"l jS F Y" }} Session starts at {{ session.session_start }}
-                {% if session.session_end %}
-                  Ends at {{ session.session_end }}
-                {% endif %}
-                </option>
-              {% endfor %}
-              </select>
-            </div>
-
-            <div class="d-flex">
-              <div>
-                <a href="{% url "events:create_session" event_id=event.id %}" class="btn btn-success btn-sm colbalt-save" >Add</a>
-                <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" disabled>Edit</button>
-              </div>
-              <div class="ml-auto">
-                <button class="btn btn-danger btn-sm cobalt-save" disabled id="delete_button" onclick="deleteSession();return false">Delete</button>
-              </div>
+              </form>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row justify-content-center">
-        <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
+
+        <a href="#" id="show_sessions">Show Sessions...</a>
+
+        <div class="row justify-content-center" id="sessions_div" style="display:none">
+          <div class="card col-lg-9">
+            <div class="card-header card-header-success">
+              <h3 class="card-title">Sessions</h3>
+              <i>If you only have a single session, you can create a session with a date and start time (end time is optional).
+                For events with multiple sessions please create an entry for each session.</i>
+            </div>
+            <div class="card-body" style="text-align: center">
+              <div class="container">
+                <select class="w-100" size="10" id="session_list">
+                  {% for session in sessions %}
+                  <option value="{{ session.id }}">{{ session.session_date|date:"l jS F Y" }} Session starts at {{ session.session_start }}
+                    {% if session.session_end %}
+                    Ends at {{ session.session_end }}
+                    {% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="d-flex">
+                <div>
+                  <a href="{% url "events:create_session" event_id=event.id %}" class="btn btn-success btn-sm colbalt-save">Add</a>
+                  <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" disabled>Edit</button>
+                </div>
+                <div class="ml-auto">
+                  <button class="btn btn-danger btn-sm cobalt-save" disabled id="delete_button" onclick="deleteSession();return false">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 </div>
 
@@ -184,7 +183,6 @@
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
-
   function deleteSession() {
     Swal.fire({
       title: 'Are you sure?',
@@ -197,61 +195,73 @@
     }).then((result) => {
       if (result.value) {
         session_id = $('#session_list').val();
-        $.get("{% url "events:delete_session_ajax" %}?session_id=" + session_id)
-            .done(response => {
-              msg = response['data']['message'];
-              if (msg == 'Success'){
-                swal.fire({ title:"Session Deleted", html: "Success. Session deleted from congress.", icon: "success", buttonsStyling: false})
+        $.get("{% url "
+            events: delete_session_ajax " %}?session_id=" + session_id)
+          .done(response => {
+            msg = response['data']['message'];
+            if (msg == 'Success') {
+              swal.fire({
+                  title: "Session Deleted",
+                  html: "Success. Session deleted from congress.",
+                  icon: "success",
+                  buttonsStyling: false
+                })
                 .then((result) => {
                   location.reload();
                 });
-              } else {
-                swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
-              }
-            });
-        }
+            } else {
+              swal.fire({
+                title: "Error",
+                html: msg,
+                icon: "error",
+                buttonsStyling: false
+              })
+            }
+          });
+      }
     })
   }
 
+  $(document).ready(function() {
 
-
-
-$(document).ready(function() {
-
-      $("#session_list").change(function(){
-        $("#edit_button").prop('disabled', false);
-        $("#delete_button").prop('disabled', false);
-      });
-
-      $("#edit_button").click(function(){
-        var session_id = $("#session_list").val();
-        window.location = "/events/congress/create/edit-session/{{congress.id}}/" + session_id;
-        return false;
-      });
-
-      $('#id_entry_open_date').datetimepicker({
-          format: 'DD/MM/YYYY'
-      });
-      $('#id_entry_close_date').datetimepicker({
-          format: 'DD/MM/YYYY',
-          useCurrent: false
-      });
-      $("#id_entry_open_date").on("dp.change", function (e) {
-          $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
-      });
-      $("#id_entry_close_date").on("dp.change", function (e) {
-          $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
-      });
-
-    $("#show_sessions").click(function(){
-        $("#sessions_div").show();
-        $("#show_sessions").hide();
+    $("#session_list").change(function() {
+      $("#edit_button").prop('disabled', false);
+      $("#delete_button").prop('disabled', false);
     });
 
-    {% if sessions %}
+    $("#edit_button").click(function() {
+      var session_id = $("#session_list").val();
+      window.location = "/events/congress/create/edit-session/{{congress.id}}/" + session_id;
+      return false;
+    });
+
+    $('#id_entry_open_date').datetimepicker({
+      format: 'DD/MM/YYYY'
+    });
+    $('#id_entry_close_date').datetimepicker({
+      format: 'DD/MM/YYYY',
+      useCurrent: false
+    });
+    $("#id_entry_open_date").on("dp.change", function(e) {
+      $('#id_entry_close_date').data("DateTimePicker").minDate(e.date);
+    });
+    $("#id_entry_close_date").on("dp.change", function(e) {
+      $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
+    });
+
+    $("#show_sessions").click(function() {
+      $("#sessions_div").show();
+      $("#show_sessions").hide();
+    });
+
+    {
+      %
+      if sessions %
+    }
     $("#sessions_div").show();
-    $("#show_sessions").hide();
-    {% endif %}
+    $("#show_sessions").hide(); {
+      % endif %
+    }
 
   });
 </script>
