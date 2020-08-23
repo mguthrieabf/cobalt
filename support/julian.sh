@@ -2,7 +2,7 @@
 
 # crontab: * * * * * /var/app/current/support/julian.sh
 
-`date` > /tmp/lastcheck.log
+date > /tmp/lastcheck.log
 FILE=/tmp/trigger.txt
 if test -f "$FILE"; then
 
