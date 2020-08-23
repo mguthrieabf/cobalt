@@ -18,8 +18,8 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    return render(request, "events/soon.html", {"congresses": congresses})
-    #return render(request, "events/home.html", {"congresses": congresses})
+    # return render(request, "events/soon.html", {"congresses": congresses})
+    return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -37,52 +37,64 @@ def view_congress(request, congress_id, fullscreen=False):
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
-# We need to build a table for the program from events that has
-# rowspans for the number of days. This is too complex for the
-# template so we build it here.
-#
-# basic structure:
-#
-# <tr><td>Simple Pairs Event<td>Monday<td>12/09/2025 10am<td>Links</tr>
-#
-# <tr><td rowspan=2>Long Teams Event<td>Monday <td>13/09/2025 10am<td rowspan=2>Links</tr>
-# <tr> !Nothing!                    <td>Tuesday<td>14/09/2025 10am !Nothing! </tr>
+    # We need to build a table for the program from events that has
+    # rowspans for the number of days. This is too complex for the
+    # template so we build it here.
+    #
+    # basic structure:
+    #
+    # <tr><td>Simple Pairs Event<td>Monday<td>12/09/2025 10am<td>Links</tr>
+    #
+    # <tr><td rowspan=2>Long Teams Event<td>Monday <td>13/09/2025 10am<td rowspan=2>Links</tr>
+    # <tr> !Nothing!                    <td>Tuesday<td>14/09/2025 10am !Nothing! </tr>
 
-# get all events for this congress so we can build the program table
+    # get all events for this congress so we can build the program table
     events = congress.event_set.all()
 
-# program_list will be passed to the template, each entry is a <tr> element
-    program_list=[]
+    # program_list will be passed to the template, each entry is a <tr> element
+    program_list = []
 
-# every day of an event gets its own row so we use rowspan for event name and links
+    # every day of an event gets its own row so we use rowspan for event name and links
     for event in events:
         program = {}
 
-# get all sessions for this event plus days and number of rows (# of days)
+        # get all sessions for this event plus days and number of rows (# of days)
         sessions = event.session_set.all()
         days = sessions.distinct("session_date")
         rows = days.count()
 
-# day td
+        # day td
         first_row_for_event = True
         for day in days:
             if first_row_for_event:
-                program['event'] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</span></td>"
-                program['links'] = f"<td rowspan='{rows}'>Links go here</td>"
+                program[
+                    "event"
+                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</span></td>"
+                program["links"] = f"<td rowspan='{rows}'>Links go here</td>"
                 first_row_for_event = False
-            program['day'] = "<td>%s</td>" % day.session_date.strftime("%A")
+            program["day"] = "<td>%s</td>" % day.session_date.strftime("%A")
 
-# handle multiple times on same day
-# time needs a bit of manipulation as %-I not supported (maybe just Windows?)
+            # handle multiple times on same day
+            # time needs a bit of manipulation as %-I not supported (maybe just Windows?)
             session_start_hour = day.session_start.strftime("%I")
             session_start_hour = "%d" % int(session_start_hour)
             session_minutes = day.session_start.strftime("%M")
             if session_minutes == "00":
-                time_str = "%s - %s%s" % (day.session_date.strftime("%d-%m-%Y"), session_start_hour, day.session_start.strftime("%p"))
+                time_str = "%s - %s%s" % (
+                    day.session_date.strftime("%d-%m-%Y"),
+                    session_start_hour,
+                    day.session_start.strftime("%p"),
+                )
             else:
-                time_str = "%s - %s:%s" % (day.session_date.strftime("%d-%m-%Y"), session_start_hour, day.session_start.strftime("%M%p"))
+                time_str = "%s - %s:%s" % (
+                    day.session_date.strftime("%d-%m-%Y"),
+                    session_start_hour,
+                    day.session_start.strftime("%M%p"),
+                )
 
-            times = Session.objects.filter(event__pk=day.event.id, session_date=day.session_date).order_by("session_start")
+            times = Session.objects.filter(
+                event__pk=day.event.id, session_date=day.session_date
+            ).order_by("session_start")
 
             print(day.id)
             print(day.event)
@@ -93,12 +105,20 @@ def view_congress(request, congress_id, fullscreen=False):
                 session_start_hour = "%d" % int(session_start_hour)
                 session_minutes = time.session_start.strftime("%M")
                 if session_minutes == "00":
-                    time_str = "%s & %s%s" % (time_str, session_start_hour, time.session_start.strftime("%p"))
+                    time_str = "%s & %s%s" % (
+                        time_str,
+                        session_start_hour,
+                        time.session_start.strftime("%p"),
+                    )
                 else:
-                    time_str = "%s & %s:%s" % (time_str, session_start_hour, time.session_start.strftime("%M%p"))
+                    time_str = "%s & %s:%s" % (
+                        time_str,
+                        session_start_hour,
+                        time.session_start.strftime("%M%p"),
+                    )
 
                 #    time_str = "%s & %s:%s" % (time_str, session_start_hour, day.session_start.strftime("%M%p"))
-            program['time'] = "<td>%s</td>" % time_str.lower() # AM -> pm
+            program["time"] = "<td>%s</td>" % time_str.lower()  # AM -> pm
             program_list.append(program)
             program = {}
 
@@ -697,7 +717,9 @@ def create_congress_wizard_7(request, step_list, congress):
 
     events = Event.objects.filter(congress=congress).count()
     if events == 0:
-        errors.append("<a href='%s%s'>%s</a>" % (url, 6, "This congress has no events defined"))
+        errors.append(
+            "<a href='%s%s'>%s</a>" % (url, 6, "This congress has no events defined")
+        )
 
     return render(
         request,
