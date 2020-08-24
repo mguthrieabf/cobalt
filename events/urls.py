@@ -11,6 +11,11 @@ urlpatterns = [
         views.view_congress,
         name="view_congress",
     ),
+    path(
+        "congress/event/enter/<int:congress_id>/<int:event_id>",
+        views.enter_event,
+        name="enter_event",
+    ),
     #    path("congress/edit/<int:congress_id>", views.edit_congress, name="edit_congress"),
     path(
         "congress/delete/<int:congress_id>",

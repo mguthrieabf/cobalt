@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Congress, CongressMaster, Event, Session
-from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
+from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_user_has_role,
@@ -70,7 +70,9 @@ def view_congress(request, congress_id, fullscreen=False):
                 program[
                     "event"
                 ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</span></td>"
-                program["links"] = f"<td rowspan='{rows}'>Links go here</td>"
+                program[
+                    "links"
+                ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a></td>"
                 first_row_for_event = False
             program["day"] = "<td>%s</td>" % day.session_date.strftime("%A")
 
@@ -960,3 +962,37 @@ def delete_session_ajax(request):
     response_data = {}
     response_data["message"] = "Success"
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def enter_event(request, congress_id, event_id):
+    """ enter an event """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+    event = get_object_or_404(Event, pk=event_id)
+    sessions = Session.objects.filter(event=event).order_by(
+        "session_date", "session_start"
+    )
+    event_start = sessions.first()
+
+    user_list = [(request.user.id, request.user), (0, "Search..."), (4, "Fred")]
+
+    initial = {"player1": request.user.id}
+
+    form = EventEntryForm(user_list=user_list, initial=initial)
+
+    if request.method == "POST":
+        print("do something")
+
+    else:
+        return render(
+            request,
+            "events/enter_event.html",
+            {
+                "form": form,
+                "congress": congress,
+                "event": event,
+                "sessions": sessions,
+                "event_start": event_start,
+            },
+        )

@@ -244,3 +244,15 @@ class SessionForm(forms.ModelForm):
             "session_start",
             "session_end",
         )
+
+
+class EventEntryForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+
+        # Get user list as parameter
+        user_list = kwargs.pop("user_list", [])
+        super(EventEntryForm, self).__init__(*args, **kwargs)
+        self.fields["player1"].choices = user_list
+        self.fields["player1"].value = user_list[0]
+
+    player1 = forms.ChoiceField()

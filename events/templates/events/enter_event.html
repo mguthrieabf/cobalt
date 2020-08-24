@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>{{ event.event_name }}</h2>
+        <h3>{{ congress.name }}</h3>
+      </div>
+      <div class="card-body">
+
+Starts at {{ event_start.session_start }} {{ event_start.session_date }}
+
+        <div class="card col-md-12">
+          <div class="card-header card-header-primary">
+            <h3>Pairs Entry</h3>
+          </div>
+
+          <div class="card-body table-responsive card-body-default">
+            <table>
+              <thead class="text-warning">
+                <th style="text-align: center;">Player</th>
+                <th style="text-align: center;">Payment Method</th>
+                <th style="text-align: center;">Amount</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <!-- <td class="col-6">
+                    <select class="selectpicker" data-style="btn btn-info" title="Select">
+                      <option selected>Allison Stralow (114197)</option>
+                      <option>Search...</option>
+                    </select> -->
+
+                    <td class="col-6">
+                      <div id="div_id_player1" class="form-group">
+                        <span class="cobalt-form-error" id="id_player1_errors">{{ form.player1.errors|striptags }}</span>
+                        <select class="selectpicker" data-style="btn btn-info" data-width="auto" title="Select">
+                          {% for val,item in form.fields.player1.choices %}
+                          <option value="{{ val }}" {% if form.fields.player1.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </td>
+
+                  <td class="col-4">
+                    <select id="mypay" class="selectpicker" data-style="btn btn-success" title="Select">
+                      <option selected>ABF Dollars</option>
+                      <option>Credit Card</option>
+                      <option>Cheque</option>
+                      <option>Cash at Table</option>
+                    </select>
+
+
+                  <td>
+
+                    <input id="mydue" type="currency" value="55">
+                </tr>
+
+                <tr>
+                  <td class="col-6">
+                    <select id="partner" class="selectpicker" data-style="btn btn-info"  data-width="100%" title="Partner">
+                      <option>Roy Nixon (763423)</option>
+                      <option>Abigail Jones (34562)</option>
+                      <option>Fred Winter (3458)</option>
+                      <option>Search...</option>
+                    </select>
+                  <td class="col-4">
+                    <select id="partnerpay" class="selectpicker" data-style="btn btn-success" title="Select">
+                      <option selected>ABF Dollars</option>
+                      <option>Credit Card</option>
+                      <option>Cheque</option>
+                      <option>Cash at Table</option>
+                    </select>
+
+
+                  <td>
+
+                    <input id="partnerdue" type="currency" value="55">
+                </tr>
+
+                <tr>
+                  <td>
+                  <td style="text-align: right; padding-right:18px;"><b>Total</b>
+                  <td>
+                    <input id="total" type="currency" value="110">
+                </tr>
+              </tbody>
+
+
+            </table>
+          </div>
+        </div>
+        <button type="submit" id="enter" class="btn btn-warning">Add to basket</button>
+        <button type="submit" id="enter" class="btn btn-warning">Checkout</button>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+
+<script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
+<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+{% endblock %}

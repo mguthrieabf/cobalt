@@ -4,11 +4,19 @@ from django.contrib.postgres.fields import ArrayField
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL
 
 PAYMENT_STATUSES = [
     ("Paid", "Entry Paid"),
     ("Pending Manual", "Pending Manual Payment"),
     ("Unpaid", "Entry Unpaid"),
+]
+PAYMENT_TYPES = [
+    ("System dollars", "%s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("Bank Transfer", "Bank Transfer"),
+    ("Cash", "Cash"),
+    ("Cheque", "Cheque"),
+    ("Unknown", "Unknown"),
 ]
 CONGRESS_STATUSES = [
     ("Draft", "Draft"),
@@ -197,20 +205,26 @@ class EventEntry(models.Model):
     """ An entry to an event """
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    payment_status = models.CharField("Event Name", max_length=100)
-    max_entries = models.IntegerField("Maximum Entries", null=True, blank=True)
     payment_status = models.CharField(
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
+    payment_type = models.CharField(
+        "Payment Type", max_length=20, choices=PAYMENT_TYPES, default="Unknown"
+    )
+    primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "%s - %s" % (self.congress, self.event_name)
+        return "%s - %s - %s" % (
+            self.event.congress,
+            self.event.event_name,
+            self.primary_entrant,
+        )
 
 
 class EventEntryPlayer(models.Model):
     """ A player who is entering an event """
 
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event_entry = models.ForeignKey(EventEntry, on_delete=models.CASCADE)
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     player_payment_record = models.ForeignKey(
         MemberTransaction, on_delete=models.CASCADE, null=True, blank=True
