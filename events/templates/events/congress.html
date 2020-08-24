@@ -159,11 +159,8 @@
 
 <script>
   $(document).ready(function() {
-    var myLatlng = new google.maps.LatLng({
-      {
-        congress.venue_location
-      }
-    });
+    var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
+
     var mapOptions = {
       zoom: 14,
       center: myLatlng,
