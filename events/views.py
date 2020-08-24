@@ -578,6 +578,18 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.allow_partnership_desk = form.cleaned_data[
                 "allow_partnership_desk"
             ]
+            congress.allow_early_payment_discount = form.cleaned_data[
+                "allow_early_payment_discount"
+            ]
+            congress.early_payment_discount_date = form.cleaned_data[
+                "early_payment_discount_date"
+            ]
+            congress.allow_youth_payment_discount = form.cleaned_data[
+                "allow_youth_payment_discount"
+            ]
+            congress.youth_payment_discount_date = form.cleaned_data[
+                "youth_payment_discount_date"
+            ]
             congress.save()
             return redirect(
                 "events:create_congress_wizard", step=6, congress_id=congress.id
@@ -586,7 +598,23 @@ def create_congress_wizard_5(request, step_list, congress):
             print(form.errors)
 
     else:
-        form = CongressForm(instance=congress)
+        # sort out dates
+        initial = {}
+        if congress.entry_open_date:
+            initial["entry_open_date"] = congress.entry_open_date.strftime("%d/%m/%Y")
+        if congress.entry_close_date:
+            initial["entry_close_date"] = congress.entry_close_date.strftime("%d/%m/%Y")
+        if congress.early_payment_discount_date:
+            initial[
+                "early_payment_discount_date"
+            ] = congress.early_payment_discount_date.strftime("%d/%m/%Y")
+        if congress.youth_payment_discount_date:
+            initial[
+                "youth_payment_discount_date"
+            ] = congress.youth_payment_discount_date.strftime("%d/%m/%Y")
+        if congress.senior_date:
+            initial["senior_date"] = congress.senior_date.strftime("%d/%m/%Y")
+        form = CongressForm(instance=congress, initial=initial)
 
     form.fields["payment_method_system_dollars"].required = True
     form.fields["payment_method_bank_transfer"].required = True
@@ -595,6 +623,7 @@ def create_congress_wizard_5(request, step_list, congress):
     form.fields["entry_open_date"].required = True
     form.fields["entry_close_date"].required = True
     form.fields["allow_partnership_desk"].required = True
+    form.fields["allow_early_payment_discount"].required = True
 
     return render(
         request,
@@ -606,48 +635,12 @@ def create_congress_wizard_5(request, step_list, congress):
 def create_congress_wizard_6(request, step_list, congress):
     """ wizard step 6 - events """
 
-    if request.method == "POST":
-        form = CongressForm(request.POST)
-        if form.is_valid():
-            congress.payment_method_system_dollars = form.cleaned_data[
-                "payment_method_system_dollars"
-            ]
-            congress.payment_method_bank_transfer = form.cleaned_data[
-                "payment_method_bank_transfer"
-            ]
-            congress.payment_method_cash = form.cleaned_data["payment_method_cash"]
-            congress.payment_method_cheques = form.cleaned_data[
-                "payment_method_cheques"
-            ]
-            congress.entry_open_date = form.cleaned_data["entry_open_date"]
-            congress.entry_close_date = form.cleaned_data["entry_close_date"]
-            congress.allow_partnership_desk = form.cleaned_data[
-                "allow_partnership_desk"
-            ]
-            congress.save()
-            return redirect(
-                "events:create_congress_wizard", step=7, congress_id=congress.id
-            )
-        else:
-            print(form.errors)
-
-    else:
-        form = CongressForm(instance=congress)
-
-    form.fields["payment_method_system_dollars"].required = True
-    form.fields["payment_method_bank_transfer"].required = True
-    form.fields["payment_method_cash"].required = True
-    form.fields["payment_method_cheques"].required = True
-    form.fields["entry_open_date"].required = True
-    form.fields["entry_close_date"].required = True
-    form.fields["allow_partnership_desk"].required = True
-
     events = Event.objects.filter(congress=congress)
 
     return render(
         request,
         "events/congress_wizard_6.html",
-        {"form": form, "step_list": step_list, "congress": congress, "events": events},
+        {"step_list": step_list, "congress": congress, "events": events},
     )
 
 
@@ -708,11 +701,21 @@ def create_congress_wizard_7(request, step_list, congress):
         )
     if not congress.entry_open_date:
         warnings.append(
-            "<a href='%s%s'>%s</a>" % (url, 2, "Entry open date is missing")
+            "<a href='%s%s'>%s</a>"
+            % (
+                url,
+                2,
+                "Entry open date is missing. Entries will be accepted any time before closing date.",
+            )
         )
     if not congress.entry_close_date:
         warnings.append(
-            "<a href='%s%s'>%s</a>" % (url, 2, "Entry close date is missing")
+            "<a href='%s%s'>%s</a>"
+            % (
+                url,
+                2,
+                "Entry close date is missing. Entries will be accepted even after the congress has started.",
+            )
         )
 
     events = Event.objects.filter(congress=congress).count()
@@ -744,6 +747,10 @@ def _update_event(request, form, event, congress, msg):
     event.entry_open_date = form.cleaned_data["entry_open_date"]
     event.entry_close_date = form.cleaned_data["entry_close_date"]
     event.player_format = form.cleaned_data["player_format"]
+    event.entry_fee = form.cleaned_data["entry_fee"]
+    event.entry_early_payment_discount = form.cleaned_data[
+        "entry_early_payment_discount"
+    ]
     event.save()
     messages.success(request, msg, extra_tags="cobalt-message-success")
 
@@ -776,7 +783,9 @@ def create_event(request, congress_id):
         form = EventForm()
 
     return render(
-        request, "events/create_event.html", {"form": form, "congress": congress},
+        request,
+        "events/edit_event.html",
+        {"form": form, "congress": congress, "page_type": "add"},
     )
 
 
@@ -817,7 +826,13 @@ def edit_event(request, congress_id, event_id):
     return render(
         request,
         "events/edit_event.html",
-        {"form": form, "congress": congress, "event": event, "sessions": sessions},
+        {
+            "form": form,
+            "congress": congress,
+            "event": event,
+            "sessions": sessions,
+            "page_type": "edit",
+        },
     )
 
 

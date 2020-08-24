@@ -90,6 +90,17 @@ class Congress(models.Model):
     payment_method_bank_transfer = models.BooleanField(default=False)
     payment_method_cash = models.BooleanField(default=False)
     payment_method_cheques = models.BooleanField(default=False)
+    allow_early_payment_discount = models.BooleanField(default=False)
+    early_payment_discount_date = models.DateTimeField(
+        "Last day for early discount", null=True, blank=True
+    )
+    allow_youth_payment_discount = models.BooleanField(default=False)
+    youth_payment_discount_date = models.DateTimeField(
+        "Date for age check", null=True, blank=True
+    )
+    youth_payment_discount_age = models.IntegerField("Cut off age", default=30)
+    senior_date = models.DateTimeField("Date for age check", null=True, blank=True)
+    senior_age = models.IntegerField("Cut off age", default=60)
     # Open and close dates can be overriden at the event level
     entry_open_date = models.DateTimeField(null=True, blank=True)
     entry_close_date = models.DateTimeField(null=True, blank=True)
@@ -127,6 +138,11 @@ class Event(models.Model):
     # Open and close dates can be overriden at the event level
     entry_open_date = models.DateTimeField(null=True, blank=True)
     entry_close_date = models.DateTimeField(null=True, blank=True)
+    entry_fee = models.DecimalField("Entry Fee", max_digits=12, decimal_places=2)
+    entry_early_payment_discount = models.DecimalField(
+        "Early Payment Discount", max_digits=12, decimal_places=2, null=True, blank=True
+    )
+
     player_format = models.CharField(
         "Player Format",
         max_length=14,
@@ -137,6 +153,24 @@ class Event(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.congress, self.event_name)
+
+    def is_open(self):
+        """ check if this event is taking entries today """
+
+        today = timezone.now().date()
+        open_date = self.event_open_date
+        if not open_date:
+            open_date = self.congress.entry_open_date
+        if today < open_date:
+            return False
+
+        close_date = self.event_close_date
+        if not close_date:
+            close_date = self.congress.entry_close_date
+        if today > close_date:
+            return False
+
+        return True
 
 
 class Session(models.Model):

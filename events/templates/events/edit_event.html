@@ -16,7 +16,11 @@
   <div class="row">
     <div class="card">
       <div class="card-header card-header-warning">
+        {% if page_type == "edit" %}
         <h2>Edit Event: {{ event.event_name }}</h2>
+        {% else %}
+        <h2>Add Event</h2>
+        {% endif %}
         <h4>Congress: {{ congress.name }}</h4>
       </div>
       <div class="card-body">
@@ -26,20 +30,39 @@
               <h3>Event Details</h3>
             </div>
             <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div>
+                    Congress Entry Open Date:
+                    {{ congress.entry_open_date|default_if_none:'Not Set'|date:"d/m/Y" }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    Congress Entry Close Date:
+                    {{ congress.entry_close_date|default_if_none:'Not Set'|date:"d/m/Y" }}
+                  </div>
+                </div>
+              </div>
+
               <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
 
-                <div class="row">
+                <button class="btn btn-sm btn-info" id="override_dates_toggle">
+                  Override dates for this event
+                </button>
+
+                <div class="row" id="override_dates" style="display:none;">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
+                      <label class="bmd-label-float" style="font-size:11px">Accept Event Entries from</label>
                       <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
+                      <label class="bmd-label-float" style="font-size:11px">Close Event Entries on</label>
                       <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
                     </div>
                   </div>
@@ -62,7 +85,7 @@
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Description
+                    Description (optional)
                   </div>
                   <div class="col-7">
                     <div id="div_id_description" class="form-group">
@@ -77,7 +100,7 @@
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Maximum Entries
+                    Maximum Entries (optional)
                   </div>
                   <div class="col-7">
                     <div id="div_id_max_entries" class="form-group">
@@ -89,11 +112,43 @@
                     <a href="#" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Entry Fee ({{ GLOBAL_CURRENCY_SYMBOL }})
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_entry_fee" class="form-group">
+                      <span class="cobalt-form-error" id="id_entry_fee_errors">{{ form.entry_fee.errors|striptags }}</span>
+                      {% render_field form.entry_fee class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Entry Fee", "The standard entry fee without discounts.");'>help</a>
+                  </div>
+                </div>
+
+                {% if congress.allow_early_payment_discount %}
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Early Entry Discount ({{ GLOBAL_CURRENCY_SYMBOL }})
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_entry_early_payment_discount" class="form-group">
+                      <span class="cobalt-form-error" id="id_entry_early_payment_discount_errors">{{ form.entry_early_payment_discount.errors|striptags }}</span>
+                      {% render_field form.entry_early_payment_discount class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Early Payment Discount", "Discount applied for entries completed before the early entry cut off.");'>help</a>
+                  </div>
+                </div>
+                {% endif %}
                 <br>
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Event Type
+                    Event Type (optional)
                   </div>
                   <div class="col-7">
                     <div id="div_id_event_type" class="form-group">
@@ -109,7 +164,7 @@
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Player Format
+                    Player Format (optional)
                   </div>
                   <div class="col-7">
                     <div id="div_id_player_format" class="form-group">
@@ -134,9 +189,9 @@
           </div>
         </div>
 
-        <a href="#" id="show_sessions">Show Sessions...</a>
+        {% if page_type == "edit" %}
 
-        <div class="row justify-content-center" id="sessions_div" style="display:none">
+        <div class="row justify-content-center" id="sessions_div">
           <div class="card col-lg-9">
             <div class="card-header card-header-success">
               <h3 class="card-title">Sessions</h3>
@@ -158,7 +213,7 @@
 
               <div class="d-flex">
                 <div>
-                  <a href="{% url "events:create_session" event_id=event.id %}" class="btn btn-success btn-sm colbalt-save">Add</a>
+                  <a href="/events/congress/create/add-session/{{ event.id }}" class="btn btn-success btn-sm colbalt-save">Add</a>
                   <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" disabled>Edit</button>
                 </div>
                 <div class="ml-auto">
@@ -171,6 +226,9 @@
         <div class="row justify-content-center">
           <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
         </div>
+
+        {% endif %}
+
       </div>
     </div>
   </div>
@@ -179,6 +237,7 @@
 
 {% endblock %}
 {% block footer %}
+<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
@@ -195,8 +254,7 @@
     }).then((result) => {
       if (result.value) {
         session_id = $('#session_list').val();
-        $.get("{% url "
-            events: delete_session_ajax " %}?session_id=" + session_id)
+        $.get("{% url "events:delete_session_ajax" %}?session_id=" + session_id)
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success') {
@@ -215,18 +273,25 @@
                 html: msg,
                 icon: "error",
                 buttonsStyling: false
-              })
+              });
             }
           });
-      }
-    })
-  }
+        }
+      });
+    }
 
   $(document).ready(function() {
 
     $("#session_list").change(function() {
       $("#edit_button").prop('disabled', false);
       $("#delete_button").prop('disabled', false);
+    });
+
+    $("#override_dates_toggle").click(function(event) {
+        event.preventDefault();
+        $("#override_dates").show();
+        $("#override_dates_toggle").hide();
+        return false;
     });
 
     $("#edit_button").click(function() {
@@ -249,19 +314,10 @@
       $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
     });
 
-    $("#show_sessions").click(function() {
-      $("#sessions_div").show();
-      $("#show_sessions").hide();
-    });
-
-    {
-      %
-      if sessions %
-    }
-    $("#sessions_div").show();
-    $("#show_sessions").hide(); {
-      % endif %
-    }
+  {% if form.entry_open_date or form.entry_close_date %}
+    $("#override_dates").show();
+    $("#override_dates_toggle").hide();
+  {% endif %}
 
   });
 </script>

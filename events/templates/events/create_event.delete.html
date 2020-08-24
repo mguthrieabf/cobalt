@@ -19,24 +19,40 @@
         <h2>Add Event to {{ congress }}</h2>
       </div>
       <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div>
+              Congress Entry Open Date:
+              {{ congress.entry_open_date|default_if_none:'Not Set'|date:"d/m/Y" }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div>
+              Congress Entry Close Date:
+              {{ congress.entry_close_date|default_if_none:'Not Set'|date:"d/m/Y" }}
+            </div>
+          </div>
+        </div>
         <div class="container">
           <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="congress" id="id_congress" value="{{ congress.id }}">
+            <button class="btn btn-sm btn-info" id="override_dates_toggle">
+              Override dates for this event
+            </button>
 
-
-            <div class="row">
+            <div class="row" id="override_dates" style="display:none;">
               <div class="col-md-6">
                 <div class="form-group">
                   <span class="cobalt-form-error" id="id_entry_open_date_errors">{{ form.entry_open_date.errors|striptags }}</span>
-                  <label class="bmd-label-float" style="font-size:11px">Accept Entries from</label>
+                  <label class="bmd-label-float" style="font-size:11px">Accept Event Entries from</label>
                   <input type="text" name="entry_open_date" id="id_entry_open_date" class="form-control datepicker" value="{{ form.entry_open_date.value|default_if_none:'' }}">
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <span class="cobalt-form-error" id="id_entry_close_date_errors">{{ form.entry_close_date.errors|striptags }}</span>
-                  <label class="bmd-label-float" style="font-size:11px">Close Entries on</label>
+                  <label class="bmd-label-float" style="font-size:11px">Close Event Entries on</label>
                   <input type="text" name="entry_close_date" id="id_entry_close_date" class="form-control datepicker" value="{{ form.entry_close_date.value|default_if_none:'' }}">
                 </div>
               </div>
@@ -133,6 +149,7 @@
 
 {% endblock %}
 {% block footer %}
+<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script>
@@ -150,6 +167,14 @@
     });
     $("#id_entry_close_date").on("dp.change", function(e) {
       $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
+    });
+
+
+    $("#override_dates_toggle").click(function(event) {
+        event.preventDefault();
+        $("#override_dates").show();
+        $("#override_dates_toggle").hide();
+        return false;
     });
 
   });

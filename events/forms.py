@@ -42,6 +42,13 @@ class CongressForm(forms.ModelForm):
         self.fields["entry_open_date"].label = False
         self.fields["entry_close_date"].label = False
         self.fields["allow_partnership_desk"].label = False
+        self.fields["allow_early_payment_discount"].label = False
+        self.fields["early_payment_discount_date"].label = False
+        self.fields["allow_youth_payment_discount"].label = False
+        self.fields["youth_payment_discount_date"].label = False
+        self.fields["youth_payment_discount_age"].label = False
+        self.fields["senior_date"].label = False
+        self.fields["senior_age"].label = False
 
         # mark fields as optional
         self.fields["name"].required = False
@@ -68,6 +75,13 @@ class CongressForm(forms.ModelForm):
         self.fields["entry_open_date"].required = False
         self.fields["entry_close_date"].required = False
         self.fields["allow_partnership_desk"].required = False
+        self.fields["allow_early_payment_discount"].required = False
+        self.fields["early_payment_discount_date"].required = False
+        self.fields["allow_youth_payment_discount"].required = False
+        self.fields["youth_payment_discount_date"].required = False
+        self.fields["youth_payment_discount_age"].required = False
+        self.fields["senior_date"].required = False
+        self.fields["senior_age"].required = False
 
     general_info = forms.CharField(
         widget=SummernoteInplaceWidget(
@@ -174,6 +188,13 @@ class CongressForm(forms.ModelForm):
             "entry_open_date",
             "entry_close_date",
             "allow_partnership_desk",
+            "allow_early_payment_discount",
+            "senior_date",
+            "senior_age",
+            "youth_payment_discount_date",
+            "youth_payment_discount_age",
+            "allow_youth_payment_discount",
+            "early_payment_discount_date",
             "default_email",
         )
 
@@ -198,7 +219,7 @@ class NewCongressForm(forms.Form):
 
 class EventForm(forms.ModelForm):
 
-#    entry_open_date = forms.DateField()
+    #    entry_open_date = forms.DateField()
 
     class Meta:
         model = Event
@@ -210,6 +231,8 @@ class EventForm(forms.ModelForm):
             "entry_open_date",
             "entry_close_date",
             "player_format",
+            "entry_fee",
+            "entry_early_payment_discount",
         )
 
 

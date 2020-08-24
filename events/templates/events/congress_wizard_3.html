@@ -171,15 +171,14 @@
 
     // set map at start if we have coordinates
 
-    {
-      %
-      if form.venue_location.value %
-    }
+
+      {% if form.venue_location.value %}
+
     var venue_location = "{{ form.venue_location.value }}"
     var parts = venue_location.split(',');
-    googlemap(parts[0], parts[1]); {
-      % endif %
-    }
+    googlemap(parts[0], parts[1]);
+
+      {% endif %}
 
   });
 </script>

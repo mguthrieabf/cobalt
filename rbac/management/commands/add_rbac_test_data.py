@@ -269,6 +269,7 @@ class Command(BaseCommand):
             # )
             # post.save()
 
+            print("Running", end="", flush=True)
             for post_counter in range(100):
 
                 post = Post(
@@ -278,7 +279,9 @@ class Command(BaseCommand):
                     author=random.choice(user_list),
                 )
                 post.save()
+                print(".", end="", flush=True)
                 self.add_comments(post, user_list)
+            print("\n")
 
         # create RBAC Groups
         print("Creating RBAC Groups")
