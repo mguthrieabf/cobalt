@@ -82,14 +82,12 @@
 <script>
   $(document).ready(function() {
 
-
     // change to range
     $(function() {
       $('#id_summary').change(function() {
         var range = $('#id_summary').val();
         // can't use url as we generate one value dynamically
         var strURL = "/payments/statement-org-summary/{{ org.id }}/" + range;
-
         $.ajax({
           url: strURL,
           context: document.body,

@@ -117,8 +117,7 @@
   $(document).ready(function() {
     $("input[name='cobalt-amount-radio']").click(function() {
       var auto_amt = $('input[name="cobalt-amount-radio"]:checked').val();
-      var strURL = "{% url "
-      payments: update_auto_amount " %}?amount=" + auto_amt;
+      var strURL = "{% url "payments:update_auto_amount" %}?amount=" + auto_amt;
 
       $.ajax({
         url: strURL,

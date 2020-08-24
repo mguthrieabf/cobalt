@@ -71,6 +71,9 @@ from cobalt.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
 from rbac.views import rbac_forbidden
+from django.utils.timezone import make_aware
+
+TZ = pytz.timezone(TIME_ZONE)
 
 ####################
 # Home             #
@@ -385,7 +388,7 @@ def statement_csv_org(request, org_id):
         organisation=organisation
     ).order_by("-created_date")
 
-    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
     response = HttpResponse(content_type="text/csv")
@@ -414,7 +417,7 @@ def statement_csv_org(request, org_id):
         if row.other_organisation:
             counterparty = row.other_organisation
 
-        local_dt = timezone.localtime(row.created_date, pytz.timezone(TIME_ZONE))
+        local_dt = timezone.localtime(row.created_date, TZ)
         writer.writerow(
             [
                 dateformat.format(local_dt, "Y-m-d H:i:s"),
@@ -508,7 +511,7 @@ def statement_csv(request, member_id=None):
 
     (summary, club, balance, auto_button, events_list) = statement_common(member)
 
-    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
     response = HttpResponse(content_type="text/csv")
@@ -534,7 +537,7 @@ def statement_csv(request, member_id=None):
             counterparty = row.other_member
         if row.organisation:
             counterparty = row.organisation
-        local_dt = timezone.localtime(row.created_date, pytz.timezone(TIME_ZONE))
+        local_dt = timezone.localtime(row.created_date, TZ)
         writer.writerow(
             [
                 dateformat.format(local_dt, "Y-m-d H:i:s"),
@@ -1003,7 +1006,7 @@ def settlement(request):
 
             if "export" in request.POST:  # CSV download
 
-                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                local_dt = timezone.localtime(timezone.now(), TZ)
                 today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
                 response = HttpResponse(content_type="text/csv")
@@ -1373,7 +1376,7 @@ def admin_members_with_balance_csv(request):
         .distinct("member")
     )
 
-    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
     response = HttpResponse(content_type="text/csv")
@@ -1422,7 +1425,7 @@ def admin_orgs_with_balance_csv(request):
         .distinct("organisation")
     )
 
-    local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+    local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
     response = HttpResponse(content_type="text/csv")
@@ -1461,12 +1464,15 @@ def admin_view_manual_adjustments(request):
         form = DateForm(request.POST)
         if form.is_valid():
 
-            to_date = form.cleaned_data["to_date"]
-            from_date = form.cleaned_data["from_date"]
-
-            # TODO: fix warning about timezone not being set
-            # to_date= pytz.utc.localize(to_date_form)
-            # from_date= pytz.utc.localize(from_date_form)
+            # Need to make the dates TZ aware
+            to_date_form = form.cleaned_data["to_date"]
+            from_date_form = form.cleaned_data["from_date"]
+            # date -> datetime
+            to_date = datetime.datetime.combine(to_date_form, datetime.time(0, 0))
+            from_date = datetime.datetime.combine(from_date_form, datetime.time(0, 0))
+            # make aware
+            to_date = make_aware(to_date, TZ)
+            from_date = make_aware(from_date, TZ)
 
             manual_member = MemberTransaction.objects.filter(
                 type="Manual Adjustment"
@@ -1477,7 +1483,7 @@ def admin_view_manual_adjustments(request):
 
             if "export" in request.POST:
 
-                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                local_dt = timezone.localtime(timezone.now(), TZ)
                 today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
                 response = HttpResponse(content_type="text/csv")
@@ -1508,9 +1514,7 @@ def admin_view_manual_adjustments(request):
                 )
 
                 for member in manual_member:
-                    local_dt = timezone.localtime(
-                        member.created_date, pytz.timezone(TIME_ZONE)
-                    )
+                    local_dt = timezone.localtime(member.created_date, TZ)
 
                     writer.writerow(
                         [
@@ -1540,9 +1544,7 @@ def admin_view_manual_adjustments(request):
                 )
 
                 for org in manual_org:
-                    local_dt = timezone.localtime(
-                        member.created_date, pytz.timezone(TIME_ZONE)
-                    )
+                    local_dt = timezone.localtime(member.created_date, TZ)
 
                     writer.writerow(
                         [
@@ -1601,12 +1603,15 @@ def admin_view_stripe_transactions(request):
         form = DateForm(request.POST)
         if form.is_valid():
 
-            to_date = form.cleaned_data["to_date"]
-            from_date = form.cleaned_data["from_date"]
-
-            # TODO: fix warning about timezone not being set
-            # to_date= pytz.utc.localize(to_date_form)
-            # from_date= pytz.utc.localize(from_date_form)
+            # Need to make the dates TZ aware
+            to_date_form = form.cleaned_data["to_date"]
+            from_date_form = form.cleaned_data["from_date"]
+            # date -> datetime
+            to_date = datetime.datetime.combine(to_date_form, datetime.time(0, 0))
+            from_date = datetime.datetime.combine(from_date_form, datetime.time(0, 0))
+            # make aware
+            to_date = make_aware(to_date, TZ)
+            from_date = make_aware(from_date, TZ)
 
             stripes = StripeTransaction.objects.filter().filter(
                 created_date__range=(from_date, to_date)
@@ -1617,7 +1622,7 @@ def admin_view_stripe_transactions(request):
 
             if "export" in request.POST:
 
-                local_dt = timezone.localtime(timezone.now(), pytz.timezone(TIME_ZONE))
+                local_dt = timezone.localtime(timezone.now(), TZ)
                 today = dateformat.format(local_dt, "Y-m-d H:i:s")
 
                 response = HttpResponse(content_type="text/csv")
@@ -1655,9 +1660,7 @@ def admin_view_stripe_transactions(request):
                 )
 
                 for stripe_item in stripes:
-                    local_dt = timezone.localtime(
-                        stripe_item.created_date, pytz.timezone(TIME_ZONE)
-                    )
+                    local_dt = timezone.localtime(stripe_item.created_date, TZ)
 
                     writer.writerow(
                         [

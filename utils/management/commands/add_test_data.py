@@ -1,6 +1,6 @@
 """ Script to create cobalt test data """
 
-from cobalt.settings import RBAC_EVERYONE
+from cobalt.settings import RBAC_EVERYONE, TIME_ZONE
 from accounts.models import User
 from events.models import CongressMaster
 from django.core.management.base import BaseCommand
@@ -27,6 +27,10 @@ from events.models import Congress, Event, Session
 import random
 from essential_generators import DocumentGenerator
 import datetime
+import pytz
+from django.utils.timezone import make_aware
+
+TZ = pytz.timezone(TIME_ZONE)
 
 
 class Command(BaseCommand):
@@ -611,14 +615,18 @@ class Command(BaseCommand):
             payment_method_cash=True,
             payment_method_cheques=False,
             allow_early_payment_discount=True,
-            early_payment_discount_date=datetime.datetime(2023, 4, 1, 0, 0),
+            early_payment_discount_date=make_aware(
+                datetime.datetime(2023, 4, 1, 0, 0), TZ
+            ),
             allow_youth_payment_discount=True,
-            youth_payment_discount_date=datetime.datetime(2023, 1, 1, 0, 0),
-            senior_date=datetime.datetime(2023, 1, 1, 0, 0),
+            youth_payment_discount_date=make_aware(
+                datetime.datetime(2023, 1, 1, 0, 0), TZ
+            ),
+            senior_date=make_aware(datetime.datetime(2023, 1, 1, 0, 0), TZ),
             youth_payment_discount_age=30,
             senior_age=65,
-            entry_open_date=datetime.datetime(2022, 12, 1, 0, 0),
-            entry_close_date=datetime.datetime(2022, 5, 1, 0, 0),
+            entry_open_date=make_aware(datetime.datetime(2022, 12, 1, 0, 0), TZ),
+            entry_close_date=make_aware(datetime.datetime(2022, 5, 1, 0, 0), TZ),
             allow_partnership_desk=False,
             status="Draft",
         )
@@ -627,7 +635,7 @@ class Command(BaseCommand):
 
         print("Events")
 
-        event_1 = Event(
+        event = Event(
             congress=congress_a,
             event_name="Welcome Pairs",
             description="27 board Matchpoint Pairs",
@@ -638,17 +646,17 @@ class Command(BaseCommand):
             player_format="Pairs",
         )
 
-        event_1.save()
+        event.save()
 
-        session_a = Session(
-            event=event_1,
-            session_date=datetime.date(2022, 5, 7),
+        session = Session(
+            event=event,
+            session_date=make_aware(datetime.datetime(2022, 5, 7, 0, 0), TZ),
             session_start=datetime.time(19, 30),
         )
 
-        session_a.save()
+        session.save()
 
-        event_2 = Event(
+        event = Event(
             congress=congress_a,
             event_name="Open Teams",
             description="2 Day Swiss Teams event. IMP scoring.",
@@ -659,105 +667,29 @@ class Command(BaseCommand):
             player_format="Teams",
         )
 
-        event_2.save()
+        event.save()
 
-        session_2a = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
+        session = Session(
+            event=event,
+            session_date=make_aware(datetime.datetime(2022, 5, 8, 0, 0), TZ),
             session_start=datetime.time(10, 00),
         )
-        session_2a.save()
-        session_2b = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
+        session.save()
+        session = Session(
+            event=event,
+            session_date=make_aware(datetime.datetime(2022, 5, 8, 0, 0), TZ),
             session_start=datetime.time(14, 00),
         )
-        session_2b.save()
-        session_2c = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
+        session.save()
+        session = Session(
+            event=event,
+            session_date=make_aware(datetime.datetime(2022, 5, 9, 0, 0), TZ),
             session_start=datetime.time(10, 00),
         )
-        session_2c.save()
-        session_2d = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
+        session.save()
+        session = Session(
+            event=event,
+            session_date=make_aware(datetime.datetime(2022, 5, 9, 0, 0), TZ),
             session_start=datetime.time(14, 00),
         )
-        session_2d.save()
-
-        event_2 = Event(
-            congress=congress_a,
-            event_name="Restricted Teams",
-            description="2 Day Swiss Teams event. IMP scoring.",
-            max_entries=40,
-            event_type="Restricted",
-            entry_fee=140.0,
-            entry_early_payment_discount=15.0,
-            player_format="Teams",
-        )
-
-        event_2.save()
-
-        session_2a = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
-            session_start=datetime.time(10, 00),
-        )
-        session_2a.save()
-        session_2b = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
-            session_start=datetime.time(14, 00),
-        )
-        session_2b.save()
-        session_2c = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
-            session_start=datetime.time(10, 00),
-        )
-        session_2c.save()
-        session_2d = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
-            session_start=datetime.time(14, 00),
-        )
-        session_2d.save()
-
-        event_2 = Event(
-            congress=congress_a,
-            event_name="Senior Teams",
-            description="2 Day Swiss Teams event. IMP scoring.",
-            max_entries=40,
-            event_type="Senior",
-            entry_fee=140.0,
-            entry_early_payment_discount=15.0,
-            player_format="Teams",
-        )
-
-        event_2.save()
-
-        session_2a = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
-            session_start=datetime.time(10, 00),
-        )
-        session_2a.save()
-        session_2b = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 8),
-            session_start=datetime.time(14, 00),
-        )
-        session_2b.save()
-        session_2c = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
-            session_start=datetime.time(10, 00),
-        )
-        session_2c.save()
-        session_2d = Session(
-            event=event_2,
-            session_date=datetime.date(2022, 5, 9),
-            session_start=datetime.time(14, 00),
-        )
-        session_2d.save()
+        session.save()

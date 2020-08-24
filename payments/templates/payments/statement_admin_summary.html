@@ -102,11 +102,8 @@
 
 {% block footer %}
 <script>
-  {
-    % include 'generic_user_search_footer.html' %
-  } {
-    % include 'generic_org_search_footer.html' %
-  }
+  {% include 'generic_user_search_footer.html' %} 
+  {% include 'generic_org_search_footer.html' %}
 
   function cobaltMemberSearchOk() {
     // clear the form
