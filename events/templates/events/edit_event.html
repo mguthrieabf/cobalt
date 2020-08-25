@@ -144,6 +144,23 @@
                   </div>
                 </div>
                 {% endif %}
+
+                {% if congress.allow_youth_payment_discount %}
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Youth Discount ({{ GLOBAL_CURRENCY_SYMBOL }})
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_entry_early_payment_discount" class="form-group">
+                      <span class="cobalt-form-error" id="id_entry_youth_payment_discount_errors">{{ form.entry_youth_payment_discount.errors|striptags }}</span>
+                      {% render_field form.entry_youth_payment_discount class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="#" onclick='help("Youth Discount", "Discount applied for youth players.");'>help</a>
+                  </div>
+                </div>
+                {% endif %}
                 <br>
 
                 <div class="row">

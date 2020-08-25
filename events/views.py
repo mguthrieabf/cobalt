@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Congress, CongressMaster, Event, Session
+from accounts.models import User
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -98,10 +99,6 @@ def view_congress(request, congress_id, fullscreen=False):
                 event__pk=day.event.id, session_date=day.session_date
             ).order_by("session_start")
 
-            print(day.id)
-            print(day.event)
-            print(times)
-
             for time in times[1:]:
                 session_start_hour = time.session_start.strftime("%I")
                 session_start_hour = "%d" % int(session_start_hour)
@@ -119,7 +116,6 @@ def view_congress(request, congress_id, fullscreen=False):
                         time.session_start.strftime("%M%p"),
                     )
 
-                #    time_str = "%s & %s:%s" % (time_str, session_start_hour, day.session_start.strftime("%M%p"))
             program["time"] = "<td>%s</td>" % time_str.lower()  # AM -> pm
             program_list.append(program)
             program = {}
@@ -129,153 +125,6 @@ def view_congress(request, congress_id, fullscreen=False):
         "events/congress.html",
         {"congress": congress, "fullscreen": fullscreen, "program_list": program_list},
     )
-
-
-# @login_required()
-# def create_congress(request):
-#     """ create a new congress
-#
-#     Args:
-#         request(HTTPRequest): standard user request
-#
-#     Returns:
-#         page(HTTPResponse): page to create congress
-#     """
-#     # get orgs that this user can manage congresses for
-#     everything, valid_orgs = rbac_user_allowed_for_model(
-#         user=request.user, app="events", model="org", action="edit"
-#     )
-#
-#     if everything:
-#         valid_orgs = Organisation.objects.all().values_list("pk")
-#
-#     # get CongressMasters that this user can manage
-#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
-#         "pk"
-#     )
-#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
-#
-#     if request.method == "POST":
-#         form = CongressForm(
-#             request.POST, valid_orgs=valid_orgs, congress_masters=congress_masters
-#         )
-#         if form.is_valid():
-#             role = "events.org.%s.edit" % form.cleaned_data["org"].id
-#             if not rbac_user_has_role(request.user, role):
-#                 return rbac_forbidden(request, role)
-#
-#             congress = form.save(commit=False)
-#             congress.author = request.user
-#             congress.save()
-#
-#             messages.success(
-#                 request, "Congress created", extra_tags="cobalt-message-success"
-#             )
-#             return redirect("events:edit_congress", congress_id=congress.id)
-#         else:
-#             messages.error(
-#                 request,
-#                 "There are errors on this form",
-#                 extra_tags="cobalt-message-error",
-#             )
-#     else:
-#         form = CongressForm(valid_orgs=valid_orgs, congress_masters=congress_masters)
-#
-#     return render(
-#         request,
-#         "events/edit_congress.html",
-#         {"form": form, "title": "Create New Congress"},
-#     )
-
-
-# @login_required()
-# def edit_congress(request, congress_id):
-#     """ edit a new congress
-#
-#     Args:
-#         request(HTTPRequest): standard user request
-#         congress_id(int): congress to view
-#
-#     Returns:
-#         page(HTTPResponse): page to create congress
-#     """
-#
-#     # get orgs that this user can manage congresses for
-#     everything, valid_orgs = rbac_user_allowed_for_model(
-#         user=request.user, app="events", model="org", action="edit"
-#     )
-#
-#     if everything:
-#         valid_orgs = Organisation.objects.all().values_list("pk")
-#
-#     # get CongressMasters that this user can manage
-#     congress_masters = CongressMaster.objects.filter(org__in=valid_orgs).values_list(
-#         "pk"
-#     )
-#     congress_masters = [cm[0] for cm in congress_masters]  # strip tuple noise
-#
-#     congress = get_object_or_404(Congress, pk=congress_id)
-#
-#     role = "events.org.%s.edit" % congress.org.id
-#     if not rbac_user_has_role(request.user, role):
-#         return rbac_forbidden(request, role)
-#
-#     conveners = rbac_get_users_with_role("events.org.%s.edit" % congress.org.id)
-#
-#     if request.method == "POST":
-#
-#         # we only process save or publish through here
-#
-#         form = CongressForm(
-#             request.POST,
-#             instance=congress,
-#             valid_orgs=valid_orgs,
-#             congress_masters=congress_masters,
-#         )
-#         if form.is_valid():
-#
-#             print(form.cleaned_data["venue_location"])
-#
-#             role = "events.org.%s.edit" % form.cleaned_data["org"].id
-#             if not rbac_user_has_role(request.user, role):
-#                 return rbac_forbidden(request, role)
-#
-#             congress = form.save(commit=False)
-#             congress.last_updated_by = request.user
-#             congress.last_updated = timezone.localtime()
-#
-#             if "Publish" in request.POST:
-#                 congress.status = "Published"
-#                 messages.success(
-#                     request, "Congress published", extra_tags="cobalt-message-success",
-#                 )
-#
-#             congress.save()
-#             messages.success(
-#                 request, "Congress saved", extra_tags="cobalt-message-success"
-#             )
-#         else:
-#             messages.error(
-#                 request,
-#                 "There are errors on this form",
-#                 extra_tags="cobalt-message-error",
-#             )
-#
-#     else:
-#         form = CongressForm(
-#             instance=congress, valid_orgs=valid_orgs, congress_masters=congress_masters
-#         )
-#
-#     return render(
-#         request,
-#         "events/edit_congress.html",
-#         {
-#             "form": form,
-#             "title": "Edit Congress",
-#             "congress": congress,
-#             "conveners": conveners,
-#         },
-#     )
 
 
 @login_required()
@@ -592,6 +441,8 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.youth_payment_discount_date = form.cleaned_data[
                 "youth_payment_discount_date"
             ]
+            congress.bank_transfer_details = form.cleaned_data["bank_transfer_details"]
+            congress.cheque_details = form.cleaned_data["cheque_details"]
             congress.save()
             return redirect(
                 "events:create_congress_wizard", step=6, congress_id=congress.id
@@ -626,6 +477,8 @@ def create_congress_wizard_5(request, step_list, congress):
     form.fields["entry_close_date"].required = True
     form.fields["allow_partnership_desk"].required = True
     form.fields["allow_early_payment_discount"].required = True
+    form.fields["bank_transfer_details"].required = True
+    form.fields["cheque_details"].required = True
 
     return render(
         request,
@@ -753,6 +606,9 @@ def _update_event(request, form, event, congress, msg):
     event.entry_early_payment_discount = form.cleaned_data[
         "entry_early_payment_discount"
     ]
+    event.entry_youth_payment_discount = form.cleaned_data[
+        "entry_youth_payment_discount"
+    ]
     event.save()
     messages.success(request, msg, extra_tags="cobalt-message-success")
 
@@ -851,8 +707,6 @@ def create_session(request, event_id):
 
     if request.method == "POST":
         form = SessionForm(request.POST)
-        print(request.POST.get("session_date"))
-        print(request.POST.get("session_start"))
         if form.is_valid():
             session = Session()
             session.event = event
@@ -968,6 +822,7 @@ def delete_session_ajax(request):
 def enter_event(request, congress_id, event_id):
     """ enter an event """
 
+    alert_msg = None
     congress = get_object_or_404(Congress, pk=congress_id)
     event = get_object_or_404(Event, pk=event_id)
     sessions = Session.objects.filter(event=event).order_by(
@@ -975,24 +830,87 @@ def enter_event(request, congress_id, event_id):
     )
     event_start = sessions.first()
 
-    user_list = [(request.user.id, request.user), (0, "Search..."), (4, "Fred")]
+    # drop down values for form
+    player1_list = [(request.user.id, request.user), (0, "Search..."), (4, "Fred")]
+    playerN_list = [
+        (0, "Search..."),
+        (4, "Fred Flintstone"),
+        (5, "Jim Smith"),
+        (2, "Freda Doghead"),
+        (12, "Dave Gerbil"),
+    ]
 
-    initial = {"player1": request.user.id}
+    # entry fee for this user
+    entry_fee, discount, reason = event.entry_fee_for(request.user)
 
-    form = EventEntryForm(user_list=user_list, initial=initial)
+    if reason == "Early discount":
+        date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
+        alert_msg = [
+            "Early Entry Discount",
+            "You qualify for an early discount if you enter now. You will save $%.2f on this event alone. Discount valid until %s."
+            % (discount, date_field),
+        ]
+
+    if reason == "Youth discount":
+        alert_msg = [
+            "Youth Discount",
+            "You qualify for a youth discount for this event. A saving of $%.2f."
+            % discount,
+        ]
 
     if request.method == "POST":
-        print("do something")
+        form = EventEntryForm(
+            request.POST,
+            congress=congress,
+            player1_list=player1_list,
+            playerN_list=playerN_list,
+        )
+
+        if form.is_valid():
+            if "now" in request.POST:
+                print("Now")
+            if "cart" in request.POST:
+                print("Cart")
+        else:
+            print(form.errors)
 
     else:
-        return render(
-            request,
-            "events/enter_event.html",
-            {
-                "form": form,
-                "congress": congress,
-                "event": event,
-                "sessions": sessions,
-                "event_start": event_start,
-            },
+        form = EventEntryForm(
+            congress=congress, player1_list=player1_list, playerN_list=playerN_list
         )
+
+    print(alert_msg)
+
+    return render(
+        request,
+        "events/enter_event.html",
+        {
+            "form": form,
+            "congress": congress,
+            "event": event,
+            "sessions": sessions,
+            "event_start": event_start,
+            "alert_msg": alert_msg,
+            "entry_fee": entry_fee,
+            "discount": discount,
+            "reason": reason,
+        },
+    )
+
+
+@login_required()
+def fee_for_user_ajax(request):
+    """ Ajax call to get entry fee for a user in an event """
+
+    if request.method == "GET":
+        event_id = request.GET["event_id"]
+        user_id = request.GET["user_id"]
+
+    event = get_object_or_404(Event, pk=event_id)
+    user = get_object_or_404(User, pk=user_id)
+
+    entry_fee, discount, reason = event.entry_fee_for(user)
+
+    response_data = {"entry_fee": entry_fee, "reason": reason, "discount": discount}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})

@@ -188,34 +188,10 @@
   $(document).ready(function() {
 
     chartData = {
-      {
-        % autoescape off %
-      }
-
-      labels: {
-        {
-          chart.labels
-        }
-      },
-      {
-        % endautoescape %
-      }
-      series: [{
-          {
-            chart.green
-          }
-        },
-        {
-          {
-            chart.red
-          }
-        },
-        {
-          {
-            chart.gold
-          }
-        }
-      ]
+      {% autoescape off %}
+      labels: {{ chart.labels }},
+      {% endautoescape %}
+      series: [{{ chart.green }},{{ chart.red }},{{ chart.gold }}]
     };
 
     chartOptions = {

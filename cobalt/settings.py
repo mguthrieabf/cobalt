@@ -161,7 +161,6 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_extensions",
     "django.contrib.admindocs",
-    "django_excel_fixture",
 ]
 
 MIDDLEWARE = [

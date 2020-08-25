@@ -83,4 +83,9 @@ urlpatterns = [
         views.delete_session_ajax,
         name="delete_session_ajax",
     ),
+    path(
+        "congress/event/enter/fee-for-user",
+        views.fee_for_user_ajax,
+        name="fee_for_user_ajax",
+    ),
 ]

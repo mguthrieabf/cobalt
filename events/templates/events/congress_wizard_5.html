@@ -101,7 +101,7 @@
                   <div class="col-6">
                     <div class="form-group">
                       <span class="cobalt-form-error" id="id_youth_payment_discount_age_errors">{{ form.youth_payment_discount_age.errors|striptags }}</span>
-                      <label class="bmd-label-float" style="font-size:11px">Age at cut off date</label>
+                      <label class="bmd-label-float" style="font-size:11px">Youth cut off date</label>
                       {% render_field form.youth_payment_discount_age class+="form-control" %}
                     </div>
                   </div>
@@ -146,19 +146,6 @@
                   </div>
                 </div>
 
-                <div class="row">
-                  <div class="col-6">
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input class="form-check-input" id="id_payment_method_bank_transfer" name="payment_method_bank_transfer" type="checkbox" {% if form.payment_method_bank_transfer.value %}checked="Checked" {% endif %}>
-                        Accept Bank Transfers
-                        <span class="form-check-sign">
-                          <span class="check"></span>
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
 
                 <div class="row">
                   <div class="col-6">
@@ -178,6 +165,28 @@
                   <div class="col-6">
                     <div class="form-check">
                       <label class="form-check-label">
+                        <input class="form-check-input" id="id_payment_method_bank_transfer" name="payment_method_bank_transfer" type="checkbox" {% if form.payment_method_bank_transfer.value %}checked="Checked" {% endif %}>
+                        Accept Bank Transfers
+                        <span class="form-check-sign">
+                          <span class="check"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row h-100" id="bank_transfer" style="display:none;">
+                    <div class="col-2 my-auto font-weight-bold" >Bank Details:</div>
+                  <div class="col-9">
+                    {{ form.bank_transfer_details|as_crispy_field }}
+                  </div>
+                </div>
+
+
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-check">
+                      <label class="form-check-label">
                         <input class="form-check-input" id="id_payment_method_cheques" name="payment_method_cheques" type="checkbox" {% if form.payment_method_cheques.value %}checked="Checked" {% endif %}>
                         Accept Cheques
                         <span class="form-check-sign">
@@ -188,11 +197,15 @@
                   </div>
                 </div>
 
+                <div class="row h-100" id="cheques" style="display:none;">
+                    <div class="col-2 my-auto font-weight-bold" >Cheque Details:</div>
+                  <div class="col-9">
+                    {{ form.cheque_details|as_crispy_field }}
+                  </div>
+                </div>
 
               </div>
             </div>
-
-
 
             <div class="row">
               <div class="col text-center">
@@ -265,6 +278,32 @@
             $("#youth_discount_date").show()
          } else {
            $("#youth_discount_date").hide()
+         }
+     });
+
+// bank transfer
+    if ($('#id_payment_method_bank_transfer').is(":checked")) {
+      $("#bank_transfer").show()
+    }
+
+    $('#id_payment_method_bank_transfer').change(function() {
+         if(this.checked) {
+            $("#bank_transfer").show()
+         } else {
+           $("#bank_transfer").hide()
+         }
+     });
+
+// cheques
+    if ($('#id_payment_method_cheques').is(":checked")) {
+      $("#cheques").show()
+    }
+
+    $('#id_payment_method_cheques').change(function() {
+         if(this.checked) {
+            $("#cheques").show()
+         } else {
+           $("#cheques").hide()
          }
      });
 

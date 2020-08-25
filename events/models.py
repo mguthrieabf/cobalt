@@ -4,7 +4,9 @@ from django.contrib.postgres.fields import ArrayField
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
-from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL, TIME_ZONE
+import datetime
+import pytz
 
 PAYMENT_STATUSES = [
     ("Paid", "Entry Paid"),
@@ -96,8 +98,12 @@ class Congress(models.Model):
     links = models.TextField("Links", null=True, blank=True)
     payment_method_system_dollars = models.BooleanField(default=True)
     payment_method_bank_transfer = models.BooleanField(default=False)
+    bank_transfer_details = models.TextField(
+        "Bank Transfer Details", null=True, blank=True
+    )
     payment_method_cash = models.BooleanField(default=False)
     payment_method_cheques = models.BooleanField(default=False)
+    cheque_details = models.TextField("Cheque Details", null=True, blank=True)
     allow_early_payment_discount = models.BooleanField(default=False)
     early_payment_discount_date = models.DateTimeField(
         "Last day for early discount", null=True, blank=True
@@ -150,6 +156,9 @@ class Event(models.Model):
     entry_early_payment_discount = models.DecimalField(
         "Early Payment Discount", max_digits=12, decimal_places=2, null=True, blank=True
     )
+    entry_youth_payment_discount = models.DecimalField(
+        "Youth Discount", max_digits=12, decimal_places=2, null=True, blank=True
+    )
 
     player_format = models.CharField(
         "Player Format",
@@ -179,6 +188,39 @@ class Event(models.Model):
             return False
 
         return True
+
+    def entry_fee_for(self, user):
+        """ return entry fee for user based on age and date """
+
+        # default
+        entry_fee = self.entry_fee
+        discount = 0.0
+        reason = "Full fee"
+
+        # date
+        if self.congress.allow_early_payment_discount:
+            today = timezone.now()
+            if self.congress.early_payment_discount_date >= today:
+                entry_fee = self.entry_fee - self.entry_early_payment_discount
+                reason = "Early discount"
+                discount = self.entry_early_payment_discount
+
+        # youth
+        if self.congress.allow_youth_payment_discount:
+            if user.dob:  # skip if no date of birth set
+                dob = datetime.datetime.combine(user.dob, datetime.time(0, 0))
+                dob = timezone.make_aware(dob, pytz.timezone(TIME_ZONE))
+                ref_date = dob.replace(
+                    year=dob.year + self.congress.youth_payment_discount_age
+                )
+                if self.congress.youth_payment_discount_date <= ref_date:
+                    youth_fee = self.entry_fee - self.entry_youth_payment_discount
+                    if youth_fee < entry_fee:
+                        entry_fee = youth_fee
+                        reason = "Youth discount"
+                        discount = self.entry_youth_payment_discount
+
+        return entry_fee, discount, reason
 
 
 class Session(models.Model):

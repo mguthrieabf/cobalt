@@ -3,6 +3,7 @@ from .models import Congress, Event, Session
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME
 
 
 class CongressForm(forms.ModelForm):
@@ -49,6 +50,8 @@ class CongressForm(forms.ModelForm):
         self.fields["youth_payment_discount_age"].label = False
         self.fields["senior_date"].label = False
         self.fields["senior_age"].label = False
+        self.fields["bank_transfer_details"].label = False
+        self.fields["cheque_details"].label = False
 
         # mark fields as optional
         self.fields["name"].required = False
@@ -82,6 +85,8 @@ class CongressForm(forms.ModelForm):
         self.fields["youth_payment_discount_age"].required = False
         self.fields["senior_date"].required = False
         self.fields["senior_age"].required = False
+        self.fields["bank_transfer_details"].required = False
+        self.fields["cheque_details"].required = False
 
     general_info = forms.CharField(
         widget=SummernoteInplaceWidget(
@@ -159,6 +164,26 @@ class CongressForm(forms.ModelForm):
             }
         )
     )
+    bank_transfer_details = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>This appears for people who pay by bank transfer. Specify the account details for your bank and any reference you would like attached.",
+                }
+            }
+        )
+    )
+    cheque_details = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>This appears for people who pay by cheque. Specify who to make the cheque payable to and where to send it.",
+                }
+            }
+        )
+    )
 
     class Meta:
         model = Congress
@@ -196,6 +221,8 @@ class CongressForm(forms.ModelForm):
             "allow_youth_payment_discount",
             "early_payment_discount_date",
             "default_email",
+            "bank_transfer_details",
+            "cheque_details",
         )
 
 
@@ -218,9 +245,6 @@ class NewCongressForm(forms.Form):
 
 
 class EventForm(forms.ModelForm):
-
-    #    entry_open_date = forms.DateField()
-
     class Meta:
         model = Event
         fields = (
@@ -233,6 +257,7 @@ class EventForm(forms.ModelForm):
             "player_format",
             "entry_fee",
             "entry_early_payment_discount",
+            "entry_youth_payment_discount",
         )
 
 
@@ -247,12 +272,43 @@ class SessionForm(forms.ModelForm):
 
 
 class EventEntryForm(forms.Form):
+    """ This form is for entering events. It does a lot of the heavy lifting
+    in terms of initialising values. """
+
     def __init__(self, *args, **kwargs):
 
-        # Get user list as parameter
-        user_list = kwargs.pop("user_list", [])
+        # Get parameters
+        congress = kwargs.pop("congress", None)
+        player1_list = kwargs.pop("player1_list", [])
+        playerN_list = kwargs.pop("playerN_list", [])
+
         super(EventEntryForm, self).__init__(*args, **kwargs)
-        self.fields["player1"].choices = user_list
-        self.fields["player1"].value = user_list[0]
+
+        # set values
+        self.fields["player1"].choices = player1_list
+        self.fields["player2"].choices = playerN_list
+
+        # payment types
+        pay_types = []
+        if congress.payment_method_system_dollars:
+            pay_types.append(
+                ("system-dollars", f"{GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+            )
+        if congress.payment_method_bank_transfer:
+            pay_types.append(("bank-transfer", "Bank Transfer"))
+        if congress.payment_method_cash:
+            pay_types.append(("cash", "Cash on the day"))
+        if congress.payment_method_cheques:
+            pay_types.append(("cheque", "Cheque"))
+
+        self.fields["player1_payment"].choices = pay_types
+        self.fields["player2_payment"].choices = pay_types
+
+        self.fields["player1_payment"].value = pay_types[0]
+        self.fields["player2_payment"].value = pay_types[0]
+        self.fields["player1"].value = player1_list[0]
 
     player1 = forms.ChoiceField()
+    player2 = forms.ChoiceField()
+    player1_payment = forms.ChoiceField()
+    player2_payment = forms.ChoiceField()

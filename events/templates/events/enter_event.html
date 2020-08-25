@@ -3,43 +3,48 @@
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
 
+{% block header %}
+<link href="{% static "assets/css/font-awesome.5.14/css/all.css" %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
-  <div class="row">
+<div class="container justify-content-center">
+  <div class="row h-100 d-flex justify-content-center">
     <div class="card">
       <div class="card-header card-header-warning">
         <h2>{{ event.event_name }}</h2>
         <h3>{{ congress.name }}</h3>
+        <h4>{{ event_start.session_date }} {{ event_start.session_start }}</h4>
       </div>
+
+
       <div class="card-body">
+        <div class="container h-100 d-flex justify-content-center">
 
-Starts at {{ event_start.session_start }} {{ event_start.session_date }}
 
-        <div class="card col-md-12">
-          <div class="card-header card-header-primary">
-            <h3>Pairs Entry</h3>
-          </div>
+          <div class="card">
+            <div class="card-header card-header-primary">
+              <h3>Pairs Entry</h3>
+            </div>
 
-          <div class="card-body table-responsive card-body-default">
-            <table>
-              <thead class="text-warning">
-                <th style="text-align: center;">Player</th>
-                <th style="text-align: center;">Payment Method</th>
-                <th style="text-align: center;">Amount</th>
-              </thead>
-              <tbody>
-                <tr>
-                  <!-- <td class="col-6">
-                    <select class="selectpicker" data-style="btn btn-info" title="Select">
-                      <option selected>Allison Stralow (114197)</option>
-                      <option>Search...</option>
-                    </select> -->
+            <div class="card-body table-responsive card-body-default">
 
-                    <td class="col-6">
+              <table>
+                <thead class="text-warning">
+                  <th style="text-align: center;">Players</th>
+                  <th style="text-align: center;">Payment Method</th>
+                  <th style="text-align: center;">Pay Now {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                  <th style="text-align: center;">Later {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                </thead>
+                <tbody>
+                  <form method="POST">
+                    {% csrf_token %}
+                  <tr>
+                    <td class="col">
                       <div id="div_id_player1" class="form-group">
                         <span class="cobalt-form-error" id="id_player1_errors">{{ form.player1.errors|striptags }}</span>
-                        <select class="selectpicker" data-style="btn btn-info" data-width="auto" title="Select">
+                        <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Select" id="id_player1" name="player1">
                           {% for val,item in form.fields.player1.choices %}
                           <option value="{{ val }}" {% if form.fields.player1.value.0 == val %} selected {% endif %}>{{ item }}</option>
                           {% endfor %}
@@ -47,57 +52,86 @@ Starts at {{ event_start.session_start }} {{ event_start.session_date }}
                       </div>
                     </td>
 
-                  <td class="col-4">
-                    <select id="mypay" class="selectpicker" data-style="btn btn-success" title="Select">
-                      <option selected>ABF Dollars</option>
-                      <option>Credit Card</option>
-                      <option>Cheque</option>
-                      <option>Cash at Table</option>
-                    </select>
+                    <td class="col">
+                      <select id="id_player1_payment" name="player1_payment" class="selectpicker" data-style="btn btn-danger" title="Select">
+                        {% for val,item in form.fields.player1_payment.choices %}
+                        <option value="{{ val }}" {% if form.fields.player1_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                        {% endfor %}
+                      </select>
 
 
-                  <td>
-
-                    <input id="mydue" type="currency" value="55">
-                </tr>
-
-                <tr>
-                  <td class="col-6">
-                    <select id="partner" class="selectpicker" data-style="btn btn-info"  data-width="100%" title="Partner">
-                      <option>Roy Nixon (763423)</option>
-                      <option>Abigail Jones (34562)</option>
-                      <option>Fred Winter (3458)</option>
-                      <option>Search...</option>
-                    </select>
-                  <td class="col-4">
-                    <select id="partnerpay" class="selectpicker" data-style="btn btn-success" title="Select">
-                      <option selected>ABF Dollars</option>
-                      <option>Credit Card</option>
-                      <option>Cheque</option>
-                      <option>Cash at Table</option>
-                    </select>
 
 
-                  <td>
+                    <td class="col-2 align="right">
+                      <nobr>
+                        {% if discount %}
+                      <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
+                          <i class="fas fa-tag"></i>
+                      </span>
+                        {% endif %}
+                      <input id="fee_1_now" type="text" size="5" readonly value="{{ entry_fee }}">
+                      </nobr>
+                    <td class="col">
+                      <input id="fee_1_later" type="text" size="5" readonly value="">
 
-                    <input id="partnerdue" type="currency" value="55">
-                </tr>
+                  </tr>
 
-                <tr>
-                  <td>
-                  <td style="text-align: right; padding-right:18px;"><b>Total</b>
-                  <td>
-                    <input id="total" type="currency" value="110">
-                </tr>
-              </tbody>
+                  <tr>
+                    <td class="col">
+                      <div id="div_id_player1" class="form-group">
+                        <span class="cobalt-form-error" id="id_player2_errors">{{ form.player2.errors|striptags }}</span>
+                        <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Partner" name="player2" id="id_player2">
+                          {% for val,item in form.fields.player2.choices %}
+                          <option value="{{ val }}" {% if form.fields.player2.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </td>
+                    <td class="col">
+                      <select id="id_player2_payment" name="player2_payment" class="selectpicker" data-style="btn btn-danger" title="Select">
+                        {% for val,item in form.fields.player2_payment.choices %}
+                        <option value="{{ val }}" {% if form.fields.player2_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                        {% endfor %}
+                      </select>
+
+                      <td class="col" align="right">
+                        <span id="player2_discount_alert"></span>
+                        <input id="fee_2_now" type="text" size="5" readonly value="">
+
+                      <td class="col">
+                        <input id="fee_2_later" type="text" size="5" readonly value="">
+
+                  </tr>
+
+                  <tr>
+                    <td>
+
+                    <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
+                    <td class="col" align="right">
+                      <input id="total_now" type="text" size="5" readonly value="{{ entry_fee }}">
+
+                    <td class="col">
+                      <input id="total_later" type="text" size="5" readonly value="">
+
+                  </tr>
+                                </form>
+                </tbody>
 
 
-            </table>
+              </table>
+              <br>
+              <div class="row">
+                <button type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px">Checkout Now</button>
+                <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Add to Cart</button>
+              </div>
+
+            </div>
+
           </div>
+
+
         </div>
-        <button type="submit" id="enter" class="btn btn-warning">Add to basket</button>
-        <button type="submit" id="enter" class="btn btn-warning">Checkout</button>
-        <div class="clearfix"></div>
+
       </div>
     </div>
   </div>
@@ -108,4 +142,55 @@ Starts at {{ event_start.session_start }} {{ event_start.session_date }}
 <script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
 <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+<script>
+$(document).ready(function(){
+
+  {% if alert_msg %}
+
+  swal.fire({
+      title: "{{ alert_msg.0 }}",
+      html: "{{ alert_msg.1 }}",
+      icon: "success",
+      buttonsStyling: false
+    })
+
+  {% endif %}
+
+
+  $(".myHover").tooltip();
+
+  $('#id_player2').on('change', function(e){
+    console.log(this.value,
+                this.options[this.selectedIndex].value,
+                $(this).find("option:selected").val(),);
+
+    user_id = this.value;
+    $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
+      .done(response => {
+        msg = response['data']['message'];
+        if (msg == 'Success') {
+          console.log(response['data']);
+
+          $("#player2_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
+               + response['data']['reason']
+               + ' $'
+               + response['data']['discount']
+               + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
+
+          $(".myHover").tooltip();
+          $("#fee_2_now").val(response['data']['entry_fee']);
+        }
+      });
+
+
+
+
+
+  });
+
+
+});
+</script>
+
 {% endblock %}
