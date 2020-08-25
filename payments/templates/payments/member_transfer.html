@@ -124,10 +124,7 @@
 
     // first check if we have been given a transfer_to value - that means
     // that we have failed validation. Show the user the same form
-    {
-      %
-      if form.transfer_to.value %
-    }
+    {% if form.transfer_to.value %}
 
     $.getJSON(member_detail + "?member_id={{ form.transfer_to.value }}")
       .done(response => {
@@ -139,9 +136,7 @@
         form_dets.show();
       });
 
-    {
-      % endif %
-    }
+    {% endif %}
 
     // validate amount
     amount.blur(function(e) {

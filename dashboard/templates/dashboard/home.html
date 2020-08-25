@@ -2,6 +2,10 @@
 {% load humanize %}
 {% load static %}
 
+{% block header %}
+
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -105,34 +109,42 @@
         <div class="card-body">
           <div class="infinite-container2">
             {% for post in posts2 %}
+
             <div class="infinite-item2">
+
               <div class="container mt-2 bg-light">
-                <div class="row h-100">
-                  <div class="col-2 my-auto">
-                    <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
-                  </div>
+                <div class="row">
                   <div class="col-12">
+                    <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
                     <div class="container">
                       <div class="row">
-                        <div class="col-10">
-                          <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
-                          <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
-                          <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
-                          <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        <div class="col-auto p-1 m-0">
+                          <a href="{% url "accounts:public_profile" pk=post.author.id %}">
+                          <img id="cobalt-pic" class="cobalt-rounded" src="/media/{{ post.author.pic }}" />
+                          </a>
+                        </div>
+                        <div class="col-8 p-0 m-0 justify-content-center align-self-center">
+                          <h4 class="p-0 m-0"><a href=" {% url "accounts:public_profile" pk=post.author.id %}" class="text-dark">{{ post.author.full_name }}</a></h4>
+                          <p>Posted in <a href="{% url "forums:post_list_single_forum" forum_id=post.forum.id %}">{{ post.forum.title }}</a></p>
                         </div>
                       </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-10">
-                        {{ post.text|truncatewords_html:50|safe }}
+                      <div class="row">
+                        <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}.</small></p>&nbsp;
+                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
                       </div>
                     </div>
                   </div>
                 </div>
+                <div class="row">
+                  <div class="col-10">
+                    {{ post.text|truncatewords_html:50|safe }}
+                  </div>
+                </div>
+                <a href="{% url 'forums:post_detail' pk=post.pk %}">More</a>
 
-              </div>
-            </div>
+              </div> <!-- end container bg-light -->
+            </div>    <!-- end infinite-item -->
+
             {% endfor %}
           </div>
         </div>
@@ -152,20 +164,23 @@
             {% for post in posts %}
             <div class="infinite-item">
               <div class="container mt-2 bg-light">
-                <div class="row h-100">
-                  <div class="col-2 my-auto">
-                    <img width="60px" class="rounded-circle img-fluid d-block mx-auto" src="/media/{{ post.author.pic }}" />
-                  </div>
-                  <div class="col-10">
+
+
+                <div class="row">
+                  <div class="col-12">
+                    <h4 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h4>
                     <div class="container">
                       <div class="row">
-                        <div class="col-10">
-                          <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
-                          <h5 class="p-0 m-0">{{ post.author.full_name }} posted in {{ post.forum.title }}</h5>
-                          <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}</small></p>
-                          <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        <div class="col-auto p-1 m-0">
+                          <a href="{% url "accounts:public_profile" pk=post.author.id %}">
+                          <img id="cobalt-pic" class="cobalt-rounded" src="/media/{{ post.author.pic }}" />
+                          </a>
                         </div>
-                        <div class="col-2 my-auto p-0 m-0">
+                        <div class="col-lg-7 p-0 m-0 justify-content-center align-self-center">
+                          <h4 class="p-0 m-0"><a href=" {% url "accounts:public_profile" pk=post.author.id %}" class="text-dark">{{ post.author.full_name }}</a></h4>
+                          <p>Posted in <a href="{% url "forums:post_list_single_forum" forum_id=post.forum.id %}">{{ post.forum.title }}</a></p>
+                        </div>
+                        <div class="col-lg-2 my-auto p-0 m-0">
                           <div class="text-center display-3">
                             {{ post.comment_count }}
                           </div>
@@ -174,10 +189,19 @@
                           </div>
                         </div>
                       </div>
+
+                      <div class="row">
+                        <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}.</small></p>&nbsp;
+                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+
+
+
+
+               </div> <!-- End bg-light -->
             </div>
             {% endfor %}
           </div>

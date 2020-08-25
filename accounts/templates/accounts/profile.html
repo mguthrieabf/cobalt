@@ -14,7 +14,7 @@
   <div class="row">
     <div class="col-md-8">
       <div class="card">
-        <div class="card-header card-header-warning">
+        <div class="card-header card-header-primary">
           <h4 class="card-title">Edit Profile for {{ user.full_name }} ({{ user.system_number }})</h4>
           <p class="card-category">Basic details</p>
         </div>
@@ -65,20 +65,34 @@
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
+            <button type="submit" class="btn btn-success pull-right">Update Profile</button>
             <div class="clearfix"></div>
           </form>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header card-header-warning">
+          <h3>Team Mates</h3>
+        </div>
+        <div class="card-body">
+          here
+        </div>
+      </div>
     </div>
+
+
+
     <div class="col-md-4">
       <form method="post" action="update-blurb" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card card-profile">
-          <div class="card-avatar">
-            <img id="cobalt-pic" class="img" src="/media/{{ form.pic.value }}" />
+          <div class="card-header card-header-primary">
+            <h4 class="card-title">About {{ request.user.first_name}}</h4>
+              <p class="card-category">Picture and description</p>
           </div>
           <div class="card-body">
+            <img id="cobalt-pic" class="cobalt-rounded text-center" style="height: 140px; width: 140px;" src="/media/{{ form.pic.value }}" />
+            <br>
             <div class="fileinput fileinput-new text-center" data-provides="fileinput">
               <div class="fileinput-preview fileinput-exists thumbnail img-circle img-raised"></div>
               <div>
@@ -92,9 +106,9 @@
             </div>
             <p class="card-description">
               <label class="bmd-label-floating">About You</label>
-              <textarea rows=8 name="about" id="id_about" class="form-control">{{ blurbform.about.value }}</textarea>
+              <textarea rows=8 name="about" id="id_about" class="form-control" placeholder="Tell people about yourself in a few words.">{{ blurbform.about.value|default_if_none:"" }}</textarea>
             </p>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-success">Update</button>
       </form>
     </div>
   </div>

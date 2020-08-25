@@ -122,6 +122,7 @@ class Command(BaseCommand):
             "Alan",
             "Admin",
             "Global Admin for Everything, well as much as possible. Also member of secret forum 6.",
+            "pic_folder/100.jpg",
         )
         bb = create_fake_user(
             self,
@@ -129,6 +130,7 @@ class Command(BaseCommand):
             "Betty",
             "Bunting",
             "Forums Global Admin. Member of secret forum 6.",
+            "pic_folder/101.jpg",
         )
         cc = create_fake_user(
             self,
@@ -136,19 +138,47 @@ class Command(BaseCommand):
             "Colin",
             "Corgy",
             "Payments Global Admin. Member of secret forum 6.",
+            "pic_folder/102.jpg",
         )
-        dd = create_fake_user(self, "103", "Debbie", "Dyson", "ABF Payments Officer")
+        dd = create_fake_user(
+            self,
+            "103",
+            "Debbie",
+            "Dyson",
+            "ABF Payments Officer",
+            "pic_folder/103.jpg",
+        )
         ee = create_fake_user(
-            self, "104", "Eric", "Eastwood", "Owner of Fantasy Bridge Club"
+            self,
+            "104",
+            "Eric",
+            "Eastwood",
+            "Owner of Fantasy Bridge Club",
+            "pic_folder/104.jpg",
         )
         ff = create_fake_user(
-            self, "105", "Fiona", "Freckle", "Accountant at Fantasy Bridge Club"
+            self,
+            "105",
+            "Fiona",
+            "Freckle",
+            "Accountant at Fantasy Bridge Club",
+            "pic_folder/105.jpg",
         )
         gg = create_fake_user(
-            self, "106", "Gary", "Golden", "Director at Fantasy Bridge Club"
+            self,
+            "106",
+            "Gary",
+            "Golden",
+            "Director at Fantasy Bridge Club",
+            "pic_folder/106.jpg",
         )
         hh = create_fake_user(
-            self, "107", "Heidi", "Hempstead", "Moderator on all public forums"
+            self,
+            "107",
+            "Heidi",
+            "Hempstead",
+            "Moderator on all public forums",
+            "pic_folder/107.jpg",
         )
         ii = create_fake_user(
             self,
@@ -156,13 +186,21 @@ class Command(BaseCommand):
             "Iain",
             "Igloo",
             "Moderator on all public forums and ABF Payments Officer",
+            "pic_folder/108.jpg",
         )
         jj = create_fake_user(
-            self, "109", "Janet", "Jumper", "Moderator and member of secret forum 6.",
+            self,
+            "109",
+            "Janet",
+            "Jumper",
+            "Moderator and member of secret forum 6.",
+            "pic_folder/109.jpg",
         )
-        kk = create_fake_user(self, "110", "Keith", "Kenneth", "Global Moderator.",)
+        kk = create_fake_user(
+            self, "110", "Keith", "Kenneth", "Global Moderator.", "pic_folder/110.jpg",
+        )
 
-        user_list = [aa, bb, cc, dd, ee, ff, gg, hh, ii]
+        user_list = [aa, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk]
 
         # create Orgs - ABF should be created first, then this.
         print("Creating Orgs")

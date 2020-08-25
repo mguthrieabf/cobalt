@@ -24,14 +24,14 @@
 <div class="container mt-2 bg-light">
   <div class="row h-100">
     <div class="col-2 my-auto">
-      <img width="60px" class="rounded-circle img-fluid  d-block mx-auto" src="/media/{{ thing.author.pic }}" />
+      <img width="60px" class="cobalt-rounded img-fluid  d-block mx-auto" src="/media/{{ thing.author.pic }}" />
     </div>
     <div class="col-10">
       <div class="container">
         <div class="row">
           <div class="col-10">
             <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=thing.pk %}">{{ thing.title }}</a></h3>
-            <h5 class="p-0 m-0">{{ thing.author.full_name }} posted in {{ thing.forum.title }}</h5>
+            <h5 class="p-0 m-0"><a href="{% url "accounts:public_profile" pk=thing.author.id %}">{{ thing.author.full_name }}</a> posted in {{ thing.forum.title }}</h5>
             <p class="p-0 m-0 font-italic"><small>{{ thing.created_date|naturaltime }}</small></p>
             <p class="p-0 m-0"><small>{{ thing.created_date|date:"n M Y P" }}</small></p>
           </div>

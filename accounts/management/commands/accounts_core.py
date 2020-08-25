@@ -2,7 +2,7 @@
 from accounts.models import User
 
 
-def create_fake_user(self, system_number, first, last, about="No info"):
+def create_fake_user(self, system_number, first, last, about="No info", pic=None):
     user = User.objects.filter(username=system_number).first()
     if user:
         self.stdout.write(
@@ -17,6 +17,7 @@ def create_fake_user(self, system_number, first, last, about="No info"):
             last_name=last,
             system_number=system_number,
             about=about,
+            pic=pic,
         )
         user.save()
         self.stdout.write(

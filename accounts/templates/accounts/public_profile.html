@@ -41,7 +41,7 @@
       <div class="col-md-4">
         <div class="card card-profile">
           <div class="card-avatar">
-            <img class="img" src="/media/{{ profile.pic }}" />
+            <img class="cobalt-rounded" src="/media/{{ profile.pic }}" />
           </div>
           <div class="card-body">
             <p class="card-description">
@@ -141,7 +141,7 @@ paginations we are doing -->
               {% for c1 in comment1s %}
               <tr>
                 <td><a href="{% url "forums:post_detail" c1.post.pk %}#c1-{{c1.id}}"> {{ c1.post.title }}</td>
-                <td>{{ c1.forum }}</td>
+                <td>{{ c1.post.forum }}</td>
                 <td>{{ c1.created_date }}</td>
               </tr>
               {% endfor %}
@@ -198,7 +198,7 @@ paginations we are doing -->
               {% for c2 in comment2s %}
               <tr>
                 <td><a href="{% url "forums:post_detail" c2.post.pk %}#c2-{{c2.id}}"> {{ c2.post.title }}</td>
-                <td>{{ c2.forum }}</td>
+                <td>{{ c2.post.forum }}</td>
                 <td>{{ c2.created_date }}</td>
               </tr>
               {% endfor %}

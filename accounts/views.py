@@ -488,7 +488,6 @@ def public_profile(request, pk):
 
     if not tab or tab == "posts":
         posts_active = "active"
-        print("here")
         posts = cobalt_paginator(request, post_list, PAGE_SIZE)
         comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE, 1)
         comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE, 1)
@@ -497,13 +496,11 @@ def public_profile(request, pk):
         posts = cobalt_paginator(request, post_list, PAGE_SIZE, 1)
         comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE)
         comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE, 1)
-    elif tab == "posts":
+    elif tab == "comment2s":
         comment2s_active = "active"
         posts = cobalt_paginator(request, post_list, PAGE_SIZE, 1)
         comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE, 1)
         comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE)
-
-    print(posts)
 
     return render(
         request,

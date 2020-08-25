@@ -34,7 +34,7 @@
 <div class="card card-nav-tabs">
   <div class="card-header card-header-warning">
     <a href="{% url 'accounts:public_profile' pk=thing.author.pk %}">
-      <img width="50px" class="rounded-circle float-left" src="/media/{{ thing.author.pic }}" style="margin-right: 5px;" />
+      <img width="50px" class="cobalt-rounded float-left" src="/media/{{ thing.author.pic }}" style="margin-right: 5px;" />
       <h5 style="color:black">{{ thing.author.full_name }}</h5>
     </a>
     <a href="{% url 'forums:post_detail' pk=thing.pk %}">

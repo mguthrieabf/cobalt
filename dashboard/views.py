@@ -67,7 +67,7 @@ def get_announcements(request):
         "-created_date"
     )
 
-    return cobalt_paginator(request, posts_list, 4)
+    return cobalt_paginator(request, posts_list, 20)
 
 
 def get_posts(request):
@@ -101,6 +101,6 @@ def get_posts(request):
             .order_by("-created_date")
         )
 
-    posts = cobalt_paginator(request, posts_list, 4)
+    posts = cobalt_paginator(request, posts_list, 20)
 
     return posts
