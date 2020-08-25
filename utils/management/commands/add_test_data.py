@@ -224,7 +224,7 @@ class Command(BaseCommand):
         if Post.objects.all().count() == 0:
 
             print("Running", end="", flush=True)
-            for post_counter in range(2):
+            for post_counter in range(200):
 
                 post = Post(
                     forum=random.choice(forum_list),
