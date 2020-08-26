@@ -89,6 +89,25 @@ changes). Do this using the class cobalt-save::
 
     <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
 
+Template Filters
+----------------
+
+You can use the following template filters::
+
+  {% load cobalt_tags %}
+
+      {{ my_date_or_datetime|cobalt_nice_date }}
+
+      e.g. Saturday 7th May 2022
+
+      {{ my_time_or_datetime|cobalt_time }}
+
+      e.g. 10am or 7:35pm
+
+      {{ my_datetime|cobalt_nice_datetime }}
+
+      e.g. Saturday 7th May 2022 11:32am
+
 Batch Jobs
 ==========
 

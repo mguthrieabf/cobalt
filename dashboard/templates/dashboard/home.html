@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% load static %}
+{% load cobalt_tags %}
 
 {% block header %}
 
@@ -130,7 +131,7 @@
                       </div>
                       <div class="row">
                         <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}.</small></p>&nbsp;
-                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
+                        <p class="p-0 m-0"><small>{{ post.created_date|cobalt_nice_datetime }}</small></p>
                       </div>
                     </div>
                   </div>
@@ -140,7 +141,7 @@
                     {{ post.text|truncatewords_html:50|safe }}
                   </div>
                 </div>
-                <a href="{% url 'forums:post_detail' pk=post.pk %}">More</a>
+                <a href="{% url 'forums:post_detail' pk=post.pk %}">Read more</a>
 
               </div> <!-- end container bg-light -->
             </div>    <!-- end infinite-item -->
@@ -176,11 +177,17 @@
                           <img id="cobalt-pic" class="cobalt-rounded" src="/media/{{ post.author.pic }}" />
                           </a>
                         </div>
+                      </div>
+                      <div class="row d-flex justify-content-between">
                         <div class="col-lg-7 p-0 m-0 justify-content-center align-self-center">
                           <h4 class="p-0 m-0"><a href=" {% url "accounts:public_profile" pk=post.author.id %}" class="text-dark">{{ post.author.full_name }}</a></h4>
-                          <p>Posted in <a href="{% url "forums:post_list_single_forum" forum_id=post.forum.id %}">{{ post.forum.title }}</a></p>
+                          Posted in <a href="{% url "forums:post_list_single_forum" forum_id=post.forum.id %}">{{ post.forum.title }}</a>
+                          <br>
+                          <p class="p-0 m-0 font-italic" ><small>{{ post.created_date|naturaltime }}.</small></p>
+                          <p class="p-0 m-0" style="line-height: 3px !important;"><small>{{ post.created_date|cobalt_nice_datetime }}</small></p>
+                          <br>
                         </div>
-                        <div class="col-lg-2 my-auto p-0 m-0">
+                        <div class="col-auto p-0 m-0 text-right justify-content-center align-self-center">
                           <div class="text-center display-3">
                             {{ post.comment_count }}
                           </div>
@@ -188,11 +195,6 @@
                             comment{{ post.comment_count|pluralize}}
                           </div>
                         </div>
-                      </div>
-
-                      <div class="row">
-                        <p class="p-0 m-0 font-italic"><small>{{ post.created_date|naturaltime }}.</small></p>&nbsp;
-                        <p class="p-0 m-0"><small>{{ post.created_date|date:"n M Y P" }}</small></p>
                       </div>
                     </div>
                   </div>

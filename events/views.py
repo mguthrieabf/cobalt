@@ -19,8 +19,8 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    # return render(request, "events/soon.html", {"congresses": congresses})
-    return render(request, "events/home.html", {"congresses": congresses})
+    return render(request, "events/soon.html", {"congresses": congresses})
+    # return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -847,7 +847,7 @@ def enter_event(request, congress_id, event_id):
         date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
         alert_msg = [
             "Early Entry Discount",
-            "You qualify for an early discount if you enter now. You will save $%.2f on this event alone. Discount valid until %s."
+            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
             % (discount, date_field),
         ]
 
