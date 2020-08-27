@@ -117,6 +117,7 @@ DATABASES = {
 #########################################
 ALLOWED_HOSTS = [
     "test.abftech.com.au",
+    "test2.abftech.com.au",
     "uat.abftech.com.au",
     "127.0.0.1",
     "cobalt-uat-3.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
