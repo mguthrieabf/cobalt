@@ -1,8 +1,6 @@
 #!/bin/bash
 
-yum -y install amazon-efs-utils
-
-# Ugly way to get env variables
+# Get env variables.
 EFS_MOUNT_DIR=`cat /opt/elasticbeanstalk/deployment/env | grep MOUNT_DIRECTORY | tr "=" " " | awk '{print $2}'`
 EFS_FILE_SYSTEM_ID=`cat /opt/elasticbeanstalk/deployment/env | grep FILE_SYSTEM_ID | tr "=" " " | awk '{print $2}'`
 
@@ -16,7 +14,7 @@ else
     service rpcidmapd stop
     if [ $? -ne 0 ] ; then
         echo 'ERROR: Failed to stop NFS ID Mapper!'
-        exit 1
+        exit 0
     fi
 fi
 
@@ -26,7 +24,7 @@ if [ ! -d ${EFS_MOUNT_DIR} ]; then
     mkdir -p ${EFS_MOUNT_DIR}
     if [ $? -ne 0 ]; then
         echo 'ERROR: Directory creation failed!'
-        exit 1
+        exit 0
     fi
 else
     echo "Directory ${EFS_MOUNT_DIR} already exists!"
@@ -38,13 +36,13 @@ if [ $? -ne 0 ]; then
     mount -t efs -o tls ${EFS_FILE_SYSTEM_ID}:/ ${EFS_MOUNT_DIR}
     if [ $? -ne 0 ] ; then
         echo 'ERROR: Mount command failed!'
-        exit 1
+        exit 0
     fi
     chmod 777 ${EFS_MOUNT_DIR}
     runuser -l  ec2-user -c "touch ${EFS_MOUNT_DIR}/it_works"
     if [[ $? -ne 0 ]]; then
         echo 'ERROR: Permission Error!'
-        exit 1
+        exit 0
     else
         runuser -l  ec2-user -c "rm -f ${EFS_MOUNT_DIR}/it_works"
     fi
@@ -58,8 +56,6 @@ echo 'EFS mount complete.'
 # instances. There is no access to the directories from elsewhere
 # and the data is not critical so oepn to everyone.
 echo 'Setting Permissions'
-chmod 777 /cobalt-media/django-summernote/
-chmod 777 /cobalt-media/health_check_storage_test/
-chmod 777 /cobalt-media/pic_folder/
+chmod 777 /cobalt-media/*
 
 exit 0
