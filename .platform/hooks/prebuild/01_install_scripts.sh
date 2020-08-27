@@ -33,7 +33,7 @@ alias x='exit'
 . /var/app/venv/staging-LQM1lest/bin/activate
 
 # set environment variables
-`cat /opt/elasticbeanstalk/deployment/env | awk '{print "export",\$1}'`
+\`cat /opt/elasticbeanstalk/deployment/env | awk '{print "export",\$1}'\`
 
 # change to app directory
 cd /var/app/current
