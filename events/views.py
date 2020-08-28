@@ -316,7 +316,6 @@ def create_congress_wizard_2(request, step_list, congress):
             congress.general_info = form.cleaned_data["general_info"]
             congress.links = form.cleaned_data["links"]
             congress.people = form.cleaned_data["people"]
-            congress.people_array = form.cleaned_data["people_array"]
             congress.additional_info = form.cleaned_data["additional_info"]
             congress.save()
             return redirect(
@@ -342,7 +341,6 @@ def create_congress_wizard_2(request, step_list, congress):
     form.fields["general_info"].required = True
     form.fields["links"].required = True
     form.fields["people"].required = True
-    form.fields["people_array"].required = True
 
     return render(
         request,

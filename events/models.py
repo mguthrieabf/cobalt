@@ -89,11 +89,7 @@ class Congress(models.Model):
     )
     raw_html = models.TextField("Raw HTML", null=True, blank=True)
     people = models.TextField("People", null=True, blank=True)
-    people_array = ArrayField(
-        ArrayField(models.CharField(max_length=30, null=True, blank=True)),
-        null=True,
-        blank=True,
-    )
+
     general_info = models.TextField("General Information", null=True, blank=True)
     links = models.TextField("Links", null=True, blank=True)
     payment_method_system_dollars = models.BooleanField(default=True)
