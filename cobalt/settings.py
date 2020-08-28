@@ -100,17 +100,30 @@ RDS_USERNAME = set_value("RDS_USERNAME")
 RDS_PASSWORD = set_value("RDS_PASSWORD")
 RDS_HOSTNAME = set_value("RDS_HOSTNAME")
 RDS_PORT = set_value("RDS_PORT")
+USE_SQLITE = set_value("USE_SQLITE", False)
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": RDS_DB_NAME,
-        "USER": RDS_USERNAME,
-        "PASSWORD": RDS_PASSWORD,
-        "HOST": RDS_HOSTNAME,
-        "PORT": RDS_PORT,
+if USE_SQLITE:
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+
+else:
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": RDS_DB_NAME,
+            "USER": RDS_USERNAME,
+            "PASSWORD": RDS_PASSWORD,
+            "HOST": RDS_HOSTNAME,
+            "PORT": RDS_PORT,
+        }
+    }
+
 
 #########################################
 # Dynamic settings.                     #

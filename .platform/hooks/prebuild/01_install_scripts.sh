@@ -39,7 +39,7 @@ alias x='exit'
 cd /var/app/current
 
 clear
-echo $COBALT_HOSTNAME
+echo \$COBALT_HOSTNAME
 cat /cobalt-media/admin/env.txt
 EOF
 
