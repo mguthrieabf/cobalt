@@ -100,14 +100,15 @@ RDS_USERNAME = set_value("RDS_USERNAME")
 RDS_PASSWORD = set_value("RDS_PASSWORD")
 RDS_HOSTNAME = set_value("RDS_HOSTNAME")
 RDS_PORT = set_value("RDS_PORT")
-USE_SQLITE = set_value("USE_SQLITE", False)
+USE_SQLITE = set_value("USE_SQLITE", 0)
 
-if USE_SQLITE:
-
+print(USE_SQLITE)
+if USE_SQLITE == "True":
+    print("SQLite then")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": BASE_DIR + "/db.sqlite3",
         }
     }
 
