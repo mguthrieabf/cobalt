@@ -257,7 +257,7 @@ STATIC_URL = "/static/"
 
 
 # append MD5 hash to filenames to prevent caching on version change
-STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
