@@ -64,27 +64,27 @@ print("**********************************")
 print("**********************************")
 print("**********************************")
 
-# fmt:off
-response = elbv2.create_rule(
-    Actions=[
-        {
-            'TargetGroupArn': target_group_arn,
-            'Type': 'forward',
-        },
-    ],
-    Conditions=[
-        {
-            'Field': 'path-pattern',
-            "PathPatternConfig": {
-                "Values": [
-                    "/health",
-                    "/health/"
-                ]
-            },
-        },
-    ],
-    ListenerArn=listener_arn,
-    Priority=1,
-)
-
-print(response)
+# # fmt:off
+# response = elbv2.create_rule(
+#     Actions=[
+#         {
+#             'TargetGroupArn': target_group_arn,
+#             'Type': 'forward',
+#         },
+#     ],
+#     Conditions=[
+#         {
+#             'Field': 'path-pattern',
+#             "PathPatternConfig": {
+#                 "Values": [
+#                     "/health",
+#                     "/health/"
+#                 ]
+#             },
+#         },
+#     ],
+#     ListenerArn=listener_arn,
+#     Priority=1,
+# )
+#
+# print(response)
