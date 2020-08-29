@@ -15,7 +15,12 @@ if [ -f /etc/bashrc ]; then
 fi
 # Pretty much everything requires root so su immediately
 alias x='exit'
-sudo -s
+# check if interactive shell or not
+if [[ $- == *i* ]]
+then
+   sudo -s
+fi
+
 EOF
 
 # root bash login script
