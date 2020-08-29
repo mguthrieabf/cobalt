@@ -255,6 +255,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 # STATIC_URL = "https://test.abftech.com.au/static/"
 
+
+# append MD5 hash to filenames to prevent caching on version change
+STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
     MEDIA_ROOT = "/cobalt-media"
