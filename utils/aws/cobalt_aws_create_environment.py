@@ -32,7 +32,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
     print("DNS: %s.abftech.com.au" % eb_dns_name)
     print("\nEnsure you have committed your git changes.\n")
     print(
-        "\nIf ssh is required to complete installation you will need to type YES in about 5 minutes.\n"
+        "If ssh is required to complete installation you will need to type 'yes' in about 5 minutes.\n"
     )
     input("Press Enter to continue...")
 
@@ -77,7 +77,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
                 "ssh",
                 env_name,
                 "--command",
-                "-f sudo /var/app/current/utils/aws/rebuild_test_data_sqlite3.sh",
+                "-f sudo /var/app/current/utils/aws/rebuild_test_database_sqlite3.sh",
             ],
             stdout=subprocess.PIPE,
         )
@@ -87,7 +87,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
                 "ssh",
                 env_name,
                 "--command",
-                "-f sudo crontab /var/app/current/utial/aws/rebuild_test_data_sqlite3_crontab.txt",
+                "-f sudo crontab /var/app/current/utils/aws/rebuild_test_data_sqlite3_crontab.txt",
             ],
             stdout=subprocess.PIPE,
         )

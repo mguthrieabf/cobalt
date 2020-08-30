@@ -7,6 +7,6 @@ if test -f "$FILE"; then
 
 rm $FILE
 
-/var/app/current/support/rebuild_test_data_postgres.sh
+/var/app/current/support/rebuild_test_database_postgres.sh
 
 fi

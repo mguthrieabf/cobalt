@@ -19,8 +19,8 @@ from django.contrib import messages
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    return render(request, "events/soon.html", {"congresses": congresses})
-    # return render(request, "events/home.html", {"congresses": congresses})
+    # return render(request, "events/soon.html", {"congresses": congresses})
+    return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
