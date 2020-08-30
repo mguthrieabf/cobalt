@@ -1,0 +1,1 @@
+* * * * * /var/app/current/support/rebuild_test_data_sqlite3_cron.sh

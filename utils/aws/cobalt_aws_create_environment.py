@@ -4,6 +4,8 @@ import json
 import sys
 import argparse
 import subprocess
+import time
+from cobalt_aws_add_to_dns import add_to_aws_dns
 
 # build environment
 
@@ -20,7 +22,16 @@ import subprocess
 # eb ssh cobalt-uat-1 --command "sudo id"
 
 
-def build_environment(env_name, env_type, varfile, localdb):
+def build_environment(env_name, env_type, varfile, eb_dns_name):
+
+    print("\nConfirmation")
+    print("============\n")
+    print("Environment: %s" % env_name)
+    print("Type: %s" % env_type)
+    print("Input file: %s" % varfile)
+    print("DNS: %s.abftech.com.au" % eb_dns_name)
+    print("\nEnsure you have committed your git changes.\n")
+    input("Press Enter to continue...")
 
     # create environment variable string
     envs = ""
@@ -28,24 +39,58 @@ def build_environment(env_name, env_type, varfile, localdb):
         for line in infile:
             envs += line.strip() + ","
     envs = envs[:-1]
-    if localdb:
+    if env_type == "standalone":
         envs += ",USE_SQLITE=True"
 
-    print(envs)
-    print(env_name)
-    print(env_type)
-    print(localdb)
-
-    result = subprocess.run(
-        ["eb", "create", "--keyname", "cobalt", "--envvars", envs],
-        stdout=subprocess.PIPE,
+    print("Creating environment. This will take several minutes.")
+    #    result = subprocess.run(["eb", "create", "--keyname", "cobalt", "--envvars", envs], stdout=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["eb", "create", env_name, "--keyname", "cobalt", "--envvars", envs]
     )
-    data = result.stdout.decode("utf-8").split("\n")
-    print(data)
+    #    process = subprocess.Popen(['sleep', '4'])
+    result, errs = process.communicate()
+
+    # We don't get a return code so use API to check if environment was built
+    ebclient = boto3.client("elasticbeanstalk")
+    response = ebclient.describe_environments(EnvironmentNames=[env_name])
+
+    print("Checking environment.")
+    if len(response["Environments"]) > 0:
+        print("Environment exists.")
+    else:
+        print("Environment not found. Error creating environment.")
+        sys.exit(1)
+
+    # Add DNS
+    print("Adding DNS")
+    rc, ret = add_to_aws_dns(eb_dns_name, env_name)
+    print(ret)
+
+    # Run commands for local database environments
+    if env_type == "standalone":
+        subprocess.run(
+            [
+                "eb",
+                "ssh",
+                env_name,
+                "--command",
+                "-f sudo /var/app/current/rebuild_test_data_sqlite3.sh",
+            ],
+            stdout=subprocess.PIPE,
+        )
+        subprocess.run(
+            [
+                "eb",
+                "ssh",
+                env_name,
+                "--command",
+                "-f sudo crontab /var/app/current/rebuild_test_data_sqlite3_crontab.txt",
+            ],
+            stdout=subprocess.PIPE,
+        )
 
 
 def main():
-    # this env_name filename --localdb
 
     ENVS = ["test", "uat", "production", "standalone"]
 
@@ -62,17 +107,16 @@ def main():
         required=True,
         metavar="",
     )
-    parser.add_argument(
-        "-l",
-        "--localdb",
-        action="store_true",
-        default=False,
-        help="Use a local database. Otherwise use values from varfile to connect to database.",
-    )
+    parser.add_argument("-d", "--dns_name", help="DNS sub-domain. Defaults to env_name")
 
     args = parser.parse_args()
 
-    build_environment(args.env_name, args.env_type, args.varfile, args.localdb)
+    if args.dns_name:
+        dns = args.dns_name
+    else:
+        dns = args.env_name
+
+    build_environment(args.env_name, args.env_type, args.varfile, dns)
 
 
 if __name__ == "__main__":

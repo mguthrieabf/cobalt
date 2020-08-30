@@ -1,0 +1,1 @@
+* * * * * /var/app/current/support/rebuild_test_data_postgres_cron.sh

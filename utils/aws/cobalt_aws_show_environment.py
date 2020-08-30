@@ -13,6 +13,11 @@ ebclient = boto3.client("elasticbeanstalk")
 
 response = ebclient.describe_environments(EnvironmentNames=[eb_environment_name])
 
+if len(response["Environments"]) > 0:
+    print("Environment exists")
+else:
+    print("Environment not found")
+
 print(response)
 
 print(json.dumps(response, sort_keys=True, indent=4))
