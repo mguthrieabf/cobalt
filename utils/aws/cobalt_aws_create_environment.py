@@ -2,9 +2,11 @@
 import boto3
 import json
 import sys
+import os
 import argparse
 import subprocess
 import time
+from termcolor import colored
 from cobalt_aws_add_to_dns import add_to_aws_dns
 
 # build environment
@@ -30,7 +32,18 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
     print("Type: %s" % env_type)
     print("Input file: %s" % varfile)
     print("DNS: %s.abftech.com.au" % eb_dns_name)
-    print("\nEnsure you have committed your git changes.\n")
+
+    result = subprocess.run(["git", "status", "--short"], stdout=subprocess.PIPE)
+    output = result.stdout.decode("utf-8")
+    if output:
+        print(
+            colored(
+                "\nYou have uncommitted changes in git:",
+                "white",
+                attrs=["reverse", "blink"],
+            )
+        )
+        print(colored(output, "red"))
     print(
         "If ssh is required to complete installation you will need to type 'yes' in about 5 minutes.\n"
     )
@@ -123,4 +136,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Interrupted")
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

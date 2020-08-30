@@ -17,6 +17,7 @@ def sec_from_instance(inst):
     )
 
     js = json.loads(result.stdout.decode("utf-8"))
+
     data = js["Reservations"][0]["Instances"][0]["SecurityGroups"][0]["GroupId"]
     return data
 
