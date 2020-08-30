@@ -13,4 +13,4 @@ cd /var/app/current
 ./manage.py dbshell <support/rebuild_test_data.sql
 
 # include scripts
-/var/app/current/support/rebuild_test_database_subcommands.sh
+/var/app/current/aws/rebuild_test_database_subcommands.sh

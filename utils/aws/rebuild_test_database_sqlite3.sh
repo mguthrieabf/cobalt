@@ -13,7 +13,7 @@ cd /var/app/current
 rm db.sqlite3
 
 # include scripts
-/var/app/current/support/rebuild_test_database_subcommands.sh
+/var/app/current/aws/rebuild_test_database_subcommands.sh
 
 # Change permissions
 chmod 777 db.sqlite3

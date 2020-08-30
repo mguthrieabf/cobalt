@@ -7,6 +7,6 @@ if test -f "$FILE"; then
 
 rm $FILE
 
-/var/app/current/support/rebuild_test_database_sqlite3.sh
+/var/app/current/aws/rebuild_test_database_sqlite3.sh
 
 fi
