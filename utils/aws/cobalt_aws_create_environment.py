@@ -84,6 +84,8 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
 
     # Run commands for local database environments
     if env_type == "standalone":
+        print("Follow up tasks for standalone environment.")
+        print("Setting up test data.")
         subprocess.run(
             [
                 "eb",
@@ -94,6 +96,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
             ],
             stdout=subprocess.PIPE,
         )
+        print("Installing crontab.")
         subprocess.run(
             [
                 "eb",
