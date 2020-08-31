@@ -107,6 +107,31 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
             ],
             stdout=subprocess.PIPE,
         )
+    # Run commands for non-prod environments
+    if env_type in ["test", "uat"]:
+        print("Follow up tasks for non-production environments.")
+        print("Setting up test data.")
+        subprocess.run(
+            [
+                "eb",
+                "ssh",
+                env_name,
+                "--command",
+                "-f sudo /var/app/current/utils/aws/rebuild_test_database_postgres.sh",
+            ],
+            stdout=subprocess.PIPE,
+        )
+        print("Installing crontab.")
+        subprocess.run(
+            [
+                "eb",
+                "ssh",
+                env_name,
+                "--command",
+                "-f sudo crontab /var/app/current/utils/aws/rebuild_test_database_postgres_crontab.txt",
+            ],
+            stdout=subprocess.PIPE,
+        )
 
 
 def main():

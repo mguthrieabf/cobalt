@@ -80,3 +80,7 @@ def events_payments_callback(status, route_payload, tran):
     print(status)
     print(route_payload)
     print(tran)
+
+
+def get_basket_for_user(user):
+    return BasketItem.objects.filter(player=user).count()

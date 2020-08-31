@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from notifications.views import get_notifications_for_user
+from events.core import get_basket_for_user
 
 
 def global_settings(request):
@@ -9,12 +10,15 @@ def global_settings(request):
     if request.user.is_anonymous:
         notifications = {}
         notification_count = 0
+        basket_items = 0
     else:
         (notification_count, notifications) = get_notifications_for_user(request.user)
+        basket_items = get_basket_for_user(request.user)
 
     return {
         "notification_count": notification_count,
         "notifications": notifications,
+        "basket_items": basket_items,
         "COBALT_HOSTNAME": settings.COBALT_HOSTNAME,
         "GLOBAL_ORG": settings.GLOBAL_ORG,
         "GLOBAL_TITLE": settings.GLOBAL_TITLE,
