@@ -50,6 +50,7 @@ from cobalt.settings import (
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
 from notifications.views import contact_member
+from events.core import events_payments_callback
 
 
 #######################
@@ -932,7 +933,6 @@ def stripe_webhook(request):
     # Don't process it twice.
 
     if event.type == "charge.succeeded" and tran_type == "Manual":
-        print("manula and charge succeeded")
         return stripe_webhook_manual(event)
 
     elif event.type == "payment_method.attached":  # auto top up set up successful
@@ -984,6 +984,15 @@ def callback_router(route_code=None, route_payload=None, tran=None, status="Succ
 
         if route_code == "MAN":
             test_callback(status, route_payload, tran)
+            log_event(
+                user="Stripe API",
+                severity="INFO",
+                source="Payments",
+                sub_source="stripe_webhook",
+                message="Callback made to: %s" % route_code,
+            )
+        elif route_code == "EVT":
+            events_payments_callback(status, route_payload, tran)
             log_event(
                 user="Stripe API",
                 severity="INFO",

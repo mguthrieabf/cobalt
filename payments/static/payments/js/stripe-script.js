@@ -10,7 +10,7 @@ var orderData = {
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
 
-fetch("create-payment-intent", {
+fetch("/payments/create-payment-intent", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -113,7 +113,7 @@ var orderComplete = function(clientSecret) {
     changeLoadingState(false);
 
 // notify backend to expect incoming event
-    $.getJSON("stripe-webpage-confirm/" + document.getElementById('transID').value + "/");
+    $.getJSON("/payments/stripe-webpage-confirm/" + document.getElementById('transID').value + "/");
 
   });
 };

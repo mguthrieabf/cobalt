@@ -1,5 +1,7 @@
 from django import template
 from django.utils.dateformat import DateFormat
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -37,3 +39,10 @@ def cobalt_nice_datetime(value):
     time_part = cobalt_time(value)
 
     return f"{date_part} {time_part}"
+
+
+# custom filter for user which includes link to public profile
+@register.filter(name="cobalt_user_link", is_safe=True)
+def cobalt_user_link(user):
+    url = reverse("accounts:public_profile", kwargs={"pk": user.id})
+    return mark_safe(f"<a href='{url}'>{user}</a>")

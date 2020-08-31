@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load cobalt_tags %}
+
+{% block content %}
+
+<div class="container justify-content-center">
+  <div class="row h-100 d-flex justify-content-center">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Congress Checkout</h2>
+      </div>
+      <div class="card-body">
+
+{% for item in basket_items %}
+
+  <div class="card">
+    <div class="card-header card-header-info">
+      <h2>{{ item.event_entry.event.congress }}</h2>
+    </div>
+
+    <div class="card-body table-responsive">
+      <table class="table table-hover">
+        <thead class="text-info">
+
+          <th>Event</th>
+          <th>Type</th>
+
+          <th>Player</th>
+          <th>Your Payments Now</th>
+          <th>Other Payment</th>
+          <th>Payment Method</th>
+        </thead>
+        <tbody>
+          {% for event_entry_player in item.event_entry.evententryplayer_set.all %}
+            <tr>
+              <td>{{ event_entry_player.event_entry.event.event_name }}</td>
+              <td>{{ item.event_entry.event.player_format }}</td>
+
+              <td>{{ event_entry_player.player|cobalt_user_link }}</td>
+              <td>
+                {% if event_entry_player.payment_type == "system-dollars"%}
+                  {{ event_entry_player.entry_fee }}
+                {% endif %}
+              </td>
+              <td>
+                {% if event_entry_player.payment_type != "system-dollars"%}
+                  {{ event_entry_player.entry_fee }}
+                {% endif %}
+              </td>
+              <td>{{ event_entry_player.payment_type }}{{ event_entry_player.batch_id }}</td>
+            </tr>
+          {% endfor %}
+
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ item.event_entry.primary_entrant_payment }}</td>
+            <td></td>
+            <td></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+{% endfor %}
+
+        <form method='post'>
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success cobalt-save" style="width:150px">Pay</button>
+          <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

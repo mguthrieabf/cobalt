@@ -14,11 +14,12 @@ PAYMENT_STATUSES = [
     ("Unpaid", "Entry Unpaid"),
 ]
 PAYMENT_TYPES = [
-    ("System dollars", "%s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
-    ("Bank Transfer", "Bank Transfer"),
-    ("Cash", "Cash"),
-    ("Cheque", "Cheque"),
-    ("Unknown", "Unknown"),
+    ("system-dollars-me", "My %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("system-dollars-them", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("bank-transfer", "Bank Transfer"),
+    ("cash", "Cash"),
+    ("cheque", "Cheque"),
+    ("unknown", "Unknown"),
 ]
 CONGRESS_STATUSES = [
     ("Draft", "Draft"),
@@ -163,6 +164,8 @@ class Event(models.Model):
         null=True,
         blank=True,
     )
+    first_created_date = models.DateTimeField(default=timezone.now)
+    entry_complete_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.congress, self.event_name)
@@ -246,9 +249,6 @@ class EventEntry(models.Model):
     payment_status = models.CharField(
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
-    payment_type = models.CharField(
-        "Payment Type", max_length=20, choices=PAYMENT_TYPES, default="Unknown"
-    )
     primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -257,6 +257,16 @@ class EventEntry(models.Model):
             self.event.event_name,
             self.primary_entrant,
         )
+
+    @property
+    def primary_entrant_payment(self):
+        "Returns the amount outstanding for the primary entrant"
+
+        event_entry_players = EventEntryPlayer.objects.filter(event_entry=self)
+        total = 0.0
+        for event_entry_player in event_entry_players:
+            total += float(event_entry_player.entry_fee)
+        return total
 
 
 class EventEntryPlayer(models.Model):
@@ -267,12 +277,21 @@ class EventEntryPlayer(models.Model):
     player_payment_record = models.ForeignKey(
         MemberTransaction, on_delete=models.CASCADE, null=True, blank=True
     )
+    payment_type = models.CharField(
+        "Payment Type", max_length=20, choices=PAYMENT_TYPES, default="Unknown"
+    )
     payment_status = models.CharField(
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
+    batch_id = models.CharField(
+        "Payment Batch ID", max_length=100, null=True, blank=True
+    )
+    entry_fee = models.DecimalField(
+        "Entry Fee", decimal_places=2, max_digits=10, null=True, blank=True
+    )
 
     def __str__(self):
-        return "%s - %s" % (self.event, self.player)
+        return "%s - %s" % (self.event_entry, self.player)
 
 
 class CongressLink(models.Model):
@@ -300,3 +319,10 @@ class CongressDownload(models.Model):
 
     congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
     text = models.TextField()  # fix later
+
+
+class BasketItem(models.Model):
+    """ items in a basket. We don't define basket itself as it isn't needed """
+
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    event_entry = models.ForeignKey(EventEntry, on_delete=models.CASCADE)

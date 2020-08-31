@@ -9,6 +9,7 @@ from .models import (
     EventEntryPlayer,
     CongressNewsItem,
     CongressDownload,
+    BasketItem,
 )
 
 admin.site.register(CongressMaster)
@@ -20,3 +21,4 @@ admin.site.register(EventEntry)
 admin.site.register(EventEntryPlayer)
 admin.site.register(CongressNewsItem)
 admin.site.register(CongressDownload)
+admin.site.register(BasketItem)

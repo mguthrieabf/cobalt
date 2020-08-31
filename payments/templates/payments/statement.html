@@ -107,11 +107,9 @@
   $(function() {
     $('#auto-button').change(function() {
       if ($(this).prop('checked')) {
-        window.location.href = "{% url "
-        payments: setup_autotopup " %}";
+        window.location.href = "{% url "payments:setup_autotopup" %}";
       } else {
-        window.location.href = "{% url "
-        payments: cancel_autotopup " %}";
+        window.location.href = "{% url "payments:cancel_autotopup" %}";
       }
     })
   })

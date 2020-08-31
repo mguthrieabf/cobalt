@@ -18,19 +18,15 @@
         <h3>{{ congress.name }}</h3>
         <h4>{{ event_start.session_date|cobalt_nice_date }} {{ event_start.session_start|cobalt_time }}</h4>
       </div>
-
-
       <div class="card-body">
         <div class="container h-100 d-flex justify-content-center">
-
-
           <div class="card">
             <div class="card-header card-header-primary">
               <h3>Pairs Entry</h3>
             </div>
-
             <div class="card-body table-responsive card-body-default">
-
+              <form method="POST">
+                {% csrf_token %}
               <table>
                 <thead class="text-warning">
                   <th style="text-align: center;">Players</th>
@@ -39,100 +35,79 @@
                   <th style="text-align: center;">Pending {{ GLOBAL_CURRENCY_SYMBOL }}</th>
                 </thead>
                 <tbody>
-                  <form method="POST">
-                    {% csrf_token %}
-                  <tr>
-                    <td class="col">
-                      <div id="div_id_player1" class="form-group">
-                        <span class="cobalt-form-error" id="id_player1_errors">{{ form.player1.errors|striptags }}</span>
-                        <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Select" id="id_player1" name="player1">
-                          {% for val,item in form.fields.player1.choices %}
-                          <option value="{{ val }}" {% if form.fields.player1.value.0 == val %} selected {% endif %}>{{ item }}</option>
+
+                    <tr>
+                      <td class="col">
+                        <div id="div_id_player1" class="form-group">
+                          <span class="cobalt-form-error" id="id_player1_errors">{{ form.player1.errors|striptags }}</span>
+                          <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Select" id="id_player1" name="player1">
+                            {% for val,item in form.fields.player1.choices %}
+                            <option value="{{ val }}" {% if form.fields.player1.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </td>
+                      <td class="col">
+                        <select id="id_player1_payment" name="player1_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select">
+                          {% for val,item in form.fields.player1_payment.choices %}
+                          <option value="{{ val }}" {% if form.fields.player1_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
                           {% endfor %}
                         </select>
-                      </div>
-                    </td>
-
-                    <td class="col">
-                      <select id="id_player1_payment" name="player1_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select">
-                        {% for val,item in form.fields.player1_payment.choices %}
-                        <option value="{{ val }}" {% if form.fields.player1_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
-                        {% endfor %}
-                      </select>
-
-
-
-
-                    <td class="col-2 align="right">
-                      <nobr>
-                        {% if discount %}
-                      <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
-                          <i class="fas fa-tag"></i>
-                      </span>
-                        {% endif %}
-                      <input id="fee_1_now" class="pay_now" type="text" size="5" readonly value="{{ entry_fee }}">
-                      </nobr>
-                    <td class="col">
-                      <input id="fee_1_later" class="pay_later" type="text" size="5" readonly value="">
-
-                  </tr>
-
-                  <tr>
-                    <td class="col">
-                      <div id="div_id_player1" class="form-group">
-                        <span class="cobalt-form-error" id="id_player2_errors">{{ form.player2.errors|striptags }}</span>
-                        <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Partner" name="player2" id="id_player2">
-                          {% for val,item in form.fields.player2.choices %}
-                          <option value="{{ val }}" {% if form.fields.player2.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                      <td class="col-2 align=" right">
+                        <nobr>
+                          {% if discount %}
+                          <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
+                            <i class="fas fa-tag"></i>
+                          </span>
+                          {% endif %}
+                          <input id="fee_1_now" class="pay_now" type="text" size="5" readonly value="{{ entry_fee }}">
+                        </nobr>
+                      <td class="col">
+                        <input id="fee_1_later" class="pay_later" type="text" size="5" readonly value="">
+                    </tr>
+                    <tr>
+                      <td class="col">
+                        <div id="div_id_player1" class="form-group">
+                          <span class="cobalt-form-error" id="id_player2_errors">{{ form.player2.errors|striptags }}</span>
+                          <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Partner" name="player2" id="id_player2">
+                            {% for val,item in form.fields.player2.choices %}
+                            <option value="{{ val }}" {% if form.fields.player2.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </td>
+                      <td class="col">
+                        <select id="id_player2_payment" name="player2_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select" disabled>
+                          {% for val,item in form.fields.player2_payment.choices %}
+                          <option value="{{ val }}" {% if form.fields.player2_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
                           {% endfor %}
                         </select>
-                      </div>
-                    </td>
-                    <td class="col">
-                      <select id="id_player2_payment" name="player2_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select">
-                        {% for val,item in form.fields.player2_payment.choices %}
-                        <option value="{{ val }}" {% if form.fields.player2_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
-                        {% endfor %}
-                      </select>
-
                       <td class="col" align="right">
                         <span id="player2_discount_alert"></span>
                         <input class="pay_now" id="fee_2_now" type="text" size="5" readonly value="">
-
                       <td class="col">
                         <input class="pay_later" id="fee_2_later" type="text" size="5" readonly value="">
+                    </tr>
+                    <tr>
+                      <td>
+                      <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
+                      <td class="col" align="right">
+                        <input id="total_now" type="text" size="5" readonly value="{{ entry_fee }}">
+                      <td class="col">
+                        <input id="total_later" type="text" size="5" readonly value="">
+                    </tr>
 
-                  </tr>
-
-                  <tr>
-                    <td>
-
-                    <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
-                    <td class="col" align="right">
-                      <input id="total_now" type="text" size="5" readonly value="{{ entry_fee }}">
-
-                    <td class="col">
-                      <input id="total_later" type="text" size="5" readonly value="">
-
-                  </tr>
-                                </form>
                 </tbody>
-
-
               </table>
               <br>
               <div class="row">
                 <button type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px">Checkout Now</button>
                 <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Add to Cart</button>
               </div>
-
+                      </form>
             </div>
-
           </div>
-
-
         </div>
-
       </div>
     </div>
   </div>
@@ -143,12 +118,14 @@
 <script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
 <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
 
 <script>
 
 // re-do totals
 function totals(){
 
+// total_now
   var total_now = 0;
   $('.pay_now').each(function(){
     var val = parseFloat($(this).val());
@@ -162,8 +139,8 @@ function totals(){
     $("#total_now").val(total_now.toFixed(2));
   }
 
+// total_later
   var total_later = 0;
-  console.log(total_later);
   $('.pay_later').each(function(){
       var val = parseFloat($(this).val());
       val = val || 0  // zero if NaN
@@ -179,34 +156,41 @@ function totals(){
 
 $(document).ready(function(){
 
+// show early discount etc msg but only once per congress
   {% if alert_msg %}
 
-  swal.fire({
-      title: "{{ alert_msg.0 }}",
-      html: "{{ alert_msg.1 }}",
-      icon: "success",
-      buttonsStyling: false
-    })
+  var alert0 = "{{ alert_msg.0 }}";
+  var alert0_cookie = alert0.replace(/ /g, "-");
+
+  if (typeof $.cookie(alert0_cookie + '-{{ congress.id }}') === 'undefined') {
+    $.cookie(alert0_cookie+ '-{{ congress.id }}', 'set', {
+      expires: 10000,
+      domain: '',
+      path: ''
+    });
+
+
+    swal.fire({
+        title: "{{ alert_msg.0 }}",
+        html: "{{ alert_msg.1 }}",
+        icon: "success",
+        buttonsStyling: false
+      })
+  }
 
   {% endif %}
 
-
+// init tooltips
   $(".myHover").tooltip();
 
 
 // when player 2 identity changes get their entry fee and update table
   $('#id_player2').on('change', function(e){
-    console.log(this.value,
-                this.options[this.selectedIndex].value,
-                $(this).find("option:selected").val(),);
-
     user_id = this.value;
     $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
       .done(response => {
         msg = response['data']['message'];
         if (msg == 'Success') {
-          console.log(response['data']);
-
           $("#player2_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
                + response['data']['reason']
                + ' $'
@@ -215,19 +199,38 @@ $(document).ready(function(){
 
           $(".myHover").tooltip();
           $("#fee_2_now").val(response['data']['entry_fee']);
+      // enable payment type - must refresh selectpickers
+          $("#id_player2_payment").prop("disabled", false);
+          $('.selectpicker').selectpicker('refresh');
           totals();
         }
       });
   });
 
-// when player payment changes update totals
-$('.payment-method').on('change', function(e){
+// when player payment method changes update totals
+// id of trigger event is id_player(N)_payment
+// we need to change
+$('.payment-method').on('change', function(event){
   var me = event.target.id;
-//  var parts = me.split("_");
-  console.log(me);
+  var parts = me.split("_");
+  var player_no = parts[1].slice(-1);  // last char of word 2
 
-  var lastname = $("#" + parts[0] + "_" + parts[1] + "_lastname")
-  var firstname = $("#" + parts[0] + "_" + parts[1] + "_firstname")
+  var now_payment = $("#fee_" + player_no + "_now");
+  var later_payment = $("#fee_" + player_no + "_later");
+
+// one or other payment field will have a value
+  var pay_amt = now_payment.val() || later_payment.val();
+
+  var selection = $(this).val();
+  if (selection == 'system-dollars') {
+    now_payment.val(pay_amt);
+    later_payment.val("");
+  } else {
+    now_payment.val("");
+    later_payment.val(pay_amt);
+  }
+  totals();
+
 });
 
 });

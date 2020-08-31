@@ -113,7 +113,7 @@ var orderComplete = function(clientSecret) {
     changeLoadingState(false);
 
 // notify backend to expect incoming event
-    $.getJSON("stripe-webpage-confirm/" + document.getElementById('transID').value + "/");
+    $.getJSON("/payments/stripe-webpage-confirm/" + document.getElementById('transID').value + "/");
 
   });
 };

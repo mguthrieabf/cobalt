@@ -3,8 +3,20 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import Congress, CongressMaster, Event, Session
+from django.db.models import Sum, Q
+from .models import (
+    Congress,
+    CongressMaster,
+    Event,
+    Session,
+    EventEntry,
+    EventEntryPlayer,
+    PAYMENT_TYPES,
+    BasketItem,
+)
 from accounts.models import User
+
+# from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -12,8 +24,10 @@ from rbac.core import (
     rbac_get_users_with_role,
 )
 from rbac.views import rbac_forbidden
+from payments.core import payment_api
 from organisations.models import Organisation
 from django.contrib import messages
+import uuid
 
 
 @login_required()
@@ -834,7 +848,7 @@ def enter_event(request, congress_id, event_id):
         (0, "Search..."),
         (4, "Fred Flintstone"),
         (5, "Jim Smith"),
-        (2, "Freda Doghead"),
+        (7, "Freda Doghead"),
         (12, "Dave Gerbil"),
     ]
 
@@ -856,28 +870,62 @@ def enter_event(request, congress_id, event_id):
             % discount,
         ]
 
-    if request.method == "POST":
-        form = EventEntryForm(
-            request.POST,
-            congress=congress,
-            player1_list=player1_list,
-            playerN_list=playerN_list,
-        )
+    # This avoids if request.method == "POST"
 
-        if form.is_valid():
-            if "now" in request.POST:
-                print("Now")
-            if "cart" in request.POST:
-                print("Cart")
-        else:
-            print(form.errors)
+    form = EventEntryForm(
+        request.POST or None,
+        congress=congress,
+        player1_list=player1_list,
+        playerN_list=playerN_list,
+    )
 
+    if form.is_valid():
+        if "now" in request.POST:
+            # save entry and redirect to checkout
+
+            # create event_entry
+            event_entry = EventEntry()
+            event_entry.event = event
+            event_entry.primary_entrant = request.user
+            event_entry.save()
+
+            # add to basket
+            basket_item = BasketItem()
+            basket_item.player = request.user
+            basket_item.event_entry = event_entry
+            basket_item.save()
+
+            # player 1
+            event_entry_player = EventEntryPlayer()
+            event_entry_player.event_entry = event_entry
+            event_entry_player.player = request.user
+            event_entry_player.payment_type = form.cleaned_data["player1_payment"]
+            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
+            event_entry_player.entry_fee = entry_fee
+            event_entry_player.save()
+            messages.success(
+                request, "Entry created p1", extra_tags="cobalt-message-success"
+            )
+
+            # player 2
+            event_entry_player = EventEntryPlayer()
+            event_entry_player.event_entry = event_entry
+            p2 = get_object_or_404(User, pk=form.cleaned_data["player2"])
+            event_entry_player.player = p2
+            event_entry_player.payment_type = form.cleaned_data["player2_payment"]
+            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
+            event_entry_player.entry_fee = entry_fee
+            event_entry_player.save()
+            messages.success(
+                request, "Entry created p2", extra_tags="cobalt-message-success"
+            )
+            return redirect("events:checkout")
+
+        if "cart" in request.POST:
+            # save entry and redirect to congress view
+            print("Cart")
     else:
-        form = EventEntryForm(
-            congress=congress, player1_list=player1_list, playerN_list=playerN_list
-        )
-
-    print(alert_msg)
+        print(form.errors)
 
     return render(
         request,
@@ -894,6 +942,67 @@ def enter_event(request, congress_id, event_id):
             "reason": reason,
         },
     )
+
+
+@login_required()
+def checkout(request):
+    """ Checkout view - make payments, get details """
+
+    basket_items = BasketItem.objects.filter(player=request.user)
+
+    if request.method == "POST":
+        # TODO: restrict to single congresses
+        organisation = (
+            basket_items.first().event_entry.event.congress.congress_master.org
+        )
+
+        # Need to mark the entries that this is covering. The payment call is asynchronous so
+        # we can't just load all the open basket_entries when we come back or more could have been
+        # added.
+
+        unique_id = str(uuid.uuid4())
+
+        # Get list of event_entry_player records to include.
+        event_entries = BasketItem.objects.filter(player=request.user).values_list(
+            "event_entry"
+        )
+        event_entry_players = (
+            EventEntryPlayer.objects.filter(event_entry__in=event_entries)
+            .exclude(payment_status="Paid")
+            .filter(Q(player=request.user) | Q(payment_type="my-system-dollars"))
+            .distinct()
+        )
+
+        # Get total amount
+        amount = event_entry_players.aggregate(Sum("entry_fee"))
+
+        print(amount)
+        print(event_entry_players)
+        for event_entry_player in event_entry_players:
+            event_entry_player.batch_id = unique_id
+            event_entry_player.save()
+
+        return payment_api(
+            request=request,
+            member=request.user,
+            description="Congress Entry",
+            amount=amount["entry_fee__sum"],
+            route_code="EVT",
+            route_payload=unique_id,
+            organisation=organisation,
+            #            log_msg=None,
+            payment_type="Entry to a congress",
+        )
+
+    return render(request, "events/checkout.html", {"basket_items": basket_items})
+
+
+@login_required()
+def admin_summary(request, congress_id):
+    """ Admin View """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+    return render(request, "events/admin_summary.html", {"congress": congress})
 
 
 @login_required()
