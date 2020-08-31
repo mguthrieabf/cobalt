@@ -41,12 +41,12 @@
 
               <td>{{ event_entry_player.player|cobalt_user_link }}</td>
               <td>
-                {% if event_entry_player.payment_type == "system-dollars"%}
+                {% if event_entry_player.payment_type == "my-system-dollars"%}
                   {{ event_entry_player.entry_fee }}
                 {% endif %}
               </td>
               <td>
-                {% if event_entry_player.payment_type != "system-dollars"%}
+                {% if event_entry_player.payment_type != "my-system-dollars"%}
                   {{ event_entry_player.entry_fee }}
                 {% endif %}
               </td>

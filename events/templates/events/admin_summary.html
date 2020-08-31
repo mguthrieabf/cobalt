@@ -32,7 +32,6 @@
           <th>Entry By</th>
           <th>Player</th>
           <th>Player Payment Status</th>
-          <th>Due</th>
           <th>Received</th>
           <th>Outstanding</th>
           <th>Payment Method</th>
@@ -51,19 +50,23 @@
               <td>{{ event_entry_player.player|cobalt_user_link }}</td>
               <td>{{ event_entry_player.payment_status }}</td>
               <td>
-                {% if event_entry_player.payment_type == "system-dollars"%}
+                {% if event_entry_player.payment_type == "my-system-dollars"%}
                   {{ event_entry_player.entry_fee }}
+                {% else %}
+                  0.00
                 {% endif %}
               </td>
               <td>
-                {% if event_entry_player.payment_type != "system-dollars"%}
+                {% if event_entry_player.payment_type != "my-system-dollars"%}
                   {{ event_entry_player.entry_fee }}
+                {% else %}
+                  0.00
                 {% endif %}
               </td>
-              <td></td>
-              <td>{{ event_entry_player.payment_type }}</td>
-              <td>{{ event_entry.first_created_date }}</td>
-              <td>{{ event_entry.entry_complete_date }}</td>
+
+              <td>{{ event_entry_player.get_payment_type_display }}</td>
+              <td>{{ event_entry.first_created_date|cobalt_nice_datetime }}</td>
+              <td>{{ event_entry.entry_complete_date |cobalt_nice_datetime }}</td>
             </tr>
           {% endfor %}
           {% endfor %}

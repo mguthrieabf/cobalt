@@ -13,9 +13,14 @@ PAYMENT_STATUSES = [
     ("Pending Manual", "Pending Manual Payment"),
     ("Unpaid", "Entry Unpaid"),
 ]
+
+# my-system-dollars - you can pay for your own or other people's entries with
+# your money.
+# their-system-dollars - you can use a team mates money to pay for their
+# entry if you have permission
 PAYMENT_TYPES = [
-    ("system-dollars-me", "My %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
-    ("system-dollars-them", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("my-system-dollars", "My %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("their-system-dollars", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
     ("bank-transfer", "Bank Transfer"),
     ("cash", "Cash"),
     ("cheque", "Cheque"),
@@ -164,8 +169,6 @@ class Event(models.Model):
         null=True,
         blank=True,
     )
-    first_created_date = models.DateTimeField(default=timezone.now)
-    entry_complete_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.congress, self.event_name)
@@ -257,6 +260,9 @@ class EventEntry(models.Model):
             self.event.event_name,
             self.primary_entrant,
         )
+
+    first_created_date = models.DateTimeField(default=timezone.now)
+    entry_complete_date = models.DateTimeField(null=True, blank=True)
 
     @property
     def primary_entrant_payment(self):

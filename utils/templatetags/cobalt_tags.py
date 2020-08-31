@@ -11,6 +11,9 @@ register = template.Library()
 @register.filter(name="cobalt_time", expects_localtime=True)
 def cobalt_time(value):
 
+    if not value:
+        return None
+
     hour_str = value.strftime("%I")
     min_str = value.strftime("%M")
     ampm_str = value.strftime("%p").replace(".", "").lower()
@@ -28,12 +31,18 @@ def cobalt_time(value):
 @register.filter(name="cobalt_nice_date", expects_localtime=True)
 def cobalt_nice_date(value):
 
+    if not value:
+        return None
+
     return DateFormat(value).format("l jS M Y")
 
 
 # custom filter for datetime to format as full date
 @register.filter(name="cobalt_nice_datetime", expects_localtime=True)
 def cobalt_nice_datetime(value):
+
+    if not value:
+        return None
 
     date_part = cobalt_nice_date(value)
     time_part = cobalt_time(value)
@@ -44,5 +53,9 @@ def cobalt_nice_datetime(value):
 # custom filter for user which includes link to public profile
 @register.filter(name="cobalt_user_link", is_safe=True)
 def cobalt_user_link(user):
+
+    if not user:
+        return None
+
     url = reverse("accounts:public_profile", kwargs={"pk": user.id})
     return mark_safe(f"<a href='{url}'>{user}</a>")

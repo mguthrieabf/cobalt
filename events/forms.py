@@ -289,7 +289,7 @@ class EventEntryForm(forms.Form):
         pay_types = []
         if congress.payment_method_system_dollars:
             pay_types.append(
-                ("system-dollars", f"{GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+                ("my-system-dollars", f"{GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
             )
         if congress.payment_method_bank_transfer:
             pay_types.append(("bank-transfer", "Bank Transfer"))
