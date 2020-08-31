@@ -233,6 +233,30 @@ changes). Do this using the class cobalt-save:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="template-filters">
+<h2>Template Filters<a class="headerlink" href="#template-filters" title="Permalink to this headline">¶</a></h2>
+<p>You can use the following template filters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="n">load</span> <span class="n">cobalt_tags</span> <span class="o">%</span><span class="p">}</span>
+
+    <span class="p">{{</span> <span class="n">my_date_or_datetime</span><span class="o">|</span><span class="n">cobalt_nice_date</span> <span class="p">}}</span>
+
+    <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">Saturday</span> <span class="mi">7</span><span class="n">th</span> <span class="n">May</span> <span class="mi">2022</span>
+
+    <span class="p">{{</span> <span class="n">my_time_or_datetime</span><span class="o">|</span><span class="n">cobalt_time</span> <span class="p">}}</span>
+
+    <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="mi">10</span><span class="n">am</span> <span class="ow">or</span> <span class="mi">7</span><span class="p">:</span><span class="mi">35</span><span class="n">pm</span>
+
+    <span class="p">{{</span> <span class="n">my_datetime</span><span class="o">|</span><span class="n">cobalt_nice_datetime</span> <span class="p">}}</span>
+
+    <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">Saturday</span> <span class="mi">7</span><span class="n">th</span> <span class="n">May</span> <span class="mi">2022</span> <span class="mi">11</span><span class="p">:</span><span class="mi">32</span><span class="n">am</span>
+
+    <span class="p">{{</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">|</span><span class="n">cobalt_user_link</span> <span class="p">}}</span>
+
+    <span class="n">prints</span> <span class="n">user</span> <span class="k">with</span> <span class="n">a</span> <span class="n">link</span> <span class="n">to</span> <span class="n">their</span> <span class="n">public</span> <span class="n">profile</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span>
+        <span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s1">&#39;/accounts/public_profile/45&#39;</span><span class="o">&gt;</span><span class="n">Peter</span> <span class="n">Parker</span><span class="p">(</span><span class="mi">45654</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="batch-jobs">
 <h1>Batch Jobs<a class="headerlink" href="#batch-jobs" title="Permalink to this headline">¶</a></h1>
@@ -292,6 +316,47 @@ rerun=True (I don’t know how yet!).</p>
 </pre></div>
 </div>
 <p>For Elastic Beanstalk this can be set up with an install script.</p>
+</div>
+</div>
+<div class="section" id="aws-utilities">
+<h1>AWS Utilities<a class="headerlink" href="#aws-utilities" title="Permalink to this headline">¶</a></h1>
+<p>These are specific to the ABF implementation of Cobalt but can be modified
+for use on any other installation that uses AWS Elastic Beanstalk.</p>
+<p>These commands also rely upon the configuration files and scripts that live in
+<code class="docutils literal notranslate"><span class="pre">.ebextensions</span></code> and <code class="docutils literal notranslate"><span class="pre">.platform</span></code>.</p>
+<div class="section" id="cobalt-aws-create-environment-py">
+<h2>cobalt_aws_create_environment.py<a class="headerlink" href="#cobalt-aws-create-environment-py" title="Permalink to this headline">¶</a></h2>
+<p>Creates a new Elastic Beanstalk environment including DNS entries. This requires
+a config file with the environment variables which for obvious security reasons
+is not kept within Github.</p>
+<p>For usage run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">cobalt_aws_create_environment</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">h</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">cobalt_aws_create_environment</span><span class="o">.</span><span class="n">py</span> <span class="n">cobalt</span><span class="o">-</span><span class="n">uat</span><span class="o">-</span><span class="n">pink</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cobalt</span><span class="o">-</span><span class="n">uat</span><span class="o">.</span><span class="n">env</span> <span class="o">--</span><span class="n">env_type</span> <span class="n">uat</span> <span class="o">-</span><span class="n">d</span> <span class="n">uat3</span>
+
+<span class="n">EB</span> <span class="n">Environment</span> <span class="n">Name</span><span class="p">:</span> <span class="n">cobalt</span><span class="o">-</span><span class="n">uat</span><span class="o">-</span><span class="n">pink</span>
+<span class="n">Input</span> <span class="n">config</span> <span class="n">file</span><span class="p">:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">cobalt</span><span class="o">-</span><span class="n">uat</span><span class="o">.</span><span class="n">env</span>
+<span class="n">Environment</span> <span class="nb">type</span><span class="p">:</span> <span class="n">UAT</span>
+<span class="n">DNS</span> <span class="n">name</span><span class="p">:</span> <span class="n">uat3</span><span class="o">.</span><span class="n">abftech</span><span class="o">.</span><span class="n">com</span><span class="o">.</span><span class="n">au</span>
+</pre></div>
+</div>
+<p>The most useful option is <code class="docutils literal notranslate"><span class="pre">--env_type</span> <span class="pre">standalone</span></code> which creates an environment
+with a local sqlite3 database. This won’t interfere with any other environment and
+can be used for specific testing. Note that creating a test or uat environment will
+replace the existing data in those databases with the default test data.</p>
+<p>This script uses ssh to connect to the instance to complete set up. This is only
+intended for single node clusters and is not used for production systems which
+must set up their own environments. As ssh is used you will be prompted to
+confirm the first time connection. You can remove this check (not recommended
+unless you are okay with no server checking which can allow a man-in-the-middle
+attack) by adding this to your .ssh/config:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="o">*</span>
+ <span class="n">StrictHostKeyChecking</span> <span class="n">no</span>
+ <span class="n">UserKnownHostsFile</span><span class="o">=/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span>
+</pre></div>
+</div>
 </div>
 </div>
 

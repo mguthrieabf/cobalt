@@ -108,6 +108,12 @@ You can use the following template filters::
 
       e.g. Saturday 7th May 2022 11:32am
 
+      {{ request.user|cobalt_user_link }}
+
+      prints user with a link to their public profile. e.g.
+          <a href='/accounts/public_profile/45'>Peter Parker(45654)</a>
+
+
 Batch Jobs
 ==========
 
@@ -171,3 +177,48 @@ You need to run batch jobs from cron::
   manage.py runjobs daily
 
 For Elastic Beanstalk this can be set up with an install script.
+
+AWS Utilities
+=============
+
+These are specific to the ABF implementation of Cobalt but can be modified
+for use on any other installation that uses AWS Elastic Beanstalk.
+
+These commands also rely upon the configuration files and scripts that live in
+``.ebextensions`` and ``.platform``.
+
+cobalt_aws_create_environment.py
+--------------------------------
+
+Creates a new Elastic Beanstalk environment including DNS entries. This requires
+a config file with the environment variables which for obvious security reasons
+is not kept within Github.
+
+For usage run::
+
+  python cobalt_aws_create_environment.py -h
+
+For example::
+
+  python cobalt_aws_create_environment.py cobalt-uat-pink /tmp/cobalt-uat.env --env_type uat -d uat3
+
+  EB Environment Name: cobalt-uat-pink
+  Input config file: /tmp/cobalt-uat.env
+  Environment type: UAT
+  DNS name: uat3.abftech.com.au
+
+The most useful option is ``--env_type standalone`` which creates an environment
+with a local sqlite3 database. This won't interfere with any other environment and
+can be used for specific testing. Note that creating a test or uat environment will
+replace the existing data in those databases with the default test data.
+
+This script uses ssh to connect to the instance to complete set up. This is only
+intended for single node clusters and is not used for production systems which
+must set up their own environments. As ssh is used you will be prompted to
+confirm the first time connection. You can remove this check (not recommended
+unless you are okay with no server checking which can allow a man-in-the-middle
+attack) by adding this to your .ssh/config::
+
+  Host *
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null

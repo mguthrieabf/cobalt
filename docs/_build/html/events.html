@@ -201,6 +201,73 @@
 <div class="section" id="module-events.models">
 <span id="events-models-module"></span><h2>events.models module<a class="headerlink" href="#module-events.models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
+<dt id="events.models.BasketItem">
+<em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">BasketItem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#BasketItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.BasketItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
+<p>items in a basket. We don’t define basket itself as it isn’t needed</p>
+<dl class="py exception">
+<dt id="events.models.BasketItem.DoesNotExist">
+<em class="property">exception </em><code class="sig-name descname">DoesNotExist</code><a class="headerlink" href="#events.models.BasketItem.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="events.models.BasketItem.MultipleObjectsReturned">
+<em class="property">exception </em><code class="sig-name descname">MultipleObjectsReturned</code><a class="headerlink" href="#events.models.BasketItem.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.exceptions.MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.event_entry">
+<code class="sig-name descname">event_entry</code><a class="headerlink" href="#events.models.BasketItem.event_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.event_entry_id">
+<code class="sig-name descname">event_entry_id</code><a class="headerlink" href="#events.models.BasketItem.event_entry_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#events.models.BasketItem.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.objects">
+<code class="sig-name descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#events.models.BasketItem.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.player">
+<code class="sig-name descname">player</code><a class="headerlink" href="#events.models.BasketItem.player" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.BasketItem.player_id">
+<code class="sig-name descname">player_id</code><a class="headerlink" href="#events.models.BasketItem.player_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="events.models.Congress">
 <em class="property">class </em><code class="sig-prename descclassname">events.models.</code><code class="sig-name descname">Congress</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Congress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Congress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.base.Model</span></code></p>
@@ -228,8 +295,22 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="events.models.Congress.allow_early_payment_discount">
+<code class="sig-name descname">allow_early_payment_discount</code><a class="headerlink" href="#events.models.Congress.allow_early_payment_discount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="events.models.Congress.allow_partnership_desk">
 <code class="sig-name descname">allow_partnership_desk</code><a class="headerlink" href="#events.models.Congress.allow_partnership_desk" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.allow_youth_payment_discount">
+<code class="sig-name descname">allow_youth_payment_discount</code><a class="headerlink" href="#events.models.Congress.allow_youth_payment_discount" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -251,6 +332,20 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dt id="events.models.Congress.author_id">
 <code class="sig-name descname">author_id</code><a class="headerlink" href="#events.models.Congress.author_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.bank_transfer_details">
+<code class="sig-name descname">bank_transfer_details</code><a class="headerlink" href="#events.models.Congress.bank_transfer_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.cheque_details">
+<code class="sig-name descname">cheque_details</code><a class="headerlink" href="#events.models.Congress.cheque_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="events.models.Congress.congress_master">
@@ -332,6 +427,13 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.Congress.default_email">
 <code class="sig-name descname">default_email</code><a class="headerlink" href="#events.models.Congress.default_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.early_payment_discount_date">
+<code class="sig-name descname">early_payment_discount_date</code><a class="headerlink" href="#events.models.Congress.early_payment_discount_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -491,15 +593,22 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.people_array">
-<code class="sig-name descname">people_array</code><a class="headerlink" href="#events.models.Congress.people_array" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.Congress.raw_html">
+<code class="sig-name descname">raw_html</code><a class="headerlink" href="#events.models.Congress.raw_html" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.Congress.raw_html">
-<code class="sig-name descname">raw_html</code><a class="headerlink" href="#events.models.Congress.raw_html" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.Congress.senior_age">
+<code class="sig-name descname">senior_age</code><a class="headerlink" href="#events.models.Congress.senior_age" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.senior_date">
+<code class="sig-name descname">senior_date</code><a class="headerlink" href="#events.models.Congress.senior_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -563,6 +672,20 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.Congress.year">
 <code class="sig-name descname">year</code><a class="headerlink" href="#events.models.Congress.year" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.youth_payment_discount_age">
+<code class="sig-name descname">youth_payment_discount_age</code><a class="headerlink" href="#events.models.Congress.youth_payment_discount_age" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Congress.youth_payment_discount_date">
+<code class="sig-name descname">youth_payment_discount_date</code><a class="headerlink" href="#events.models.Congress.youth_payment_discount_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -862,8 +985,35 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="events.models.Event.entry_early_payment_discount">
+<code class="sig-name descname">entry_early_payment_discount</code><a class="headerlink" href="#events.models.Event.entry_early_payment_discount" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.entry_fee">
+<code class="sig-name descname">entry_fee</code><a class="headerlink" href="#events.models.Event.entry_fee" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="events.models.Event.entry_fee_for">
+<code class="sig-name descname">entry_fee_for</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Event.entry_fee_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Event.entry_fee_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>return entry fee for user based on age and date</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="events.models.Event.entry_open_date">
 <code class="sig-name descname">entry_open_date</code><a class="headerlink" href="#events.models.Event.entry_open_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.Event.entry_youth_payment_discount">
+<code class="sig-name descname">entry_youth_payment_discount</code><a class="headerlink" href="#events.models.Event.entry_youth_payment_discount" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -885,21 +1035,6 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.Event.evententry_set">
 <code class="sig-name descname">evententry_set</code><a class="headerlink" href="#events.models.Event.evententry_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.Event.evententryplayer_set">
-<code class="sig-name descname">evententryplayer_set</code><a class="headerlink" href="#events.models.Event.evententryplayer_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
 many-to-one relation.</p>
 <p>In the example:</p>
@@ -942,6 +1077,12 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <code class="sig-name descname">id</code><a class="headerlink" href="#events.models.Event.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="events.models.Event.is_open">
+<code class="sig-name descname">is_open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Event.is_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Event.is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if this event is taking entries today</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -998,6 +1139,28 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="events.models.EventEntry.basketitem_set">
+<code class="sig-name descname">basketitem_set</code><a class="headerlink" href="#events.models.EventEntry.basketitem_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntry.entry_complete_date">
+<code class="sig-name descname">entry_complete_date</code><a class="headerlink" href="#events.models.EventEntry.entry_complete_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="events.models.EventEntry.event">
 <code class="sig-name descname">event</code><a class="headerlink" href="#events.models.EventEntry.event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related object on the forward side of a many-to-one or
@@ -1015,21 +1178,46 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <code class="sig-name descname">event_id</code><a class="headerlink" href="#events.models.EventEntry.event_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt id="events.models.EventEntry.evententryplayer_set">
+<code class="sig-name descname">evententryplayer_set</code><a class="headerlink" href="#events.models.EventEntry.evententryplayer_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntry.first_created_date">
+<code class="sig-name descname">first_created_date</code><a class="headerlink" href="#events.models.EventEntry.first_created_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="events.models.EventEntry.get_next_by_first_created_date">
+<code class="sig-name descname">get_next_by_first_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: first_created_date&gt;</em>, <em class="sig-param">is_next=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.EventEntry.get_next_by_first_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt id="events.models.EventEntry.get_payment_status_display">
 <code class="sig-name descname">get_payment_status_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: payment_status&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.EventEntry.get_payment_status_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="events.models.EventEntry.get_previous_by_first_created_date">
+<code class="sig-name descname">get_previous_by_first_created_date</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.DateTimeField: first_created_date&gt;</em>, <em class="sig-param">is_next=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.EventEntry.get_previous_by_first_created_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="events.models.EventEntry.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#events.models.EventEntry.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="events.models.EventEntry.max_entries">
-<code class="sig-name descname">max_entries</code><a class="headerlink" href="#events.models.EventEntry.max_entries" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -1044,6 +1232,30 @@ object the first time, the query is executed.</p>
 <code class="sig-name descname">payment_status</code><a class="headerlink" href="#events.models.EventEntry.payment_status" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntry.primary_entrant">
+<code class="sig-name descname">primary_entrant</code><a class="headerlink" href="#events.models.EventEntry.primary_entrant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntry.primary_entrant_id">
+<code class="sig-name descname">primary_entrant_id</code><a class="headerlink" href="#events.models.EventEntry.primary_entrant_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="events.models.EventEntry.primary_entrant_payment">
+<em class="property">property </em><code class="sig-name descname">primary_entrant_payment</code><a class="headerlink" href="#events.models.EventEntry.primary_entrant_payment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount outstanding for the primary entrant</p>
 </dd></dl>
 
 </dd></dl>
@@ -1066,8 +1278,22 @@ object the first time, the query is executed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.EventEntryPlayer.event">
-<code class="sig-name descname">event</code><a class="headerlink" href="#events.models.EventEntryPlayer.event" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.EventEntryPlayer.batch_id">
+<code class="sig-name descname">batch_id</code><a class="headerlink" href="#events.models.EventEntryPlayer.batch_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntryPlayer.entry_fee">
+<code class="sig-name descname">entry_fee</code><a class="headerlink" href="#events.models.EventEntryPlayer.entry_fee" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntryPlayer.event_entry">
+<code class="sig-name descname">event_entry</code><a class="headerlink" href="#events.models.EventEntryPlayer.event_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related object on the forward side of a many-to-one or
 one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <p>In the example:</p>
@@ -1079,13 +1305,18 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="events.models.EventEntryPlayer.event_id">
-<code class="sig-name descname">event_id</code><a class="headerlink" href="#events.models.EventEntryPlayer.event_id" title="Permalink to this definition">¶</a></dt>
+<dt id="events.models.EventEntryPlayer.event_entry_id">
+<code class="sig-name descname">event_entry_id</code><a class="headerlink" href="#events.models.EventEntryPlayer.event_entry_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="events.models.EventEntryPlayer.get_payment_status_display">
 <code class="sig-name descname">get_payment_status_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: payment_status&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.EventEntryPlayer.get_payment_status_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="events.models.EventEntryPlayer.get_payment_type_display">
+<code class="sig-name descname">get_payment_type_display</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">field=&lt;django.db.models.fields.CharField: payment_type&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#events.models.EventEntryPlayer.get_payment_type_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1103,6 +1334,13 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt id="events.models.EventEntryPlayer.payment_status">
 <code class="sig-name descname">payment_status</code><a class="headerlink" href="#events.models.EventEntryPlayer.payment_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="events.models.EventEntryPlayer.payment_type">
+<code class="sig-name descname">payment_type</code><a class="headerlink" href="#events.models.EventEntryPlayer.payment_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -1298,6 +1536,18 @@ object the first time, the query is executed.</p>
 <div class="section" id="module-events.views">
 <span id="events-views-module"></span><h2>events.views module<a class="headerlink" href="#module-events.views" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
+<dt id="events.views.admin_summary">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">admin_summary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#admin_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.admin_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Admin View</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.checkout">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#checkout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.checkout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checkout view - make payments, get details</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="events.views.create_congress_wizard">
 <code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">create_congress_wizard</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">step</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">congress_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#create_congress_wizard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.create_congress_wizard" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a new congress using a wizard format.</p>
@@ -1402,6 +1652,18 @@ congress. The last steps allows the congress to be published.</p>
 <dt id="events.views.edit_session">
 <code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">event_id</span></em>, <em class="sig-param"><span class="n">session_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>edit session within an event</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.enter_event">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">enter_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em>, <em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#enter_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.enter_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>enter an event</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.fee_for_user_ajax">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">fee_for_user_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#fee_for_user_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.fee_for_user_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax call to get entry fee for a user in an event</p>
 </dd></dl>
 
 <dl class="py function">

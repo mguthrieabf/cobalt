@@ -168,19 +168,6 @@
 <span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">django.contrib.messages</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">messages</span>
 
-<span class="c1">#</span>
-<span class="c1"># import sentry_sdk</span>
-<span class="c1"># from sentry_sdk.integrations.django import DjangoIntegration</span>
-<span class="c1">#</span>
-<span class="c1"># sentry_sdk.init(</span>
-<span class="c1">#     dsn=&quot;https://03fc58740fd4459889c627a99ab9b922@o434604.ingest.sentry.io/5391868&quot;,</span>
-<span class="c1">#     integrations=[DjangoIntegration()],</span>
-<span class="c1">#</span>
-<span class="c1">#     # If you wish to associate users to errors (assuming you are using</span>
-<span class="c1">#     # django.contrib.auth) you may enable sending PII data.</span>
-<span class="c1">#     send_default_pii=True</span>
-<span class="c1"># )</span>
-
 <span class="c1">###########################################</span>
 <span class="c1"># function to set values from environment #</span>
 <span class="c1"># variables.                              #</span>
@@ -246,28 +233,46 @@
 <span class="n">RDS_PASSWORD</span> <span class="o">=</span> <span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;RDS_PASSWORD&quot;</span><span class="p">)</span>
 <span class="n">RDS_HOSTNAME</span> <span class="o">=</span> <span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;RDS_HOSTNAME&quot;</span><span class="p">)</span>
 <span class="n">RDS_PORT</span> <span class="o">=</span> <span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;RDS_PORT&quot;</span><span class="p">)</span>
+<span class="n">USE_SQLITE</span> <span class="o">=</span> <span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;USE_SQLITE&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.db.backends.postgresql_psycopg2&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="n">RDS_DB_NAME</span><span class="p">,</span>
-        <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="n">RDS_USERNAME</span><span class="p">,</span>
-        <span class="s2">&quot;PASSWORD&quot;</span><span class="p">:</span> <span class="n">RDS_PASSWORD</span><span class="p">,</span>
-        <span class="s2">&quot;HOST&quot;</span><span class="p">:</span> <span class="n">RDS_HOSTNAME</span><span class="p">,</span>
-        <span class="s2">&quot;PORT&quot;</span><span class="p">:</span> <span class="n">RDS_PORT</span><span class="p">,</span>
+<span class="k">if</span> <span class="n">USE_SQLITE</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using SQLite&quot;</span><span class="p">)</span>
+    <span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.db.backends.sqlite3&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="n">BASE_DIR</span> <span class="o">+</span> <span class="s2">&quot;/db.sqlite3&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">}</span>
+
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.db.backends.postgresql_psycopg2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="n">RDS_DB_NAME</span><span class="p">,</span>
+            <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="n">RDS_USERNAME</span><span class="p">,</span>
+            <span class="s2">&quot;PASSWORD&quot;</span><span class="p">:</span> <span class="n">RDS_PASSWORD</span><span class="p">,</span>
+            <span class="s2">&quot;HOST&quot;</span><span class="p">:</span> <span class="n">RDS_HOSTNAME</span><span class="p">,</span>
+            <span class="s2">&quot;PORT&quot;</span><span class="p">:</span> <span class="n">RDS_PORT</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
 
 <span class="c1">#########################################</span>
 <span class="c1"># Dynamic settings.                     #</span>
 <span class="c1">#########################################</span>
-<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;test.abftech.com.au&quot;</span><span class="p">,</span> <span class="s2">&quot;uat.abftech.com.au&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">]</span>
+<span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;.abftech.com.au&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 <span class="c1"># For AWS we also need to add the local IP address as this is used by the health checks</span>
 <span class="c1"># We do this dynamically</span>
-<span class="c1"># This gives an error on windows but it can be ignored</span>
-<span class="n">local_ip</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s2">&quot;hostname -I 2&gt;/dev/null&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">ALLOWED_HOSTS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_ip</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<span class="c1"># Windows doesn&#39;t support this and isn&#39;t used on AWS so skip unless Unix</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;posix&quot;</span><span class="p">:</span>
+    <span class="n">local_ip</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s2">&quot;hostname -I 2&gt;/dev/null&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">ALLOWED_HOSTS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_ip</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
 <span class="c1">#########################################</span>
 <span class="c1"># Common settings for all environments  #</span>
@@ -381,6 +386,10 @@
 <span class="c1"># External reference point to find static</span>
 <span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s2">&quot;/static/&quot;</span>
 <span class="c1"># STATIC_URL = &quot;https://test.abftech.com.au/static/&quot;</span>
+
+
+<span class="c1"># append MD5 hash to filenames to prevent caching on version change</span>
+<span class="c1"># STATICFILES_STORAGE = &quot;utils.storage.ForgivingManifestStaticFilesStorage&quot;</span>
 
 <span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;media&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="s2">&quot;FILE_SYSTEM_ID&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>  <span class="c1"># AWS EFS for media</span>

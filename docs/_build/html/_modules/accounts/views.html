@@ -634,7 +634,6 @@
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tab</span> <span class="ow">or</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span>
         <span class="n">posts_active</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;here&quot;</span><span class="p">)</span>
         <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
         <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -643,13 +642,11 @@
         <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
         <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s2">&quot;comment2s&quot;</span><span class="p">:</span>
         <span class="n">comment2s_active</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
         <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">comment1s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment1_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">comment2s</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">comment2_list</span><span class="p">,</span> <span class="n">PAGE_SIZE</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>

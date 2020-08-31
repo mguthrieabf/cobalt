@@ -146,6 +146,9 @@
   <h1>Source code for support.views</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">send_cobalt_email</span>
+<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">COBALT_HOSTNAME</span>
+
 <span class="c1"># from django.http import HttpResponse</span>
 <span class="c1"># from django.utils import timezone</span>
 
@@ -160,6 +163,7 @@
     <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/trigger.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">send_cobalt_email</span><span class="p">(</span><span class="s1">&#39;m@rkguthrie.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Test Data Reset on </span><span class="si">%s</span><span class="s1"> by </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">COBALT_HOSTNAME</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">),</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;support/rebuild.html&quot;</span><span class="p">)</span></div>
 </pre></div>
 

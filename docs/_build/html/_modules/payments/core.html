@@ -196,6 +196,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">StripeTransaction</span><span class="p">,</span> <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">OrganisationTransaction</span>
 <span class="kn">from</span> <span class="nn">notifications.views</span> <span class="kn">import</span> <span class="n">contact_member</span>
+<span class="kn">from</span> <span class="nn">events.core</span> <span class="kn">import</span> <span class="n">events_payments_callback</span>
 
 
 <span class="c1">#######################</span>
@@ -1078,7 +1079,6 @@
     <span class="c1"># Don&#39;t process it twice.</span>
 
     <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;charge.succeeded&quot;</span> <span class="ow">and</span> <span class="n">tran_type</span> <span class="o">==</span> <span class="s2">&quot;Manual&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;manula and charge succeeded&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">stripe_webhook_manual</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;payment_method.attached&quot;</span><span class="p">:</span>  <span class="c1"># auto top up set up successful</span>
@@ -1130,6 +1130,15 @@
 
         <span class="k">if</span> <span class="n">route_code</span> <span class="o">==</span> <span class="s2">&quot;MAN&quot;</span><span class="p">:</span>
             <span class="n">test_callback</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">route_payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">)</span>
+            <span class="n">log_event</span><span class="p">(</span>
+                <span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
+                <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;stripe_webhook&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Callback made to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">route_code</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">route_code</span> <span class="o">==</span> <span class="s2">&quot;EVT&quot;</span><span class="p">:</span>
+            <span class="n">events_payments_callback</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">route_payload</span><span class="p">,</span> <span class="n">tran</span><span class="p">)</span>
             <span class="n">log_event</span><span class="p">(</span>
                 <span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
                 <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span>

@@ -213,7 +213,7 @@
         <span class="s2">&quot;-created_date&quot;</span>
     <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_posts"><a class="viewcode-back" href="../../dashboard.html#dashboard.views.get_posts">[docs]</a><span class="k">def</span> <span class="nf">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
@@ -247,7 +247,7 @@
             <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-created_date&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">cobalt_paginator</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">posts_list</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">posts</span></div>
 </pre></div>

@@ -150,11 +150,27 @@
 <span class="kn">from</span> <span class="nn">organisations.models</span> <span class="kn">import</span> <span class="n">Organisation</span>
 <span class="kn">from</span> <span class="nn">accounts.models</span> <span class="kn">import</span> <span class="n">User</span>
 <span class="kn">from</span> <span class="nn">payments.models</span> <span class="kn">import</span> <span class="n">MemberTransaction</span>
+<span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">GLOBAL_ORG</span><span class="p">,</span> <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span> <span class="n">TIME_ZONE</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
 
 <span class="n">PAYMENT_STATUSES</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s2">&quot;Paid&quot;</span><span class="p">,</span> <span class="s2">&quot;Entry Paid&quot;</span><span class="p">),</span>
     <span class="p">(</span><span class="s2">&quot;Pending Manual&quot;</span><span class="p">,</span> <span class="s2">&quot;Pending Manual Payment&quot;</span><span class="p">),</span>
     <span class="p">(</span><span class="s2">&quot;Unpaid&quot;</span><span class="p">,</span> <span class="s2">&quot;Entry Unpaid&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># my-system-dollars - you can pay for your own or other people&#39;s entries with</span>
+<span class="c1"># your money.</span>
+<span class="c1"># their-system-dollars - you can use a team mates money to pay for their</span>
+<span class="c1"># entry if you have permission</span>
+<span class="n">PAYMENT_TYPES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;my-system-dollars&quot;</span><span class="p">,</span> <span class="s2">&quot;My </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_ORG</span><span class="p">,</span> <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">&quot;their-system-dollars&quot;</span><span class="p">,</span> <span class="s2">&quot;Their </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">GLOBAL_ORG</span><span class="p">,</span> <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">&quot;bank-transfer&quot;</span><span class="p">,</span> <span class="s2">&quot;Bank Transfer&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;cash&quot;</span><span class="p">,</span> <span class="s2">&quot;Cash&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;cheque&quot;</span><span class="p">,</span> <span class="s2">&quot;Cheque&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">),</span>
 <span class="p">]</span>
 <span class="n">CONGRESS_STATUSES</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s2">&quot;Draft&quot;</span><span class="p">,</span> <span class="s2">&quot;Draft&quot;</span><span class="p">),</span>
@@ -225,17 +241,28 @@
     <span class="p">)</span>
     <span class="n">raw_html</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;Raw HTML&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">people</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;People&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">people_array</span> <span class="o">=</span> <span class="n">ArrayField</span><span class="p">(</span>
-        <span class="n">ArrayField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span>
+
     <span class="n">general_info</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;General Information&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">links</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;Links&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">payment_method_system_dollars</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">payment_method_bank_transfer</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">bank_transfer_details</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="s2">&quot;Bank Transfer Details&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
     <span class="n">payment_method_cash</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">payment_method_cheques</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">cheque_details</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="s2">&quot;Cheque Details&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">allow_early_payment_discount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">early_payment_discount_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="s2">&quot;Last day for early discount&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">allow_youth_payment_discount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">youth_payment_discount_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="s2">&quot;Date for age check&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">youth_payment_discount_age</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Cut off age&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">senior_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="s2">&quot;Date for age check&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">senior_age</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Cut off age&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
     <span class="c1"># Open and close dates can be overriden at the event level</span>
     <span class="n">entry_open_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">entry_close_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -273,6 +300,14 @@
     <span class="c1"># Open and close dates can be overriden at the event level</span>
     <span class="n">entry_open_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">entry_close_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">entry_fee</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="s2">&quot;Entry Fee&quot;</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">entry_early_payment_discount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+        <span class="s2">&quot;Early Payment Discount&quot;</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">entry_youth_payment_discount</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+        <span class="s2">&quot;Youth Discount&quot;</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
     <span class="n">player_format</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
         <span class="s2">&quot;Player Format&quot;</span><span class="p">,</span>
         <span class="n">max_length</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
@@ -282,7 +317,58 @@
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Event.is_open"><a class="viewcode-back" href="../../events.html#events.models.Event.is_open">[docs]</a>    <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check if this event is taking entries today &quot;&quot;&quot;</span>
+
+        <span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">open_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_open_date</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">open_date</span><span class="p">:</span>
+            <span class="n">open_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">entry_open_date</span>
+        <span class="k">if</span> <span class="n">today</span> <span class="o">&lt;</span> <span class="n">open_date</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">close_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_close_date</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">close_date</span><span class="p">:</span>
+            <span class="n">close_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">entry_close_date</span>
+        <span class="k">if</span> <span class="n">today</span> <span class="o">&gt;</span> <span class="n">close_date</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Event.entry_fee_for"><a class="viewcode-back" href="../../events.html#events.models.Event.entry_fee_for">[docs]</a>    <span class="k">def</span> <span class="nf">entry_fee_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; return entry fee for user based on age and date &quot;&quot;&quot;</span>
+
+        <span class="c1"># default</span>
+        <span class="n">entry_fee</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_fee</span>
+        <span class="n">discount</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;Full fee&quot;</span>
+
+        <span class="c1"># date</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">allow_early_payment_discount</span><span class="p">:</span>
+            <span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">early_payment_discount_date</span> <span class="o">&gt;=</span> <span class="n">today</span><span class="p">:</span>
+                <span class="n">entry_fee</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_fee</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_early_payment_discount</span>
+                <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;Early discount&quot;</span>
+                <span class="n">discount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_early_payment_discount</span>
+
+        <span class="c1"># youth</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">allow_youth_payment_discount</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="p">:</span>  <span class="c1"># skip if no date of birth set</span>
+                <span class="n">dob</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">dob</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="n">dob</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_aware</span><span class="p">(</span><span class="n">dob</span><span class="p">,</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">TIME_ZONE</span><span class="p">))</span>
+                <span class="n">ref_date</span> <span class="o">=</span> <span class="n">dob</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="n">year</span><span class="o">=</span><span class="n">dob</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">youth_payment_discount_age</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="o">.</span><span class="n">youth_payment_discount_date</span> <span class="o">&lt;=</span> <span class="n">ref_date</span><span class="p">:</span>
+                    <span class="n">youth_fee</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_fee</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_youth_payment_discount</span>
+                    <span class="k">if</span> <span class="n">youth_fee</span> <span class="o">&lt;</span> <span class="n">entry_fee</span><span class="p">:</span>
+                        <span class="n">entry_fee</span> <span class="o">=</span> <span class="n">youth_fee</span>
+                        <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;Youth discount&quot;</span>
+                        <span class="n">discount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entry_youth_payment_discount</span>
+
+        <span class="k">return</span> <span class="n">entry_fee</span><span class="p">,</span> <span class="n">discount</span><span class="p">,</span> <span class="n">reason</span></div></div>
 
 
 <div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../events.html#events.models.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
@@ -309,30 +395,55 @@
     <span class="sd">&quot;&quot;&quot; An entry to an event &quot;&quot;&quot;</span>
 
     <span class="n">event</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
-    <span class="n">payment_status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;Event Name&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-    <span class="n">max_entries</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Maximum Entries&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">payment_status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
         <span class="s2">&quot;Payment Status&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">PAYMENT_STATUSES</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Unpaid&quot;</span>
     <span class="p">)</span>
+    <span class="n">primary_entrant</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">congress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">congress</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">event_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">primary_entrant</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">first_created_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">entry_complete_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">primary_entrant_payment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Returns the amount outstanding for the primary entrant&quot;</span>
+
+        <span class="n">event_entry_players</span> <span class="o">=</span> <span class="n">EventEntryPlayer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">event_entry</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">event_entry_player</span> <span class="ow">in</span> <span class="n">event_entry_players</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_entry_player</span><span class="o">.</span><span class="n">entry_fee</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span></div>
 
 
 <div class="viewcode-block" id="EventEntryPlayer"><a class="viewcode-back" href="../../events.html#events.models.EventEntryPlayer">[docs]</a><span class="k">class</span> <span class="nc">EventEntryPlayer</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A player who is entering an event &quot;&quot;&quot;</span>
 
-    <span class="n">event</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Event</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">event_entry</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">EventEntry</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">player</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">player_payment_record</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
         <span class="n">MemberTransaction</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span>
+    <span class="n">payment_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="s2">&quot;Payment Type&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">PAYMENT_TYPES</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Unknown&quot;</span>
+    <span class="p">)</span>
     <span class="n">payment_status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
         <span class="s2">&quot;Payment Status&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">PAYMENT_STATUSES</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Unpaid&quot;</span>
     <span class="p">)</span>
+    <span class="n">batch_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="s2">&quot;Payment Batch ID&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">entry_fee</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span>
+        <span class="s2">&quot;Entry Fee&quot;</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_entry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CongressLink"><a class="viewcode-back" href="../../events.html#events.models.CongressLink">[docs]</a><span class="k">class</span> <span class="nc">CongressLink</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
@@ -360,6 +471,13 @@
 
     <span class="n">congress</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Congress</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
     <span class="n">text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>  <span class="c1"># fix later</span></div>
+
+
+<div class="viewcode-block" id="BasketItem"><a class="viewcode-back" href="../../events.html#events.models.BasketItem">[docs]</a><span class="k">class</span> <span class="nc">BasketItem</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; items in a basket. We don&#39;t define basket itself as it isn&#39;t needed &quot;&quot;&quot;</span>
+
+    <span class="n">player</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">event_entry</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">EventEntry</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

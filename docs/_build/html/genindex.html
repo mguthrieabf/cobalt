@@ -358,8 +358,6 @@
         <li><a href="accounts.migrations.html#module-accounts.migrations.0018_remove_user_show_facts">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     accounts.models
 
@@ -367,6 +365,8 @@
         <li><a href="accounts.html#module-accounts.models">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     accounts.tokens
 
@@ -434,15 +434,21 @@
 </li>
       <li><a href="payments.html#payments.views.admin_orgs_with_balance_csv">admin_orgs_with_balance_csv() (in module payments.views)</a>
 </li>
+      <li><a href="events.html#events.views.admin_summary">admin_summary() (in module events.views)</a>
+</li>
       <li><a href="rbac.html#rbac.views.admin_tree_screen">admin_tree_screen() (in module rbac.views)</a>
 </li>
       <li><a href="payments.html#payments.views.admin_view_manual_adjustments">admin_view_manual_adjustments() (in module payments.views)</a>
 </li>
       <li><a href="payments.html#payments.views.admin_view_stripe_transactions">admin_view_stripe_transactions() (in module payments.views)</a>
 </li>
+      <li><a href="events.html#events.models.Congress.allow_early_payment_discount">allow_early_payment_discount (events.models.Congress attribute)</a>
+</li>
       <li><a href="events.html#events.models.Congress.allow_partnership_desk">allow_partnership_desk (events.models.Congress attribute)</a>
 </li>
       <li><a href="rbac.html#rbac.core.allow_to_boolean">allow_to_boolean() (in module rbac.core)</a>
+</li>
+      <li><a href="events.html#events.models.Congress.allow_youth_payment_discount">allow_youth_payment_discount (events.models.Congress attribute)</a>
 </li>
       <li><a href="payments.html#payments.models.AbstractTransaction.amount">amount (payments.models.AbstractTransaction attribute)</a>
 
@@ -506,6 +512,8 @@
 </li>
       <li><a href="organisations.html#organisations.models.Organisation.bank_bsb">bank_bsb (organisations.models.Organisation attribute)</a>
 </li>
+      <li><a href="events.html#events.models.Congress.bank_transfer_details">bank_transfer_details (events.models.Congress attribute)</a>
+</li>
       <li><a href="accounts.html#accounts.forms.BlurbUpdateForm.base_fields">base_fields (accounts.forms.BlurbUpdateForm attribute)</a>
 
       <ul>
@@ -542,6 +550,20 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="events.html#events.models.BasketItem">BasketItem (class in events.models)</a>
+</li>
+      <li><a href="events.html#events.models.BasketItem.DoesNotExist">BasketItem.DoesNotExist</a>
+</li>
+      <li><a href="events.html#events.models.BasketItem.MultipleObjectsReturned">BasketItem.MultipleObjectsReturned</a>
+</li>
+      <li><a href="accounts.html#accounts.models.User.basketitem_set">basketitem_set (accounts.models.User attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntry.basketitem_set">(events.models.EventEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="events.html#events.models.EventEntryPlayer.batch_id">batch_id (events.models.EventEntryPlayer attribute)</a>
+</li>
       <li><a href="accounts.html#accounts.models.User.bbo_name">bbo_name (accounts.models.User attribute)</a>
 </li>
       <li><a href="forums.html#forums.models.Forum.bg_colour">bg_colour (forums.models.Forum attribute)</a>
@@ -626,6 +648,10 @@
       <li><a href="accounts.html#accounts.views.change_password">change_password() (in module accounts.views)</a>
 </li>
       <li><a href="notifications.html#notifications.views.check_listener">check_listener() (in module notifications.views)</a>
+</li>
+      <li><a href="events.html#events.views.checkout">checkout() (in module events.views)</a>
+</li>
+      <li><a href="events.html#events.models.Congress.cheque_details">cheque_details (events.models.Congress attribute)</a>
 </li>
       <li><a href="payments.html#payments.forms.ManualTopup.clean">clean() (payments.forms.ManualTopup method)</a>
 
@@ -724,12 +750,12 @@
 </li>
       <li><a href="forums.html#forums.forms.Comment2Form.Meta">Comment2Form.Meta (class in forums.forms)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="forums.html#forums.models.Post.comment_count">comment_count (forums.models.Post attribute)</a>
 </li>
       <li><a href="forums.html#forums.views.comment_edit_common">comment_edit_common() (in module forums.views)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="forums.html#forums.forms.CommentForm">CommentForm (class in forums.forms)</a>
 </li>
       <li><a href="forums.html#forums.forms.CommentForm.Meta">CommentForm.Meta (class in forums.forms)</a>
@@ -848,13 +874,6 @@
         <li><a href="rbac.html#rbac.models.RBACAdminGroup.created_date">(rbac.models.RBACAdminGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACGroup.created_date">(rbac.models.RBACGroup attribute)</a>
-</li>
-      </ul></li>
-      <li>
-    cron
-
-      <ul>
-        <li><a href="cron.html#module-cron">module</a>
 </li>
       </ul></li>
       <li>
@@ -1178,11 +1197,15 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="events.html#events.models.Congress.early_payment_discount_date">early_payment_discount_date (events.models.Congress attribute)</a>
+</li>
       <li><a href="events.html#events.views.edit_event">edit_event() (in module events.views)</a>
 </li>
       <li><a href="events.html#events.views.edit_session">edit_session() (in module events.views)</a>
 </li>
       <li><a href="events.html#events.models.Congress.end_date">end_date (events.models.Congress attribute)</a>
+</li>
+      <li><a href="events.html#events.views.enter_event">enter_event() (in module events.views)</a>
 </li>
       <li><a href="events.html#events.models.Congress.entry_close_date">entry_close_date (events.models.Congress attribute)</a>
 
@@ -1190,7 +1213,19 @@
         <li><a href="events.html#events.models.Event.entry_close_date">(events.models.Event attribute)</a>
 </li>
       </ul></li>
-      <li><a href="events.html#events.models.EventEntryType.entry_fee">entry_fee (events.models.EventEntryType attribute)</a>
+      <li><a href="events.html#events.models.EventEntry.entry_complete_date">entry_complete_date (events.models.EventEntry attribute)</a>
+</li>
+      <li><a href="events.html#events.models.Event.entry_early_payment_discount">entry_early_payment_discount (events.models.Event attribute)</a>
+</li>
+      <li><a href="events.html#events.models.Event.entry_fee">entry_fee (events.models.Event attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntryPlayer.entry_fee">(events.models.EventEntryPlayer attribute)</a>
+</li>
+        <li><a href="events.html#events.models.EventEntryType.entry_fee">(events.models.EventEntryType attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="events.html#events.models.Event.entry_fee_for">entry_fee_for() (events.models.Event method)</a>
 </li>
       <li><a href="events.html#events.models.Congress.entry_open_date">entry_open_date (events.models.Congress attribute)</a>
 
@@ -1198,13 +1233,13 @@
         <li><a href="events.html#events.models.Event.entry_open_date">(events.models.Event attribute)</a>
 </li>
       </ul></li>
+      <li><a href="events.html#events.models.Event.entry_youth_payment_discount">entry_youth_payment_discount (events.models.Event attribute)</a>
+</li>
       <li><a href="events.html#events.models.Event">Event (class in events.models)</a>
 </li>
       <li><a href="events.html#events.models.EventEntry.event">event (events.models.EventEntry attribute)</a>
 
       <ul>
-        <li><a href="events.html#events.models.EventEntryPlayer.event">(events.models.EventEntryPlayer attribute)</a>
-</li>
         <li><a href="events.html#events.models.EventEntryType.event">(events.models.EventEntryType attribute)</a>
 </li>
         <li><a href="events.html#events.models.Session.event">(events.models.Session attribute)</a>
@@ -1216,13 +1251,23 @@
 </li>
       <li><a href="logs.html#logs.models.Log.event_date">event_date (logs.models.Log attribute)</a>
 </li>
+      <li><a href="events.html#events.models.BasketItem.event_entry">event_entry (events.models.BasketItem attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntryPlayer.event_entry">(events.models.EventEntryPlayer attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="events.html#events.models.BasketItem.event_entry_id">event_entry_id (events.models.BasketItem attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntryPlayer.event_entry_id">(events.models.EventEntryPlayer attribute)</a>
+</li>
+      </ul></li>
       <li><a href="events.html#events.models.EventEntryType.event_entry_type">event_entry_type (events.models.EventEntryType attribute)</a>
 </li>
       <li><a href="events.html#events.models.EventEntry.event_id">event_id (events.models.EventEntry attribute)</a>
 
       <ul>
-        <li><a href="events.html#events.models.EventEntryPlayer.event_id">(events.models.EventEntryPlayer attribute)</a>
-</li>
         <li><a href="events.html#events.models.EventEntryType.event_id">(events.models.EventEntryType attribute)</a>
 </li>
         <li><a href="events.html#events.models.Session.event_id">(events.models.Session attribute)</a>
@@ -1230,6 +1275,8 @@
       </ul></li>
       <li><a href="events.html#events.models.Event.event_name">event_name (events.models.Event attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="events.html#events.models.Congress.event_set">event_set (events.models.Congress attribute)</a>
 </li>
       <li><a href="events.html#events.models.Event.event_type">event_type (events.models.Event attribute)</a>
@@ -1242,12 +1289,14 @@
 </li>
       <li><a href="events.html#events.models.EventEntry.DoesNotExist">EventEntry.DoesNotExist</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="events.html#events.models.EventEntry.MultipleObjectsReturned">EventEntry.MultipleObjectsReturned</a>
 </li>
-      <li><a href="events.html#events.models.Event.evententry_set">evententry_set (events.models.Event attribute)</a>
+      <li><a href="accounts.html#accounts.models.User.evententry_set">evententry_set (accounts.models.User attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.Event.evententry_set">(events.models.Event attribute)</a>
 </li>
+      </ul></li>
       <li><a href="events.html#events.models.EventEntryPlayer">EventEntryPlayer (class in events.models)</a>
 </li>
       <li><a href="events.html#events.models.EventEntryPlayer.DoesNotExist">EventEntryPlayer.DoesNotExist</a>
@@ -1257,7 +1306,7 @@
       <li><a href="accounts.html#accounts.models.User.evententryplayer_set">evententryplayer_set (accounts.models.User attribute)</a>
 
       <ul>
-        <li><a href="events.html#events.models.Event.evententryplayer_set">(events.models.Event attribute)</a>
+        <li><a href="events.html#events.models.EventEntry.evententryplayer_set">(events.models.EventEntry attribute)</a>
 </li>
         <li><a href="payments.html#payments.models.MemberTransaction.evententryplayer_set">(payments.models.MemberTransaction attribute)</a>
 </li>
@@ -1327,6 +1376,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="events.html#events.views.fee_for_user_ajax">fee_for_user_ajax() (in module events.views)</a>
+</li>
       <li><a href="forums.html#forums.models.Forum.fg_colour">fg_colour (forums.models.Forum attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.forms.BlurbUpdateForm.Meta.fields">fields (accounts.forms.BlurbUpdateForm.Meta attribute)</a>
@@ -1351,6 +1402,8 @@
         <li><a href="payments.html#payments.forms.AdjustOrgForm.Meta.fields">(payments.forms.AdjustOrgForm.Meta attribute)</a>
 </li>
       </ul></li>
+      <li><a href="events.html#events.models.EventEntry.first_created_date">first_created_date (events.models.EventEntry attribute)</a>
+</li>
       <li><a href="forums.html#forums.views.follow_forum_ajax">follow_forum_ajax() (in module forums.views)</a>
 </li>
       <li><a href="forums.html#forums.views.follow_post_ajax">follow_post_ajax() (in module forums.views)</a>
@@ -1590,6 +1643,8 @@
 </li>
       <li><a href="logs.html#logs.models.Log.get_next_by_event_date">get_next_by_event_date() (logs.models.Log method)</a>
 </li>
+      <li><a href="events.html#events.models.EventEntry.get_next_by_first_created_date">get_next_by_first_created_date() (events.models.EventEntry method)</a>
+</li>
       <li><a href="payments.html#payments.models.StripeTransaction.get_next_by_last_change_date">get_next_by_last_change_date() (payments.models.StripeTransaction method)</a>
 </li>
       <li><a href="events.html#events.models.Congress.get_next_by_last_updated">get_next_by_last_updated() (events.models.Congress method)</a>
@@ -1610,6 +1665,8 @@
         <li><a href="events.html#events.models.EventEntryPlayer.get_payment_status_display">(events.models.EventEntryPlayer method)</a>
 </li>
       </ul></li>
+      <li><a href="events.html#events.models.EventEntryPlayer.get_payment_type_display">get_payment_type_display() (events.models.EventEntryPlayer method)</a>
+</li>
       <li><a href="events.html#events.models.Event.get_player_format_display">get_player_format_display() (events.models.Event method)</a>
 </li>
       <li><a href="dashboard.html#dashboard.views.get_posts">get_posts() (in module dashboard.views)</a>
@@ -1645,6 +1702,8 @@
       <li><a href="accounts.html#accounts.models.User.get_previous_by_date_joined">get_previous_by_date_joined() (accounts.models.User method)</a>
 </li>
       <li><a href="logs.html#logs.models.Log.get_previous_by_event_date">get_previous_by_event_date() (logs.models.Log method)</a>
+</li>
+      <li><a href="events.html#events.models.EventEntry.get_previous_by_first_created_date">get_previous_by_first_created_date() (events.models.EventEntry method)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.get_previous_by_last_change_date">get_previous_by_last_change_date() (payments.models.StripeTransaction method)</a>
 </li>
@@ -1757,6 +1816,8 @@
       <li><a href="accounts.html#accounts.models.User.id">id (accounts.models.User attribute)</a>
 
       <ul>
+        <li><a href="events.html#events.models.BasketItem.id">(events.models.BasketItem attribute)</a>
+</li>
         <li><a href="events.html#events.models.Congress.id">(events.models.Congress attribute)</a>
 </li>
         <li><a href="events.html#events.models.CongressDownload.id">(events.models.CongressDownload attribute)</a>
@@ -1861,6 +1922,8 @@
 </li>
       </ul></li>
       <li><a href="logs.html#logs.models.Log.ip">ip (logs.models.Log attribute)</a>
+</li>
+      <li><a href="events.html#events.models.Event.is_open">is_open() (events.models.Event method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2176,11 +2239,7 @@
       <li><a href="masterpoints.html#masterpoints.apps.MasterpointsConfig">MasterpointsConfig (class in masterpoints.apps)</a>
 </li>
       <li><a href="events.html#events.models.Event.max_entries">max_entries (events.models.Event attribute)</a>
-
-      <ul>
-        <li><a href="events.html#events.models.EventEntry.max_entries">(events.models.EventEntry attribute)</a>
 </li>
-      </ul></li>
       <li><a href="accounts.html#accounts.admin.UserAdmin.media">media() (accounts.admin.UserAdmin property)</a>
 
       <ul>
@@ -2624,8 +2683,6 @@
         <li><a href="cobalt.html#module-cobalt.urls">cobalt.urls</a>
 </li>
         <li><a href="cobalt.html#module-cobalt.wsgi">cobalt.wsgi</a>
-</li>
-        <li><a href="cron.html#module-cron">cron</a>
 </li>
         <li><a href="cron.migrations.html#module-cron.migrations">cron.migrations</a>
 </li>
@@ -3141,9 +3198,11 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="events.html#events.models.Congress.objects">objects (events.models.Congress attribute)</a>
+      <li><a href="events.html#events.models.BasketItem.objects">objects (events.models.BasketItem attribute)</a>
 
       <ul>
+        <li><a href="events.html#events.models.Congress.objects">(events.models.Congress attribute)</a>
+</li>
         <li><a href="events.html#events.models.CongressDownload.objects">(events.models.CongressDownload attribute)</a>
 </li>
         <li><a href="events.html#events.models.CongressLink.objects">(events.models.CongressLink attribute)</a>
@@ -3593,6 +3652,8 @@
         <li><a href="events.html#events.models.EventEntryPlayer.payment_status">(events.models.EventEntryPlayer attribute)</a>
 </li>
       </ul></li>
+      <li><a href="events.html#events.models.EventEntryPlayer.payment_type">payment_type (events.models.EventEntryPlayer attribute)</a>
+</li>
       <li>
     payments
 
@@ -3782,8 +3843,6 @@
         <li><a href="payments.migrations.html#module-payments.migrations.0021_auto_20200429_1451">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     payments.migrations.0022_auto_20200502_1048
 
@@ -3791,6 +3850,8 @@
         <li><a href="payments.migrations.html#module-payments.migrations.0022_auto_20200502_1048">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     payments.migrations.0023_auto_20200505_1307
 
@@ -3893,18 +3954,24 @@
 </li>
       <li><a href="events.html#events.models.Congress.people">people (events.models.Congress attribute)</a>
 </li>
-      <li><a href="events.html#events.models.Congress.people_array">people_array (events.models.Congress attribute)</a>
-</li>
       <li><a href="accounts.html#accounts.models.User.phone_regex">phone_regex (accounts.models.User attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.models.User.pic">pic (accounts.models.User attribute)</a>
 </li>
-      <li><a href="events.html#events.models.EventEntryPlayer.player">player (events.models.EventEntryPlayer attribute)</a>
+      <li><a href="events.html#events.models.BasketItem.player">player (events.models.BasketItem attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntryPlayer.player">(events.models.EventEntryPlayer attribute)</a>
 </li>
+      </ul></li>
       <li><a href="events.html#events.models.Event.player_format">player_format (events.models.Event attribute)</a>
 </li>
-      <li><a href="events.html#events.models.EventEntryPlayer.player_id">player_id (events.models.EventEntryPlayer attribute)</a>
+      <li><a href="events.html#events.models.BasketItem.player_id">player_id (events.models.BasketItem attribute)</a>
+
+      <ul>
+        <li><a href="events.html#events.models.EventEntryPlayer.player_id">(events.models.EventEntryPlayer attribute)</a>
 </li>
+      </ul></li>
       <li><a href="events.html#events.models.EventEntryPlayer.player_payment_record">player_payment_record (events.models.EventEntryPlayer attribute)</a>
 </li>
       <li><a href="events.html#events.models.EventEntryPlayer.player_payment_record_id">player_payment_record_id (events.models.EventEntryPlayer attribute)</a>
@@ -3954,6 +4021,12 @@
       <li><a href="forums.html#forums.forms.PostForm">PostForm (class in forums.forms)</a>
 </li>
       <li><a href="forums.html#forums.forms.PostForm.Meta">PostForm.Meta (class in forums.forms)</a>
+</li>
+      <li><a href="events.html#events.models.EventEntry.primary_entrant">primary_entrant (events.models.EventEntry attribute)</a>
+</li>
+      <li><a href="events.html#events.models.EventEntry.primary_entrant_id">primary_entrant_id (events.models.EventEntry attribute)</a>
+</li>
+      <li><a href="events.html#events.models.EventEntry.primary_entrant_payment">primary_entrant_payment() (events.models.EventEntry property)</a>
 </li>
       <li><a href="accounts.html#accounts.models.User.primary_member">primary_member (accounts.models.User attribute)</a>
 </li>
@@ -4496,6 +4569,10 @@
 </li>
       <li><a href="notifications.html#notifications.views.send_cobalt_sms">send_cobalt_sms() (in module notifications.views)</a>
 </li>
+      <li><a href="events.html#events.models.Congress.senior_age">senior_age (events.models.Congress attribute)</a>
+</li>
+      <li><a href="events.html#events.models.Congress.senior_date">senior_date (events.models.Congress attribute)</a>
+</li>
       <li><a href="events.html#events.models.Session">Session (class in events.models)</a>
 </li>
       <li><a href="events.html#events.models.Session.DoesNotExist">Session.DoesNotExist</a>
@@ -4560,10 +4637,10 @@
 </li>
       <li><a href="payments.html#payments.views.stripe_autotopup_confirm">stripe_autotopup_confirm() (in module payments.views)</a>
 </li>
-      <li><a href="payments.html#payments.views.stripe_autotopup_off">stripe_autotopup_off() (in module payments.views)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="payments.html#payments.views.stripe_autotopup_off">stripe_autotopup_off() (in module payments.views)</a>
+</li>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_brand">stripe_brand (payments.models.StripeTransaction attribute)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_country">stripe_country (payments.models.StripeTransaction attribute)</a>
@@ -4816,6 +4893,12 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="events.html#events.models.Congress.year">year (events.models.Congress attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="events.html#events.models.Congress.youth_payment_discount_age">youth_payment_discount_age (events.models.Congress attribute)</a>
+</li>
+      <li><a href="events.html#events.models.Congress.youth_payment_discount_date">youth_payment_discount_date (events.models.Congress attribute)</a>
 </li>
   </ul></td>
 </tr></table>
