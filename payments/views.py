@@ -341,11 +341,12 @@ def statement_org(request, org_id):
 
     page_balance = {}
 
-    page_balance["closing_balance"] = things[0].balance
-    page_balance["closing_date"] = things[0].created_date
-    earliest = things[len(things) - 1]
-    page_balance["opening_balance"] = earliest.balance - earliest.amount
-    page_balance["opening_date"] = earliest.created_date
+    if things:
+        page_balance["closing_balance"] = things[0].balance
+        page_balance["closing_date"] = things[0].created_date
+        earliest = things[len(things) - 1]
+        page_balance["opening_balance"] = earliest.balance - earliest.amount
+        page_balance["opening_date"] = earliest.created_date
 
     return render(
         request,

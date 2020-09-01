@@ -305,12 +305,12 @@ class EventEntryForm(forms.Form):
         self.fields["player2_payment"].value = pay_types[0]
         self.fields["player1"].value = player1_list[0]
 
-        self.fields["player2"].required = False
-
-    def clean_player2(self):
-        print("clean p2")
-        player2 = self.cleaned_data["player2"]
-        return player2
+    #     self.fields["player2"].required = False
+    #
+    # def clean(self):
+    #     print("clean p2")
+    #     player2 = self.cleaned_data["player2"]
+    #     return player2
 
     player1 = forms.ChoiceField()
     player2 = forms.ChoiceField()
