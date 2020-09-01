@@ -487,11 +487,12 @@
 
     <span class="n">page_balance</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;closing_balance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">balance</span>
-    <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;closing_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">created_date</span>
-    <span class="n">earliest</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">things</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;opening_balance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">earliest</span><span class="o">.</span><span class="n">balance</span> <span class="o">-</span> <span class="n">earliest</span><span class="o">.</span><span class="n">amount</span>
-    <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;opening_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">earliest</span><span class="o">.</span><span class="n">created_date</span>
+    <span class="k">if</span> <span class="n">things</span><span class="p">:</span>
+        <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;closing_balance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">balance</span>
+        <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;closing_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">created_date</span>
+        <span class="n">earliest</span> <span class="o">=</span> <span class="n">things</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">things</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;opening_balance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">earliest</span><span class="o">.</span><span class="n">balance</span> <span class="o">-</span> <span class="n">earliest</span><span class="o">.</span><span class="n">amount</span>
+        <span class="n">page_balance</span><span class="p">[</span><span class="s2">&quot;opening_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">earliest</span><span class="o">.</span><span class="n">created_date</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>

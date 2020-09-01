@@ -224,7 +224,6 @@
             <span class="c1"># add item and any existing lower parts of tree to choices</span>
             <span class="n">item</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">item</span>
             <span class="k">for</span> <span class="n">wtree</span> <span class="ow">in</span> <span class="n">whole_tree</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">wtree</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">wtree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">wtree</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">already_included</span><span class="p">:</span>
                     <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">wtree</span><span class="p">,</span> <span class="n">wtree</span><span class="p">))</span>
                     <span class="n">already_included</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wtree</span><span class="p">)</span>

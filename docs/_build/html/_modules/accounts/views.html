@@ -378,7 +378,7 @@
                         <span class="s2">&quot;global_org&quot;</span><span class="p">:</span> <span class="n">global_org</span><span class="p">,</span>
                     <span class="p">},</span>
                 <span class="p">)</span>
-                <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">,</span> <span class="s2">&quot;member&quot;</span><span class="p">:</span> <span class="n">member</span><span class="o">.</span><span class="n">full_name</span><span class="p">}</span>
+                <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">html</span><span class="p">,</span> <span class="s2">&quot;member&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">member</span><span class="p">}</span>
                 <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request&quot;</span><span class="p">})</span></div>
 

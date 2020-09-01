@@ -450,6 +450,8 @@
 </li>
       <li><a href="events.html#events.models.Congress.allow_youth_payment_discount">allow_youth_payment_discount (events.models.Congress attribute)</a>
 </li>
+      <li><a href="events.html#events.models.Event.already_entered">already_entered() (events.models.Event method)</a>
+</li>
       <li><a href="payments.html#payments.models.AbstractTransaction.amount">amount (payments.models.AbstractTransaction attribute)</a>
 
       <ul>
@@ -748,10 +750,10 @@
       </ul></li>
       <li><a href="forums.html#forums.forms.Comment2Form">Comment2Form (class in forums.forms)</a>
 </li>
-      <li><a href="forums.html#forums.forms.Comment2Form.Meta">Comment2Form.Meta (class in forums.forms)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="forums.html#forums.forms.Comment2Form.Meta">Comment2Form.Meta (class in forums.forms)</a>
+</li>
       <li><a href="forums.html#forums.models.Post.comment_count">comment_count (forums.models.Post attribute)</a>
 </li>
       <li><a href="forums.html#forums.views.comment_edit_common">comment_edit_common() (in module forums.views)</a>
@@ -874,13 +876,6 @@
         <li><a href="rbac.html#rbac.models.RBACAdminGroup.created_date">(rbac.models.RBACAdminGroup attribute)</a>
 </li>
         <li><a href="rbac.html#rbac.models.RBACGroup.created_date">(rbac.models.RBACGroup attribute)</a>
-</li>
-      </ul></li>
-      <li>
-    cron.migrations
-
-      <ul>
-        <li><a href="cron.migrations.html#module-cron.migrations">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1813,9 +1808,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="accounts.html#accounts.models.User.id">id (accounts.models.User attribute)</a>
+      <li><a href="accounts.html#accounts.models.TeamMate.id">id (accounts.models.TeamMate attribute)</a>
 
       <ul>
+        <li><a href="accounts.html#accounts.models.User.id">(accounts.models.User attribute)</a>
+</li>
         <li><a href="events.html#events.models.BasketItem.id">(events.models.BasketItem attribute)</a>
 </li>
         <li><a href="events.html#events.models.Congress.id">(events.models.Congress attribute)</a>
@@ -2146,6 +2143,8 @@
       <li><a href="rbac.html#rbac.views.main_admin_screen">main_admin_screen() (in module rbac.views)</a>
 </li>
       <li><a href="accounts.html#accounts.models.User.main_member">main_member (accounts.models.User attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.TeamMate.make_payments">make_payments (accounts.models.TeamMate attribute)</a>
 </li>
       <li>
     manage
@@ -2602,6 +2601,8 @@
         <li><a href="rbac.html#rbac.models.RBACGroupRole.model_id">(rbac.models.RBACGroupRole attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -2683,8 +2684,6 @@
         <li><a href="cobalt.html#module-cobalt.urls">cobalt.urls</a>
 </li>
         <li><a href="cobalt.html#module-cobalt.wsgi">cobalt.wsgi</a>
-</li>
-        <li><a href="cron.migrations.html#module-cron.migrations">cron.migrations</a>
 </li>
         <li><a href="dashboard.html#module-dashboard">dashboard</a>
 </li>
@@ -3198,9 +3197,11 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="events.html#events.models.BasketItem.objects">objects (events.models.BasketItem attribute)</a>
+      <li><a href="accounts.html#accounts.models.TeamMate.objects">objects (accounts.models.TeamMate attribute)</a>
 
       <ul>
+        <li><a href="events.html#events.models.BasketItem.objects">(events.models.BasketItem attribute)</a>
+</li>
         <li><a href="events.html#events.models.Congress.objects">(events.models.Congress attribute)</a>
 </li>
         <li><a href="events.html#events.models.CongressDownload.objects">(events.models.CongressDownload attribute)</a>
@@ -4026,8 +4027,6 @@
 </li>
       <li><a href="events.html#events.models.EventEntry.primary_entrant_id">primary_entrant_id (events.models.EventEntry attribute)</a>
 </li>
-      <li><a href="events.html#events.models.EventEntry.primary_entrant_payment">primary_entrant_payment() (events.models.EventEntry property)</a>
-</li>
       <li><a href="accounts.html#accounts.models.User.primary_member">primary_member (accounts.models.User attribute)</a>
 </li>
       <li><a href="organisations.html#organisations.models.Organisation.primary_org">primary_org (organisations.models.Organisation attribute)</a>
@@ -4768,6 +4767,20 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="accounts.html#accounts.models.TeamMate.team_mate">team_mate (accounts.models.TeamMate attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.TeamMate.team_mate_id">team_mate_id (accounts.models.TeamMate attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.User.team_mate_team_mate">team_mate_team_mate (accounts.models.User attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.User.team_mate_user">team_mate_user (accounts.models.User attribute)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.TeamMate">TeamMate (class in accounts.models)</a>
+</li>
+      <li><a href="accounts.html#accounts.models.TeamMate.DoesNotExist">TeamMate.DoesNotExist</a>
+</li>
+      <li><a href="accounts.html#accounts.models.TeamMate.MultipleObjectsReturned">TeamMate.MultipleObjectsReturned</a>
+</li>
       <li><a href="payments.html#payments.core.test_callback">test_callback() (in module payments.core)</a>
 </li>
       <li><a href="payments.html#payments.views.test_payment">test_payment() (in module payments.views)</a>
@@ -4828,6 +4841,8 @@
 </li>
       <li><a href="payments.html#payments.core.update_organisation">update_organisation() (in module payments.core)</a>
 </li>
+      <li><a href="accounts.html#accounts.models.TeamMate.user">user (accounts.models.TeamMate attribute)</a>
+</li>
       <li><a href="accounts.html#accounts.models.User">User (class in accounts.models)</a>
 </li>
       <li><a href="forums.html#forums.models.ForumFollow.user">user (forums.models.ForumFollow attribute)</a>
@@ -4842,8 +4857,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="accounts.html#accounts.models.User.MultipleObjectsReturned">User.MultipleObjectsReturned</a>
 </li>
-      <li><a href="forums.html#forums.models.ForumFollow.user_id">user_id (forums.models.ForumFollow attribute)</a>
+      <li><a href="accounts.html#accounts.models.TeamMate.user_id">user_id (accounts.models.TeamMate attribute)</a>
+
+      <ul>
+        <li><a href="forums.html#forums.models.ForumFollow.user_id">(forums.models.ForumFollow attribute)</a>
 </li>
+      </ul></li>
       <li><a href="accounts.html#accounts.models.User.user_permissions">user_permissions (accounts.models.User attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.views.user_settings">user_settings() (in module accounts.views)</a>

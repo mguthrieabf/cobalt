@@ -833,7 +833,6 @@
     <span class="c1"># Set the payment type - this could be for a linked transaction or a manual</span>
     <span class="c1"># payment.</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;linked?&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">tran</span><span class="o">.</span><span class="n">linked_transaction_type</span><span class="p">:</span>  <span class="c1"># payment for a linked transaction</span>
         <span class="n">paytype</span> <span class="o">=</span> <span class="s2">&quot;CC Payment&quot;</span>
@@ -1186,7 +1185,7 @@
 <span class="sd">            organisation - linked organisation (optional)</span>
 
 <span class="sd">        returns:</span>
-<span class="sd">            nothing</span>
+<span class="sd">            MemberTransaction</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Get old balance</span>
@@ -1211,7 +1210,9 @@
         <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
         <span class="n">sub_source</span><span class="o">=</span><span class="n">sub_source</span><span class="p">,</span>
         <span class="n">message</span><span class="o">=</span><span class="n">log_msg</span> <span class="o">+</span> <span class="s2">&quot; Updated MemberTransaction table&quot;</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">act</span></div>
 
 
 <span class="c1">#########################</span>
