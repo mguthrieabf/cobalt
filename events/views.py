@@ -853,11 +853,17 @@ def enter_event(request, congress_id, event_id):
     # drop down values for form
     team_mates = TeamMate.objects.filter(user=request.user)
     player1_list = [(request.user.id, request.user)]
+
+    # players 2 - 6 use all the same reference data
     playerN_list = [(0, "Search...")]
     for team_mate in team_mates:
         item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
-        #        player1_list.append(item)
         playerN_list.append(item)
+
+    # Get team_mates in reverse direction to see who we can pay for
+    team_mates_reverse = TeamMate.objects.filter(
+        team_mate=request.user, make_payments=True
+    )
 
     # entry fee for this user
     entry_fee, discount, reason = event.entry_fee_for(request.user)
@@ -884,6 +890,7 @@ def enter_event(request, congress_id, event_id):
         congress=congress,
         player1_list=player1_list,
         playerN_list=playerN_list,
+        team_mates_reverse=team_mates_reverse,
     )
 
     if form.is_valid():
