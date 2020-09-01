@@ -1,0 +1,1 @@
+fbc, 45.00, bb, Entry to Some Event, Event Entry

@@ -1,0 +1,2 @@
+fbc, 9991, Fantasy Bridge Club, A Street,,,ACT,000,Club
+rbc, 9992, Rival Bridge Club, B Street,,,ACT,000,Club

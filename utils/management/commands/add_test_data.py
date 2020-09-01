@@ -20,6 +20,8 @@ from rbac.core import (
     rbac_add_user_to_group,
     rbac_add_role_to_group,
 )
+from payments.core import update_account, update_organisation
+from payments.models import StripeTransaction
 from forums.models import Post, Comment1, Comment2, LikePost, LikeComment1, LikeComment2
 from organisations.models import MemberOrganisation
 from rbac.models import RBACModelDefault
@@ -28,9 +30,10 @@ import random
 from essential_generators import DocumentGenerator
 import datetime
 import pytz
-from django.utils.timezone import make_aware
+from django.utils.timezone import make_aware, now
 
 TZ = pytz.timezone(TIME_ZONE)
+DATA_DIR = "utils/testdata/"
 
 
 class Command(BaseCommand):
@@ -114,620 +117,529 @@ class Command(BaseCommand):
         mark = User.objects.filter(system_number="620246").first()
         julian = User.objects.filter(system_number="518891").first()
 
-        # Create Users
+        # Users
         print("Creating Users")
-        aa = create_fake_user(
-            self,
-            "100",
-            "Alan",
-            "Admin",
-            "Global Admin for Everything, well as much as possible. Also member of secret forum 6.",
-            "pic_folder/100.jpg",
-        )
-        bb = create_fake_user(
-            self,
-            "101",
-            "Betty",
-            "Bunting",
-            "Forums Global Admin. Member of secret forum 6.",
-            "pic_folder/101.jpg",
-        )
-        cc = create_fake_user(
-            self,
-            "102",
-            "Colin",
-            "Corgy",
-            "Payments Global Admin. Member of secret forum 6.",
-            "pic_folder/102.jpg",
-        )
-        dd = create_fake_user(
-            self,
-            "103",
-            "Debbie",
-            "Dyson",
-            "ABF Payments Officer",
-            "pic_folder/103.jpg",
-        )
-        ee = create_fake_user(
-            self,
-            "104",
-            "Eric",
-            "Eastwood",
-            "Owner of Fantasy Bridge Club",
-            "pic_folder/104.jpg",
-        )
-        ff = create_fake_user(
-            self,
-            "105",
-            "Fiona",
-            "Freckle",
-            "Accountant at Fantasy Bridge Club",
-            "pic_folder/105.jpg",
-        )
-        gg = create_fake_user(
-            self,
-            "106",
-            "Gary",
-            "Golden",
-            "Director at Fantasy Bridge Club",
-            "pic_folder/106.jpg",
-        )
-        hh = create_fake_user(
-            self,
-            "107",
-            "Heidi",
-            "Hempstead",
-            "Moderator on all public forums",
-            "pic_folder/107.jpg",
-        )
-        ii = create_fake_user(
-            self,
-            "108",
-            "Iain",
-            "Igloo",
-            "Moderator on all public forums and ABF Payments Officer",
-            "pic_folder/108.jpg",
-        )
-        jj = create_fake_user(
-            self,
-            "109",
-            "Janet",
-            "Jumper",
-            "Moderator and member of secret forum 6.",
-            "pic_folder/109.jpg",
-        )
-        kk = create_fake_user(
-            self, "110", "Keith", "Kenneth", "Global Moderator.", "pic_folder/110.jpg",
-        )
+        user_dic = {}
+        with open(DATA_DIR + "users.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, num, fname, lname, about, pic) = parts
+                user = create_fake_user(self, num, fname, lname, about, pic)
+                user_dic[id] = user
+        user_dic["EVERYONE"] = EVERYONE
+        user_dic["mark"] = mark
+        user_dic["julian"] = julian
 
-        user_list = [aa, bb, cc, dd, ee, ff, gg, hh, ii, jj, kk]
-
-        # create Orgs - ABF should be created first, then this.
+        # Orgs - assumes ABF already created elsewhere
         print("Creating Orgs")
-        fbc = create_org(
-            self,
-            "9991",
-            "Fantasy Bridge Club",
-            "A Street",
-            "",
-            "",
-            "ACT",
-            "0000",
-            "Club",
-        )
-        rbc = create_org(
-            self, "9992", "Rival Bridge Club", "B Street", "", "", "ACT", "0000", "Club"
-        )
+        org_dic = {}
+        with open(DATA_DIR + "orgs.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, num, name, add1, add2, add3, state, clubnum, orgtype) = parts
+                org = create_org(
+                    self, num, name, add1, add2, add3, state, clubnum, orgtype
+                )
+                org_dic[id] = org
 
-        # Adding Members to Orgs
+        # Add Members to Orgs
         print("Adding Members to clubs")
-        MemberOrganisation(member=aa, organisation=fbc).save()
-        MemberOrganisation(member=aa, organisation=rbc).save()
-        MemberOrganisation(member=bb, organisation=rbc).save()
-        MemberOrganisation(member=cc, organisation=fbc).save()
-        MemberOrganisation(member=dd, organisation=rbc).save()
-        MemberOrganisation(member=ee, organisation=fbc).save()
-        MemberOrganisation(member=ff, organisation=fbc).save()
-        MemberOrganisation(member=gg, organisation=fbc).save()
-        MemberOrganisation(member=hh, organisation=rbc).save()
-        MemberOrganisation(member=ii, organisation=rbc).save()
-        MemberOrganisation(member=jj, organisation=fbc).save()
-        MemberOrganisation(member=kk, organisation=fbc).save()
+        with open(DATA_DIR + "member_orgs.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (member, org) = parts
+                MemberOrganisation(
+                    member=user_dic[member], organisation=org_dic[org]
+                ).save()
 
         # create Forums
         print("Creating Forums")
-        f1 = create_forum(
-            self,
-            "System Announcements",
-            "Announcements relating to this system",
-            "Announcement",
-        )
-        f2 = create_forum(
-            self, "General Discussions", "General fake discussions", "Discussion"
-        )
-        f3 = create_forum(
-            self, "Technical Discussions", "Technical fake discussions", "Discussion"
-        )
-        f4 = create_forum(self, "Fantasy Bridge Club", "Club site", "Club")
-        f5 = create_forum(self, "Rival Bridge Club", "Club site", "Club")
-        f6 = create_forum(
-            self, "Secret Committee Notes", "Fake secret stuff", "Discussion"
-        )
-
-        forum_list = [f1, f2, f3, f4, f5, f6]
+        forum_dic = {}
+        with open(DATA_DIR + "forums.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, name, desc, ftype) = parts
+                forum = create_forum(self, name, desc, ftype)
+                forum_dic[id] = forum
 
         # create dummy Posts
         print("Creating dummy forum posts")
+        print("Running", end="", flush=True)
+        for post_counter in range(10):
 
-        if Post.objects.all().count() == 0:
-
-            print("Running", end="", flush=True)
-            for post_counter in range(200):
-
-                post = Post(
-                    forum=random.choice(forum_list),
-                    title=self.random_sentence(),
-                    text=self.random_paragraphs_with_stuff(),
-                    author=random.choice(user_list),
-                )
-                post.save()
-                print(".", end="", flush=True)
-                self.add_comments(post, user_list)
-            print("\n")
+            post = Post(
+                forum=random.choice(list(forum_dic.values())),
+                title=self.random_sentence(),
+                text=self.random_paragraphs_with_stuff(),
+                author=random.choice(list(user_dic.values())),
+            )
+            post.save()
+            print(".", end="", flush=True)
+            self.add_comments(post, list(user_dic.values()))
+        print("\n")
 
         # create RBAC Groups
         print("Creating RBAC Groups")
 
-        # Dummy tree
-        print("\nDummy Tree")
-        rbac_create_group(
-            "rbac.orgs.clubs.act.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.nsw.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.vic.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.tas.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.wa.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.sa.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.nt.pretent_club", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.act.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.nsw.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.vic.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.tas.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.wa.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.sa.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.clubs.nt.made_up_rsl", "staff", "Staff at Dummy Bridge Club"
-        )
-        rbac_create_group(
-            "rbac.orgs.states.nsw.admin", "staff", "Staff at NSW State Org"
-        )
-        rbac_create_group("rbac.orgs.states.nt.admin", "staff", "Staff at NT State Org")
-        rbac_create_group(
-            "rbac.orgs.states.vic.admin", "staff", "Staff at VIC State Org"
-        )
-        rbac_create_group("rbac.orgs.states.sa.admin", "staff", "Staff at SA State Org")
-        rbac_create_group("rbac.orgs.states.wa.admin", "staff", "Staff at WA State Org")
-        rbac_create_group(
-            "rbac.orgs.states.tas.admin", "staff", "Staff at TAS State Org"
-        )
-        rbac_create_group(
-            "rbac.orgs.states.act.admin", "staff", "Staff at ACT State Org"
-        )
-        rbac_create_group("rbac.modules.payments", "dummy", "Payments stuff")
-        rbac_create_group("rbac.modules.scoring", "dummy", "Scoring stuff")
-        rbac_create_group("rbac.modules.scoring", "dummy", "Scoring stuff")
+        rbac_group_dic = {}
+        with open(DATA_DIR + "rbac_groups.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, tree, name, desc) = parts
+                group = rbac_create_group(tree, name, desc)
+                rbac_group_dic[id] = group
 
-        # FBC Staff
-        print("\nFBC Staff")
-        fbc_staff = rbac_create_group(
-            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
-            "staff",
-            "Staff at Fantasy Bridge Club",
-        )
-        print(fbc_staff)
+        # add roles to groups
+        print("Adding Roles to RBAC Groups")
+        with open(DATA_DIR + "rbac_group_roles.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, a, b, c, d, e) = parts
+                if e == "":
+                    e = None
+                rbac_add_role_to_group(rbac_group_dic[id], a, b, c, d, model_id=e)
 
-        role = rbac_add_role_to_group(
-            fbc_staff, "orgs", "org", "edit", "Allow", model_id=fbc.id
-        )
-        print("Added/Checked role %s" % role)
+        # add users to groups
+        print("Adding Users to RBAC Groups")
+        with open(DATA_DIR + "rbac_group_users.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (groupid, userid) = parts
+                if e == "":
+                    e = None
+                rbac_add_user_to_group(user_dic[userid], rbac_group_dic[groupid])
 
-        rbac_add_user_to_group(ee, fbc_staff)
-        print("added %s to group" % ee)
-        rbac_add_user_to_group(ff, fbc_staff)
-        print("added %s to group" % ff)
-        rbac_add_user_to_group(gg, fbc_staff)
-        print("added %s to group" % gg)
+        # admin tree
+        print("Admin Tree")
+        print("Creating RBAC Admin Groups")
 
-        # FBC Payments
-        print("\nFBC Payments")
-        fbc_pay = rbac_create_group(
-            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
-            "payments",
-            "Payments for Fantasy Bridge Club",
-        )
-        print(fbc_pay)
+        rbac_admin_group_dic = {}
+        with open(DATA_DIR + "rbac_admin_groups.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, tree, name, desc) = parts
+                group = create_RBAC_admin_group(self, tree, name, desc)
+                rbac_admin_group_dic[id] = group
 
-        role = rbac_add_role_to_group(
-            fbc_pay, "payments", "manage", "all", "Allow", model_id=fbc.id
-        )
-        print("Added/Checked role %s" % role)
+        print("Adding Trees to RBAC Admin Groups")
 
-        rbac_add_user_to_group(ee, fbc_pay)
-        print("added %s to group" % ee)
-        rbac_add_user_to_group(ff, fbc_pay)
-        print("added %s to group" % ff)
+        with open(DATA_DIR + "rbac_admin_group_trees.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, tree) = parts
+                create_RBAC_admin_tree(self, rbac_admin_group_dic[id], tree)
 
-        # Forum Admins
-        print("\nGlobal Forum Admins")
-        forum_admin = rbac_create_group(
-            "rbac.modules.forums.admin", "forum_admins", "Global admins for forums"
-        )
-        print(forum_admin)
+        print("Adding Roles to RBAC Admin Groups")
 
-        role = rbac_add_role_to_group(forum_admin, "forums", "admin", "edit", "Allow")
-        print("Added/Checked role %s" % role)
+        with open(DATA_DIR + "rbac_admin_group_roles.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, app, model) = parts
+                rbac_add_role_to_admin_group(
+                    rbac_admin_group_dic[id], app=app, model=model
+                )
 
-        rbac_add_user_to_group(bb, forum_admin)
-        print("added %s to group" % bb)
+        print("Adding Users to RBAC Admin Groups")
 
-        # Public Mods
-        print("\nPublic Forum Mods")
-        public_mods = rbac_create_group(
-            "rbac.modules.forums.admin",
-            "public_moderators",
-            "Moderators for Public Forums",
-        )
-        print(public_mods)
-
-        role = rbac_add_role_to_group(
-            public_mods, "forums", "moderate", "edit", "Allow", model_id=f1.id
-        )
-        print("Added/Checked role %s" % role)
-        role = rbac_add_role_to_group(
-            public_mods, "forums", "moderate", "edit", "Allow", model_id=f2.id
-        )
-        print("Added/Checked role %s" % role)
-        role = rbac_add_role_to_group(
-            public_mods, "forums", "moderate", "edit", "Allow", model_id=f3.id
-        )
-        print("Added/Checked role %s" % role)
-        role = rbac_add_role_to_group(
-            public_mods, "forums", "moderate", "edit", "Allow", model_id=f4.id
-        )
-        print("Added/Checked role %s" % role)
-        role = rbac_add_role_to_group(
-            public_mods, "forums", "moderate", "edit", "Allow", model_id=f5.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(ii, public_mods)
-        print("added %s to group" % ii)
-        rbac_add_user_to_group(hh, public_mods)
-        print("added %s to group" % hh)
-
-        # Secret Forum
-        print("\nSecret Forum - Block All")
-        block_all = rbac_create_group(
-            "rbac.modules.forums.private.committeenote",
-            "block_everyone",
-            "Block public access to Committee Notes",
-        )
-        print(block_all)
-
-        role = rbac_add_role_to_group(
-            block_all, "forums", "forum", "all", "Block", model_id=f6.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(EVERYONE, block_all)
-        print("added %s to group" % EVERYONE)
-
-        print("\nSecret Forum - Allow Specific")
-        allow_specific = rbac_create_group(
-            "rbac.modules.forums.private.committeenote",
-            "allow_specific",
-            "Allow specific access to Committee Notes",
-        )
-        print(allow_specific)
-
-        role = rbac_add_role_to_group(
-            allow_specific, "forums", "forum", "all", "Allow", model_id=f6.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(aa, allow_specific)
-        print("added %s to group" % aa)
-        rbac_add_user_to_group(bb, allow_specific)
-        print("added %s to group" % bb)
-        rbac_add_user_to_group(cc, allow_specific)
-        print("added %s to group" % cc)
-
-        # Secret Forum Moderator
-        print("\nSecret Forum - Special Moderator")
-
-        secret_mods = rbac_create_group(
-            "rbac.modules.forums.admin",
-            "secret_moderators",
-            "Moderators for Hidden Forum 6",
-        )
-        print(secret_mods)
-
-        role = rbac_add_role_to_group(
-            secret_mods, "forums", "moderate", "edit", "Allow", model_id=f6.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(jj, secret_mods)
-        print("added %s to group" % jj)
-
-        # Global Forum Moderator
-        print("\nGlobal Forum Moderators")
-
-        global_mods = rbac_create_group(
-            "rbac.modules.forums.admin",
-            "global_moderators",
-            "Moderators for all forums, even hidden.",
-        )
-        print(global_mods)
-
-        role = rbac_add_role_to_group(
-            global_mods, "forums", "moderate", "edit", "Allow"
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(kk, global_mods)
-        print("added %s to group" % kk)
-
-        # ABF Payments
-        print("\nABF Payments Officers")
-        abfp = rbac_create_group(
-            "rbac.orgs.abf.abf_roles",
-            "payments_officers",
-            "Group to manage payments for the ABF",
-        )
-        print(abfp)
-
-        role = rbac_add_role_to_group(abfp, "payments", "global", "all", "Allow")
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(dd, abfp)
-        print("added %s to group" % dd)
-        rbac_add_user_to_group(ii, abfp)
-        print("added %s to group" % ii)
-
-        #################################################################
-        # Admin Tree                                                    #
-        #################################################################
-
-        # Global Roles
-        ad_group = create_RBAC_admin_group(
-            self,
-            "admin.cobalt.global",
-            "system_gods",
-            "Highest level of admin to all functions.",
-        )
-        create_RBAC_admin_tree(self, ad_group, "rbac")
-        rbac_add_user_to_admin_group(ad_group, aa)
-        models = RBACModelDefault.objects.all()
-        for model in models:
-            rbac_add_role_to_admin_group(ad_group, app=model.app, model=model.model)
-
-        # Forums admin
-        f_group = create_RBAC_admin_group(
-            self, "admin.cobalt.global", "forums", "All forum admin",
-        )
-        create_RBAC_admin_tree(self, f_group, "rbac.modules.forums")
-        create_RBAC_admin_tree(self, f_group, "rbac.orgs")
-        rbac_add_user_to_admin_group(f_group, bb)
-        rbac_add_role_to_admin_group(f_group, app="forums", model="forum")
-        rbac_add_role_to_admin_group(f_group, app="forums", model="admin")
-        rbac_add_role_to_admin_group(f_group, app="forums", model="moderate")
-
-        # Fantasy Bridge Club congresses
-        print("\nFantasy Bridge Club Congresses")
-        fbc_congress = rbac_create_group(
-            "rbac.orgs.clubs.act.fantasy_bridge_club[%s]" % fbc.id,
-            "congresses",
-            "Congress Conveners at Fantasy Bridge Club",
-        )
-        print(fbc_congress)
-
-        role = rbac_add_role_to_group(
-            fbc_congress, "events", "org", "all", "Allow", fbc.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(cc, fbc_congress)
-        print("added %s to group" % cc)
-        rbac_add_user_to_group(ee, fbc_congress)
-        print("added %s to group" % ee)
-        rbac_add_user_to_group(ff, fbc_congress)
-        print("added %s to group" % ff)
-        rbac_add_user_to_group(gg, fbc_congress)
-        print("added %s to group" % gg)
-        rbac_add_user_to_group(mark, fbc_congress)
-        print("added %s to group" % mark)
-        rbac_add_user_to_group(julian, fbc_congress)
-        print("added %s to group" % julian)
-
-        # Rival Bridge Club congresses
-        print("\nRival Bridge Club Congresses")
-        rbc_congress = rbac_create_group(
-            "rbac.orgs.clubs.act.rival_bridge_club[%s]" % rbc.id,
-            "congresses",
-            "Congress Conveners at Rival Bridge Club",
-        )
-        print(rbc_congress)
-
-        role = rbac_add_role_to_group(
-            rbc_congress, "events", "org", "all", "Allow", rbc.id
-        )
-        print("Added/Checked role %s" % role)
-
-        rbac_add_user_to_group(bb, rbc_congress)
-        print("added %s to group" % bb)
-        rbac_add_user_to_group(dd, rbc_congress)
-        print("added %s to group" % dd)
-        rbac_add_user_to_group(hh, rbc_congress)
-        print("added %s to group" % hh)
-        rbac_add_user_to_group(mark, rbc_congress)
-        print("added %s to group" % mark)
-        rbac_add_user_to_group(julian, rbc_congress)
-        print("added %s to group" % julian)
+        with open(DATA_DIR + "rbac_admin_group_users.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (groupid, userid) = parts
+                rbac_add_user_to_admin_group(rbac_admin_group_dic[id], user_dic[userid])
 
         # create event test data
         print("Creating Events Test Data")
 
         # Congress Master
         print("Congress Masters")
+        congress_master_dic = {}
+        with open(DATA_DIR + "events_congress_masters.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (id, orgid, name) = parts
+                cm = CongressMaster(name=name, org=org_dic[orgid])
+                cm.save()
+                congress_master_dic[id] = cm
 
-        # Congress Master
-        congress_master_fasc = CongressMaster(
-            name="Fantasy Annual Super Congress", org=fbc
-        )
-        congress_master_fasc.save()
-        congress_master_erpc = CongressMaster(
-            name="Fantasy Easter Red Points Congress", org=fbc
-        )
-        congress_master_erpc.save()
-        congress_master_erpc = CongressMaster(
-            name="Fantasy Christmas Red Points Congress", org=fbc
-        )
-        congress_master_erpc.save()
-
-        congress_master_rasc = CongressMaster(
-            name="Rival Annual Super Congress", org=rbc
-        )
-        congress_master_rasc.save()
-        congress_master_rerpc = CongressMaster(
-            name="Rival Easter Red Points Congress", org=rbc
-        )
-        congress_master_rerpc.save()
-        congress_master_rcrpc = CongressMaster(
-            name="Rival Christmas Red Points Congress", org=rbc
-        )
-        congress_master_rcrpc.save()
-
+        # Congress
         print("Congresses")
+        congress_dic = {}
+        with open(DATA_DIR + "events_congresses.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                vars = [
+                    "id",
+                    "cmid",
+                    "start_yr",
+                    "start_mth",
+                    "start_day",
+                    "end_yr",
+                    "end_mth",
+                    "end_day",
+                    "date_string",
+                    "year",
+                    "venue_name",
+                    "lat",
+                    "lon",
+                    "venue_transport",
+                    "venue_catering",
+                    "people",
+                    "general_info",
+                    "payment_method_system_dollars",
+                    "payment_method_bank_transfer",
+                    "payment_method_cash",
+                    "payment_method_cheques",
+                    "allow_early_payment_discount",
+                    "early_yr",
+                    "early_mnth",
+                    "early_day",
+                    "allow_youth_payment_discount",
+                    "yth_year",
+                    "yth_mnth",
+                    "yth_day",
+                    "snr_yr",
+                    "snr_mnth",
+                    "snr_day",
+                    "youth_payment_discount_age",
+                    "senior_age",
+                    "open_yr",
+                    "open_mnth",
+                    "open_day",
+                    "close_yr",
+                    "close_mnth",
+                    "close_day",
+                    "allow_partnership_desk",
+                    "status",
+                ]
+                for i in range(len(parts)):
+                    print(vars[i], parts[i])
 
-        congress_a = Congress(
-            congress_master=congress_master_fasc,
-            name=congress_master_fasc.name + " 2022",
-            default_email="dummy@fake.com",
-            start_date=datetime.date(2022, 5, 7),
-            end_date=datetime.date(2022, 5, 15),
-            date_string="7th to 15th May 2022",
-            year=2022,
-            venue_name="Sydney Opera House",
-            venue_location="-33.856000, 151.215340",
-            venue_transport="<h3>Public Transport</h3><ul><li>235 Bus stops outside.<li>Circular Quay train station is 5 minutes walk.<li>Circular Quay ferries services are 5 minutes walk.</ul><h3>Parking</h3><p>Ample parking on street nearby.</p>",
-            venue_catering="<ul><li>Sandwiches and pies are available at the shop.<li>Restaurants and cafes nearby.<li>Good pubs a short walk away.<li>You can also bring your own food.</ul>",
-            people="TBA",
-            general_info="<p>Welcome to our annual congress with prize money in excess of $20M</p><p>This year we have new premises and a new directing team.</p>",
-            payment_method_system_dollars=True,
-            payment_method_bank_transfer=True,
-            payment_method_cash=True,
-            payment_method_cheques=False,
-            allow_early_payment_discount=True,
-            early_payment_discount_date=make_aware(
-                datetime.datetime(2023, 4, 1, 0, 0), TZ
-            ),
-            allow_youth_payment_discount=True,
-            youth_payment_discount_date=make_aware(
-                datetime.datetime(2023, 1, 1, 0, 0), TZ
-            ),
-            senior_date=make_aware(datetime.datetime(2023, 1, 1, 0, 0), TZ),
-            youth_payment_discount_age=30,
-            senior_age=65,
-            entry_open_date=make_aware(datetime.datetime(2022, 12, 1, 0, 0), TZ),
-            entry_close_date=make_aware(datetime.datetime(2022, 5, 1, 0, 0), TZ),
-            allow_partnership_desk=False,
-            status="Draft",
-        )
+                (
+                    id,
+                    cmid,
+                    start_yr,
+                    start_mth,
+                    start_day,
+                    end_yr,
+                    end_mth,
+                    end_day,
+                    date_string,
+                    year,
+                    venue_name,
+                    lat,
+                    lon,
+                    venue_transport,
+                    venue_catering,
+                    people,
+                    general_info,
+                    payment_method_system_dollars,
+                    payment_method_bank_transfer,
+                    payment_method_cash,
+                    payment_method_cheques,
+                    allow_early_payment_discount,
+                    early_yr,
+                    early_mnth,
+                    early_day,
+                    allow_youth_payment_discount,
+                    yth_year,
+                    yth_mnth,
+                    yth_day,
+                    snr_yr,
+                    snr_mnth,
+                    snr_day,
+                    youth_payment_discount_age,
+                    senior_age,
+                    open_yr,
+                    open_mnth,
+                    open_day,
+                    close_yr,
+                    close_mnth,
+                    close_day,
+                    allow_partnership_desk,
+                    status,
+                ) = parts
 
-        congress_a.save()
+                congress = Congress(
+                    congress_master=congress_master_dic[cmid],
+                    name=congress_master_dic[cmid].name + " %s" % year,
+                    default_email="dummy@fake.com",
+                    start_date=datetime.date(
+                        int(start_yr), int(start_mth), int(start_day)
+                    ),
+                    end_date=datetime.date(int(end_yr), int(end_mth), int(end_day)),
+                    date_string=date_string,
+                    year=int(year),
+                    venue_name=venue_name,
+                    venue_location="%s, %s" % (lat, lon),
+                    venue_transport=venue_transport,
+                    venue_catering=venue_catering,
+                    people=people,
+                    general_info=general_info,
+                    payment_method_system_dollars=payment_method_system_dollars,
+                    payment_method_bank_transfer=payment_method_bank_transfer,
+                    payment_method_cash=payment_method_cash,
+                    payment_method_cheques=payment_method_cheques,
+                    allow_early_payment_discount=allow_early_payment_discount,
+                    early_payment_discount_date=make_aware(
+                        datetime.datetime(
+                            int(early_yr), int(early_mnth), int(early_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    allow_youth_payment_discount=allow_youth_payment_discount,
+                    youth_payment_discount_date=make_aware(
+                        datetime.datetime(
+                            int(yth_year), int(yth_mnth), int(yth_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    senior_date=make_aware(
+                        datetime.datetime(
+                            int(snr_yr), int(snr_mnth), int(snr_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    youth_payment_discount_age=int(youth_payment_discount_age),
+                    senior_age=int(senior_age),
+                    entry_open_date=make_aware(
+                        datetime.datetime(
+                            int(open_yr), int(open_mnth), int(open_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    entry_close_date=make_aware(
+                        datetime.datetime(
+                            int(close_yr), int(close_mnth), int(close_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    allow_partnership_desk=allow_partnership_desk,
+                    status=status,
+                )
+
+                congress.save()
+                congress_dic[id] = congress
 
         print("Events")
 
-        event = Event(
-            congress=congress_a,
-            event_name="Welcome Pairs",
-            description="27 board Matchpoint Pairs",
-            max_entries=40,
-            event_type="Open",
-            entry_fee=30.0,
-            entry_early_payment_discount=5.0,
-            player_format="Pairs",
-        )
+        event_dic = {}
+        with open(DATA_DIR + "events_events.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (
+                    id,
+                    congressid,
+                    event_name,
+                    description,
+                    max_entries,
+                    event_type,
+                    entry_fee,
+                    entry_early_payment_discount,
+                    player_format,
+                ) = parts
+                event = Event(
+                    congress=congress_dic[congressid],
+                    event_name=event_name,
+                    description=description,
+                    max_entries=max_entries,
+                    event_type=event_type,
+                    entry_fee=entry_fee,
+                    entry_early_payment_discount=entry_early_payment_discount,
+                    player_format=player_format,
+                )
+                event.save()
+                event_dic[id] = event
 
-        event.save()
+        print("Sessions")
 
-        session = Session(
-            event=event,
-            session_date=make_aware(datetime.datetime(2022, 5, 7, 0, 0), TZ),
-            session_start=datetime.time(19, 30),
-        )
+        with open(DATA_DIR + "events_sessions.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (
+                    eventid,
+                    ses_yr,
+                    sess_mnth,
+                    sess_day,
+                    st_hr,
+                    st_min,
+                    end_hr,
+                    end_min,
+                ) = parts
+                if end_hr:
+                    session_end = datetime.time(int(end_hr), int(end_min))
+                else:
+                    session_end = None
+                Session(
+                    event=event_dic[eventid],
+                    session_date=make_aware(
+                        datetime.datetime(
+                            int(ses_yr), int(sess_mnth), int(sess_day), 0, 0
+                        ),
+                        TZ,
+                    ),
+                    session_start=datetime.time(int(st_hr), int(st_min)),
+                    session_end=session_end,
+                ).save()
 
-        session.save()
+        # Payments
+        print("Payments")
 
-        event = Event(
-            congress=congress_a,
-            event_name="Open Teams",
-            description="2 Day Swiss Teams event. IMP scoring.",
-            max_entries=80,
-            event_type="Open",
-            entry_fee=140.0,
-            entry_early_payment_discount=15.0,
-            player_format="Teams",
-        )
+        print("Stripe")
+        stripe_dic = {}
+        with open(DATA_DIR + "payments_stripe.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (
+                    id,
+                    memberid,
+                    description,
+                    amount,
+                    stripe_brand,
+                    stripe_country,
+                    stripe_exp_month,
+                    stripe_exp_year,
+                    stripe_last4,
+                    orgid,
+                    othermemberid,
+                ) = parts
 
-        event.save()
+                if othermemberid:
+                    other_member = user_dic[othermemberid]
+                else:
+                    other_member = None
 
-        session = Session(
-            event=event,
-            session_date=make_aware(datetime.datetime(2022, 5, 8, 0, 0), TZ),
-            session_start=datetime.time(10, 00),
-        )
-        session.save()
-        session = Session(
-            event=event,
-            session_date=make_aware(datetime.datetime(2022, 5, 8, 0, 0), TZ),
-            session_start=datetime.time(14, 00),
-        )
-        session.save()
-        session = Session(
-            event=event,
-            session_date=make_aware(datetime.datetime(2022, 5, 9, 0, 0), TZ),
-            session_start=datetime.time(10, 00),
-        )
-        session.save()
-        session = Session(
-            event=event,
-            session_date=make_aware(datetime.datetime(2022, 5, 9, 0, 0), TZ),
-            session_start=datetime.time(14, 00),
-        )
-        session.save()
+                if orgid:
+                    org = org_dic[orgid]
+                else:
+                    org = None
+
+                tran = StripeTransaction()
+
+                tran.description = description
+                tran.amount = amount
+                tran.member = user_dic[memberid]
+                tran.linked_member = other_member
+                tran.linked_organisation = org
+                tran.stripe_reference = "dummy-ref-no"
+                tran.stripe_method = "dummy-pay-ref"
+                tran.stripe_currency = "aud"
+                tran.stripe_receipt_url = "https://pay.stripe.com/receipts/acct_1GiCM8JWMUHj2yxk/ch_1HMfsvJWMUHj2yxkxV0hkyJF/rcpt_HwZ0zOou5vrn4VaNHpLOO59ybx1psji"
+                tran.stripe_brand = stripe_brand
+                tran.stripe_country = stripe_country
+                tran.stripe_exp_month = stripe_exp_month
+                tran.stripe_exp_year = stripe_exp_year
+                tran.stripe_last4 = stripe_last4
+                tran.last_change_date = now()
+                tran.status = "Complete"
+                tran.save()
+                stripe_dic[id] = tran
+
+        print("Member")
+        payments_member_dic = {}
+        with open(DATA_DIR + "payments_member.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (
+                    id,
+                    memberid,
+                    amount,
+                    orgid,
+                    other_memberid,
+                    stripe_transactionid,
+                    description,
+                    payment_type,
+                    days_ago,
+                    hour,
+                    min,
+                ) = parts
+                member = user_dic[memberid]
+
+                if other_memberid:
+                    other_member = user_dic[other_memberid]
+                else:
+                    other_member = None
+
+                if orgid:
+                    org = org_dic[orgid]
+                else:
+                    org = None
+
+                if stripe_transactionid:
+                    tran = stripe_dic[stripe_transactionid]
+                else:
+                    tran = None
+
+                act = update_account(
+                    member=member,
+                    amount=amount,
+                    organisation=org,
+                    other_member=other_member,
+                    stripe_transaction=tran,
+                    description=description,
+                    source="TestData",
+                    sub_source="testdata",
+                    payment_type=payment_type,
+                    log_msg="test data",
+                )
+
+                if days_ago:
+                    act.created_date = now() - datetime.timedelta(days=int(days_ago))
+                    #    act.created_date = act.created_date.replace(hour=int(hour), minute=int(min))
+                    act.save()
+
+                payments_member_dic[id] = act
+
+        print("Orgs")
+        with open(DATA_DIR + "payments_org.txt") as infile:
+            for line in infile:
+                if line.find("#") == 0 or line.strip() == "":
+                    continue
+                parts = [s.strip() for s in line.split(",")]
+                (orgid, amount, memberid, description, payment_type) = parts
+                member = user_dic[memberid]
+                org = org_dic[orgid]
+
+                update_organisation(
+                    organisation=org,
+                    amount=amount,
+                    description=description,
+                    log_msg="test data",
+                    source="TestData",
+                    sub_source="test_data",
+                    payment_type=payment_type,
+                    member=member,
+                )

@@ -1,0 +1,2 @@
+wp, c1, Welcome Pairs, 27 board Matchpoint Pairs, 40, Open, 30.0, 5.0, Pairs
+st, c1, Open Teams, 2 Day Swiss Teams event. IMP scoring., 80, Open, 140.0, 15.0, Teams

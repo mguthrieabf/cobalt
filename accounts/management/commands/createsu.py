@@ -3,7 +3,9 @@ from accounts.models import User
 
 
 class Command(BaseCommand):
-    def CreateDefaultTestUsers(self, newuser, email, system_number, first, last):
+    def CreateDefaultTestUsers(
+        self, newuser, email, system_number, first, last, about="No info", pic=None
+    ):
         if not User.objects.filter(username=newuser).exists():
             user = User.objects.create_user(
                 username=newuser,
@@ -12,6 +14,8 @@ class Command(BaseCommand):
                 first_name=first,
                 last_name=last,
                 system_number=system_number,
+                about=about,
+                pic=pic,
             )
             user.is_superuser = True
             user.is_staff = True
@@ -30,11 +34,23 @@ class Command(BaseCommand):
             "EVERYONE", "a@b.com", "0", "EVERYONE", "system_account"
         )
         self.CreateDefaultTestUsers(
-            "Mark", "m@rkguthrie.com", "620246", "Mark", "Guthrie"
+            "Mark",
+            "m@rkguthrie.com",
+            "620246",
+            "Mark",
+            "Guthrie",
+            "TBA",
+            "pic_folder/mark.jpg",
         )
 
         self.CreateDefaultTestUsers(
-            "518891", "julianrfoster@gmail.com", "518891", "Julian", "Foster"
+            "518891",
+            "julianrfoster@gmail.com",
+            "518891",
+            "Julian",
+            "Foster",
+            "TBA",
+            "pic_folder/julian.jpg",
         )
 
         self.CreateDefaultTestUsers(

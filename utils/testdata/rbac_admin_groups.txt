@@ -1,0 +1,2 @@
+ad_group, admin.cobalt.global, system_gods, Highest level of admin to all functions.
+f_group, admin.cobalt.global, forums, All forum admin

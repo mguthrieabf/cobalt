@@ -687,7 +687,6 @@ def stripe_webhook_manual(event):
     # Set the payment type - this could be for a linked transaction or a manual
     # payment.
 
-    print("linked?")
     print(tran.linked_transaction_type)
     if tran.linked_transaction_type:  # payment for a linked transaction
         paytype = "CC Payment"
@@ -1040,7 +1039,7 @@ def update_account(
             organisation - linked organisation (optional)
 
         returns:
-            nothing
+            MemberTransaction
 
     """
     # Get old balance
@@ -1066,6 +1065,8 @@ def update_account(
         sub_source=sub_source,
         message=log_msg + " Updated MemberTransaction table",
     )
+
+    return act
 
 
 #########################

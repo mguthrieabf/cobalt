@@ -16,7 +16,7 @@ fi
 # Pretty much everything requires root so su immediately
 alias x='exit'
 # check if interactive shell or not
-if [[ $- == *i* ]]
+if [ -t 0 ]
 then
    sudo -s
 fi

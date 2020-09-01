@@ -1,0 +1,6 @@
+# This is a comment
+
+tr1, bb, 45.00,,,stripe1, Payment from card **** **** ***** 4242 Exp 4/24, CC Payment, 1, 1, 55
+tr2, bb, -45.00, fbc,,, Entry into Popup Tournament, Congress Entry,,,
+
+# So is this

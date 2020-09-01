@@ -5,11 +5,15 @@
 
 <div>
   <div class="container-fluid">
-    <div class="row">
+    <div class="row justify-content-center">
       <div class="col-md-8">
         <div class="card card-profile">
           <div class="card-header card-header-warning">
-            <h4 class="card-title">{{ profile.full_name }} ({{ profile.system_number }})</h4>
+            <h3 class="card-title">{{ profile.full_name }}</h3>
+            <h4 class="card-title">{{ GLOBAL_ORG }} No. {{ profile.system_number }}</h4>
+            {% for org in profile.memberorganisation_set.all %}
+            <h4 class="card-title">{{ org.organisation }} - {{ org.organisation.state }}</h4>
+            {% endfor %}
           </div>
           <div class="card-body">
             <img id="cobalt-pic" class="cobalt-rounded text-center" style="height: 140px; width: 140px;" src="/media/{{ profile.pic }}" />
