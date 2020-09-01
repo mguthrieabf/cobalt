@@ -75,7 +75,10 @@
           <h3>Team Mates</h3>
         </div>
         <div class="card-body">
-          here
+          <h4>This cannot yet be edited here.</h4>
+          {% for team_mate in request.user.team_mate_user.all %}
+            {{ team_mate.team_mate }} - {{ team_mate.make_payments }}
+          {% endfor %}
         </div>
       </div>
     </div>

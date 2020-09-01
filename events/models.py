@@ -224,6 +224,16 @@ class Event(models.Model):
 
         return entry_fee, discount, reason
 
+    def already_entered(self, user):
+        """ check if a user has already entered """
+
+        event_entry_list = self.evententry_set.all().values_list("id")
+        return (
+            EventEntryPlayer.objects.filter(player=user)
+            .filter(event_entry__in=event_entry_list)
+            .exists()
+        )
+
 
 class Session(models.Model):
     """ A session within an event """
@@ -242,7 +252,7 @@ class EventEntryType(models.Model):
     entry_fee = models.DecimalField("Full Entry Fee", decimal_places=2, max_digits=10)
 
     def __str__(self):
-        return "%s - %s" % (self.event, self.event_emtry_type)
+        return "%s - %s" % (self.event, self.event_entry_type)
 
 
 class EventEntry(models.Model):
@@ -263,16 +273,6 @@ class EventEntry(models.Model):
 
     first_created_date = models.DateTimeField(default=timezone.now)
     entry_complete_date = models.DateTimeField(null=True, blank=True)
-
-    @property
-    def primary_entrant_payment(self):
-        "Returns the amount outstanding for the primary entrant"
-
-        event_entry_players = EventEntryPlayer.objects.filter(event_entry=self)
-        total = 0.0
-        for event_entry_player in event_entry_players:
-            total += float(event_entry_player.entry_fee)
-        return total
 
 
 class EventEntryPlayer(models.Model):

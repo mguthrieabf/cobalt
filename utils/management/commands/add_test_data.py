@@ -372,7 +372,7 @@ class Command(BaseCommand):
         print(fbc_pay)
 
         role = rbac_add_role_to_group(
-            fbc_pay, "payments", "manage", "edit", "Allow", model_id=fbc_pay.id
+            fbc_pay, "payments", "manage", "all", "Allow", model_id=fbc.id
         )
         print("Added/Checked role %s" % role)
 

@@ -25,6 +25,7 @@
               <h3>Pairs Entry</h3>
             </div>
             <div class="card-body table-responsive card-body-default">
+              {% include "generic_user_search_body.html" %}
               <form method="POST">
                 {% csrf_token %}
               <table>
@@ -119,8 +120,14 @@
 <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
-
 <script>
+{% include 'generic_user_search_footer.html' %}
+
+function cobaltMemberSearchOk() {
+  clearModal();
+  $("#id_player2").append('<option value="'+member_id+'" selected="">'+member_name+'</option>');
+  user_entry_fee(member_id);
+}
 
 // re-do totals
 function totals(){
@@ -154,6 +161,28 @@ function totals(){
   }
 }
 
+// get entry fee for user
+function user_entry_fee(user_id){
+$.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
+  .done(response => {
+    msg = response['data']['message'];
+    if (msg == 'Success') {
+      $("#player2_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
+           + response['data']['reason']
+           + ' $'
+           + response['data']['discount']
+           + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
+
+      $(".myHover").tooltip();
+      $("#fee_2_now").val(response['data']['entry_fee']);
+  // enable payment type - must refresh selectpickers
+      $("#id_player2_payment").prop("disabled", false);
+      $('.selectpicker').selectpicker('refresh');
+      totals();
+    }
+  });
+}
+
 $(document).ready(function(){
 
 // show early discount etc msg but only once per congress
@@ -183,28 +212,21 @@ $(document).ready(function(){
 // init tooltips
   $(".myHover").tooltip();
 
+// trigger member search
+
 
 // when player 2 identity changes get their entry fee and update table
   $('#id_player2').on('change', function(e){
     user_id = this.value;
-    $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
-      .done(response => {
-        msg = response['data']['message'];
-        if (msg == 'Success') {
-          $("#player2_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
-               + response['data']['reason']
-               + ' $'
-               + response['data']['discount']
-               + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
-          $(".myHover").tooltip();
-          $("#fee_2_now").val(response['data']['entry_fee']);
-      // enable payment type - must refresh selectpickers
-          $("#id_player2_payment").prop("disabled", false);
-          $('.selectpicker').selectpicker('refresh');
-          totals();
-        }
-      });
+// check for search id=0
+    if (user_id == 0){
+      console.log("userid is " + user_id);
+      $('#cobalt_general_member_search').modal('show');
+    } else {
+      user_entry_fee(user_id);
+    }
+
   });
 
 // when player payment method changes update totals

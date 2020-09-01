@@ -77,3 +77,15 @@ class User(AbstractUser):
     def full_name(self):
         "Returns the person's full name."
         return "%s %s" % (self.first_name, self.last_name)
+
+
+class TeamMate(models.Model):
+    """ link two members together """
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="team_mate_user"
+    )
+    team_mate = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="team_mate_team_mate"
+    )
+    make_payments = models.BooleanField("Use my account", default=False)

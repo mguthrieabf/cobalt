@@ -14,7 +14,7 @@ from .models import (
     PAYMENT_TYPES,
     BasketItem,
 )
-from accounts.models import User
+from accounts.models import User, TeamMate
 
 # from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
@@ -33,8 +33,8 @@ import uuid
 @login_required()
 def home(request):
     congresses = Congress.objects.all()
-    # return render(request, "events/soon.html", {"congresses": congresses})
-    return render(request, "events/home.html", {"congresses": congresses})
+    return render(request, "events/soon.html", {"congresses": congresses})
+    # return render(request, "events/home.html", {"congresses": congresses})
 
 
 @login_required()
@@ -834,23 +834,30 @@ def delete_session_ajax(request):
 def enter_event(request, congress_id, event_id):
     """ enter an event """
 
+    event = get_object_or_404(Event, pk=event_id)
+
+    if event.already_entered(request.user):
+        messages.error(
+            request,
+            "You have already entered ths event",
+            extra_tags="cobalt-message-error",
+        )
+
     alert_msg = None
     congress = get_object_or_404(Congress, pk=congress_id)
-    event = get_object_or_404(Event, pk=event_id)
     sessions = Session.objects.filter(event=event).order_by(
         "session_date", "session_start"
     )
     event_start = sessions.first()
 
     # drop down values for form
-    player1_list = [(request.user.id, request.user), (0, "Search..."), (4, "Fred")]
-    playerN_list = [
-        (0, "Search..."),
-        (4, "Fred Flintstone"),
-        (5, "Jim Smith"),
-        (7, "Freda Doghead"),
-        (12, "Dave Gerbil"),
-    ]
+    team_mates = TeamMate.objects.filter(user=request.user)
+    player1_list = [(request.user.id, request.user)]
+    playerN_list = [(0, "Search...")]
+    for team_mate in team_mates:
+        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
+        #        player1_list.append(item)
+        playerN_list.append(item)
 
     # entry fee for this user
     entry_fee, discount, reason = event.entry_fee_for(request.user)
@@ -903,9 +910,6 @@ def enter_event(request, congress_id, event_id):
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
             event_entry_player.save()
-            messages.success(
-                request, "Entry created p1", extra_tags="cobalt-message-success"
-            )
 
             # player 2
             event_entry_player = EventEntryPlayer()
@@ -916,9 +920,7 @@ def enter_event(request, congress_id, event_id):
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
             event_entry_player.save()
-            messages.success(
-                request, "Entry created p2", extra_tags="cobalt-message-success"
-            )
+
             return redirect("events:checkout")
 
         if "cart" in request.POST:

@@ -172,6 +172,7 @@ def rbac_add_role_to_group_ajax(request):
 
         role_ok = rbac_user_is_role_admin(request.user, role_str)
         group_ok = rbac_user_is_group_admin(request.user, group)
+
         if role_ok and group_ok:
 
             rbac_add_role_to_group(
@@ -184,7 +185,6 @@ def rbac_add_role_to_group_ajax(request):
             )
             msg = "Success"
         else:
-            print("Access Denied")
             msg = "Access Denied"
 
     else:
@@ -354,14 +354,22 @@ def rbac_delete_role_from_group_ajax(request):
         # must be both an admin for this group (able to edit this part of the tree)
         # and have rights to this role.
 
-        role_ok = rbac_user_is_role_admin(request.user, role.role)
+        # Use role.path not role.role (don't want action)
+
+        role_ok = rbac_user_is_role_admin(request.user, role.path)
         group_ok = rbac_user_is_group_admin(request.user, role.group)
+
+        print("Deleting Role")
+        print(role.role)
+        print(role.group)
+        print(role_ok)
+        print(group_ok)
+
         if role_ok and group_ok:
 
             role.delete()
             msg = "Success"
         else:
-            print("Access Denied")
             msg = "Access Denied"
 
     else:

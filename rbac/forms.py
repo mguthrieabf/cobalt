@@ -78,7 +78,6 @@ class AddGroup(forms.Form):
             # add item and any existing lower parts of tree to choices
             item = "%s" % item
             for wtree in whole_tree:
-                print("*** %s" % wtree)
                 if wtree.find(item) == 0 and wtree not in already_included:
                     choices.append((wtree, wtree))
                     already_included.append(wtree)
