@@ -1,3 +1,19 @@
+##################################################
+##################################################
+# Columns                                        #
+# -------                                        #
+#                                                #
+# 1 = id                                         #
+# 2 = system number                              #
+# 3 = first name                                 #
+# 4 = last name                                  #
+# 5 = about (text description)                   #
+# 6 = picture usually pic_folder/[something]     #
+#                                                #
+##################################################
+##################################################
+
+(id, num, fname, lname, about, pic)
 aa, 100, Alan, Admin, Global Admin for Everything (well as much as possible). Also member of secret forum 6., pic_folder/100.jpg
 bb, 101, Betty, Bunting, Forums Global Admin. Member of secret forum 6., pic_folder/101.jpg
 cc, 102, Colin, Corgy, Payments Global Admin. Member of secret forum 6., pic_folder/102.jpg
