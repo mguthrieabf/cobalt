@@ -30,7 +30,7 @@ import random
 from essential_generators import DocumentGenerator
 import datetime
 import pytz
-from django.utils.timezone import make_aware, now
+from django.utils.timezone import make_aware, now, utc
 
 TZ = pytz.timezone(TIME_ZONE)
 DATA_DIR = "utils/testdata/"
@@ -533,6 +533,9 @@ class Command(BaseCommand):
                     stripe_last4,
                     orgid,
                     othermemberid,
+                    days_ago,
+                    hour,
+                    min
                 ) = parts
 
                 if othermemberid:
@@ -617,8 +620,14 @@ class Command(BaseCommand):
                 )
 
                 if days_ago:
+                    # get date now - days_ago in UTC
                     act.created_date = now() - datetime.timedelta(days=int(days_ago))
-                    #    act.created_date = act.created_date.replace(hour=int(hour), minute=int(min))
+                    # convert to our TZ
+                    datetime_local = act.created_date.astimezone(TZ)
+                    # change hours and mins
+                    datetime_local = datetime_local.replace(hour=int(hour), minute=int(min))
+                    # convert to utc and save
+                    act.created_date = datetime_local.replace(tzinfo=utc)
                     act.save()
 
                 payments_member_dic[id] = act
@@ -629,7 +638,7 @@ class Command(BaseCommand):
                 if line.find("#") == 0 or line.strip() == "":
                     continue
                 parts = [s.strip() for s in line.split(",")]
-                (orgid, amount, memberid, description, payment_type) = parts
+                (orgid, amount, memberid, description, payment_type, days_ago, hour, min) = parts
                 member = user_dic[memberid]
                 org = org_dic[orgid]
 

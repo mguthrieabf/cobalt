@@ -1,3 +1,18 @@
+################################################################################
+################################################################################
+#                                                                              #
+# Events Congress Masters - maps to events.congress_master                     #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+# 1 = id                                                                       #
+# 2 = org_id                                                                   #
+# 3 = name                                                                     #
+#                                                                              #
+################################################################################
+################################################################################
+
 fasc, fbc, Fantasy Annual Super Congress
 ferp, fbc, Fantasy Easter Red Points Congress
 fcrp, fbc, Fantasy Christmas Red Points Congress

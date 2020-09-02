@@ -19,11 +19,8 @@ the directory ``utils/testdata``. The test data is in CSV format and the filenam
 match the models within Cobalt.
 
 The script assumes an empty but initialised database. It requires the default
-Users and Org to be present as well as the RBAC static data. You can achieve this
-by running:
-
-* TBA
-* TBA or link to somewhere
+Users and Org to be present as well as the RBAC static data. The standard
+configuration scripts take care of this.
 
 CSV Format
 ----------
@@ -32,9 +29,9 @@ The files are CSV, so commas cannot be used within text fields or the script
 will fail. It will ignore blank lines or lines that **start** with #. Using
 a # as a comment anywhere but the first column will not work.
 
-Each file has a description of the fields in comments at the top, please
-don't overwrite these by importing to a CSV and exporting again as nobody
-else will know what the format should be after that.
+Each file has a description of the fields in comments at the top, if you import
+the files into Excel and then export them, check that the comments are not
+deleted.
 
 Foreign Keys
 ------------
@@ -45,10 +42,27 @@ instance of that model. e.g.::
 
   users.txt
 
-  jj, 109, Janet, Jumper, Moderator and member of secret forum 6., pic_folder/109.jpg
-  kk, 110, Keith, Kenneth, Global Moderator., pic_folder/110.jpg
+  jj, 109, Janet, Jumper,,
+  kk, 110, Keith, Kenneth,,
 
   member_orgs.txt
 
   jj, fbc
   jj, rbc
+
+If an id is required but you don't need to refer to this field elsewhere then
+you can use anything as long as it doesn't clash with something you do want to
+refer to elsewhere (e.g. Dummy).
+
+Relative Dates
+--------------
+
+Some files support providing relative date parameters to backdate transactions.
+e.g.::
+
+  tr1, something, 1, 16, 55
+
+Here field 3 is a relative date (1 day ago) and fields 4 and 5 set the time to
+4:55pm.
+
+Note: time settings are not currently working.

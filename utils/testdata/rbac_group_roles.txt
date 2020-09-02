@@ -1,3 +1,25 @@
+################################################################################
+################################################################################
+#                                                                              #
+# RBAC Groups Role - maps to rbac.rbac_group_role                              #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+# 1 = group_id                                                                 #
+# 2 = app                                                                      #
+# 3 = model                                                                    #
+# 4 = action                                                                   #
+# 5 = rule_type                                                                #
+# 6 = model_id (optional)                                                      #
+#                                                                              #
+# Note: you may need to 'calculate' the model_id based upon order creation.    #
+# For example fbc_staff want access to the fbc org. This is the first org      #
+# created by this script but ABF is already present (org=1) so fbc is org 2.   #
+#                                                                              #
+################################################################################
+################################################################################
+
 fbc_staff, orgs, org, edit, Allow, 2
 fbc_pay, payments, manage, all, Allow, 2
 forum_admin, forums, admin, edit, Allow,

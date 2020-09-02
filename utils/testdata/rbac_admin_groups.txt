@@ -1,2 +1,18 @@
+################################################################################
+################################################################################
+#                                                                              #
+# RBAC Admin Groups - maps to rbac.rbac_admin_group                            #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+# 1 = group_id                                                                 #
+# 2 = tree                                                                     #
+# 3 = name                                                                     #
+# 4 = Description                                                              #
+#                                                                              #
+################################################################################
+################################################################################
+
 ad_group, admin.cobalt.global, system_gods, Highest level of admin to all functions.
 f_group, admin.cobalt.global, forums, All forum admin
