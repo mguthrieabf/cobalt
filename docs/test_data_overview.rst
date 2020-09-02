@@ -66,3 +66,10 @@ Here field 3 is a relative date (1 day ago) and fields 4 and 5 set the time to
 4:55pm.
 
 Note: time settings are not currently working.
+
+Payments
+--------
+
+Cobalt takes care of booking both sides of a transaction (user to org and org
+to user for example). Here that does not happen so you will need to book two
+transactions yourself.
