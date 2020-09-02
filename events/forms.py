@@ -278,6 +278,7 @@ class EventEntryForm(forms.Form):
         congress = kwargs.pop("congress", None)
         player1_list = kwargs.pop("player1_list", [])
         playerN_list = kwargs.pop("playerN_list", [])
+        team_mates_reverse = kwargs.pop("team_mates_reverse", [])
 
         super(EventEntryForm, self).__init__(*args, **kwargs)
 
@@ -304,6 +305,12 @@ class EventEntryForm(forms.Form):
         self.fields["player1_payment"].value = pay_types[0]
         self.fields["player2_payment"].value = pay_types[0]
         self.fields["player1"].value = player1_list[0]
+
+    def clean(self):
+        print("INSIDE")
+        print(self.cleaned_data)
+        print(self.data)
+        print(dir(self))
 
     #     self.fields["player2"].required = False
     #

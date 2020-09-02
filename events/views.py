@@ -893,9 +893,14 @@ def enter_event(request, congress_id, event_id):
         team_mates_reverse=team_mates_reverse,
     )
 
-    if form.is_valid():
+    print(request.POST)
+    print(request.body)
+
+#    if form.is_valid():
+    if True:
         if "now" in request.POST:
             # save entry and redirect to checkout
+
 
             # create event_entry
             event_entry = EventEntry()
@@ -913,7 +918,7 @@ def enter_event(request, congress_id, event_id):
             event_entry_player = EventEntryPlayer()
             event_entry_player.event_entry = event_entry
             event_entry_player.player = request.user
-            event_entry_player.payment_type = form.cleaned_data["player1_payment"]
+            event_entry_player.payment_type = form.data["player1_payment"]
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
             event_entry_player.save()
@@ -921,9 +926,9 @@ def enter_event(request, congress_id, event_id):
             # player 2
             event_entry_player = EventEntryPlayer()
             event_entry_player.event_entry = event_entry
-            p2 = get_object_or_404(User, pk=form.cleaned_data["player2"])
+            p2 = get_object_or_404(User, pk=form.data["player2"])
             event_entry_player.player = p2
-            event_entry_player.payment_type = form.cleaned_data["player2_payment"]
+            event_entry_player.payment_type = form.data["player2_payment"]
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
             event_entry_player.save()
