@@ -216,7 +216,8 @@ class MemberTransaction(AbstractTransaction):
     )
 
     def save(self, *args, **kwargs):
-        self.description = self.description[:80]
+        if self.description:
+            self.description = self.description[:80]
         if not self.reference_no:
             self.reference_no = "%s-%s-%s" % (
                 "".join(random.choices(string.ascii_uppercase + string.digits, k=4)),

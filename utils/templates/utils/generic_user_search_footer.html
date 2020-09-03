@@ -1,0 +1,75 @@
+  // Code for user search dialog
+
+      const search_results{{ search_id }} = $('#search-results{{ search_id }}')
+      const search_panel{{ search_id }} = $('#cobalt-search{{ search_id }}')
+      const member_display{{ search_id }} = $('#cobalt-member{{ search_id }}')
+      const member_search = '{% url "accounts:member_search_ajax" %}'
+      const member_detail = '{% url "accounts:member_details_ajax" %}'
+
+      var member_id{{ search_id }} = 0;
+      var group_id{{ search_id }};
+
+  jQuery(document).ready(function() {
+
+// fill in single person hide other fields
+    function showSingleMember(id) {
+      $.getJSON(member_detail + "?member_id=" + id + "&search_id={{ search_id }}")
+        .done(response => {
+        //  search_panel{{ search_id }}.hide();
+          search_results{{ search_id }}.html("");
+
+          // show the member
+          member_display{{ search_id }}.html(response['data']);
+
+          // set member_id and name
+          member_id{{ search_id }} = id;
+          member_name{{ search_id }} = response['member'];
+        })
+     }
+
+// dynamic search
+    $(".dynamic-search{{ search_id }}").on('keyup', function(event){
+
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+// Get values and search if enough letters typed
+
+      var lastname = $("#id_lastname{{ search_id }}")
+      var firstname = $("#id_firstname{{ search_id }}")
+
+      var ln = lastname.val();
+      var fn = firstname.val();
+
+      search_results{{ search_id }}.html("");
+
+      if (ln.length + fn.length > 3) {
+        $.getJSON(member_search + "?lastname=" + ln + "&firstname=" + fn + "&search_id={{ search_id }}")
+            .done(response => {
+              console.log(response['data']);
+
+              // update screen with results
+                search_results{{ search_id }}.html(response['data']);
+
+              // watch for user selecting member and change screen again
+                $(".cobalt-names{{ search_id }}").change(function(event){
+                  var id=$(this).val();
+                  lastname.val('');
+                  firstname.val('');
+                  showSingleMember(id);
+                });
+            })
+      }
+    });
+  });
+
+// Clear and hide generic member search popup
+  function clearModal{{ search_id }}(){
+    $('.dynamic_search{{ search_id }}').each(function(i, obj) {
+      obj.val("");
+    })
+    search_results{{ search_id }}.html("");
+    member_display{{ search_id }}.html("");
+    $(':focus').blur()
+    $('#cobalt_general_member_search{{ search_id }}').modal('hide');
+  }

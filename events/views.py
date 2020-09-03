@@ -165,56 +165,6 @@ def delete_congress(request, congress_id):
 
 
 @login_required()
-def get_conveners_ajax(request, org_id):
-    """ returns a list of conveners as html for an organisation """
-
-    conveners = rbac_get_users_with_role("events.org.%s.edit" % org_id)
-
-    ret = "<ul>"
-    for con in conveners:
-        ret += "<li>%s" % con
-    ret += (
-        "</ul><p>These can be changed from the <a href='/organisations/edit/%s' target='_blank'>Organisation Administration Page</p>"
-        % org_id
-    )
-
-    data_dict = {"data": ret}
-    return JsonResponse(data=data_dict, safe=False)
-
-
-@login_required()
-def get_congress_master_ajax(request, org_id):
-    """ returns a list of congress_masters as html for an organisation """
-
-    org = get_object_or_404(Organisation, pk=org_id)
-
-    qs = CongressMaster.objects.filter(org=org).distinct("name")
-
-    ret = "<option value=''>-----------"
-    for cm in qs:
-        ret += f"<option value='{cm.pk}'>{cm.name}</option>"
-
-    data_dict = {"data": ret}
-    return JsonResponse(data=data_dict, safe=False)
-
-
-@login_required()
-def get_congress_ajax(request, congress_id):
-    """ returns a list of congresses as html for an congress_master """
-
-    master = get_object_or_404(CongressMaster, pk=congress_id)
-
-    qs = Congress.objects.filter(congress_master=master).distinct("name")
-
-    ret = "<option value=''>-----------"
-    for cm in qs:
-        ret += f"<option value='{cm.id}'>{cm.name}</option>"
-
-    data_dict = {"data": ret}
-    return JsonResponse(data=data_dict, safe=False)
-
-
-@login_required()
 def create_congress_wizard(request, step=1, congress_id=None):
     """ create a new congress using a wizard format.
 
@@ -789,53 +739,13 @@ def edit_session(request, event_id, session_id):
 
 
 @login_required()
-def delete_event_ajax(request):
-    """ Ajax call to delete an event from a congress """
-
-    if request.method == "GET":
-        event_id = request.GET["event_id"]
-
-    event = get_object_or_404(Event, pk=event_id)
-
-    # check access
-    role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
-
-    event.delete()
-
-    response_data = {}
-    response_data["message"] = "Success"
-    return JsonResponse({"data": response_data})
-
-
-@login_required()
-def delete_session_ajax(request):
-    """ Ajax call to delete a session from a congress """
-
-    if request.method == "GET":
-        session_id = request.GET["session_id"]
-
-    session = get_object_or_404(Session, pk=session_id)
-
-    # check access
-    role = "events.org.%s.edit" % session.event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
-
-    session.delete()
-
-    response_data = {}
-    response_data["message"] = "Success"
-    return JsonResponse({"data": response_data})
-
-
-@login_required()
 def enter_event(request, congress_id, event_id):
     """ enter an event """
 
+    # Load the event
     event = get_object_or_404(Event, pk=event_id)
 
+    # Check if already entered
     if event.already_entered(request.user):
         messages.error(
             request,
@@ -843,119 +753,122 @@ def enter_event(request, congress_id, event_id):
             extra_tags="cobalt-message-error",
         )
 
-    alert_msg = None
-    congress = get_object_or_404(Congress, pk=congress_id)
-    sessions = Session.objects.filter(event=event).order_by(
-        "session_date", "session_start"
-    )
-    event_start = sessions.first()
+    # check if POST.
+    # Note: this works a bit differently to most forms in Cobalt.
+    #       We build a blank form but use client side code to validate and
+    #       modify the form. We don't call is_valid() as this will fail. We get
+    #       the data from form.data instead. This will work unless someone has
+    #       deliberately bypassed the client side validation in which case we
+    #       don't mind failing with an error.
 
-    # drop down values for form
-    team_mates = TeamMate.objects.filter(user=request.user)
-    player1_list = [(request.user.id, request.user)]
+    if request.method == "POST":
 
-    # players 2 - 6 use all the same reference data
-    playerN_list = [(0, "Search...")]
-    for team_mate in team_mates:
-        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
-        playerN_list.append(item)
+        form = EventEntryForm(request.POST)
 
-    # Get team_mates in reverse direction to see who we can pay for
-    team_mates_reverse = TeamMate.objects.filter(
-        team_mate=request.user, make_payments=True
-    )
+        # create event_entry
+        event_entry = EventEntry()
+        event_entry.event = event
+        event_entry.primary_entrant = request.user
+        event_entry.save()
 
-    # entry fee for this user
-    entry_fee, discount, reason = event.entry_fee_for(request.user)
+        # add to basket
+        basket_item = BasketItem()
+        basket_item.player = request.user
+        basket_item.event_entry = event_entry
+        basket_item.save()
 
-    if reason == "Early discount":
-        date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
-        alert_msg = [
-            "Early Entry Discount",
-            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
-            % (discount, date_field),
-        ]
+        # Get players from form
+        players = {0: request.user}
+        player_payments = {0: form.data["player0_payment"]}
 
-    if reason == "Youth discount":
-        alert_msg = [
-            "Youth Discount",
-            "You qualify for a youth discount for this event. A saving of $%.2f."
-            % discount,
-        ]
+        for p_id in range(1, 6):
+            p_string = f"player{p_id}"
+            ppay_string = f"player{p_id}_payment"
+            if p_string in form.data:
+                players[p_id] = get_object_or_404(User, pk=int(form.data[p_string]))
+                player_payments[p_id] = form.data[ppay_string]
+        print(players)
+        print(player_payments)
 
-    # This avoids if request.method == "POST"
+        # validate
+        if (event.player_format == "Pairs" and len(players) != 2) or (
+            event.player_format == "Teams" and len(players) < 4
+        ):
+            print("invalid number of entries")
+            return
 
-    form = EventEntryForm(
-        request.POST or None,
-        congress=congress,
-        player1_list=player1_list,
-        playerN_list=playerN_list,
-        team_mates_reverse=team_mates_reverse,
-    )
+        # create player entries
+        for p_id in range(len(players)):
 
-    print(request.POST)
-    print(request.body)
+            event_entry_player = EventEntryPlayer()
+            event_entry_player.event_entry = event_entry
+            event_entry_player.player = players[p_id]
+            event_entry_player.payment_type = player_payments[p_id]
+            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
+            event_entry_player.entry_fee = entry_fee
+            event_entry_player.save()
 
-#    if form.is_valid():
-    if True:
         if "now" in request.POST:
-            # save entry and redirect to checkout
-
-
-            # create event_entry
-            event_entry = EventEntry()
-            event_entry.event = event
-            event_entry.primary_entrant = request.user
-            event_entry.save()
-
-            # add to basket
-            basket_item = BasketItem()
-            basket_item.player = request.user
-            basket_item.event_entry = event_entry
-            basket_item.save()
-
-            # player 1
-            event_entry_player = EventEntryPlayer()
-            event_entry_player.event_entry = event_entry
-            event_entry_player.player = request.user
-            event_entry_player.payment_type = form.data["player1_payment"]
-            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
-            event_entry_player.entry_fee = entry_fee
-            event_entry_player.save()
-
-            # player 2
-            event_entry_player = EventEntryPlayer()
-            event_entry_player.event_entry = event_entry
-            p2 = get_object_or_404(User, pk=form.data["player2"])
-            event_entry_player.player = p2
-            event_entry_player.payment_type = form.data["player2_payment"]
-            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
-            event_entry_player.entry_fee = entry_fee
-            event_entry_player.save()
-
             return redirect("events:checkout")
+        else:  # add to cart and keep shopping
+            return redirect("events:view_congress", congress_id=event.congress.id)
 
-        if "cart" in request.POST:
-            # save entry and redirect to congress view
-            print("Cart")
     else:
-        print(form.errors)
 
-    return render(
-        request,
-        "events/enter_event.html",
-        {
-            "form": form,
-            "congress": congress,
-            "event": event,
-            "sessions": sessions,
-            "event_start": event_start,
-            "alert_msg": alert_msg,
-            "entry_fee": entry_fee,
-            "discount": discount,
-            "reason": reason,
-        },
-    )
+        alert_msg = None
+        congress = get_object_or_404(Congress, pk=congress_id)
+        sessions = Session.objects.filter(event=event).order_by(
+            "session_date", "session_start"
+        )
+        event_start = sessions.first()
+
+        # drop down values for form
+        team_mates = TeamMate.objects.filter(user=request.user)
+        player0_list = [(request.user.id, request.user)]
+
+        # players 2 - 6 use all the same reference data
+        playerN_list = [(0, "Search...")]
+        for team_mate in team_mates:
+            item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
+            playerN_list.append(item)
+
+        # entry fee for this user
+        entry_fee, discount, reason = event.entry_fee_for(request.user)
+
+        if reason == "Early discount":
+            date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
+            alert_msg = [
+                "Early Entry Discount",
+                "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
+                % (discount, date_field),
+            ]
+
+        if reason == "Youth discount":
+            alert_msg = [
+                "Youth Discount",
+                "You qualify for a youth discount for this event. A saving of $%.2f."
+                % discount,
+            ]
+
+        form = EventEntryForm(
+            congress=congress, player0_list=player0_list, playerN_list=playerN_list,
+        )
+
+        return render(
+            request,
+            "events/enter_event.html",
+            {
+                "form": form,
+                "congress": congress,
+                "event": event,
+                "sessions": sessions,
+                "event_start": event_start,
+                "alert_msg": alert_msg,
+                "entry_fee": entry_fee,
+                "discount": discount,
+                "reason": reason,
+            },
+        )
 
 
 @login_required()
@@ -1017,21 +930,3 @@ def admin_summary(request, congress_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
     return render(request, "events/admin_summary.html", {"congress": congress})
-
-
-@login_required()
-def fee_for_user_ajax(request):
-    """ Ajax call to get entry fee for a user in an event """
-
-    if request.method == "GET":
-        event_id = request.GET["event_id"]
-        user_id = request.GET["user_id"]
-
-    event = get_object_or_404(Event, pk=event_id)
-    user = get_object_or_404(User, pk=user_id)
-
-    entry_fee, discount, reason = event.entry_fee_for(user)
-
-    response_data = {"entry_fee": entry_fee, "reason": reason, "discount": discount}
-    response_data["message"] = "Success"
-    return JsonResponse({"data": response_data})

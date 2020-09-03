@@ -212,12 +212,20 @@ def member_details_ajax(request):
 
     Args:
         member_id - member number
+        search_id - used if page has multiple user searches. We just pass this
+        through. Optional.
 
     Returns:
         Json array: member, clubs,  global org name.
     """
 
     if request.method == "GET":
+
+        if "search_id" in request.GET:
+            search_id = request.GET.get("search_id")
+        else:
+            search_id = None
+
         if "member_id" in request.GET:
             member_id = request.GET.get("member_id")
             member = get_object_or_404(User, pk=member_id)
@@ -230,6 +238,7 @@ def member_details_ajax(request):
                         "member": member,
                         "clubs": clubs,
                         "global_org": global_org,
+                        "search_id": search_id,
                     },
                 )
                 data_dict = {"data": html, "member": "%s" % member}
@@ -314,6 +323,8 @@ def member_search_ajax(request):
     Args:
         lastname - partial lastname to search for. Wild cards the ending.
         firstname - partial firstname to search for. Wild cards the ending.
+        search_id - used if page has multiple user searches. We just pass this
+        through. Optional.
 
     Returns:
         HttpResponse - either a message or a list of users in HTML format.
@@ -322,6 +333,11 @@ def member_search_ajax(request):
     msg = ""
 
     if request.method == "GET":
+
+        if "search_id" in request.GET:
+            search_id = request.GET.get("search_id")
+        else:
+            search_id = None
 
         if "lastname" in request.GET:
             search_last_name = request.GET.get("lastname")
@@ -355,7 +371,7 @@ def member_search_ajax(request):
                 msg = "No matches found"
             html = render_to_string(
                 template_name="accounts/search_results_ajax.html",
-                context={"members": members, "msg": msg},
+                context={"members": members, "msg": msg, "search_id": search_id},
             )
 
             data_dict = {"data": html}

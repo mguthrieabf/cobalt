@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, ajax
 
 app_name = "events"  # pylint: disable=invalid-name
 
@@ -40,17 +40,17 @@ urlpatterns = [
     ),
     path(
         "congress/get-conveners/<int:org_id>",
-        views.get_conveners_ajax,
+        ajax.get_conveners_ajax,
         name="get_conveners_ajax",
     ),
     path(
         "congress/create/get-congress-master/<int:org_id>",
-        views.get_congress_master_ajax,
+        ajax.get_congress_master_ajax,
         name="get_congress_master_ajax",
     ),
     path(
         "congress/create/get-congress/<int:congress_id>",
-        views.get_congress_ajax,
+        ajax.get_congress_ajax,
         name="get_congress_ajax",
     ),
     path(
@@ -81,17 +81,22 @@ urlpatterns = [
     ),
     path(
         "congress/create/delete-event",
-        views.delete_event_ajax,
+        ajax.delete_event_ajax,
         name="delete_event_ajax",
     ),
     path(
         "congress/create/delete-session",
-        views.delete_session_ajax,
+        ajax.delete_session_ajax,
         name="delete_session_ajax",
     ),
     path(
         "congress/event/enter/fee-for-user",
-        views.fee_for_user_ajax,
+        ajax.fee_for_user_ajax,
         name="fee_for_user_ajax",
+    ),
+    path(
+        "congress/event/enter/payment-options-for-user",
+        ajax.payment_options_for_user_ajax,
+        name="payment_options_for_user_ajax",
     ),
 ]

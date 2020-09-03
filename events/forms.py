@@ -269,57 +269,44 @@ class SessionForm(forms.ModelForm):
 
 
 class EventEntryForm(forms.Form):
-    """ This form is for entering events. It does a lot of the heavy lifting
-    in terms of initialising values. """
+    """ This form is for entering events. is_valid() is not called. """
+
+    player0 = forms.ChoiceField()
+    player1 = forms.ChoiceField()
+    player0_payment = forms.ChoiceField()
+    player1_payment = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
 
         # Get parameters
         congress = kwargs.pop("congress", None)
-        player1_list = kwargs.pop("player1_list", [])
+        player0_list = kwargs.pop("player0_list", [])
         playerN_list = kwargs.pop("playerN_list", [])
-        team_mates_reverse = kwargs.pop("team_mates_reverse", [])
 
         super(EventEntryForm, self).__init__(*args, **kwargs)
 
         # set values
-        self.fields["player1"].choices = player1_list
-        self.fields["player2"].choices = playerN_list
+        self.fields["player0"].choices = player0_list
+        self.fields["player1"].choices = playerN_list
+        if player0_list:
+            self.fields["player0"].value = player0_list[0]
 
         # payment types
-        pay_types = []
-        if congress.payment_method_system_dollars:
-            pay_types.append(
-                ("my-system-dollars", f"{GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
-            )
-        if congress.payment_method_bank_transfer:
-            pay_types.append(("bank-transfer", "Bank Transfer"))
-        if congress.payment_method_cash:
-            pay_types.append(("cash", "Cash on the day"))
-        if congress.payment_method_cheques:
-            pay_types.append(("cheque", "Cheque"))
+        if congress:
+            pay_types = []
+            if congress.payment_method_system_dollars:
+                pay_types.append(
+                    ("my-system-dollars", f"My {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+                )
+            if congress.payment_method_bank_transfer:
+                pay_types.append(("bank-transfer", "Bank Transfer"))
+            if congress.payment_method_cash:
+                pay_types.append(("cash", "Cash on the day"))
+            if congress.payment_method_cheques:
+                pay_types.append(("cheque", "Cheque"))
 
-        self.fields["player1_payment"].choices = pay_types
-        self.fields["player2_payment"].choices = pay_types
+            self.fields["player0_payment"].choices = pay_types
+            self.fields["player1_payment"].choices = pay_types
 
-        self.fields["player1_payment"].value = pay_types[0]
-        self.fields["player2_payment"].value = pay_types[0]
-        self.fields["player1"].value = player1_list[0]
-
-    def clean(self):
-        print("INSIDE")
-        print(self.cleaned_data)
-        print(self.data)
-        print(dir(self))
-
-    #     self.fields["player2"].required = False
-    #
-    # def clean(self):
-    #     print("clean p2")
-    #     player2 = self.cleaned_data["player2"]
-    #     return player2
-
-    player1 = forms.ChoiceField()
-    player2 = forms.ChoiceField()
-    player1_payment = forms.ChoiceField()
-    player2_payment = forms.ChoiceField()
+            self.fields["player0_payment"].value = pay_types[0]
+            self.fields["player1_payment"].value = pay_types[0]
