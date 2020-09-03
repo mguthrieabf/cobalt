@@ -14,7 +14,7 @@
 # 6 = stripe_transaction_id                                                    #
 # 7 = description                                                              #
 # 8 = transaction_type (see https://cobalt-bridge.readthedocs.io/en/latest/_modules/payments/models.html)
-# 12 = days_ago (optional)                                                     #
+# 9 = days_ago (optional)                                                     #
 # 13 = hour (optional)                                                         #
 # 14 - minute (optional)                                                       #
 #                                                                              #

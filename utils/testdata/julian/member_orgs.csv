@@ -1,0 +1,28 @@
+################################################################################
+################################################################################
+#                                                                              #
+# Member Orgs - maps to organisations.MemberOrg                                #
+#                                                                              #
+# Controls who is associated with which org                                    #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+# 1 = member_id (foreign key for users.txt)                                    #
+# 2 = org_id (foreign key for orgs.txt)                                        #
+#                                                                              #
+################################################################################
+################################################################################
+
+aa, fbc
+aa, rbc
+bb, rbc
+cc, fbc
+dd, rbc
+ee, fbc
+ff, fbc
+gg, fbc
+hh, rbc
+ii, rbc
+jj, fbc
+kk, fbc

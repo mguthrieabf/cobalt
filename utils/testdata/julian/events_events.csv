@@ -1,0 +1,23 @@
+################################################################################
+################################################################################
+#                                                                              #
+# Events Events - maps to events.event                                         #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+# 1 = id                                                                       #
+# 2 = congress_id                                                              #
+# 3 = name                                                                     #
+# 4 = description                                                              #
+# 5 = max_entries                                                              #
+# 6 = entry_type = Open, Restricted, Novice, Senior, Youth                     #
+# 7 = entry_fee                                                                #
+# 8 = early_payment_discount                                                   #
+# 9 = player_format = Individual, Pairs, Teams                                 #
+#                                                                              #
+################################################################################
+################################################################################
+
+wp, c1, Welcome Pairs, 27 board Matchpoint Pairs, 40, Open, 30.0, 5.0, Pairs
+st, c1, Open Teams, 2 Day Swiss Teams event. IMP scoring., 80, Open, 140.0, 15.0, Teams

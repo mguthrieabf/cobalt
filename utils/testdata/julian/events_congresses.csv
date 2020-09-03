@@ -1,0 +1,57 @@
+################################################################################
+################################################################################
+#                                                                              #
+# Events Congress - maps to events.congress                                    #
+#                                                                              #
+#       This one is a monster!!!                                               #
+#                                                                              #
+# Columns                                                                      #
+# -------                                                                      #
+#                                                                              #
+#    1 = id                                                                    #
+#    2 = congress_master_id                                                    #
+#    3 = start_yr                                                              #
+#    4 = start_mth                                                             #
+#    5 = start_day                                                             #
+#    6 = end_yr                                                                #
+#    7 = end_mth                                                               #
+#    8 = end_day                                                               #
+#    9 = date_string                                                           #
+#    10 = year                                                                 #
+#    11 = venue_name                                                           #
+#    12 = lat                                                                  #
+#    13 = lon                                                                  #
+#    14 = venue_transport                                                      #
+#    15 = venue_catering                                                       #
+#    16 = people                                                               #
+#    17 = general_info                                                         #
+#    18 = payment_method_system_dollars                                        #
+#    19 = payment_method_bank_transfer                                         #
+#    20 = payment_method_cash                                                  #
+#    21 = payment_method_cheques                                               #
+#    22 = allow_early_payment_discount                                         #
+#    23 = early_yr                                                             #
+#    24 = early_mnth                                                           #
+#    25 = early_day                                                            #
+#    26 = allow_youth_payment_discount                                         #
+#    27 = yth_year                                                             #
+#    28 = yth_mnth                                                             #
+#    29 = yth_day                                                              #
+#    30 = snr_yr                                                               #
+#    31 = snr_mnth                                                             #
+#    32 = snr_day                                                              #
+#    33 = youth_payment_discount_age                                           #
+#    34 = senior_age                                                           #
+#    35 = open_yr                                                              #
+#    36 = open_mnth                                                            #
+#    37 = open_day                                                             #
+#    38 = close_yr                                                             #
+#    39 = close_mnth                                                           #
+#    40 = close_day                                                            #
+#    41 = allow_partnership_desk                                               #
+#    42 = status                                                               #
+#                                                                              #
+################################################################################
+################################################################################
+
+c1, fasc, 2022, 5, 7, 2022, 5, 15, 7th to 15th May 2022, 2022,Sydney Opera House, -33.856000, 151.215340, <h3>Public Transport</h3><ul><li>235 Bus stops outside.<li>Circular Quay train station is 5 minutes walk.<li>Circular Quay ferries services are 5 minutes walk.</ul><h3>Parking</h3><p>Ample parking on street nearby.</p>, <ul><li>Sandwiches and pies are available at the shop.<li>Restaurants and cafes nearby.<li>Good pubs a short walk away.<li>You can also bring your own food.</ul>, TBA, <p>Welcome to our annual congress with prize money in excess of $20M</p><p>This year we have new premises and a new directing team.</p>, 1, 1, 0, 1, 1, 2023, 4, 1, 1, 2023, 1, 1, 2023, 1, 1, 30, 65, 2022, 12, 1, 2022, 5, 1, 0, Published

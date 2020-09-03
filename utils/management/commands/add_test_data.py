@@ -33,7 +33,7 @@ import pytz
 from django.utils.timezone import make_aware, now, utc
 
 TZ = pytz.timezone(TIME_ZONE)
-DATA_DIR = "utils/testdata/"
+DATA_DIR = "utils/testdata/julian/"
 
 
 class Command(BaseCommand):
@@ -120,7 +120,7 @@ class Command(BaseCommand):
         # Users
         print("Creating Users")
         user_dic = {}
-        with open(DATA_DIR + "users.txt") as infile:
+        with open(DATA_DIR + "users.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -135,7 +135,7 @@ class Command(BaseCommand):
         # Orgs - assumes ABF already created elsewhere
         print("Creating Orgs")
         org_dic = {}
-        with open(DATA_DIR + "orgs.txt") as infile:
+        with open(DATA_DIR + "orgs.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -148,7 +148,7 @@ class Command(BaseCommand):
 
         # Add Members to Orgs
         print("Adding Members to clubs")
-        with open(DATA_DIR + "member_orgs.txt") as infile:
+        with open(DATA_DIR + "member_orgs.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -161,7 +161,7 @@ class Command(BaseCommand):
         # create Forums
         print("Creating Forums")
         forum_dic = {}
-        with open(DATA_DIR + "forums.txt") as infile:
+        with open(DATA_DIR + "forums.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -190,7 +190,7 @@ class Command(BaseCommand):
         print("Creating RBAC Groups")
 
         rbac_group_dic = {}
-        with open(DATA_DIR + "rbac_groups.txt") as infile:
+        with open(DATA_DIR + "rbac_groups.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -201,7 +201,7 @@ class Command(BaseCommand):
 
         # add roles to groups
         print("Adding Roles to RBAC Groups")
-        with open(DATA_DIR + "rbac_group_roles.txt") as infile:
+        with open(DATA_DIR + "rbac_group_roles.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -213,7 +213,7 @@ class Command(BaseCommand):
 
         # add users to groups
         print("Adding Users to RBAC Groups")
-        with open(DATA_DIR + "rbac_group_users.txt") as infile:
+        with open(DATA_DIR + "rbac_group_users.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -228,7 +228,7 @@ class Command(BaseCommand):
         print("Creating RBAC Admin Groups")
 
         rbac_admin_group_dic = {}
-        with open(DATA_DIR + "rbac_admin_groups.txt") as infile:
+        with open(DATA_DIR + "rbac_admin_groups.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -239,7 +239,7 @@ class Command(BaseCommand):
 
         print("Adding Trees to RBAC Admin Groups")
 
-        with open(DATA_DIR + "rbac_admin_group_trees.txt") as infile:
+        with open(DATA_DIR + "rbac_admin_group_trees.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -249,7 +249,7 @@ class Command(BaseCommand):
 
         print("Adding Roles to RBAC Admin Groups")
 
-        with open(DATA_DIR + "rbac_admin_group_roles.txt") as infile:
+        with open(DATA_DIR + "rbac_admin_group_roles.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -261,7 +261,7 @@ class Command(BaseCommand):
 
         print("Adding Users to RBAC Admin Groups")
 
-        with open(DATA_DIR + "rbac_admin_group_users.txt") as infile:
+        with open(DATA_DIR + "rbac_admin_group_users.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -275,7 +275,7 @@ class Command(BaseCommand):
         # Congress Master
         print("Congress Masters")
         congress_master_dic = {}
-        with open(DATA_DIR + "events_congress_masters.txt") as infile:
+        with open(DATA_DIR + "events_congress_masters.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -288,7 +288,7 @@ class Command(BaseCommand):
         # Congress
         print("Congresses")
         congress_dic = {}
-        with open(DATA_DIR + "events_congresses.txt") as infile:
+        with open(DATA_DIR + "events_congresses.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -449,7 +449,7 @@ class Command(BaseCommand):
         print("Events")
 
         event_dic = {}
-        with open(DATA_DIR + "events_events.txt") as infile:
+        with open(DATA_DIR + "events_events.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -480,7 +480,7 @@ class Command(BaseCommand):
 
         print("Sessions")
 
-        with open(DATA_DIR + "events_sessions.txt") as infile:
+        with open(DATA_DIR + "events_sessions.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
@@ -516,10 +516,11 @@ class Command(BaseCommand):
 
         print("Stripe")
         stripe_dic = {}
-        with open(DATA_DIR + "payments_stripe.txt") as infile:
+        with open(DATA_DIR + "payments_stripe.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
+                print(line)
                 parts = [s.strip() for s in line.split(",")]
                 (
                     id,
@@ -535,7 +536,7 @@ class Command(BaseCommand):
                     othermemberid,
                     days_ago,
                     hour,
-                    min
+                    min,
                 ) = parts
 
                 if othermemberid:
@@ -571,10 +572,11 @@ class Command(BaseCommand):
 
         print("Member")
         payments_member_dic = {}
-        with open(DATA_DIR + "payments_member.txt") as infile:
+        with open(DATA_DIR + "payments_member.csv") as infile:
             for line in infile:
                 if line.find("#") == 0 or line.strip() == "":
                     continue
+                print(line)
                 parts = [s.strip() for s in line.split(",")]
                 (
                     id,
@@ -602,6 +604,7 @@ class Command(BaseCommand):
                     org = None
 
                 if stripe_transactionid:
+                    print(stripe_dic)
                     tran = stripe_dic[stripe_transactionid]
                 else:
                     tran = None
@@ -620,12 +623,19 @@ class Command(BaseCommand):
                 )
 
                 if days_ago:
+                    print(f"#########{hour}###")
+                    if hour == "":
+                        hour = 0
+                    if min == "":
+                        min = 0
                     # get date now - days_ago in UTC
                     act.created_date = now() - datetime.timedelta(days=int(days_ago))
                     # convert to our TZ
                     datetime_local = act.created_date.astimezone(TZ)
                     # change hours and mins
-                    datetime_local = datetime_local.replace(hour=int(hour), minute=int(min))
+                    datetime_local = datetime_local.replace(
+                        hour=int(hour), minute=int(min)
+                    )
                     # convert to utc and save
                     act.created_date = datetime_local.replace(tzinfo=utc)
                     act.save()
@@ -633,12 +643,27 @@ class Command(BaseCommand):
                 payments_member_dic[id] = act
 
         print("Orgs")
-        with open(DATA_DIR + "payments_org.txt") as infile:
+        with open(DATA_DIR + "payments_org.csv") as infile:
+            i = 0
             for line in infile:
+                i += 1
+                print(i)
                 if line.find("#") == 0 or line.strip() == "":
                     continue
                 parts = [s.strip() for s in line.split(",")]
-                (orgid, amount, memberid, description, payment_type, days_ago, hour, min) = parts
+                print("ORGS-----")
+                print(line)
+                print(parts)
+                (
+                    orgid,
+                    amount,
+                    memberid,
+                    description,
+                    payment_type,
+                    days_ago,
+                    hour,
+                    min,
+                ) = parts
                 member = user_dic[memberid]
                 org = org_dic[orgid]
 
