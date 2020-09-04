@@ -13,6 +13,11 @@ urlpatterns = [
     path("search-ajax", views.search_ajax, name="member_search_M2M_ajax"),
     path("detail-ajax", views.member_detail_m2m_ajax, name="member_detail_m2m_ajax"),
     path("member-search-ajax", views.member_search_ajax, name="member_search_ajax"),
+    path(
+        "system-number-search-ajax",
+        views.system_number_search_ajax,
+        name="system_number_search_ajax",
+    ),
     path("member-details-ajax", views.member_details_ajax, name="member_details_ajax"),
     path("change-password", views.change_password, name="change_password"),
     path("activate/<str:uidb64>/<str:token>/", views.activate, name="activate"),

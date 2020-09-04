@@ -28,6 +28,7 @@ from .tokens import account_activation_token
 from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
 from forums.models import Post, Comment1, Comment2
 from cobalt.utils import cobalt_paginator
+from cobalt.settings import GLOBAL_ORG
 
 
 def html_email_reset(request):
@@ -385,6 +386,43 @@ def member_search_ajax(request):
     )
 
 
+@login_required()
+def system_number_search_ajax(request):
+    """ Ajax system_number search function. Used by the generic member search.
+
+    Args:
+        system_number - exact number to search for
+
+    Returns:
+        HttpResponse - either a message or a list of users in HTML format.
+    """
+
+    if request.method == "GET":
+
+        if "system_number" in request.GET:
+            system_number = request.GET.get("system_number")
+            member = User.objects.filter(system_number=system_number).first()
+        else:
+            system_number = None
+            member = None
+
+        if member:
+            status = "Success"
+            msg = "Found member"
+            member_id = member.id
+        else:
+            status = "Not Found"
+            msg = f"No matches found for that {GLOBAL_ORG} number"
+            member_id = 0
+
+        data = {"member_id": member_id, "status": status, "msg": msg}
+
+        data_dict = {"data": data}
+        return JsonResponse(data=data_dict, safe=False)
+
+    return JsonResponse(data={"error": "Invalid request"})
+
+
 @login_required
 def profile(request):
     """ Profile update form.
@@ -417,11 +455,6 @@ def profile(request):
 
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
-
-    # access_token = "70691e3380c3b2"
-    # handler = ipinfo.getHandler(access_token)
-    # ip_address = get_client_ip(request)
-    # ip_details = handler.getDetails(ip_address)
 
     context = {
         "form": form,
@@ -537,7 +570,7 @@ def public_profile(request, pk):
 def user_settings(request):
     """ User settings form.
 
-    Allow user to chose preferences
+    Allow user to choose preferences
 
     Args:
         request - standard request object

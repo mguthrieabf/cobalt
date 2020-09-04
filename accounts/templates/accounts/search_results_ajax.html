@@ -1,19 +1,20 @@
 {{ msg }}
 {% if members %}
 
-<h5>Found:</h5>
+<div class="">
 
-{% for member in members %}
+  <h4>Matches</h4>
 
-<div class="form-check form-check-radio">
-  <label class="form-check-label">
-    <input class="form-check-input cobalt-names{{ search_id|default_if_none:""}}" type="radio" name="transfer_to" id="id_transfer_to_{{ member.pk }}" value="{{ member.pk }}">
-    <b>{{ member.full_name }} ({{ member.system_number }})</b>
-    <br>
-    <span class="check"></span>
+    {% for member in members %}
 
-  </label>
+        <a href="#" class="p-1 b-1 btn btn-sm btn-outline-primary cobalt-text-transform-off cobalt-names{{ search_id|default_if_none:"" }}" value="{{ member.pk }}">
+          <span style="font-size:larger;">
+            {{ member.full_name }} {{ member.system_number}}
+          </span>
+        </a>
+
+    {% endfor %}
+
 </div>
 
-{% endfor %}
 {% endif %}

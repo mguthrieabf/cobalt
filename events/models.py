@@ -41,8 +41,15 @@ EVENT_TYPES = [
 EVENT_PLAYER_FORMAT = [
     ("Individual", "Individual"),
     ("Pairs", "Pairs"),
+    ("Teams of 3", "Teams of Three"),
     ("Teams", "Teams"),
 ]
+EVENT_PLAYER_FORMAT_SIZE = {
+    "Individual": 1,
+    "Pairs": 2,
+    "Teams of 3": 3,
+    "Teams": 6,
+}
 
 
 class CongressMaster(models.Model):

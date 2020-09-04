@@ -17,7 +17,7 @@ from .models import (
 from accounts.models import User, TeamMate
 
 # from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
-from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
+from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_user_has_role,

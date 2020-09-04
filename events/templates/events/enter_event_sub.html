@@ -1,0 +1,27 @@
+<tr>
+
+  <td class="col">
+    <div id="div_id_player{{ our_form_row.player_no }}" class="form-group">
+      <select class="selectpicker cobalt-playerN" data-style="btn btn-info" data-width="270px" title="Partner" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
+        {% for val,item in our_form_row.name_choices %}
+        <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </td>
+  <td class="col">
+    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select" disabled>
+      {% for val,item in our_form_row.payment_choices %}
+
+      <h1>{{ our_form_row.payment_selected.0 }} - {{ val }}</h1>
+      <option value="{{ val }}" {% if our_form_row.payment_selected.0 == item %} selected {% endif %}>
+    
+      {{ item }}</option>
+      {% endfor %}
+    </select>
+  <td class="col" align="right">
+    <span id="player{{ player_no }}_discount_alert"></span>
+    <input class="pay_now" id="fee_{{ our_form_row.player_no }}_now" type="text" size="5" readonly value="">
+  <td class="col">
+    <input class="pay_later" id="fee_{{ our_form_row.player_no }}_later" type="text" size="5" readonly value="">
+</tr>

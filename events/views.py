@@ -12,12 +12,13 @@ from .models import (
     EventEntry,
     EventEntryPlayer,
     PAYMENT_TYPES,
+    EVENT_PLAYER_FORMAT_SIZE,
     BasketItem,
 )
 from accounts.models import User, TeamMate
 
 # from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
-from .forms import CongressForm, NewCongressForm, EventForm, SessionForm, EventEntryForm
+from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_user_has_role,
@@ -28,6 +29,7 @@ from payments.core import payment_api
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME
 
 
 @login_required()
@@ -738,12 +740,105 @@ def edit_session(request, event_id, session_id):
     return render(request, "events/edit_session.html", {"form": form, "event": event},)
 
 
+def enter_event_form(event, congress, request):
+    """ build the form part of the enter_event view. Its not a Django form,
+        we build our own as the validation won't work with a dynamic form
+        and we are validating on the client side anyway."""
+
+    our_form = []
+
+    # get payment types for this congress
+    pay_types = []
+    if congress.payment_method_system_dollars:
+        pay_types.append(
+            ("my-system-dollars", f"My {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+        )
+    if congress.payment_method_bank_transfer:
+        pay_types.append(("bank-transfer", "Bank Transfer"))
+    if congress.payment_method_cash:
+        pay_types.append(("cash", "Cash on the day"))
+    if congress.payment_method_cheques:
+        pay_types.append(("cheque", "Cheque"))
+
+    # Get team mates for this user
+    team_mates = TeamMate.objects.filter(user=request.user)
+
+    name_list = [(0, "Search...")]
+    for team_mate in team_mates:
+        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
+        name_list.append(item)
+
+    # set values for player0 (the user)
+    entry_fee, discount, reason = event.entry_fee_for(request.user)
+    player0 = {
+        "id": request.user.id,
+        "payment_choices": pay_types,
+        "payment_selected": pay_types[0],
+        "name": request.user,
+        "entry_fee": entry_fee,
+    }
+
+    # set values for other players
+    team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
+    for ref in range(1, team_size):
+        item = {
+            "player_no": ref,
+            "payment_choices": pay_types,
+            "payment_selected": pay_types[0],
+            "name_choices": name_list,
+            "name_selected": None,
+            "entry_fee": None,
+        }
+        our_form.append(item)
+
+    # Start time of event
+    sessions = Session.objects.filter(event=event).order_by(
+        "session_date", "session_start"
+    )
+    event_start = sessions.first()
+
+    # use reason etc from above to see if discounts apply
+    alert_msg = None
+    if reason == "Early discount":
+        date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
+        alert_msg = [
+            "Early Entry Discount",
+            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
+            % (discount, date_field),
+        ]
+
+    if reason == "Youth discount":
+        alert_msg = [
+            "Youth Discount",
+            "You qualify for a youth discount for this event. A saving of $%.2f."
+            % discount,
+        ]
+
+    return render(
+        request,
+        "events/enter_event.html",
+        {
+            "player0": player0,
+            "our_form": our_form,
+            "congress": congress,
+            "event": event,
+            "sessions": sessions,
+            "event_start": event_start,
+            "alert_msg": alert_msg,
+            "entry_fee": entry_fee,
+            "discount": discount,
+            "reason": reason,
+        },
+    )
+
+
 @login_required()
 def enter_event(request, congress_id, event_id):
     """ enter an event """
 
     # Load the event
     event = get_object_or_404(Event, pk=event_id)
+    congress = get_object_or_404(Congress, pk=congress_id)
 
     # Check if already entered
     if event.already_entered(request.user):
@@ -755,15 +850,15 @@ def enter_event(request, congress_id, event_id):
 
     # check if POST.
     # Note: this works a bit differently to most forms in Cobalt.
-    #       We build a blank form but use client side code to validate and
-    #       modify the form. We don't call is_valid() as this will fail. We get
-    #       the data from form.data instead. This will work unless someone has
+    #       We build our own form and use client side code to validate and
+    #       modify it.
+    #       This will work unless someone has
     #       deliberately bypassed the client side validation in which case we
     #       don't mind failing with an error.
 
     if request.method == "POST":
 
-        form = EventEntryForm(request.POST)
+        #        form = EventEntryForm(request.POST)
 
         # create event_entry
         event_entry = EventEntry()
@@ -779,14 +874,16 @@ def enter_event(request, congress_id, event_id):
 
         # Get players from form
         players = {0: request.user}
-        player_payments = {0: form.data["player0_payment"]}
+        player_payments = {0: request.POST.get("player0_payment")}
 
         for p_id in range(1, 6):
             p_string = f"player{p_id}"
             ppay_string = f"player{p_id}_payment"
-            if p_string in form.data:
-                players[p_id] = get_object_or_404(User, pk=int(form.data[p_string]))
-                player_payments[p_id] = form.data[ppay_string]
+            if p_string in request.POST:
+                players[p_id] = get_object_or_404(
+                    User, pk=int(request.POST.get(p_string))
+                )
+                player_payments[p_id] = request.POST.get(ppay_string)
         print(players)
         print(player_payments)
 
@@ -814,61 +911,7 @@ def enter_event(request, congress_id, event_id):
             return redirect("events:view_congress", congress_id=event.congress.id)
 
     else:
-
-        alert_msg = None
-        congress = get_object_or_404(Congress, pk=congress_id)
-        sessions = Session.objects.filter(event=event).order_by(
-            "session_date", "session_start"
-        )
-        event_start = sessions.first()
-
-        # drop down values for form
-        team_mates = TeamMate.objects.filter(user=request.user)
-        player0_list = [(request.user.id, request.user)]
-
-        # players 2 - 6 use all the same reference data
-        playerN_list = [(0, "Search...")]
-        for team_mate in team_mates:
-            item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
-            playerN_list.append(item)
-
-        # entry fee for this user
-        entry_fee, discount, reason = event.entry_fee_for(request.user)
-
-        if reason == "Early discount":
-            date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
-            alert_msg = [
-                "Early Entry Discount",
-                "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
-                % (discount, date_field),
-            ]
-
-        if reason == "Youth discount":
-            alert_msg = [
-                "Youth Discount",
-                "You qualify for a youth discount for this event. A saving of $%.2f."
-                % discount,
-            ]
-
-        form = EventEntryForm(
-            congress=congress, player0_list=player0_list, playerN_list=playerN_list,
-        )
-
-        return render(
-            request,
-            "events/enter_event.html",
-            {
-                "form": form,
-                "congress": congress,
-                "event": event,
-                "sessions": sessions,
-                "event_start": event_start,
-                "alert_msg": alert_msg,
-                "entry_fee": entry_fee,
-                "discount": discount,
-                "reason": reason,
-            },
-        )
+        return enter_event_form(event, congress, request)
 
 
 @login_required()

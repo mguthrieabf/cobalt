@@ -26,7 +26,9 @@
             </div>
             <div class="card-body table-responsive card-body-default">
 
-{% include "utils/generic_user_search_body.html" with search_id=1 %}
+{% for our_form_row in our_form %}
+  {% include "utils/generic_user_search_body.html" with search_id=our_form_row.player_no %}
+{% endfor %}
 
               <form method="POST">
                 {% csrf_token %}
@@ -42,18 +44,15 @@
                     <tr>
                       <td class="col">
                         <div id="div_id_player0" class="form-group">
-                          <span class="cobalt-form-error" id="id_player0_errors">{{ form.player0.errors|striptags }}</span>
                           <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Select" id="id_player0" name="player0">
-                            {% for val,item in form.fields.player0.choices %}
-                            <option value="{{ val }}" {% if form.fields.player0.value.0 == val %} selected {% endif %}>{{ item }}</option>
-                            {% endfor %}
+                            <option value="{{ player0.id }}" selected>{{ player0.name }}</option>
                           </select>
                         </div>
                       </td>
                       <td class="col">
-                        <select id="id_player0_payment" name="player0_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select">
-                          {% for val,item in form.fields.player0_payment.choices %}
-                          <option value="{{ val }}" {% if form.fields.player0_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
+                        <select id="id_player0_payment" name="player0_payment" class="selectpicker payment-method" data-style="btn btn-danger">
+                          {% for val,item in player0.payment_choices %}
+                          <option value="{{ val }}">{{ item }}</option>
                           {% endfor %}
                         </select>
                       <td class="col-2 align=" right">
@@ -63,34 +62,15 @@
                             <i class="fas fa-tag"></i>
                           </span>
                           {% endif %}
-                          <input id="fee_1_now" class="pay_now" type="text" size="5" readonly value="{{ entry_fee }}">
+                          <input id="fee_0_now" class="pay_now" type="text" size="5" readonly value="{{ entry_fee }}">
                         </nobr>
                       <td class="col">
-                        <input id="fee_1_later" class="pay_later" type="text" size="5" readonly value="">
+                        <input id="fee_0_later" class="pay_later" type="text" size="5" readonly value="">
                     </tr>
-                    <tr>
-                      <td class="col">
-                        <div id="div_id_player0" class="form-group">
-                          <span class="cobalt-form-error" id="id_player1_errors">{{ form.player1.errors|striptags }}</span>
-                          <select class="selectpicker" data-style="btn btn-info" data-width="270px" title="Partner" name="player1" id="id_player1">
-                            {% for val,item in form.fields.player1.choices %}
-                            <option value="{{ val }}" {% if form.fields.player1.value.0 == val %} selected {% endif %}>{{ item }}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                      </td>
-                      <td class="col">
-                        <select id="id_player1_payment" name="player1_payment" class="selectpicker payment-method" data-style="btn btn-danger" title="Select" disabled>
-                          {% for val,item in form.fields.player1_payment.choices %}
-                          <option value="{{ val }}" {% if form.fields.player1_payment.value.0 == val %} selected {% endif %}>{{ item }}</option>
-                          {% endfor %}
-                        </select>
-                      <td class="col" align="right">
-                        <span id="player1_discount_alert"></span>
-                        <input class="pay_now" id="fee_2_now" type="text" size="5" readonly value="">
-                      <td class="col">
-                        <input class="pay_later" id="fee_2_later" type="text" size="5" readonly value="">
-                    </tr>
+
+{% for our_form_row in our_form %}
+{% include "events/enter_event_sub.html" with row=our_form_row %}
+{% endfor %}
                     <tr>
                       <td>
                       <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
@@ -123,17 +103,49 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
 <script>
-{% include 'utils/generic_user_search_footer.html' with search_id=1 %}
+  {% for our_form_row in our_form %}
+  {% include 'utils/generic_user_search_footer.html' with search_id=our_form_row.player_no %}
+  {% endfor %}
 
-function cobaltMemberSearchOk1() {
-  // clear search form
-  clearModal1();
-  // add option if not already there
 
-//  if($('#select-box option[value='+thevalue+']').length
-  $("#id_player1").append('<option value="'+member_id1+'" selected="">'+member_name1+'</option>');
-  user_entry_fee(member_id1);
-  user_payment_method(member_id1);
+// callback from generic search if user is chosen
+function cobaltMemberSearchOk(search_id) {
+
+  // check if this member is already on this page
+  var search_member_id = member_id[search_id];
+  var already = false;
+  $('.cobalt-playerN').each(function(i, obj) {
+    if ($(this).val() == search_member_id){
+      already = true;
+    }
+  });
+
+  if (already == true) {
+    swal.fire({
+        title: "Already Added",
+        html: member_name[search_id] + " is already present.",
+        icon: "error",
+        buttonsStyling: false
+      })
+  } else {
+
+    // add option if not already there
+    if ($('#id_player' + search_id + ' option[value=' + member_id[search_id] + ']').length==0) {
+      // not found so add
+      $("#id_player" + search_id).append('<option value="'+member_id[search_id]+'" selected="">'+member_name[search_id]+'</option>');
+    } else {
+      // already present - set as selected
+      $("#id_player" + search_id).val(member_id[search_id]).selectpicker('refresh');
+    }
+
+    user_entry_fee(member_id[search_id], search_id);
+    user_payment_method(member_id[search_id], search_id);
+  }
+}
+
+// if generic search is cancelled reset the player field
+function cobaltMemberSearchCancel(search_id) {
+  $("#id_player" + search_id).val('').selectpicker('refresh');
 }
 
 // re-do totals
@@ -169,21 +181,22 @@ function totals(){
 }
 
 // get entry fee for user
-function user_entry_fee(user_id){
+function user_entry_fee(user_id, search_id){
 $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
   .done(response => {
     msg = response['data']['message'];
     if (msg == 'Success') {
-      $("#player1_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
+      $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
            + response['data']['reason']
            + ' $'
            + response['data']['discount']
            + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
       $(".myHover").tooltip();
-      $("#fee_2_now").val(response['data']['entry_fee']);
+      $("#fee_" + search_id + "_now").val(response['data']['entry_fee']);
+
   // enable payment type - must refresh selectpickers
-      $("#id_player1_payment").prop("disabled", false);
+      $("#id_player" + search_id + "_payment").prop("disabled", false);
       $('.selectpicker').selectpicker('refresh');
       totals();
     }
@@ -191,18 +204,15 @@ $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + 
 }
 
 // update payment method if team mates
-function user_payment_method(user_id){
+function user_payment_method(user_id, search_id){
 $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&entering_user_id={{ request.user.id }}&other_user_id=" + user_id)
   .done(response => {
     msg = response['data']['message'];
     if (msg == 'Allowed') {
-      $("#id_player1_payment").prepend('<option value="their-system-dollars" selected="">Their ABF Dollars</option>');
-      $("#id_player1_payment").prop("disabled", false);
+      $("#id_player" + search_id + "_payment").prepend('<option value="their-system-dollars" selected="">Their ABF Dollars</option>');
+      $("#id_player" + search_id + "_payment").prop("disabled", false);
       $('.selectpicker').selectpicker('refresh');
       totals();
-    } else {
-      console.log("not adding");
-      console.log(response['data']['reason'])
     }
   });
 }
@@ -239,16 +249,27 @@ $(document).ready(function(){
 // trigger member search
 
 
-// when player 1 identity changes get their entry fee and update table
-  $('#id_player1').on('change', function(e){
-    user_id = this.value;
+// when player N identity changes get their entry fee and update table
+  $('.cobalt-playerN').on('change', function(event){
+    var user_id = this.value;
+    var search_id = event.target.id.slice(-1);
+    var this_id = event.target.id;
+    console.log(member_id);
 
 // check for search id=0
     if (user_id == 0){
-      console.log("userid is " + user_id);
-      $('#cobalt_general_member_search1').modal('show');
+      $('#cobalt_general_member_search' + search_id).modal('show');
     } else {
-      user_entry_fee(user_id);
+      user_entry_fee(user_id, search_id);
+      // remove from other lists
+
+// TODO: if a user changes multiple times they don't go back on the other lists
+
+      $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
+        if ($(this).parent().attr('id') != this_id) {
+          $(this).remove();
+        }
+      });
     }
 
   });
