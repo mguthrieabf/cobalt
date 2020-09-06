@@ -165,7 +165,8 @@ class Command(BaseCommand):
             row = {}
             for i in range(len(header_list)):
                 try:
-                    row[header_list[i]] = columns[i].strip()
+                    if not columns[i].strip() == "":
+                        row[header_list[i]] = columns[i].strip()
                 except IndexError:
                     row[header_list[i]] = None
             data.append(row)
@@ -202,7 +203,7 @@ class Command(BaseCommand):
                             fmodel = parts[3]
                             this_array = self.id_array
                             exec_cmd += f".filter({fkey}=this_array[f'{fapp}.{fmodel}']['{value}'])"
-                        else:
+                        elif key[:2] != "t.":  # exclude time
                             exec_cmd2 = f"module = import_module(f'{app}.models')\nfield_type=module.{model}._meta.get_field('{key}').get_internal_type()"
                             exec(exec_cmd2, globals())
                             if field_type == "CharField":  # noqa: F821
@@ -223,7 +224,10 @@ class Command(BaseCommand):
                         "module = import_module('%s.models')\ninstance = module.%s()"
                         % (app, model)
                     )
-                    exec(exec_cmd, globals())
+                    local_array = {}
+                    exec(exec_cmd, globals(), local_array)
+                    instance = local_array["instance"]
+
                     if not instance:
                         print("\n\nError\n")
                         print(f"Failed to create instance of {app}.{model}")
@@ -237,7 +241,7 @@ class Command(BaseCommand):
                         )
                         sys.exit()
                     for key, value in row.items():
-                        if key != "id":
+                        if key != "id" and key[:2] != "t.":
                             if len(key) > 3:
                                 if key[:3] == "id.":  # foreign key
                                     parts = key.split(".")
@@ -256,12 +260,18 @@ class Command(BaseCommand):
                                             f"Check that the file with {app}.{model} has id {value} and that it is loaded before this file.\n"
                                         )
                                         sys.exit()
-                                    print(instance)
+                                    # print(instance)
                                     setattr(instance, fkey, val)
                                 else:
+                                    print(row)
+                                    print(key)
+                                    print(value)
                                     setattr(instance, key, value)
                             else:
                                 setattr(instance, key, value)
+                        if key[:2] == "t.":
+                            print("TIME")
+                            print(key, value)
                     instance.save()
                 # add to dic if we have an id field
                 if "id" in row.keys():
@@ -272,6 +282,11 @@ class Command(BaseCommand):
     def accounts_user(self, app, model, data):
         dic = {}
         for row in data:
+            if "about" not in row:
+                row["about"] = None
+            if "pic" not in row:
+                row["pic"] = None
+
             user = create_fake_user(
                 self,
                 row["system_number"],

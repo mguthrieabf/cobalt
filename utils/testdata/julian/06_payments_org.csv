@@ -1,0 +1,30 @@
+payments, OrganisationTransaction,,,,,,
+id,id.member.accounts.User, amount,id.organisation.organisations.Organisation, reference_no,description,type,t.days_ago
+tr87,ff,35,fbc,,Fantasy Congress,Congress Entry,395
+tr88,ff,35,fbc,,Fantasy Congress,Congress Entry,395
+tr89,dd,35.5,fbc,,ABF administrator adjustment,Manual Adjustment,395
+tr90,ff,45,fbc,,Fantasy Congress,Congress Entry,180
+tr91,ff,45,fbc,,Fantasy Congress,Congress Entry,180
+tr92,dd,45.5,fbc,,ABF administrator adjustment,Manual Adjustment,180
+tr93,ff,55,fbc,,Fantasy Congress,Congress Entry,90
+tr94,ff,55,fbc,,Fantasy Congress,Congress Entry,90
+tr95,dd,55.5,fbc,,ABF administrator adjustment,Manual Adjustment,90
+tr96,ff,65,fbc,,Fantasy Congress,Congress Entry,20
+tr97,ff,65,fbc,,Fantasy Congress,Congress Entry,20
+tr98,dd,65.5,fbc,,ABF administrator adjustment,Manual Adjustment,20
+tr99,ff,35,rbc,,Fantasy Congress,Congress Entry,395
+tr100,ff,35,rbc,,Fantasy Congress,Congress Entry,395
+tr101,ff,45,rbc,,Fantasy Congress,Congress Entry,180
+tr102,ff,45,rbc,,Fantasy Congress,Congress Entry,180
+tr103,ff,55,rbc,,Fantasy Congress,Congress Entry,90
+tr104,ff,55,rbc,,Fantasy Congress,Congress Entry,90
+tr105,ff,65,rbc,,Fantasy Congress,Congress Entry,20
+tr106,ff,65,rbc,,Fantasy Congress,Congress Entry,20
+tr107,ff,35,nsw,,State event entry fee,Congress Entry,395
+tr108,ff,35,nsw,,State event entry fee,Congress Entry,395
+tr109,ff,45,nsw,,State event entry fee,Congress Entry,180
+tr110,ff,45,nsw,,State event entry fee,Congress Entry,180
+tr111,ff,55,nsw,,State event entry fee,Congress Entry,90
+tr112,ff,55,nsw,,State event entry fee,Congress Entry,90
+tr113,ff,65,nsw,,State event entry fee,Congress Entry,20
+tr114,ff,65,nsw,,State event entry fee,Congress Entry,20
