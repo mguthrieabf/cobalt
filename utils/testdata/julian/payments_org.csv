@@ -27,8 +27,21 @@
 #,,#,,,,,,
 #,##############################################################################,#,,,,,,
 #,##############################################################################,#,,,,,,
+
+orgid,
+  amount,
+  memberid,
+  description,
+  payment_type,
+  days_ago,
+  hour,
+  min,
+
+  bc, 45.00, bb, Entry to Some Event, Event Entry,,,
+
+
 #,USER ID,AMOUNT,ORG ID,OTHER MEM ID,STRIPE ID,DESCRIPTION,TYPE,DAYS AGO
-tr87,ff,35,fbc,,,Fantasy Congress,Congress Entry,395
+tr87,ff,35,fbc,,,Fantasy Congress,Congress Entry,395,,
 tr88,ff,35,fbc,,,Fantasy Congress,Congress Entry,395
 tr89,dd,35.5,fbc,,,ABF administrator adjustment,Manual Adjustment,395
 tr90,ff,45,fbc,,,Fantasy Congress,Congress Entry,180
