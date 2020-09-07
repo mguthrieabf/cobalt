@@ -140,6 +140,14 @@ class Command(BaseCommand):
             print("Line is: %s\n" % lines[0])
             sys.exit()
 
+        try:
+            if lines[0].split(",")[3] == "duplicates":
+                allow_dupes = True
+            else:
+                allow_dupes = False
+        except (ValueError, IndexError):
+            allow_dupes = False
+
         headers = lines[1]
         header_list = []
 
@@ -171,11 +179,11 @@ class Command(BaseCommand):
                     row[header_list[i]] = None
             data.append(row)
 
-        return (app.strip(), model.strip(), data)
+        return (app.strip(), model.strip(), data, allow_dupes)
 
     def process_csv(self, csv):
         """ do the work on the csv data """
-        app, model, data = self.parse_csv(csv)
+        app, model, data, allow_dupes = self.parse_csv(csv)
         print(f"App Model is: {app}.{model}\n")
 
         # special cases
@@ -213,11 +221,22 @@ class Command(BaseCommand):
                 exec_cmd += ".first()"
 
                 local_array = {"this_array": this_array}
-                exec(exec_cmd, globals(), local_array)
+                try:
+                    exec(exec_cmd, globals(), local_array)
+                except KeyError as exc:
+                    print("\n\nError\n")
+                    print(str(exc))
+                    print("Array contains:")
+                    for block in this_array:
+                        for key2, val2 in this_array[block].items():
+                            print(block, key2, val2)
+                    print("\nStatement was:")
+                    print(exec_cmd)
+                    sys.exit()
                 instance = local_array["instance"]
 
                 # that was hard, now check it
-                if instance:
+                if instance and not allow_dupes:
                     print("already present: %s" % instance)
                 else:
                     exec_cmd = (
@@ -241,6 +260,10 @@ class Command(BaseCommand):
                         )
                         sys.exit()
                     for key, value in row.items():
+                        try:
+                            value=value.replace("^",",")
+                        except AttributeError:
+                            pass
                         if key != "id" and key[:2] != "t.":
                             if len(key) > 3:
                                 if key[:3] == "id.":  # foreign key
@@ -260,18 +283,26 @@ class Command(BaseCommand):
                                             f"Check that the file with {app}.{model} has id {value} and that it is loaded before this file.\n"
                                         )
                                         sys.exit()
-                                    # print(instance)
                                     setattr(instance, fkey, val)
                                 else:
-                                    print(row)
-                                    print(key)
-                                    print(value)
                                     setattr(instance, key, value)
                             else:
                                 setattr(instance, key, value)
                         if key[:2] == "t.":
-                            print("TIME")
-                            print(key, value)
+                            field = key[2:]
+                            adjusted_date = now() - datetime.timedelta(days=int(value))
+                            datetime_local = adjusted_date.astimezone(TZ)
+                            setattr(instance, field, datetime_local)
+                        if key[:2] == "d.":
+                            field = key[2:]
+                            yr, mt, dy = value.split("-")
+                            this_date=make_aware(
+                                datetime.datetime(
+                                    int(yr), int(mt), int(dy), 0, 0
+                                ),
+                                TZ,
+                            )
+                            setattr(instance, field, this_date)
                     instance.save()
                 # add to dic if we have an id field
                 if "id" in row.keys():

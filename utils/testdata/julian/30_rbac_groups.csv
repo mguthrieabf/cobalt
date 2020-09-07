@@ -1,19 +1,5 @@
-################################################################################
-################################################################################
-#                                                                              #
-# RBAC Groups - maps to rbac.rbac_group                                        #
-#                                                                              #
-# Columns                                                                      #
-# -------                                                                      #
-#                                                                              #
-# 1 = id                                                                       #
-# 2 = tree                                                                     #
-# 3 = name                                                                     #
-# 4 = Description                                                              #
-#                                                                              #
-################################################################################
-################################################################################
-
+rbac, RBACGroup
+id, name_qualifier, name_item, description
 dummy, rbac.orgs.clubs.act.pretent_club, staff, Staff at Dummy Bridge Club
 dummy, rbac.orgs.clubs.nsw.pretent_club, staff, Staff at Dummy Bridge Club
 dummy, rbac.orgs.clubs.vic.pretent_club, staff, Staff at Dummy Bridge Club

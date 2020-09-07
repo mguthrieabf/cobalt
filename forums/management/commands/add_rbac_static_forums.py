@@ -57,28 +57,28 @@ class Command(BaseCommand):
 
         # add myself as an admin and create tree and group
         # This lets us create admins who can create and delete forums
-        user = User.objects.filter(username="Mark").first()
-
-        group = create_RBAC_admin_group(
-            self,
-            "admin.orgs.abf.forums",
-            "admin",
-            "Group to create users who can create, modify or delete forums",
-        )
-        create_RBAC_admin_tree(self, group, "rbac.orgs")
-        create_RBAC_admin_tree(self, group, "rbac.modules.forums")
-        rbac_add_user_to_admin_group(group, user)
-        rbac_add_role_to_admin_group(group, app="forums", model="admin")
-
-        # grant writes to forums.forum
-        # This creates admins who can make people moderators or block forum access
-        group = create_RBAC_admin_group(
-            self,
-            "admin.orgs.abf.forums",
-            "moderators",
-            "Group to create users who are moderators of forums or can hide forums",
-        )
-        # create group - won't duplicate if already exists
-        create_RBAC_admin_tree(self, group, "rbac.orgs.abf.forums")
-        rbac_add_user_to_admin_group(group, user)
-        rbac_add_role_to_admin_group(group, app="forums", model="forum")
+        # user = User.objects.filter(username="Mark").first()
+        #
+        # group = create_RBAC_admin_group(
+        #     self,
+        #     "admin.orgs.abf.forums",
+        #     "admin",
+        #     "Group to create users who can create, modify or delete forums",
+        # )
+        # create_RBAC_admin_tree(self, group, "rbac.orgs")
+        # create_RBAC_admin_tree(self, group, "rbac.modules.forums")
+        # rbac_add_user_to_admin_group(group, user)
+        # rbac_add_role_to_admin_group(group, app="forums", model="admin")
+        #
+        # # grant writes to forums.forum
+        # # This creates admins who can make people moderators or block forum access
+        # group = create_RBAC_admin_group(
+        #     self,
+        #     "admin.orgs.abf.forums",
+        #     "moderators",
+        #     "Group to create users who are moderators of forums or can hide forums",
+        # )
+        # # create group - won't duplicate if already exists
+        # create_RBAC_admin_tree(self, group, "rbac.orgs.abf.forums")
+        # rbac_add_user_to_admin_group(group, user)
+        # rbac_add_role_to_admin_group(group, app="forums", model="forum")
