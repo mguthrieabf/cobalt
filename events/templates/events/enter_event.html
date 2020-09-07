@@ -20,7 +20,7 @@
       </div>
       <div class="card-body">
         <div class="container h-100 d-flex justify-content-center">
-          <div class="card">
+          <div class="card col-10">
             <div class="card-header card-header-primary">
               <h3>Entry</h3>
             </div>
@@ -32,7 +32,7 @@
 
               <form method="POST">
                 {% csrf_token %}
-              <table>
+              <table class="table-responsive">
                 <thead class="text-warning">
                   <th style="text-align: center;">Players</th>
                   <th style="text-align: center;">Payment Method</th>
@@ -42,20 +42,20 @@
                 <tbody>
 
                     <tr>
-                      <td style="background-color: green;" class="col">
+                      <td class="col text-center">
                         <div id="div_id_player0" class="form-group">
                           <select class="selectpicker" data-style="btn btn-info" title="Select" id="id_player0" name="player0">
                             <option value="{{ player0.id }}" selected>{{ player0.name }}</option>
                           </select>
                         </div>
                       </td>
-                      <td style="background-color: pink;" class="col">
+                      <td class="col">
                         <select id="id_player0_payment" name="player0_payment" class="selectpicker payment-method" data-style="btn btn-danger">
                           {% for val,item in player0.payment_choices %}
                           <option value="{{ val }}">{{ item }}</option>
                           {% endfor %}
                         </select>
-                      <td style="background-color: green;" class="col-2 align=" right">
+                      <td class="col">
                         <nobr>
                           {% if discount %}
                           <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
@@ -64,7 +64,7 @@
                           {% endif %}
                           <input id="fee_0_now" class="pay_now" type="text" size="6" readonly value="{{ entry_fee }}">
                         </nobr>
-                      <td style="background-color: orange;" class="col">
+                      <td class="col">
                         <input id="fee_0_later" class="pay_later" type="text" size="6" readonly value="">
                     </tr>
 
@@ -84,10 +84,12 @@
               </table>
               <br>
               <div class="row">
-                <button id="id_checkout" type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
-                <button id="id_cart" type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px" disabled>Add to Cart</button>
+                <div class="col text-center">
+                  <button id="id_checkout" type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
+                  <button id="id_cart" type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px" disabled>Add to Cart</button>
+                </div>
               </div>
-                      </form>
+            </form>
             </div>
           </div>
         </div>

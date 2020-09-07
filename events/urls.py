@@ -16,6 +16,11 @@ urlpatterns = [
         views.enter_event,
         name="enter_event",
     ),
+    path(
+        "congress/event/change-entry/<int:congress_id>/<int:event_id>",
+        views.edit_event_entry,
+        name="edit_event_entry",
+    ),
     #    path("congress/edit/<int:congress_id>", views.edit_congress, name="edit_congress"),
     path(
         "congress/delete/<int:congress_id>",

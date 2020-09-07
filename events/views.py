@@ -884,12 +884,10 @@ def enter_event(request, congress_id, event_id):
             p_string = f"player{p_id}"
             ppay_string = f"player{p_id}_payment"
             if p_string in request.POST:
-                players[p_id] = get_object_or_404(
-                    User, pk=int(request.POST.get(p_string))
-                )
-                player_payments[p_id] = request.POST.get(ppay_string)
-        print(players)
-        print(player_payments)
+                p_string_value = request.POST.get(p_string)
+                if p_string_value != "":
+                    players[p_id] = get_object_or_404(User, pk=int(p_string_value))
+                    player_payments[p_id] = request.POST.get(ppay_string)
 
         # validate
         if (event.player_format == "Pairs" and len(players) != 2) or (
@@ -908,6 +906,83 @@ def enter_event(request, congress_id, event_id):
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
             event_entry_player.save()
+
+        if "now" in request.POST:
+            return redirect("events:checkout")
+        else:  # add to cart and keep shopping
+            return redirect("events:view_congress", congress_id=event.congress.id)
+
+    else:
+        return enter_event_form(event, congress, request)
+
+
+@login_required()
+def edit_event_entry(request, congress_id, event_id):
+    """ edit an event entry """
+
+    # Load the event
+    event = get_object_or_404(Event, pk=event_id)
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # Check if already entered
+    if not event.already_entered(request.user):
+        messages.info(
+            request,
+            "You haven't entered ths event, yet. Taking you to the event entry screen.",
+            extra_tags="cobalt-message-info",
+        )
+
+    if request.method == "POST":
+
+        # get event_entry
+        event_entry_list = event.evententry_set.all().values_list("id")
+        event_entry = (
+            EventEntryPlayer.objects.filter(player=request.user)
+            .filter(event_entry__in=event_entry_list)
+            .first()
+            .event_entry
+        )
+
+        # Get players from form
+        players = {0: request.user}
+        player_payments = {0: request.POST.get("player0_payment")}
+
+        for p_id in range(1, 6):
+            p_string = f"player{p_id}"
+            ppay_string = f"player{p_id}_payment"
+            if p_string in request.POST:
+                players[p_id] = get_object_or_404(
+                    User, pk=int(request.POST.get(p_string))
+                )
+                player_payments[p_id] = request.POST.get(ppay_string)
+
+        # validate
+        if (event.player_format == "Pairs" and len(players) != 2) or (
+            event.player_format == "Teams" and len(players) < 4
+        ):
+            print("invalid number of entries")
+            return
+
+        # get existing player entries
+        event_entry_player_list = EventEntryPlayer.objects.filter(
+            event_entry=event_entry
+        )
+
+        # update player entries
+        for p_id in range(len(players)):
+            event_entry_player = event_entry_player_list.filter(
+                player=players[p_id]
+            ).first()
+            if event_entry_player:  # found a match
+                event_entry_player.payment_type = player_payments[p_id]
+                entry_fee, discount, reason = event.entry_fee_for(
+                    event_entry_player.player
+                )
+                event_entry_player.entry_fee = entry_fee
+                event_entry_player.save()
+            else:  # player name has changed -
+                print("NFI")
+                return
 
         if "now" in request.POST:
             return redirect("events:checkout")
