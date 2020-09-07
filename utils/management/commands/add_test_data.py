@@ -214,7 +214,10 @@ class Command(BaseCommand):
                         elif key[:2] != "t.":  # exclude time
                             exec_cmd2 = f"module = import_module(f'{app}.models')\nfield_type=module.{model}._meta.get_field('{key}').get_internal_type()"
                             exec(exec_cmd2, globals())
-                            if field_type == "CharField" or field_type=="TextField":  # noqa: F821
+                            if (
+                                field_type == "CharField"  # noqa: F821
+                                or field_type == "TextField"  # noqa: F821
+                            ):  # noqa: F821
                                 exec_cmd += f".filter({key}='{value}')"
                             else:
                                 exec_cmd += f".filter({key}={value})"
@@ -260,7 +263,7 @@ class Command(BaseCommand):
                         sys.exit()
                     for key, value in row.items():
                         try:
-                            value=value.replace("^",",")
+                            value = value.replace("^", ",")
                         except AttributeError:
                             pass
                         if key != "id" and key[:2] != "t.":
@@ -295,11 +298,8 @@ class Command(BaseCommand):
                         if key[:2] == "d.":
                             field = key[2:]
                             dy, mt, yr = value.split("/")
-                            this_date=make_aware(
-                                datetime.datetime(
-                                    int(yr), int(mt), int(dy), 0, 0
-                                ),
-                                TZ,
+                            this_date = make_aware(
+                                datetime.datetime(int(yr), int(mt), int(dy), 0, 0), TZ,
                             )
                             setattr(instance, field, this_date)
                         if key[:2] == "m.":
@@ -343,19 +343,21 @@ class Command(BaseCommand):
             print("Processing: %s" % fname)
             self.process_csv(fname)
 
-
         # create dummy Posts
         print("\nCreating dummy forum posts")
         print("Running", end="", flush=True)
         for post_counter in range(200):
 
+            user_list = list(self.id_array["accounts.User"].values())
+            user_list.remove(self.id_array["accounts.User"]["EVERYONE"])
+
             post = Post(
-                forum=random.choice(list(self.id_array['forums.Forum'].values())),
+                forum=random.choice(list(self.id_array["forums.Forum"].values())),
                 title=self.random_sentence(),
                 text=self.random_paragraphs_with_stuff(),
-                author=random.choice(list(self.id_array['accounts.User'].values())),
+                author=random.choice(user_list),
             )
             post.save()
             print(".", end="", flush=True)
-            self.add_comments(post, list(self.id_array['accounts.User'].values()))
+            self.add_comments(post, user_list)
         print("\n")
