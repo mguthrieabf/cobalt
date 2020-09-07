@@ -10,7 +10,7 @@
 cd /var/app/current
 
 # Drop and recreate DB in Postgres
-./manage.py dbshell <cobalt/utils/aws/rebuild_test_data.sql
+./manage.py dbshell <utils/aws/rebuild_test_data.sql
 
 # include scripts
-/var/app/current/cobalt/utils/aws/rebuild_test_database_subcommands.sh
+/var/app/current/utils/aws/rebuild_test_database_subcommands.sh

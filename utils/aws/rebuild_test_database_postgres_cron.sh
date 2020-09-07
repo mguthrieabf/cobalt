@@ -5,6 +5,6 @@ if test -f "$FILE"; then
 
 rm $FILE
 
-/var/app/current/cobalt/utils/aws/rebuild_test_database_postgres.sh
+/var/app/current/utils/aws/rebuild_test_database_postgres.sh
 
 fi

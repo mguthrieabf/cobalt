@@ -128,7 +128,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
                 "ssh",
                 env_name,
                 "--command",
-                "-f sudo crontab /var/app/current/cobalt/utils/aws/rebuild_test_database_postgres_crontab.txt",
+                "-f sudo crontab /var/app/current/utils/aws/rebuild_test_database_postgres_crontab.txt",
             ],
             stdout=subprocess.PIPE,
         )
