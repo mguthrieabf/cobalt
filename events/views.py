@@ -780,6 +780,9 @@ def enter_event_form(event, congress, request):
 
     # set values for other players
     team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
+    min_entries = team_size
+    if team_size == 6:
+        min_entries = 4
     for ref in range(1, team_size):
         item = {
             "player_no": ref,
@@ -828,6 +831,7 @@ def enter_event_form(event, congress, request):
             "entry_fee": entry_fee,
             "discount": discount,
             "reason": reason,
+            "min_entries": min_entries,
         },
     )
 
