@@ -27,6 +27,7 @@
             <input type="hidden" id="transID" name="transID" value="{{ trans.id }}">
             <input type="hidden" id="transAmount" name="transAmount" value="{{ trans.amount }}">
             <input type="hidden" id="transDescription" name="transDescription" value="{{ trans.description }}">
+            <input type="hidden" id="next_url" name="next_url" value="{{ next_url }}">
             <div class="sr-combo-inputs-row">
               <div class="sr-input sr-card-element" id="card-element"></div>
             </div>
@@ -44,37 +45,15 @@
             <h3>Your payment has been processed.</h3>
             <p>It may take several minutes for this to reach your statement.</p>
             <p>Click <b>Payments</b> in the menu to view your statement.</p>
+            {% if next_url %}
+              <h3>Taking you <a href="{{ next_url }}" style="color: blue;">back to events</a> in <span id="time"></span></h3>
+            {% endif %}
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<h2>Test Card Numbers</h2>
-<table class="table table-hover">
-  <thead>
-    <th>Number
-    <th>Function
-  </thead>
-  <tbody>
-    <tr class="tr">
-      <td>4242 4242 4242 4242
-      <td>Visa success, any expiry and CVC
-    </tr>
-    <tr class="tr">
-      <td>4000 0566 5566 5556
-      <td>Visa debit, any expiry and CVC
-    </tr>
-    <tr class="tr">
-      <td>5555 5555 5555 4444
-      <td>Mastercard success, any expiry and CVC
-    </tr>
-  </tbody>
-</table>
-
-<a href="https://stripe.com/docs/testing">
-  <h3 style="color: blue">Full List</h3>
 </a>
 
 

@@ -611,7 +611,9 @@ def payment_api(
                     msg = "Payment for: " + description
 
             return render(
-                request, "payments/checkout.html", {"trans": trans, "msg": msg}
+                request,
+                "payments/checkout.html",
+                {"trans": trans, "msg": msg, "next_url": url},
             )
 
 

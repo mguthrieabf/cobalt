@@ -7,6 +7,8 @@ var orderData = {
   "description": document.getElementById('transDescription').value
 };
 
+var next_url = document.getElementById('next_url').value;
+
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
 
@@ -101,6 +103,18 @@ var orderComplete = function(clientSecret) {
     var paymentIntent = result.paymentIntent;
     var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
     console.log(paymentIntentJson);
+    if (next_url){
+      var time = 10;
+      setInterval(function() {
+        document.getElementById("time").innerHTML = time + " seconds";
+        time--;
+        if (time == 0) {
+          window.location.href = next_url;
+        }
+      }, 1000);
+    }
+
+
 
     document.querySelector(".sr-payment-form").classList.add("hidden");
 //    document.querySelector("pre").textContent = paymentIntentJson;

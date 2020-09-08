@@ -232,7 +232,7 @@ TIME_INPUT_FORMATS = [
 
 # app specific static lives in app_name/static/app_name
 # general static lives in STATICFILES_DIRS
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "cobalt/static/")]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "cobalt/static/")]
 
 # This is where collectstatic will put the static files it finds
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -243,7 +243,7 @@ STATIC_URL = "/static/"
 
 
 # append MD5 hash to filenames to prevent caching on version change
-# STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"
+STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media

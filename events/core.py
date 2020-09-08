@@ -77,10 +77,6 @@ def events_payments_callback(status, route_payload, tran):
                 event_entry.entry_complete_date = timezone.now()
                 event_entry.save()
 
-    print(status)
-    print(route_payload)
-    print(tran)
-
 
 def get_basket_for_user(user):
     return BasketItem.objects.filter(player=user).count()

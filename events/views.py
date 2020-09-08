@@ -1025,11 +1025,12 @@ def checkout(request):
         # Get total amount
         amount = event_entry_players.aggregate(Sum("entry_fee"))
 
-        print(amount)
-        print(event_entry_players)
         for event_entry_player in event_entry_players:
             event_entry_player.batch_id = unique_id
             event_entry_player.save()
+
+        # empty basket - should do this after payment attempt complete
+        basket_items.delete()
 
         return payment_api(
             request=request,
@@ -1038,6 +1039,7 @@ def checkout(request):
             amount=amount["entry_fee__sum"],
             route_code="EVT",
             route_payload=unique_id,
+            url="/events",
             organisation=organisation,
             #            log_msg=None,
             payment_type="Entry to a congress",
