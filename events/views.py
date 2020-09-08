@@ -994,10 +994,23 @@ def edit_event_entry(request, congress_id, event_id):
 
 
 @login_required()
-def checkout(request):
+def checkout(request, congress_id=None):
     """ Checkout view - make payments, get details """
 
     basket_items = BasketItem.objects.filter(player=request.user)
+
+    if not congress_id:  # check if only one congress in basket
+        congress_list = []
+        for basket_item in basket_items:
+            congress_item = basket_item.event_entry.event.congress
+            if congress_item not in congress_list:
+                congress_list.append(congress_item)
+        if len(congress_item) > 1:  # multiple congresses in basket
+            return render(
+                request,
+                "events/congress_list_checkout.html",
+                {"congress_list": congress_list},
+            )
 
     if request.method == "POST":
         # TODO: restrict to single congresses
