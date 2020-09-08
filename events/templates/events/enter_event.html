@@ -61,6 +61,8 @@
                           <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
                             <i class="fas fa-tag"></i>
                           </span>
+                          {% else %}
+                          &nbsp;
                           {% endif %}
                           <input id="fee_0_now" class="pay_now" type="text" size="6" readonly value="{{ entry_fee }}">
                         </nobr>

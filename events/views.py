@@ -47,12 +47,19 @@ def view_congress(request, congress_id, fullscreen=False):
         request(HTTPRequest): standard user request
         congress_id(int): congress to view
         fullscreen(boolean): if true shows just the page, not the standard surrounds
+        Also accepts a GET parameter of msg to display for returning from event entry
 
     Returns:
         page(HTTPResponse): page with details about the event
     """
 
     congress = get_object_or_404(Congress, pk=congress_id)
+
+    if request.method == "GET" and "msg" in request.GET:
+        msg = request.GET["msg"]
+        print(msg)
+        print("Added to request")
+        messages.success(request, msg, extra_tags="cobalt-message-success")
 
     # We need to build a table for the program from events that has
     # rowspans for the number of days. This is too complex for the
@@ -910,7 +917,10 @@ def enter_event(request, congress_id, event_id):
         if "now" in request.POST:
             return redirect("events:checkout")
         else:  # add to cart and keep shopping
-            return redirect("events:view_congress", congress_id=event.congress.id)
+            msg = "Added to your cart"
+            return redirect(
+                f"/events/congress/view/{event.congress.id}?msg={msg}#program"
+            )
 
     else:
         return enter_event_form(event, congress, request)
