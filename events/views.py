@@ -1005,7 +1005,7 @@ def checkout(request, congress_id=None):
             congress_item = basket_item.event_entry.event.congress
             if congress_item not in congress_list:
                 congress_list.append(congress_item)
-        if len(congress_item) > 1:  # multiple congresses in basket
+        if len(congress_list) > 1:  # multiple congresses in basket
             return render(
                 request,
                 "events/congress_list_checkout.html",
