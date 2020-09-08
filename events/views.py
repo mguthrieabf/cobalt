@@ -57,9 +57,8 @@ def view_congress(request, congress_id, fullscreen=False):
 
     if request.method == "GET" and "msg" in request.GET:
         msg = request.GET["msg"]
-        print(msg)
-        print("Added to request")
-        messages.success(request, msg, extra_tags="cobalt-message-success")
+    else:
+        msg = None
 
     # We need to build a table for the program from events that has
     # rowspans for the number of days. This is too complex for the
@@ -146,7 +145,12 @@ def view_congress(request, congress_id, fullscreen=False):
     return render(
         request,
         "events/congress.html",
-        {"congress": congress, "fullscreen": fullscreen, "program_list": program_list},
+        {
+            "congress": congress,
+            "fullscreen": fullscreen,
+            "program_list": program_list,
+            "msg": msg,
+        },
     )
 
 
