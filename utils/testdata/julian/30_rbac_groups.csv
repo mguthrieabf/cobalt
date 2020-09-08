@@ -1,4 +1,4 @@
-rbac, RBACGroup
+rbac, RBACGroup,,
 id, name_qualifier, name_item, description
 dummy, rbac.orgs.clubs.act.pretent_club, staff, Staff at Dummy Bridge Club
 dummy, rbac.orgs.clubs.nsw.pretent_club, staff, Staff at Dummy Bridge Club
@@ -25,7 +25,7 @@ dummy, rbac.modules.payments, dummy, Payments stuff
 dummy, rbac.modules.scoring, dummy, Scoring stuff
 dummy, rbac.modules.scoring, dummy, Scoring stuff
 fbc_staff, rbac.orgs.clubs.act.fantasy_bridge_club, staff, Staff at Fantasy Bridge Club
-fbc_pay, rbac.orgs.clubs.act.fantasy_bridge_club[%s], payments, Payments for Fantasy Bridge Club
+fbc_pay, rbac.orgs.clubs.act.fantasy_bridge_club, payments, Payments for Fantasy Bridge Club
 forum_admin, rbac.modules.forums.admin, forum_admins, Global admins for forums
 public_mods, rbac.modules.forums.admin, public_moderators, Moderators for Public Forums
 block_all, rbac.modules.forums.private.committeenote, block_everyone, Block public access to Committee Notes

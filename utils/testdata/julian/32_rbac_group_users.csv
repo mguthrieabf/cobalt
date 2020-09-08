@@ -12,8 +12,10 @@ block_all, EVERYONE
 allow_specific, aa
 allow_specific, bb
 allow_specific, cc
+allow_specific,jj
 secret_mods, jj
 global_mods, kk
+global_mods,bb
 abfp, dd
 abfp, ii
 fbc_congress, cc
