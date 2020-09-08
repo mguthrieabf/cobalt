@@ -18,7 +18,7 @@
 
       {% if congress.sponsors %}
       <div class="row">
-        <div class="card col-8">
+        <div class="card col-lg-8 col-md-8 mx-auto">
           <div class="card-header card-header-info">
             <h4 class="card-title">Sponsors</h4>
           </div>
@@ -30,30 +30,35 @@
       {% endif %}
 
       <div class="row">
-        <div class="col-lg-4 col-md-4">
-          <div class="card">
-            <div class="card-header card-header-success">
-              <h4 class="card-title">People</h4>
+        <div class="col-lg-8 col-md-8 mx-auto">
+    <div class="row">
+          <div class="col-6">
+            <div class="card">
+              <div class="card-header card-header-success">
+                <h4 class="card-title">People</h4>
+              </div>
+              <div class="card-body table-responsive">
+                {{ congress.people|safe }}
+              </div>
             </div>
-            <div class="card-body table-responsive">
-              {{ congress.people|safe }}
+          </div>
+
+          <div class="col-6">
+            <div class="card">
+              <div class="card-header card-header-primary">
+                <h4 class="card-title">Links</h4>
+              </div>
+              <div class="card-body table-responsive">
+                {{ congress.links|safe }}
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="col-lg-4 col-md-4">
-          <div class="card">
-            <div class="card-header card-header-primary">
-              <h4 class="card-title">Links</h4>
-            </div>
-            <div class="card-body table-responsive">
-              {{ congress.links|safe }}
-            </div>
-          </div>
         </div>
       </div>
 
-      <div class="col-lg-8 col-md-8">
+
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-danger">
             <h4 class="card-title">General Information</h4>
@@ -64,7 +69,7 @@
         </div>
       </div>
 
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-success">
             <h4 class="card-title">Location - {{ congress.venue_name }}</h4>
@@ -76,7 +81,7 @@
       </div>
 
       {% if congress.venue_transport %}
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-success">
             <h4 class="card-title">Transport</h4>
@@ -89,7 +94,7 @@
       {% endif %}
 
       {% if congress.venue_catering %}
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-success">
             <h4 class="card-title">Catering</h4>
@@ -102,7 +107,7 @@
       {% endif %}
 
       {% if congress.venue_additional_info %}
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-success">
             <h4 class="card-title">Additonal Information</h4>
@@ -114,7 +119,7 @@
       </div>
       {% endif %}
 
-      <div class="col-lg-8 col-md-8">
+      <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-success">
             <h4 class="card-title">Program</h4>

@@ -381,8 +381,8 @@ def payment_api(
     if not payment_type:
         payment_type = "Miscellaneous"
 
-    if not url:  # where to next
-        url = "dashboard"
+    # if not url:  # where to next
+    #     url = "dashboard"
 
     if amount <= balance:  # sufficient funds
 
