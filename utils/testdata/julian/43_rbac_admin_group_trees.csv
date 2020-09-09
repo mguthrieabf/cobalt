@@ -2,6 +2,6 @@ rbac, RBACAdminTree
 id.group.rbac.RBACAdminGroup, tree
 ad_group, rbac
 f_group, rbac.modules.forums
-f_group, rbac.orgs
-p_group, rbac.orgs.abf
+p_group, rbac.orgs.abf.abf_roles
 fbc,rbac.orgs.clubs.act.fantasy_bridge_club
+rbc,rbac.orgs.clubs.act.rival_bridge_club

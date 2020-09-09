@@ -15,9 +15,9 @@ allow_specific, cc
 allow_specific,jj
 secret_mods, jj
 global_mods, kk
-global_mods,bb
 abfp, dd
 abfp, ii
+abfpv, julian
 fbc_congress, cc
 fbc_congress, ee
 fbc_congress, ff

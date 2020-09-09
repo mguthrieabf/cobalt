@@ -33,5 +33,6 @@ allow_specific, rbac.modules.forums.private.committeenote, allow_specific, Allow
 secret_mods, rbac.modules.forums.admin, secret_moderators, Moderators for Hidden Forum 6
 global_mods, rbac.modules.forums.admin, global_moderators, Moderators for all forums (even hidden).
 abfp, rbac.orgs.abf.abf_roles, payments_officers, Group to manage payments for the ABF
+abfpv, rbac.orgs.abf.abf_roles, payments_view, Read only access to payments for the ABF
 fbc_congress, rbac.orgs.clubs.act.fantasy_bridge_club, congresses, Congress Conveners at Fantasy Bridge Club
 rbc_congress, rbac.orgs.clubs.act.rival_bridge_club, congresses, Congress Conveners at Rival Bridge Club
