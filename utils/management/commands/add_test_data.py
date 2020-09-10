@@ -37,7 +37,7 @@ import sys
 from inspect import currentframe, getframeinfo
 
 TZ = pytz.timezone(TIME_ZONE)
-DATA_DIR = "utils/testdata/julian/"
+DATA_DIR = "/tmp/test-data"
 
 
 class Command(BaseCommand):
