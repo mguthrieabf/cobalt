@@ -81,11 +81,11 @@
           </select>
         </div>
 
-        {% include "generic_user_search_body.html" %}
+        {% include "utils/generic_user_search_body.html" with search_id=1 %}
 
         <div class="d-flex">
           <div>
-            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search">Add User</a>
+            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search1">Add User</a>
             <button class="btn btn-success" id="cobalt_everyone" onclick="addEveryone();">Add Everyone</button>
             <button class="btn btn-success" id="cobalt_self" onclick="addSelf();">Add Yourself</button>
           </div>
@@ -186,10 +186,10 @@
 
 <script>
 
-{% include 'generic_user_search_footer.html' %}
+{% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
   function addUser(member_id){
-    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
+    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id[1] + "&group_id=" + {{ group.id }})
         .done(response => {
           msg = response['data']['message'];
           if (msg == 'Success'){

@@ -192,8 +192,8 @@ transform: rotate(90deg);
       </div>
       <hr>
       <div id="user_box">
-        {% include "generic_user_search_body.html" %}
-        <button style="width: 150px" class="cobalt_generic_member btn btn-sm btn-primary" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search">Select User</button>
+        {% include "utils/generic_user_search_body.html" with search_id=1 %}
+        <button style="width: 150px" class="cobalt_generic_member btn btn-sm btn-primary" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search1">Select User</button>
         <span id="id_user">
           {% if member_id %}
           = {{ member_id }} {{ user }}
@@ -286,14 +286,14 @@ transform: rotate(90deg);
 
 {% block footer %}
 <script>
-  {% include 'generic_user_search_footer.html' %}
+  {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
   // Generic member search popup ok button pressed
 
   function cobaltMemberSearchOk() {
     clearModal();
-    $("#id_user").text(" = " + member_id);
-    $("#hidden_user").html("<input type='hidden' id='id_user' name='id_user' value='" + member_id + "'>");
+    $("#id_user").text(" = " + member_id[1]);
+    $("#hidden_user").html("<input type='hidden' id='id_user' name='id_user' value='" + member_id[1] + "'>");
   }
 
   // toggle tree

@@ -83,11 +83,11 @@
           </select>
         </div>
 
-        {% include "generic_user_search_body.html" %}
+        {% include "utils/generic_user_search_body.html" with search_id=1%}
 
         <div class="d-flex">
           <div>
-            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search">Add</a>
+            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search1">Add</a>
           </div>
           <div class="ml-auto">
             <button class="btn btn-info center-text" onclick="deleteUser();">Delete</button>
@@ -185,21 +185,14 @@
 
 {% block footer %}
 <script>
-  {
-    % include 'generic_user_search_footer.html' %
-  }
+  {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
   // Generic member search popup ok button pressed
 
   function cobaltMemberSearchOk() {
     clearModal();
 
-    $.get("{% url "
-        rbac: rbac_add_user_to_admin_group_ajax " %}?member_id=" + member_id + "&group_id=" + {
-          {
-            group.id
-          }
-        })
+    $.get("{% url "rbac:rbac_add_user_to_admin_group_ajax" %}?member_id=" + member_id[1] + "&group_id=" + {{ group.id }})
       .done(response => {
         msg = response['data']['message'];
         if (msg == 'Success') {
@@ -235,12 +228,7 @@
     }).then((result) => {
       if (result.value) {
         member_id = $('#user_list').val();
-        $.get("{% url "
-            rbac: rbac_delete_user_from_admin_group_ajax " %}?member_id=" + member_id + "&group_id=" + {
-              {
-                group.id
-              }
-            })
+        $.get("{% url "rbac:rbac_delete_user_from_admin_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success') {
@@ -278,8 +266,7 @@
     }).then((result) => {
       if (result.value) {
         role_id = $('#role_list').val();
-        $.get("{% url "
-            rbac: rbac_delete_role_from_admin_group_ajax " %}?role_id=" + role_id)
+        $.get("{% url "rbac:rbac_delete_role_from_admin_group_ajax" %}?role_id=" + role_id)
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success') {
@@ -325,8 +312,7 @@
       model_id = "None";
     }
 
-    $.get("{% url "
-        rbac: rbac_add_role_to_admin_group_ajax " %}?group_id={{ group.id }}&app=" + app + "&model=" + model + "&model_id=" + model_id)
+    $.get("{% url "rbac:rbac_add_role_to_admin_group_ajax" %}?group_id={{ group.id }}&app=" + app + "&model=" + model + "&model_id=" + model_id)
       .done(response => {
         msg = response['data']['message'];
         if (msg == 'Success') {

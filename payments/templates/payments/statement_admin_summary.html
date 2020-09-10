@@ -34,8 +34,8 @@
               <td class="text-right px-2">{{ GLOBAL_CURRENCY_SYMBOL }}{{ total_balance_members|floatformat:2|intcomma }}</td>
             </tr>
           </table>
-          {% include "generic_user_search_body.html" %}
-          <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search" data-target="#cobalt_general_member_search"><span style="color: white;">Lookup Member Statement</span></a>
+          {% include "utils/generic_user_search_body.html" with search_id=1 %}
+          <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search1" data-target="#cobalt_general_member_search1"><span style="color: white;">Lookup Member Statement</span></a>
           <a href="{% url "payments:admin_members_with_balance" %}" class="btn btn-success btn-sm">Members with Balances</a>
           <a href="{% url "payments:manual_adjust_member" %}" class="btn btn-info btn-sm">Manual Adjustment</a>
         </div>
@@ -102,7 +102,7 @@
 
 {% block footer %}
 <script>
-  {% include 'generic_user_search_footer.html' %} 
+  {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
   {% include 'generic_org_search_footer.html' %}
 
   function cobaltMemberSearchOk() {
@@ -110,7 +110,7 @@
     clearModal();
 
     // Go to member statement
-    window.location.href = 'statement-admin-view/' + member_id;
+    window.location.href = 'statement-admin-view/' + member_id[1];
   }
 
   function cobaltOrgSearchOk() {

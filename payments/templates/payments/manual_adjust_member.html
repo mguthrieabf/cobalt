@@ -11,8 +11,8 @@
       <h2>Manual Adjust Member Account<span id="member"></span></h2>
     </div>
     <div class="card-body table-responsive">
-      {% include "generic_user_search_body.html" %}
-      <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search" data-target="#cobalt_general_member_search"><span style="color: white;">Member Search</span></a>
+      {% include "utils/generic_user_search_body.html" with search_id=1 %}
+      <a class="cobalt_generic_member btn btn-warning btn-sm" data-toggle="modal" id="id_member_search" data-target="#cobalt_general_member_search1"><span style="color: white;">Member Search</span></a>
       <div id="cobalt_form" style="display: none;">
         <form method="POST">
           {% csrf_token %}
@@ -59,16 +59,16 @@
 
 {% block footer %}
 <script>
-  {% include 'generic_user_search_footer.html' %}
+  {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
-  $('#cobalt_general_member_search').modal('show');
+  $('#cobalt_general_member_search1').modal('show');
 
   function cobaltMemberSearchOk() {
     // Show form now that search is complete
     $("#cobalt_form").show();
     $("#id_member_search").hide();
-    $("#cobalt-hidden-member").html("<input type='hidden' id='id_member' name='member' value='" + member_id + "'>");
-    $("#member").html(" - " + member_name);
+    $("#cobalt-hidden-member").html("<input type='hidden' id='id_member' name='member' value='" + member_id[1] + "'>");
+    $("#member").html(" - " + member_name[1]);
     clearModal();
   }
 </script>
