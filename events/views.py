@@ -29,14 +29,49 @@ from payments.core import payment_api
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
-from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME, TIME_ZONE
+from datetime import datetime
+import itertools
+from cobalt.utils import cobalt_paginator
+from django.utils.timezone import make_aware, now, utc
+import pytz
+
+TZ = pytz.timezone(TIME_ZONE)
 
 
 @login_required()
 def home(request):
-    congresses = Congress.objects.all()
-    # return render(request, "events/soon.html", {"congresses": congresses})
-    return render(request, "events/home.html", {"congresses": congresses})
+    congresses = Congress.objects.order_by("start_date").filter(
+        start_date__gte=datetime.now()
+    )
+
+    grouped_by_month = {}
+    for congress in congresses:
+
+        # Comment field
+        if congress.entry_open_date > make_aware(datetime.now(), TZ):
+            congress.msg = "Entries open on %s" % congress.entry_open_date
+        elif congress.entry_close_date > make_aware(datetime.now(), TZ):
+            congress.msg = "Entries close on %s" % congress.entry_close_date
+        else:
+            congress.msg = "Congress entries are closed"
+
+        # check access
+        congress.convener = congress.user_is_convener(request.user)
+
+        # Group congresses by date
+        month = congress.start_date.strftime("%B %Y")
+        if month in grouped_by_month:
+            grouped_by_month[month].append(congress)
+        else:
+            grouped_by_month[month] = [congress]
+
+        admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[0]
+    return render(
+        request,
+        "events/home.html",
+        {"grouped_by_month": grouped_by_month, "admin": admin},
+    )
 
 
 @login_required()
@@ -81,6 +116,9 @@ def view_congress(request, congress_id, fullscreen=False):
     for event in events:
         program = {}
 
+        # see if user has entered already
+        program["entry"] = event.already_entered(request.user)
+
         # get all sessions for this event plus days and number of rows (# of days)
         sessions = event.session_set.all()
         days = sessions.distinct("session_date")
@@ -93,9 +131,14 @@ def view_congress(request, congress_id, fullscreen=False):
                 program[
                     "event"
                 ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</span></td>"
-                program[
-                    "links"
-                ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a></td>"
+                if program["entry"]:
+                    program[
+                        "links"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>View Entry</a></td>"
+                else:
+                    program[
+                        "links"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a></td>"
                 first_row_for_event = False
             program["day"] = "<td>%s</td>" % day.session_date.strftime("%A")
 
@@ -139,6 +182,7 @@ def view_congress(request, congress_id, fullscreen=False):
                     )
 
             program["time"] = "<td>%s</td>" % time_str.lower()  # AM -> pm
+
             program_list.append(program)
             program = {}
 
@@ -1008,29 +1052,29 @@ def edit_event_entry(request, congress_id, event_id):
 
 
 @login_required()
-def checkout(request, congress_id=None):
+def checkout(request):
     """ Checkout view - make payments, get details """
 
     basket_items = BasketItem.objects.filter(player=request.user)
 
-    if not congress_id:  # check if only one congress in basket
-        congress_list = []
-        for basket_item in basket_items:
-            congress_item = basket_item.event_entry.event.congress
-            if congress_item not in congress_list:
-                congress_list.append(congress_item)
-        if len(congress_list) > 1:  # multiple congresses in basket
-            return render(
-                request,
-                "events/congress_list_checkout.html",
-                {"congress_list": congress_list},
-            )
+    # if not congress_id:  # check if only one congress in basket
+    #     congress_list = []
+    #     for basket_item in basket_items:
+    #         congress_item = basket_item.event_entry.event.congress
+    #         if congress_item not in congress_list:
+    #             congress_list.append(congress_item)
+    #     if len(congress_list) > 1:  # multiple congresses in basket
+    #         return render(
+    #             request,
+    #             "events/congress_list_checkout.html",
+    #             {"congress_list": congress_list},
+    #         )
 
     if request.method == "POST":
-        # TODO: restrict to single congresses
-        organisation = (
-            basket_items.first().event_entry.event.congress.congress_master.org
-        )
+
+        # organisation = (
+        #     basket_items.first().event_entry.event.congress.congress_master.org
+        # )
 
         # Need to mark the entries that this is covering. The payment call is asynchronous so
         # we can't just load all the open basket_entries when we come back or more could have been
@@ -1056,9 +1100,6 @@ def checkout(request, congress_id=None):
             event_entry_player.batch_id = unique_id
             event_entry_player.save()
 
-        # empty basket - should do this after payment attempt complete
-        basket_items.delete()
-
         return payment_api(
             request=request,
             member=request.user,
@@ -1067,8 +1108,6 @@ def checkout(request, congress_id=None):
             route_code="EVT",
             route_payload=unique_id,
             url="/events",
-            organisation=organisation,
-            #            log_msg=None,
             payment_type="Entry to a congress",
         )
 

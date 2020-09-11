@@ -153,6 +153,7 @@
 <span class="kn">from</span> <span class="nn">cobalt.settings</span> <span class="kn">import</span> <span class="n">GLOBAL_ORG</span><span class="p">,</span> <span class="n">GLOBAL_CURRENCY_SYMBOL</span><span class="p">,</span> <span class="n">TIME_ZONE</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">from</span> <span class="nn">rbac.core</span> <span class="kn">import</span> <span class="n">rbac_user_has_role</span>
 
 <span class="n">PAYMENT_STATUSES</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s2">&quot;Paid&quot;</span><span class="p">,</span> <span class="s2">&quot;Entry Paid&quot;</span><span class="p">),</span>
@@ -187,8 +188,15 @@
 <span class="n">EVENT_PLAYER_FORMAT</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s2">&quot;Individual&quot;</span><span class="p">,</span> <span class="s2">&quot;Individual&quot;</span><span class="p">),</span>
     <span class="p">(</span><span class="s2">&quot;Pairs&quot;</span><span class="p">,</span> <span class="s2">&quot;Pairs&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;Teams of 3&quot;</span><span class="p">,</span> <span class="s2">&quot;Teams of Three&quot;</span><span class="p">),</span>
     <span class="p">(</span><span class="s2">&quot;Teams&quot;</span><span class="p">,</span> <span class="s2">&quot;Teams&quot;</span><span class="p">),</span>
 <span class="p">]</span>
+<span class="n">EVENT_PLAYER_FORMAT_SIZE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Individual&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;Pairs&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;Teams of 3&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;Teams&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="CongressMaster"><a class="viewcode-back" href="../../events.html#events.models.CongressMaster">[docs]</a><span class="k">class</span> <span class="nc">CongressMaster</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
@@ -284,8 +292,13 @@
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">congress_master</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">congress_master</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Congress.user_is_convener"><a class="viewcode-back" href="../../events.html#events.models.Congress.user_is_convener">[docs]</a>    <span class="k">def</span> <span class="nf">user_is_convener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check if a user has convener rights to this congress &quot;&quot;&quot;</span>
+
+        <span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;events.org.</span><span class="si">%s</span><span class="s2">.edit&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">congress_master</span><span class="o">.</span><span class="n">org</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span> <span class="n">rbac_user_has_role</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../events.html#events.models.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An event within a congress &quot;&quot;&quot;</span>
@@ -374,11 +387,13 @@
         <span class="sd">&quot;&quot;&quot; check if a user has already entered &quot;&quot;&quot;</span>
 
         <span class="n">event_entry_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evententry_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">EventEntryPlayer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">player</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">event_entry__in</span><span class="o">=</span><span class="n">event_entry_list</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">exists</span><span class="p">()</span>
-        <span class="p">)</span></div></div>
+
+        <span class="n">event_entry_player</span> <span class="o">=</span> <span class="n">EventEntryPlayer</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">player</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">event_entry__in</span><span class="o">=</span><span class="n">event_entry_list</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">event_entry_player</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="n">event_entry_player</span><span class="o">.</span><span class="n">event_entry</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
 <div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../events.html#events.models.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>

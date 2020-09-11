@@ -508,15 +508,20 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">other_member</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">organisation</span><span class="p">:</span>  <span class="c1"># must have one</span>
-        <span class="n">log_event</span><span class="p">(</span>
-            <span class="n">user</span><span class="o">=</span><span class="s2">&quot;Stripe API&quot;</span><span class="p">,</span>
-            <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;CRITICAL&quot;</span><span class="p">,</span>
-            <span class="n">source</span><span class="o">=</span><span class="s2">&quot;Payments&quot;</span><span class="p">,</span>
-            <span class="n">sub_source</span><span class="o">=</span><span class="s2">&quot;payments_api&quot;</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Received neither other_member nor organisation. Code Error.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="c1"># We need to allow having neither other_member or org for Events.</span>
+<span class="c1"># Events needs to split the payments potentially between different</span>
+<span class="c1"># orgs so it creates its own org payments which won&#39;t be a single</span>
+<span class="c1"># match for the user payment.</span>
+
+    <span class="c1"># if not other_member and not organisation:  # must have one</span>
+    <span class="c1">#     log_event(</span>
+    <span class="c1">#         user=&quot;Stripe API&quot;,</span>
+    <span class="c1">#         severity=&quot;CRITICAL&quot;,</span>
+    <span class="c1">#         source=&quot;Payments&quot;,</span>
+    <span class="c1">#         sub_source=&quot;payments_api&quot;,</span>
+    <span class="c1">#         message=&quot;Received neither other_member nor organisation. Code Error.&quot;,</span>
+    <span class="c1">#     )</span>
+    <span class="c1">#     return HttpResponse(status=500)</span>
 
     <span class="n">balance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">get_balance</span><span class="p">(</span><span class="n">member</span><span class="p">))</span>
     <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
@@ -527,8 +532,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">payment_type</span><span class="p">:</span>
         <span class="n">payment_type</span> <span class="o">=</span> <span class="s2">&quot;Miscellaneous&quot;</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>  <span class="c1"># where to next</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;dashboard&quot;</span>
+    <span class="c1"># if not url:  # where to next</span>
+    <span class="c1">#     url = &quot;dashboard&quot;</span>
 
     <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="n">balance</span><span class="p">:</span>  <span class="c1"># sufficient funds</span>
 
@@ -757,7 +762,9 @@
                     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Payment for: &quot;</span> <span class="o">+</span> <span class="n">description</span>
 
             <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
-                <span class="n">request</span><span class="p">,</span> <span class="s2">&quot;payments/checkout.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;trans&quot;</span><span class="p">:</span> <span class="n">trans</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">}</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;payments/checkout.html&quot;</span><span class="p">,</span>
+                <span class="p">{</span><span class="s2">&quot;trans&quot;</span><span class="p">:</span> <span class="n">trans</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;next_url&quot;</span><span class="p">:</span> <span class="n">url</span><span class="p">},</span>
             <span class="p">)</span></div>
 
 

@@ -331,11 +331,14 @@ def payment_api(
     amount is a charge, a negative amount is an incoming payment.
 
     We accept either organisation as the counterpart for this payment or
-    other_member. We must have either an organisation or a member, but
-    we can't pay to both.
+    other_member. Some clients only do one side of the transaction through
+    this API so we also accept neither.
+
+    This is generally expected to return a page giving the user information,
+    but it can also be called headlessly by setting request to None.
 
     args:
-        request - standard request object
+        request - standard request object (optional)
         description - text description of the payment
         amount - how much
         member - User object related to the payment
@@ -362,15 +365,22 @@ def payment_api(
         )
         return HttpResponse(status=500)
 
-    if not other_member and not organisation:  # must have one
-        log_event(
-            user="Stripe API",
-            severity="CRITICAL",
-            source="Payments",
-            sub_source="payments_api",
-            message="Received neither other_member nor organisation. Code Error.",
-        )
-        return HttpResponse(status=500)
+    return_msg = None  # for non user interactive calls
+
+    # We need to allow having neither other_member or org for Events.
+    # Events needs to split the payments potentially between different
+    # orgs so it creates its own org payments which won't be a single
+    # match for the user payment.
+
+    # if not other_member and not organisation:  # must have one
+    #     log_event(
+    #         user="Stripe API",
+    #         severity="CRITICAL",
+    #         source="Payments",
+    #         sub_source="payments_api",
+    #         message="Received neither other_member nor organisation. Code Error.",
+    #     )
+    #     return HttpResponse(status=500)
 
     balance = float(get_balance(member))
     amount = float(amount)
@@ -381,8 +391,8 @@ def payment_api(
     if not payment_type:
         payment_type = "Miscellaneous"
 
-    # if not url:  # where to next
-    #     url = "dashboard"
+    if not url:  # where to next
+        url = "dashboard"
 
     if amount <= balance:  # sufficient funds
 
@@ -411,11 +421,12 @@ def payment_api(
                 member=member,
             )
 
-            messages.success(
-                request,
-                f"Payment successful! You paid ${amount:.2f} to {organisation}.",
-                extra_tags="cobalt-message-success",
-            )
+            if request:
+                messages.success(
+                    request,
+                    f"Payment successful! You paid ${amount:.2f} to {organisation}.",
+                    extra_tags="cobalt-message-success",
+                )
 
         # If we got an other_member then make their payment too
         if other_member:
@@ -430,11 +441,12 @@ def payment_api(
                 member=other_member,
             )
 
-            messages.success(
-                request,
-                f"Payment successful! You paid ${amount:.2f} to {other_member}.",
-                extra_tags="cobalt-message-success",
-            )
+            if request:
+                messages.success(
+                    request,
+                    f"Payment successful! You paid ${amount:.2f} to {other_member}.",
+                    extra_tags="cobalt-message-success",
+                )
 
         callback_router(route_code=route_code, route_payload=route_payload, tran=None)
 
@@ -444,9 +456,14 @@ def payment_api(
             if balance - amount < AUTO_TOP_UP_LOW_LIMIT:
                 (return_code, msg) = auto_topup_member(member)
                 if return_code:  # Success
-                    messages.success(request, msg, extra_tags="cobalt-message-success")
+                    if request:
+                        messages.success(
+                            request, msg, extra_tags="cobalt-message-success"
+                        )
                 else:  # Failure
-                    messages.error(request, msg, extra_tags="cobalt-message-error")
+                    if request:
+                        return_msg = msg
+                        messages.error(request, msg, extra_tags="cobalt-message-error")
 
         return redirect(url)
 
@@ -459,18 +476,13 @@ def payment_api(
             # we top up by increments of the top up amount.
             topup_required = amount  # normal top up
             if balance < AUTO_TOP_UP_LOW_LIMIT:
-                print("balance < AUTO_TOP_UP_LOW_LIMIT")
+
                 if member.auto_amount >= amount:  # use biggest
-                    print("member.auto_amount >= amount")
-                    print("topup_required = member.auto_amount")
                     topup_required = member.auto_amount
                 else:
-                    print("topup_required = amount")
                     topup_required = amount
                 # check if we will still be under threshold
                 if balance + topup_required - amount < AUTO_TOP_UP_LOW_LIMIT:
-                    print("balance + topup_required - amount < AUTO_TOP_UP_LOW_LIMIT")
-                    print("topup_required = member.auto_amount - balance + amount")
                     topup_required = member.auto_amount - balance + amount
 
                     # Change from magic number to multiples of auto top up
@@ -479,13 +491,8 @@ def payment_api(
                     n = int(min_required_amt / member.auto_amount) + 1
                     topup_required = member.auto_amount * n
 
-                    print("top up required: %s" % topup_required)
-
             else:  # not below auto limit, but insufficient funds - use largest of amt and auto
-                print("balance < AUTO_TOP_UP_LOW_LIMIT")
                 if member.auto_amount >= amount:  # use biggest
-                    print("member.auto_amount >= amount")
-                    print("topup_required = member.auto_amount")
                     topup_required = member.auto_amount
 
             (return_code, msg) = auto_topup_member(
@@ -518,12 +525,13 @@ def payment_api(
                         member=member,
                     )
 
-                    messages.success(
-                        request,
-                        f"Payment successful! You paid \
-                                     ${amount:.2f} to {organisation}.",
-                        extra_tags="cobalt-message-success",
-                    )
+                    if request:
+                        messages.success(
+                            request,
+                            f"Payment successful! You paid \
+                                         ${amount:.2f} to {organisation}.",
+                            extra_tags="cobalt-message-success",
+                        )
 
                 # If we got an other_member then make their payment too
                 if other_member:
@@ -538,20 +546,24 @@ def payment_api(
                         member=other_member,
                     )
 
-                    messages.success(
-                        request,
-                        f"Payment successful! You paid ${amount:.2f} to {other_member}.",
-                        extra_tags="cobalt-message-success",
-                    )
+                    if request:
+                        messages.success(
+                            request,
+                            f"Payment successful! You paid ${amount:.2f} to {other_member}.",
+                            extra_tags="cobalt-message-success",
+                        )
 
-                messages.success(request, msg, extra_tags="cobalt-message-success")
+                if request:
+                    messages.success(request, msg, extra_tags="cobalt-message-success")
                 callback_router(
                     route_code=route_code, route_payload=route_payload, tran=None
                 )
                 return redirect(url)
 
             else:  # auto top up failed
-                messages.error(request, msg, extra_tags="cobalt-message-error")
+                if request:
+                    messages.error(request, msg, extra_tags="cobalt-message-error")
+                    return_msg = msg
                 callback_router(
                     route_code=route_code,
                     route_payload=route_payload,
@@ -610,11 +622,14 @@ def payment_api(
                 else:
                     msg = "Payment for: " + description
 
-            return render(
-                request,
-                "payments/checkout.html",
-                {"trans": trans, "msg": msg, "next_url": url},
-            )
+            if request:
+                return render(
+                    request,
+                    "payments/checkout.html",
+                    {"trans": trans, "msg": msg, "next_url": url},
+                )
+            else:
+                return return_msg
 
 
 #########################
@@ -712,9 +727,6 @@ def stripe_webhook_manual(event):
     # linked_transaction_type will be None
 
     if tran.linked_transaction_type:
-        print("linked?")
-        print(tran.linked_organisation)
-        print(tran.linked_member)
 
         # We could be linked to a member payment or an organisation payment
         if tran.linked_organisation:

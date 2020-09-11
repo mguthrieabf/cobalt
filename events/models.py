@@ -7,6 +7,7 @@ from payments.models import MemberTransaction
 from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL, TIME_ZONE
 import datetime
 import pytz
+from rbac.core import rbac_user_has_role
 
 PAYMENT_STATUSES = [
     ("Paid", "Entry Paid"),
@@ -147,6 +148,12 @@ class Congress(models.Model):
     def __str__(self):
         return "%s - %s" % (self.congress_master, self.year)
 
+    def user_is_convener(self, user):
+        """ check if a user has convener rights to this congress """
+
+        role = "events.org.%s.edit" % self.congress_master.org.id
+        return rbac_user_has_role(user, role)
+
 
 class Event(models.Model):
     """ An event within a congress """
@@ -235,11 +242,17 @@ class Event(models.Model):
         """ check if a user has already entered """
 
         event_entry_list = self.evententry_set.all().values_list("id")
-        return (
+
+        event_entry_player = (
             EventEntryPlayer.objects.filter(player=user)
             .filter(event_entry__in=event_entry_list)
-            .exists()
+            .first()
         )
+
+        if event_entry_player:
+            return event_entry_player.event_entry
+        else:
+            return None
 
 
 class Session(models.Model):

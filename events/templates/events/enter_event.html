@@ -6,6 +6,13 @@
 
 {% block header %}
 <link href="{% static "assets/css/font-awesome.5.14/css/all.css" %}" rel="stylesheet">
+<style>
+  select{
+      width: 100px;
+      text-overflow: ellipsis;
+  }
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +46,7 @@
                   <th style="text-align: center;">You {{ GLOBAL_CURRENCY_SYMBOL }}</th>
                   <th style="text-align: center;">Pending {{ GLOBAL_CURRENCY_SYMBOL }}</th>
                 </thead>
-                <tbody>
+                <tbody style="overflow:hidden;">
 
                     <tr>
                       <td class="col text-center">
@@ -190,13 +197,15 @@ $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + 
   .done(response => {
     msg = response['data']['message'];
     if (msg == 'Success') {
-      $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
-           + response['data']['reason']
-           + ' $'
-           + response['data']['discount']
-           + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
+      if (response['data']['discount']>0) {
+        $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
+             + response['data']['reason']
+             + ' $'
+             + response['data']['discount']
+             + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
-      $(".myHover").tooltip();
+        $(".myHover").tooltip();
+    }
       $("#fee_" + search_id + "_now").val(response['data']['entry_fee']);
       $("#fee_" + search_id + "_later").val("");
 
@@ -351,6 +360,16 @@ $(document).ready(function(){
     $('#plus_5').hide();
     return false;
   });
+
+// fix dropdown being stuck in box
+  // $('.dropdown').on('show.bs.dropdown', function() {
+  //   $('body').append($('.dropdown').css({
+  //     position: 'absolute',
+  //     left: $('.dropdown').offset().left,
+  //     top: $('.dropdown').offset().top
+  //   }).detach());
+  // });
+
 
 });
 </script>

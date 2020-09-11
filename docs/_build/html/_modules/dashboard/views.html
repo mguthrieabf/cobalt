@@ -150,6 +150,7 @@
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">masterpoints.views</span> <span class="kn">import</span> <span class="n">get_masterpoints</span>
 <span class="kn">from</span> <span class="nn">payments.core</span> <span class="kn">import</span> <span class="n">get_balance_detail</span>
+<span class="kn">from</span> <span class="nn">events.core</span> <span class="kn">import</span> <span class="n">get_events</span>
 
 <span class="c1"># from forums.views import post_list_dashboard</span>
 <span class="kn">from</span> <span class="nn">cobalt.utils</span> <span class="kn">import</span> <span class="n">cobalt_paginator</span>
@@ -169,11 +170,12 @@
     <span class="n">payments</span> <span class="o">=</span> <span class="n">get_balance_detail</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="n">posts</span> <span class="o">=</span> <span class="n">get_posts</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="n">posts2</span> <span class="o">=</span> <span class="n">get_announcements</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">get_events</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
         <span class="n">request</span><span class="p">,</span>
         <span class="s2">&quot;dashboard/home.html&quot;</span><span class="p">,</span>
-        <span class="p">{</span><span class="s2">&quot;mp&quot;</span><span class="p">:</span> <span class="n">masterpoints</span><span class="p">,</span> <span class="s2">&quot;payments&quot;</span><span class="p">:</span> <span class="n">payments</span><span class="p">,</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span> <span class="s2">&quot;posts2&quot;</span><span class="p">:</span> <span class="n">posts2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;mp&quot;</span><span class="p">:</span> <span class="n">masterpoints</span><span class="p">,</span> <span class="s2">&quot;payments&quot;</span><span class="p">:</span> <span class="n">payments</span><span class="p">,</span> <span class="s2">&quot;posts&quot;</span><span class="p">:</span> <span class="n">posts</span><span class="p">,</span> <span class="s2">&quot;posts2&quot;</span><span class="p">:</span> <span class="n">posts2</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events</span><span class="p">},</span>
     <span class="p">)</span></div>
 
 

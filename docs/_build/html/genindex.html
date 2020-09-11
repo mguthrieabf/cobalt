@@ -962,11 +962,7 @@
 </li>
       <li><a href="events.html#events.views.delete_congress">delete_congress() (in module events.views)</a>
 </li>
-      <li><a href="events.html#events.views.delete_event_ajax">delete_event_ajax() (in module events.views)</a>
-</li>
       <li><a href="notifications.html#notifications.views.delete_in_app_notification">delete_in_app_notification() (in module notifications.views)</a>
-</li>
-      <li><a href="events.html#events.views.delete_session_ajax">delete_session_ajax() (in module events.views)</a>
 </li>
       <li><a href="notifications.html#notifications.views.deleteall">deleteall() (in module notifications.views)</a>
 </li>
@@ -1196,11 +1192,15 @@
 </li>
       <li><a href="events.html#events.views.edit_event">edit_event() (in module events.views)</a>
 </li>
+      <li><a href="events.html#events.views.edit_event_entry">edit_event_entry() (in module events.views)</a>
+</li>
       <li><a href="events.html#events.views.edit_session">edit_session() (in module events.views)</a>
 </li>
       <li><a href="events.html#events.models.Congress.end_date">end_date (events.models.Congress attribute)</a>
 </li>
       <li><a href="events.html#events.views.enter_event">enter_event() (in module events.views)</a>
+</li>
+      <li><a href="events.html#events.views.enter_event_form">enter_event_form() (in module events.views)</a>
 </li>
       <li><a href="events.html#events.models.Congress.entry_close_date">entry_close_date (events.models.Congress attribute)</a>
 
@@ -1268,10 +1268,10 @@
         <li><a href="events.html#events.models.Session.event_id">(events.models.Session attribute)</a>
 </li>
       </ul></li>
-      <li><a href="events.html#events.models.Event.event_name">event_name (events.models.Event attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="events.html#events.models.Event.event_name">event_name (events.models.Event attribute)</a>
+</li>
       <li><a href="events.html#events.models.Congress.event_set">event_set (events.models.Congress attribute)</a>
 </li>
       <li><a href="events.html#events.models.Event.event_type">event_type (events.models.Event attribute)</a>
@@ -1371,8 +1371,6 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="events.html#events.views.fee_for_user_ajax">fee_for_user_ajax() (in module events.views)</a>
-</li>
       <li><a href="forums.html#forums.models.Forum.fg_colour">fg_colour (forums.models.Forum attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.forms.BlurbUpdateForm.Meta.fields">fields (accounts.forms.BlurbUpdateForm.Meta attribute)</a>
@@ -1593,12 +1591,6 @@
       <li><a href="payments.html#payments.core.get_balance_detail">get_balance_detail() (in module payments.core)</a>
 </li>
       <li><a href="logs.html#logs.views.get_client_ip">get_client_ip() (in module logs.views)</a>
-</li>
-      <li><a href="events.html#events.views.get_congress_ajax">get_congress_ajax() (in module events.views)</a>
-</li>
-      <li><a href="events.html#events.views.get_congress_master_ajax">get_congress_master_ajax() (in module events.views)</a>
-</li>
-      <li><a href="events.html#events.views.get_conveners_ajax">get_conveners_ajax() (in module events.views)</a>
 </li>
       <li><a href="rbac.html#rbac.models.RBACModelDefault.get_default_behaviour_display">get_default_behaviour_display() (rbac.models.RBACModelDefault method)</a>
 </li>
@@ -4636,10 +4628,10 @@
 </li>
       <li><a href="payments.html#payments.views.stripe_autotopup_confirm">stripe_autotopup_confirm() (in module payments.views)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="payments.html#payments.views.stripe_autotopup_off">stripe_autotopup_off() (in module payments.views)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_brand">stripe_brand (payments.models.StripeTransaction attribute)</a>
 </li>
       <li><a href="payments.html#payments.models.StripeTransaction.stripe_country">stripe_country (payments.models.StripeTransaction attribute)</a>
@@ -4761,6 +4753,8 @@
 </li>
       <li><a href="masterpoints.html#masterpoints.views.system_number_lookup">system_number_lookup() (in module masterpoints.views)</a>
 </li>
+      <li><a href="accounts.html#accounts.views.system_number_search_ajax">system_number_search_ajax() (in module accounts.views)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -4853,16 +4847,18 @@
       </ul></li>
       <li><a href="accounts.html#accounts.models.User.DoesNotExist">User.DoesNotExist</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="accounts.html#accounts.models.User.MultipleObjectsReturned">User.MultipleObjectsReturned</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="accounts.html#accounts.models.TeamMate.user_id">user_id (accounts.models.TeamMate attribute)</a>
 
       <ul>
         <li><a href="forums.html#forums.models.ForumFollow.user_id">(forums.models.ForumFollow attribute)</a>
 </li>
       </ul></li>
+      <li><a href="events.html#events.models.Congress.user_is_convener">user_is_convener() (events.models.Congress method)</a>
+</li>
       <li><a href="accounts.html#accounts.models.User.user_permissions">user_permissions (accounts.models.User attribute)</a>
 </li>
       <li><a href="accounts.html#accounts.views.user_settings">user_settings() (in module accounts.views)</a>

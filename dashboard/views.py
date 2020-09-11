@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from masterpoints.views import get_masterpoints
 from payments.core import get_balance_detail
+from events.core import get_events
 
 # from forums.views import post_list_dashboard
 from cobalt.utils import cobalt_paginator
@@ -23,11 +24,18 @@ def home(request):
     payments = get_balance_detail(request.user)
     posts = get_posts(request)
     posts2 = get_announcements(request)
+    events = get_events(request.user)
 
     return render(
         request,
         "dashboard/home.html",
-        {"mp": masterpoints, "payments": payments, "posts": posts, "posts2": posts2},
+        {
+            "mp": masterpoints,
+            "payments": payments,
+            "posts": posts,
+            "posts2": posts2,
+            "events": events,
+        },
     )
 
 

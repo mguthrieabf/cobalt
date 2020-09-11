@@ -378,7 +378,7 @@
 
 <span class="c1"># app specific static lives in app_name/static/app_name</span>
 <span class="c1"># general static lives in STATICFILES_DIRS</span>
-<span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;cobalt/static/&quot;</span><span class="p">)]</span>
+<span class="c1"># STATICFILES_DIRS = [os.path.join(BASE_DIR, &quot;cobalt/static/&quot;)]</span>
 
 <span class="c1"># This is where collectstatic will put the static files it finds</span>
 <span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;static&quot;</span><span class="p">)</span>
@@ -389,7 +389,7 @@
 
 
 <span class="c1"># append MD5 hash to filenames to prevent caching on version change</span>
-<span class="c1"># STATICFILES_STORAGE = &quot;utils.storage.ForgivingManifestStaticFilesStorage&quot;</span>
+<span class="n">STATICFILES_STORAGE</span> <span class="o">=</span> <span class="s2">&quot;utils.storage.ForgivingManifestStaticFilesStorage&quot;</span>
 
 <span class="n">MEDIA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;media&quot;</span><span class="p">)</span>
 <span class="k">if</span> <span class="s2">&quot;FILE_SYSTEM_ID&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>  <span class="c1"># AWS EFS for media</span>

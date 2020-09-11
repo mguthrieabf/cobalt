@@ -41,7 +41,7 @@
             <i class="material-icons">list_alt</i>
           </div>
           <p class="card-category">Booked Events</p>
-          <h3 class="card-title">0</h3>
+          <h3 class="card-title">{{ events.count }}</h3>
         </div>
         <div class="card-footer">
           <div class="stats">
@@ -92,7 +92,10 @@
 
 
         <div class="card-body table-responsive">
-          Coming Soon!
+          {% for event in events %}
+            <a class="card-link" href="{% url "events:view_congress" congress_id=event.event_entry.event.congress.id %}">{{ event.event_entry.event }}</a><br>
+          {% endfor %}
+
         </div>
       </div>
     </div>

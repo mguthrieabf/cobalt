@@ -634,6 +634,12 @@ object the first time, the query is executed.</p>
 object the first time, the query is executed.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="events.models.Congress.user_is_convener">
+<code class="sig-name descname">user_is_convener</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/models.html#Congress.user_is_convener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.models.Congress.user_is_convener" title="Permalink to this definition">¶</a></dt>
+<dd><p>check if a user has convener rights to this congress</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt id="events.models.Congress.venue_additional_info">
 <code class="sig-name descname">venue_additional_info</code><a class="headerlink" href="#events.models.Congress.venue_additional_info" title="Permalink to this definition">¶</a></dt>
@@ -1543,7 +1549,7 @@ object the first time, the query is executed.</p>
 
 <dl class="py function">
 <dt id="events.views.checkout">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#checkout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.checkout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#checkout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.checkout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checkout view - make payments, get details</p>
 </dd></dl>
 
@@ -1631,21 +1637,15 @@ congress. The last steps allows the congress to be published.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="events.views.delete_event_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">delete_event_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#delete_event_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.delete_event_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ajax call to delete an event from a congress</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="events.views.delete_session_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">delete_session_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#delete_session_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.delete_session_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ajax call to delete a session from a congress</p>
-</dd></dl>
-
-<dl class="py function">
 <dt id="events.views.edit_event">
 <code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_event</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em>, <em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>edit an event within a congress</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="events.views.edit_event_entry">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">edit_event_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em>, <em class="sig-param"><span class="n">event_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#edit_event_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.edit_event_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>edit an event entry</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1661,27 +1661,11 @@ congress. The last steps allows the congress to be published.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="events.views.fee_for_user_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">fee_for_user_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#fee_for_user_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.fee_for_user_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ajax call to get entry fee for a user in an event</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="events.views.get_congress_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_congress_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">congress_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_congress_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_congress_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a list of congresses as html for an congress_master</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="events.views.get_congress_master_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_congress_master_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">org_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_congress_master_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_congress_master_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a list of congress_masters as html for an organisation</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="events.views.get_conveners_ajax">
-<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">get_conveners_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em>, <em class="sig-param"><span class="n">org_id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#get_conveners_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.get_conveners_ajax" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns a list of conveners as html for an organisation</p>
+<dt id="events.views.enter_event_form">
+<code class="sig-prename descclassname">events.views.</code><code class="sig-name descname">enter_event_form</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em>, <em class="sig-param"><span class="n">congress</span></em>, <em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/events/views.html#enter_event_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#events.views.enter_event_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>build the form part of the enter_event view. Its not a Django form,
+we build our own as the validation won’t work with a dynamic form
+and we are validating on the client side anyway.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1699,6 +1683,7 @@ congress. The last steps allows the congress to be published.</p>
 <li><p><strong>request</strong> (<em>HTTPRequest</em>) – standard user request</p></li>
 <li><p><strong>congress_id</strong> (<em>int</em>) – congress to view</p></li>
 <li><p><strong>fullscreen</strong> (<em>boolean</em>) – if true shows just the page, not the standard surrounds</p></li>
+<li><p><strong>accepts a GET parameter of msg to display for returning from event entry</strong> (<em>Also</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

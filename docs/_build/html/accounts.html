@@ -1223,7 +1223,11 @@ if the member number is invalid.</p>
 if the member number is invalid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>- member number</strong> (<em>member_id</em>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- member number</strong> (<em>member_id</em>) – </p></li>
+<li><p><strong>- used if page has multiple user searches. We just pass this</strong> (<em>search_id</em>) – </p></li>
+<li><p><strong>Optional.</strong> (<em>through.</em>) – </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>member, clubs,  global org name.</p>
@@ -1246,6 +1250,8 @@ parts of the system need a search function.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>- partial lastname to search for. Wild cards the ending.</strong> (<em>lastname</em>) – </p></li>
 <li><p><strong>- partial firstname to search for. Wild cards the ending.</strong> (<em>firstname</em>) – </p></li>
+<li><p><strong>- used if page has multiple user searches. We just pass this</strong> (<em>search_id</em>) – </p></li>
+<li><p><strong>Optional.</strong> (<em>through.</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1326,10 +1332,24 @@ parts of the system need a search function.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="accounts.views.system_number_search_ajax">
+<code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">system_number_search_ajax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#system_number_search_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.system_number_search_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ajax system_number search function. Used by the generic member search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>- exact number to search for</strong> (<em>system_number</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HttpResponse - either a message or a list of users in HTML format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="accounts.views.user_settings">
 <code class="sig-prename descclassname">accounts.views.</code><code class="sig-name descname">user_settings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">request</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#user_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#accounts.views.user_settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>User settings form.</p>
-<p>Allow user to chose preferences</p>
+<p>Allow user to choose preferences</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>- standard request object</strong> (<em>request</em>) – </p>

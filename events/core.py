@@ -1,44 +1,8 @@
 from .models import BasketItem, EventEntry, EventEntryPlayer
 from django.db.models import Q
 from django.utils import timezone
-
-# def _totals(event_entry_players):
-#     """ total calcs are the same for all functions so use common routine """
-#
-#     total = 0
-#     for event_entry_player in event_entry_players:
-#         total += float(event_entry_player.entry_fee)
-#     return total
-#
-#
-# def basket_amt_total(user):
-#     """ total amount, owning or paid, in a users basket including other people's payments """
-#
-#     event_entries =  BasketItem.objects.filter(player=user).values_list('event_entry')
-#     event_entry_players = EventEntryPlayer.objects.filter(event_entry__in=event_entries)
-#     return _totals(event_entry_players)
-#
-# def basket_amt_paid(user):
-#     """ total amount paid in a users basket including other people's payments """
-#
-#     event_entries =  BasketItem.objects.filter(player=user).values_list('event_entry')
-#     event_entry_players = EventEntryPlayer.objects.filter(event_entry__in=event_entries).exclude(payment_status="Paid")
-#     return _totals(event_entry_players)
-#
-# def basket_amt_this_user_only(user):
-#     """ total amount paid, or unpaid in a users basket excluding other people's
-#     payments unless the payment_method is my-system-dollars  """
-#
-#     event_entries =  BasketItem.objects.filter(player=user).values_list('event_entry')
-#     event_entry_players = EventEntryPlayer.objects.filter(event_entry__in=event_entries).filter(Q(player=user) | Q(payment_type="my-system-dollars"))
-#     return _totals(event_entry_players)
-#
-# def basket_amt_owing_this_user_only(user):
-#     """ total amount unpaid in a users basket excluding other people's payments """
-#
-#     event_entries =  BasketItem.objects.filter(player=user).values_list('event_entry')
-#     event_entry_players = EventEntryPlayer.objects.filter(event_entry__in=event_entries).exclude(payment_status="Paid").filter(Q(player=user) | Q(payment_type="my-system-dollars"))
-#     return _totals(event_entry_players)
+import payments.core as payments_core  # circular dependency
+from notifications.views import contact_member
 
 
 def events_payments_callback(status, route_payload, tran):
@@ -55,7 +19,28 @@ def events_payments_callback(status, route_payload, tran):
             event_entry_player.payment_status = "Paid"
             event_entry_player.save()
 
-        # Check if EntryEvent is now complete
+            # create payments in org account
+            payments_core.update_organisation(
+                organisation=event_entry_player.event_entry.event.congress.congress_master.org,
+                amount=event_entry_player.entry_fee,
+                description="hello",
+                source="Events",
+                log_msg="hello",
+                sub_source="events_callback",
+                payment_type="Entry to an event",
+                member=event_entry_player.player,  # who we are paying for, not necessarily who paid
+            )
+
+            payments_core.update_account(
+                member=event_entry_player.player,
+                amount=-event_entry_player.entry_fee,
+                description="goodbye",
+                source="Events",
+                sub_source="events_callback",
+                payment_type="Entry to an event",
+                log_msg="goodbye",
+                organisation=event_entry_player.event_entry.event.congress.congress_master.org,
+            )
 
         # Get all EventEntries for changed EventEntryPlayers
         event_entry_list = (
@@ -66,6 +51,24 @@ def events_payments_callback(status, route_payload, tran):
 
         event_entries = EventEntry.objects.filter(pk__in=event_entry_list)
 
+        # Now process their system dollar transactions - same loop as above but
+        # easier to understand as 2 separate bits of code
+        for event_entry in event_entries:
+            for event_entry_player in event_entry.evententryplayer_set.all():
+                if event_entry_player.payment_type == "their-system-dollars":
+                    rc = payments_core.payment_api(
+                        request=None,
+                        member=event_entry_player.player,
+                        description="Congress Entry",
+                        amount=event_entry_player.entry_fee,
+                        organisation=event_entry_player.event_entry.event.congress.congress_master.org,
+                        payment_type="Entry to a congress",
+                    )
+                    print(rc)
+                    event_entry_player.payment_status = "Paid"
+                    event_entry_player.save()
+
+        # Check if EntryEvent is now complete
         for event_entry in event_entries:
             all_complete = True
             for event_entry_player in event_entry.evententryplayer_set.all():
@@ -77,6 +80,30 @@ def events_payments_callback(status, route_payload, tran):
                 event_entry.entry_complete_date = timezone.now()
                 event_entry.save()
 
+        # empty basket - if user added things after they went to the
+        # checkout screen then they will be lost
+        user = (
+            EventEntryPlayer.objects.filter(batch_id=route_payload)
+            .first()
+            .event_entry.primary_entrant
+        )
+        BasketItem.objects.filter(player=user).delete()
+
+        # notify people
+        contact_member(
+            member=user,
+            msg="Entry stuff",
+            contact_type="email",
+            html_msg="<h2>Stuff</h2>",
+            link=None,
+            subject="Stuff",
+        )
+
 
 def get_basket_for_user(user):
     return BasketItem.objects.filter(player=user).count()
+
+
+def get_events(user):
+    """ called by dashboard to get upcoming events """
+    return EventEntryPlayer.objects.filter(player=user)
