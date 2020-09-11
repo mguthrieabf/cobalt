@@ -39,7 +39,7 @@
           {{ request.META.HTTP_HOST }}
           {% endif %}
           <br>
-          <img src="{% static "/assets/img/logo.gif" %}">
+          <img src="{% static "/assets/img/abftechlogo.png" %}" style="width:110px">
         </a>
       </div>
       <div class="sidebar-wrapper">
@@ -185,7 +185,7 @@
               {% if basket_items %}
               <li class="nav-item dropdown">
                 <a href="{% url "events:checkout" %}">
-                
+
                   <i class="material-icons">shopping_cart</i>
                 </a>
               </li>
