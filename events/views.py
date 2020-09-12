@@ -66,7 +66,7 @@ def home(request):
         else:
             grouped_by_month[month] = [congress]
 
-        admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[0]
+    admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[0]
     return render(
         request,
         "events/home.html",

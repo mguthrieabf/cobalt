@@ -1,6 +1,5 @@
 # from django.shortcuts import render
 from geopy.geocoders import Nominatim
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 import json
@@ -10,6 +9,50 @@ from random import randint
 from time import sleep
 from django.contrib.auth.decorators import user_passes_test
 from cobalt.utils import cobalt_paginator
+from django.shortcuts import render, redirect, get_object_or_404
+from notifications.views import send_cobalt_email
+from cobalt.settings import COBALT_HOSTNAME
+from accounts.models import User
+import datetime
+
+
+@login_required
+def user_activity(request):
+    """ show user activity figures """
+
+    users = (
+        User.objects.order_by("-last_activity")
+        .exclude(last_activity=None)
+        .exclude(id=request.user.id)
+    )
+
+    five_min_ago = timezone.now() - datetime.timedelta(minutes=5)
+    last_5m = User.objects.filter(last_activity__gte=five_min_ago).count()
+
+    one_hour_ago = timezone.now() - datetime.timedelta(hours=1)
+    last_1hr = User.objects.filter(last_activity__gte=one_hour_ago).count()
+
+    one_day_ago = timezone.now() - datetime.timedelta(days=1)
+    last_day = User.objects.filter(last_activity__gte=one_day_ago).count()
+
+    one_week_ago = timezone.now() - datetime.timedelta(days=7)
+    last_week = User.objects.filter(last_activity__gte=one_week_ago).count()
+
+    one_month_ago = timezone.now() - datetime.timedelta(days=30)
+    last_month = User.objects.filter(last_activity__gte=one_month_ago).count()
+
+    return render(
+        request,
+        "utils/user_activity.html",
+        {
+            "users": users,
+            "last_5m": last_5m,
+            "last_1hr": last_1hr,
+            "last_day": last_day,
+            "last_week": last_week,
+            "last_month": last_month,
+        },
+    )
 
 
 @login_required()

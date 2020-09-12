@@ -158,16 +158,17 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django_summernote",
     "crispy_forms",
-    "health_check",
-    "health_check.db",
-    "health_check.cache",
-    "health_check.storage",
+    # "health_check",
+    # "health_check.db",
+    # "health_check.cache",
+    # "health_check.storage",
     "widget_tweaks",
     "django_extensions",
     "django.contrib.admindocs",
 ]
 
 MIDDLEWARE = [
+    "utils.middleware.CobaltMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
