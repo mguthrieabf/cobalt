@@ -116,8 +116,8 @@
   <script type="text/javascript">
       $(document).ready(function() {
 
-        pic = Math.floor(Math.random() * 10) + 1;
-        $('#bg').css('background-image', 'url({% static "assets/img/backgrounds/bg" %}' + pic +'.jpg');
+        pic = Math.floor(Math.random() * 10) + 1;  
+        $('#bg').css('background-image', 'url(/static/assets/img/backgrounds/bg' + pic +'.jpg');
         $('#bg').fadeIn(100);
 
       });

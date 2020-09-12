@@ -190,7 +190,7 @@
 
       // set random background
       pic = Math.floor(Math.random() * 10) + 1;
-      $('#bg').css('background-image', 'url({% static "assets/img/backgrounds/bg" %}' + pic + '.jpg');
+      $('#bg').css('background-image', 'url(/static/assets/img/backgrounds/bg' + pic +'.jpg');
       $('#bg').fadeIn(100);
 
     });
