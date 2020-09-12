@@ -11,7 +11,7 @@
     <div class="bs-example">
       <div class="dropdown">
     <div id="div_id_player{{ our_form_row.player_no }}" class="form-group" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
-      <select class="selectpicker cobalt-playerN" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
+      <select class="selectpicker cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
         {% for val,item in our_form_row.name_choices %}
         <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
         {% endfor %}
