@@ -80,16 +80,17 @@ def events_payments_callback(status, route_payload, tran):
                 event_entry.entry_complete_date = timezone.now()
                 event_entry.save()
 
-        # empty basket - if user added things after they went to the
-        # checkout screen then they will be lost
         user = (
             EventEntryPlayer.objects.filter(batch_id=route_payload)
             .first()
             .event_entry.primary_entrant
         )
+        # empty basket - if user added things after they went to the
+        # checkout screen then they will be lost
         BasketItem.objects.filter(player=user).delete()
 
         # notify people
+        print(user)
         contact_member(
             member=user,
             msg="Entry stuff",
