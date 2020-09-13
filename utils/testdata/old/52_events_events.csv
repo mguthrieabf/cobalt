@@ -1,4 +1,0 @@
-events, Event,,,,,,,,,,
-id,id.congress.events.Congress, event_name, description, max_entries, event_type, entry_open_date, entry_close_date, entry_fee, entry_early_payment_discount, entry_youth_payment_discount, player_format
-wp, c1, Welcome Pairs, 27 board Matchpoint Pairs,40, Open,,,40,10,15, Pairs
-st, c1, Open Teams, 2 Day Swiss Teams event. IMP scoring.,80, Open,,,80,20,25, Teams

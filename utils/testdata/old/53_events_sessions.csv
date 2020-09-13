@@ -1,7 +1,0 @@
-events, Session,,
-id.event.events.Event,d.session_date,m.session_start,m.session_end
-wp,1/01/2022,10:00,16:00
-st,2/01/2022,10:00,16:00
-st,3/01/2022,10:00,16:00
-st,4/01/2022,10:00,16:00
-st,5/01/2022,10:00,16:00
