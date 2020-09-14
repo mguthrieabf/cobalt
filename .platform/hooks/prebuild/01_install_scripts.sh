@@ -57,24 +57,28 @@ echo
 echo Logs live in /var/log
 echo
 PS3='Select a log file: '
-options=("cfn-init.log (install file)" "cfn-init-cmd.log (install file details)" "web.stdout.log (print and errors from app)" "nginx/access.log (web access log)" "nginx/error.log (web error log)" "Quit")
-select opt in "\${options[@]}"
+options=("eb-engine.log (install file)" "eb-hooks.log (install file details)" "web.stdout.log (boring)" "nginx/access.log (web access log)" "nginx/access.log (web access log filtered)" "nginx/error.log (web error log)" "Quit")
+select opt in "${options[@]}"
 do
-    case \$opt in
-        "cfn-init.log (install file)")
-            tail -100f /var/log/cfn-init.log
+    case $opt in
+        "eb-engine.log (install file)")
+            tail -100f /var/log/eb-engine.log
             break
             ;;
-        "cfn-init-cmd.log (install file details)")
-            tail -100f /var/log/cfn-init-cmd.log
+        "eb-hooks.log (install file details)")
+            tail -100f /var/log/eb-hooks.log
             break
           ;;
-        "web.stdout.log (print and errors from app)")
+        "web.stdout.log (boring)")
             tail -100f /var/log/web.stdout.log | grep -v "Invalid HTTP_HOST"
             break
             ;;
         "nginx/access.log (web access log)")
-            tail -1000f /var/log/nginx/access.log | grep -v health
+            tail -1000f /var/log/nginx/access.log
+            break
+            ;;
+        "nginx/access.log (web access log filtered)")
+            tail -1000f /var/log/nginx/access.log | grep -v HealthChecker
             break
             ;;
         "nginx/error.log (web error log)")
@@ -84,10 +88,9 @@ do
         "Quit")
             break
             ;;
-        *) echo "invalid option $REPLY";;
+        *) echo "invalid option ";;
     esac
 done
-EOF
 chmod 755 /usr/local/bin/tlog
 
 # help file
