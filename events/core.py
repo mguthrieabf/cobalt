@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.utils import timezone
 import payments.core as payments_core  # circular dependency
 from notifications.views import contact_member
+from cobalt.settings import COBALT_HOSTNAME
+from django.template.loader import render_to_string
 
 
 def events_payments_callback(status, route_payload, tran):
@@ -51,7 +53,7 @@ def events_payments_callback(status, route_payload, tran):
 
         event_entries = EventEntry.objects.filter(pk__in=event_entry_list)
 
-        # Now process their system dollar transactions - same loop as above but
+        # Now process their system dollar transactions - same loop as below but
         # easier to understand as 2 separate bits of code
         for event_entry in event_entries:
             for event_entry_player in event_entry.evententryplayer_set.all():
@@ -90,14 +92,25 @@ def events_payments_callback(status, route_payload, tran):
         BasketItem.objects.filter(player=user).delete()
 
         # notify people
-        print(user)
+        msg = f"<h3>Entry submitted for {event_entry}.</h3>"
+        context = {
+            "name": user.first_name,
+            "title": "Event Entry - %s" % event_entry,
+            "email_body": msg,
+            "host": COBALT_HOSTNAME,
+            "link": "/events",
+            "link_text": "Edit Entry",
+        }
+
+        html_msg = render_to_string("notifications/email-notification.html", context)
+
         contact_member(
             member=user,
-            msg="Entry stuff",
-            contact_type="email",
-            html_msg="<h2>Stuff</h2>",
-            link=None,
-            subject="Stuff",
+            msg=msg,
+            contact_type="Email",
+            html_msg=html_msg,
+            link="/events",
+            subject="Event Entry - %s" % event_entry,
         )
 
 

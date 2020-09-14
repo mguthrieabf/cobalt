@@ -40,8 +40,10 @@
           <div class="card-icon">
             <i class="material-icons">list_alt</i>
           </div>
+          <a href='{% url "events:view_events" %}'>
           <p class="card-category">Booked Events</p>
           <h3 class="card-title">{{ events.count }}</h3>
+          </a>
         </div>
         <div class="card-footer">
           <div class="stats">

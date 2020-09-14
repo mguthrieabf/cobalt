@@ -104,4 +104,5 @@ urlpatterns = [
         ajax.payment_options_for_user_ajax,
         name="payment_options_for_user_ajax",
     ),
+    path("view", views.view_events, name="view_events",),
 ]

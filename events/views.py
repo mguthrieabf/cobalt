@@ -1120,3 +1120,24 @@ def admin_summary(request, congress_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
     return render(request, "events/admin_summary.html", {"congress": congress})
+
+
+@login_required()
+def view_events(request):
+    """ View Events you are entered into """
+
+    # get event entries with event entry player entries for this user
+    event_entries_list = (
+        EventEntry.objects.filter(evententryplayer__player=request.user)
+    ).values_list("id")
+
+    # get events where event_entries_list is entered
+    events = Event.objects.filter(evententry__in=event_entries_list)
+
+    # Only include the ones in the future
+    event_list = []
+    for event in events:
+        if event.start_date() >= datetime.now().date():
+            event.entry_status = event.entry_status(request.user)
+            event_list.append(event)
+    return render(request, "events/view_events.html", {"event_list": event_list})

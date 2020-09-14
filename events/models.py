@@ -254,6 +254,20 @@ class Event(models.Model):
         else:
             return None
 
+    def start_date(self):
+        """ return the start date of this event """
+        session = Session.objects.filter(event=self).earliest("session_date")
+        if session:
+            return session.session_date
+        else:
+            return None
+
+    def entry_status(self, user):
+        """ returns the status of the team/pairs/individual entry """
+        event_entry = EventEntry.objects.filter(event=self).first()
+        if event_entry:
+            return event_entry.payment_status
+
 
 class Session(models.Model):
     """ A session within an event """
