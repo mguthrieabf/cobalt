@@ -69,7 +69,7 @@ def get_balance_detail(member):
 
     last_tran = MemberTransaction.objects.filter(member=member).last()
     if last_tran:
-        balance = "$%s" % last_tran.balance
+        balance = "${:,}".format(last_tran.balance)
         return {"balance": balance, "last_top_up": last_tran.created_date}
     else:
         return {"balance": "$0.00", "last_top_up": None}

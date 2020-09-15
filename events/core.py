@@ -87,31 +87,71 @@ def events_payments_callback(status, route_payload, tran):
             .first()
             .event_entry.primary_entrant
         )
+
+        # Go through the basket and notify people
+        # We send one email per congress
+        # email_dic will be email_dic[congress][user][event_entry]
+        email_dic = {}
+
+        basket_items = BasketItem.objects.filter(player=user)
+
+        for basket_item in basket_items:
+            # Get players in event
+            players = basket_item.event_entry.evententryplayer_set.all()
+
+            for player in players:
+                event_entry = basket_item.event_entry
+                event = basket_item.event_entry.event
+                congress = event.congress
+                if congress not in email_dic.keys():
+                    email_dic[congress] = {}
+                if player not in email_dic[congress].keys():
+                    email_dic[congress][player] = []
+                email_dic[congress][player].append(event_entry)
+
+        # now send the emails
+        for congress in email_dic.keys():
+            for user_item in email_dic[congress].keys():
+                msg = f"""
+                        <p>Entry received for <b>{congress.name} hosted by {congress.congress_master.org}.</b></p>
+                        <p>Entry made by {email_dic[congress][user_item][0].primary_entrant}.</p>
+                        <table class="receipt" border="0" cellpadding="0" cellspacing="0">
+                        <tr><th>Event<th>Team Mates<th>Entry Status</tr>
+
+                """
+                for event_entry in email_dic[congress][user_item]:
+                    msg += f"<tr><td class='receipt-figure'>{event_entry.event.event_name}<td class='receipt-figure'>"
+
+                    for event_entry_player in event_entry.evententryplayer_set.all():
+                        msg += f"{event_entry_player.player}<br>"
+
+                    msg += f"<td class='receipt-figure'>{event_entry_player.payment_status}</tr>"
+                msg += "</table><br>"
+                context = {
+                    "name": user.first_name,
+                    "title": "Event Entry - %s" % event_entry.event.congress,
+                    "email_body": msg,
+                    "host": COBALT_HOSTNAME,
+                    "link": "/events",
+                    "link_text": "Edit Entry",
+                }
+
+                html_msg = render_to_string(
+                    "notifications/email_with_button.html", context
+                )
+
+                contact_member(
+                    member=user,
+                    msg=msg,
+                    contact_type="Email",
+                    html_msg=html_msg,
+                    link="/events",
+                    subject="Event Entry - %s" % event_entry,
+                )
+
         # empty basket - if user added things after they went to the
         # checkout screen then they will be lost
-        BasketItem.objects.filter(player=user).delete()
-
-        # notify people
-        msg = f"<h3>Entry submitted for {event_entry}.</h3>"
-        context = {
-            "name": user.first_name,
-            "title": "Event Entry - %s" % event_entry,
-            "email_body": msg,
-            "host": COBALT_HOSTNAME,
-            "link": "/events",
-            "link_text": "Edit Entry",
-        }
-
-        html_msg = render_to_string("notifications/email-notification.html", context)
-
-        contact_member(
-            member=user,
-            msg=msg,
-            contact_type="Email",
-            html_msg=html_msg,
-            link="/events",
-            subject="Event Entry - %s" % event_entry,
-        )
+        basket_items.delete()
 
 
 def get_basket_for_user(user):

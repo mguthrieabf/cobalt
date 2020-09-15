@@ -11,7 +11,8 @@ def create_fake_user(self, system_number, first, last, about="No info", pic=None
     else:
         user = User.objects.create_user(
             username=system_number,
-            email="%s@fake.com" % system_number,
+            #        email="%s@fake.com" % system_number,
+            email="m@rkguthrie.com",
             password="F1shcake",
             first_name=first,
             last_name=last,

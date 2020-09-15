@@ -14,14 +14,14 @@
 
     <div class="col-lg-4 col-md-6 col-sm-6">
       <div class="card card-stats">
+        <a href=' {% url "payments:payments" %}'>
         <div class="card-header card-header-success card-header-icon">
           <div class="card-icon">
             <i class="material-icons">attach_money</i>
           </div>
           <p class="card-category">Account Balance</p>
-          <a href=' {% url "payments:payments" %}'>
-            <h3 class="card-title"> {{ payments.balance }}</h3>
-          </a>
+
+            <h3 class="card-title">{{ payments.balance|intcomma }}</h3>
         </div>
         <div class="card-footer">
           <div class="stats">
@@ -32,18 +32,20 @@
             {{ payments.last_top_up|default_if_none:"No History" }}
           </div>
         </div>
+        </a>
       </div>
     </div>
+
+
     <div class="col-lg-4 col-md-6 col-sm-6">
       <div class="card card-stats">
+        <a href='{% url "events:view_events" %}'>
         <div class="card-header card-header-warning card-header-icon">
           <div class="card-icon">
             <i class="material-icons">list_alt</i>
           </div>
-          <a href='{% url "events:view_events" %}'>
           <p class="card-category">Booked Events</p>
           <h3 class="card-title">{{ events.count }}</h3>
-          </a>
         </div>
         <div class="card-footer">
           <div class="stats">
@@ -51,24 +53,29 @@
             Events
           </div>
         </div>
+        </a>
       </div>
     </div>
+
+
     <div class="col-lg-4 col-md-6 col-sm-6">
       <div class="card card-stats">
+          <a href="./masterpoints/view/{{ request.user.system_number }}">
         <div class="card-header card-header-info card-header-icon">
           <div class="card-icon">
             <i class="material-icons">call_made</i>
           </div>
           <p class="card-category">Masterpoints</p>
-          <a href="./masterpoints/view/{{ request.user.system_number }}">
+
             <h3 class="card-title"> <span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
-          </a>
+
         </div>
         <div class="card-footer">
           <div class="stats">
             <i class="material-icons">stars</i> {{ mp.rank }}
           </div>
         </div>
+        </a>
       </div>
     </div>
   </div>
