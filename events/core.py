@@ -118,6 +118,7 @@ def events_payments_callback(status, route_payload, tran):
                     print("---- %s" % player)
 
         # now send the emails
+        email_list={}
         for congress in email_dic.keys():
             for event in email_dic[congress].keys():
                 msg = f"""
@@ -126,14 +127,16 @@ def events_payments_callback(status, route_payload, tran):
                         <tr><th>Event<th>Team Mates<th>Entry Status</tr>
 
                 """
+                player_list=[]
                 for player in email_dic[congress][event]:
-                    msg += f"<tr><td class='receipt-figure'>{player.event.event_name}<td class='receipt-figure'>"
+                    player_list.append(player.player)
+                    if player not in email_list.keys():
+                        email_list[player]=""
+                    sub_msg = f"<tr><td class='receipt-figure'>{event.event_name}<td class='receipt-figure'>"
+                    sub_msg += f"{player.player}<br>"
+                    sub_msg += f"<td class='receipt-figure'>{player.payment_status}</tr>"
 
-                    for event_entry_player in event_entry.evententryplayer_set.all():
-                        msg += f"{event_entry_player.player}<br>"
-
-                    msg += f"<td class='receipt-figure'>{event_entry_player.payment_status}</tr>"
-                msg += "</table><br>"
+                msg += sub_msg + "</table><br>"
                 context = {
                     "name": event_entry_player_item.player.first_name,
                     "title": "Event Entry - %s" % event_entry.event.congress,
