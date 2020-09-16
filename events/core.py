@@ -105,22 +105,29 @@ def events_payments_callback(status, route_payload, tran):
                 congress = event.congress
                 if congress not in email_dic.keys():
                     email_dic[congress] = {}
-                if player not in email_dic[congress].keys():
-                    email_dic[congress][player] = []
-                email_dic[congress][player].append(event_entry)
+                if event not in email_dic[congress].keys():
+                    email_dic[congress][event] = []
+                email_dic[congress][event].append(player)
+
+        print(email_dic)
+        for congress in email_dic.keys():
+            print(congress)
+            for event in email_dic[congress].keys():
+                print("-- %s" % event)
+                for player in email_dic[congress][event]:
+                    print("---- %s" % player)
 
         # now send the emails
         for congress in email_dic.keys():
-            for user_item in email_dic[congress].keys():
+            for event in email_dic[congress].keys():
                 msg = f"""
-                        <p>Entry received for <b>{congress.name} hosted by {congress.congress_master.org}.</b></p>
-                        <p>Entry made by {email_dic[congress][user_item][0].primary_entrant}.</p>
+                        <p>Entry received for <b>{congress.name}</b> hosted by {congress.congress_master.org}.</p>
                         <table class="receipt" border="0" cellpadding="0" cellspacing="0">
                         <tr><th>Event<th>Team Mates<th>Entry Status</tr>
 
                 """
-                for event_entry in email_dic[congress][user_item]:
-                    msg += f"<tr><td class='receipt-figure'>{event_entry.event.event_name}<td class='receipt-figure'>"
+                for player in email_dic[congress][event]:
+                    msg += f"<tr><td class='receipt-figure'>{player.event.event_name}<td class='receipt-figure'>"
 
                     for event_entry_player in event_entry.evententryplayer_set.all():
                         msg += f"{event_entry_player.player}<br>"
@@ -128,7 +135,7 @@ def events_payments_callback(status, route_payload, tran):
                     msg += f"<td class='receipt-figure'>{event_entry_player.payment_status}</tr>"
                 msg += "</table><br>"
                 context = {
-                    "name": user.first_name,
+                    "name": event_entry_player_item.player.first_name,
                     "title": "Event Entry - %s" % event_entry.event.congress,
                     "email_body": msg,
                     "host": COBALT_HOSTNAME,
