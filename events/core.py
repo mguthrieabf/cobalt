@@ -90,7 +90,7 @@ def events_payments_callback(status, route_payload, tran):
 
         # Go through the basket and notify people
         # We send one email per congress
-        # email_dic will be email_dic[congress][user][event_entry]
+        # email_dic will be email_dic[congress][event][player]
         email_dic = {}
 
         basket_items = BasketItem.objects.filter(player=user)
@@ -117,30 +117,74 @@ def events_payments_callback(status, route_payload, tran):
                 for player in email_dic[congress][event]:
                     print("---- %s" % player)
 
-        # now send the emails
-        email_list={}
+        # now build the emails
         for congress in email_dic.keys():
+            print("Congress Loop")
+
+            # build a list of all players so we can set them each up a custom email
+            player_email = {}  # email to send keyed by player
+            player_included = {}  # flag for whether player is in this event
             for event in email_dic[congress].keys():
-                msg = f"""
-                        <p>Entry received for <b>{congress.name}</b> hosted by {congress.congress_master.org}.</p>
-                        <table class="receipt" border="0" cellpadding="0" cellspacing="0">
-                        <tr><th>Event<th>Team Mates<th>Entry Status</tr>
-
-                """
-                player_list=[]
                 for player in email_dic[congress][event]:
-                    player_list.append(player.player)
-                    if player not in email_list.keys():
-                        email_list[player]=""
-                    sub_msg = f"<tr><td class='receipt-figure'>{event.event_name}<td class='receipt-figure'>"
-                    sub_msg += f"{player.player}<br>"
-                    sub_msg += f"<td class='receipt-figure'>{player.payment_status}</tr>"
+                    if player.player not in player_email.keys():
+                        player_email[player.player] = ""
+                        player_included[player.player] = False
+            print("Built arrays")
+            print(player_email)
+            print(player_included)
 
-                msg += sub_msg + "</table><br>"
+            # Get who created this entry - all entries point to the same person
+            first_event = list(email_dic[congress].keys())[0]
+            first_user = email_dic[congress][first_event][0]
+            primary_entrant = first_user.event_entry.primary_entrant
+
+            # build start of email for this congress
+            for player in player_email.keys():
+                player_email[
+                    player
+                ] = f"""
+                    <p>Entry received for <b>{congress.name}</b> hosted by {congress.congress_master.org}.</p>
+                    <p>Entry made by {primary_entrant}.</p>
+                    <table class="receipt" border="0" cellpadding="0" cellspacing="0">
+                    <tr><th>Event<th>Playing With<th>Entry Status</tr>
+                    """
+            print("Built start of email")
+            print(player_email)
+
+            for event in email_dic[congress].keys():
+                print("Event loop")
+                sub_msg = ""
+                for player in email_dic[congress][event]:
+                    print("Player loop Alpha - %s" % player)
+                    sub_msg += f"<tr><td class='receipt-figure'>{event.event_name}<td class='receipt-figure'>"
+                    sub_msg += f"{player.player}<br>"
+                    sub_msg += (
+                        f"<td class='receipt-figure'>{player.payment_status}</tr>"
+                    )
+                    print("Sub_msg is %s" % sub_msg)
+
+                    player_included[player.player] = True
+
+                sub_msg += "</table><br>"
+                print("sub_msg built")
+                print(sub_msg)
+
+                # add this row if player is in the event
+                for player in player_email.keys():
+                    print("Checking if we should add this for %s" % player)
+                    if player_included[player]:
+                        print("Yes we should")
+                        player_email[player] += sub_msg
+                        player_included[player] = False
+
+            for player in player_email.keys():
+                print("player loop")
+                print(player)
+
                 context = {
-                    "name": event_entry_player_item.player.first_name,
-                    "title": "Event Entry - %s" % event_entry.event.congress,
-                    "email_body": msg,
+                    "name": player.first_name,
+                    "title": "Event Entry - %s" % congress,
+                    "email_body": player_email[player],
                     "host": COBALT_HOSTNAME,
                     "link": "/events",
                     "link_text": "Edit Entry",
@@ -151,8 +195,8 @@ def events_payments_callback(status, route_payload, tran):
                 )
 
                 contact_member(
-                    member=user,
-                    msg=msg,
+                    member=player,
+                    msg=player_email[player],
                     contact_type="Email",
                     html_msg=html_msg,
                     link="/events",
