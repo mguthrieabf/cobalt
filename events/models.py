@@ -19,9 +19,12 @@ PAYMENT_STATUSES = [
 # your money.
 # their-system-dollars - you can use a team mates money to pay for their
 # entry if you have permission
+# other-system-dollars - we're not paying and we're not using their account
+# to pay
 PAYMENT_TYPES = [
     ("my-system-dollars", "My %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
     ("their-system-dollars", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
     ("cash", "Cash"),
     ("cheque", "Cheque"),

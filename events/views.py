@@ -808,6 +808,7 @@ def enter_event_form(event, congress, request):
         pay_types.append(
             ("my-system-dollars", f"My {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
         )
+        pay_types.append(("other-system-dollars", f"Ask them to pay"))
     if congress.payment_method_bank_transfer:
         pay_types.append(("bank-transfer", "Bank Transfer"))
     if congress.payment_method_cash:
