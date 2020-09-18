@@ -50,7 +50,7 @@ from cobalt.settings import (
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
 from notifications.views import contact_member
-from events.core import events_payments_callback
+from events.core import events_payments_callback, events_payments_secondary_callback
 
 
 #######################
@@ -1008,6 +1008,15 @@ def callback_router(route_code=None, route_payload=None, tran=None, status="Succ
             )
         elif route_code == "EVT":
             events_payments_callback(status, route_payload, tran)
+            log_event(
+                user="Stripe API",
+                severity="INFO",
+                source="Payments",
+                sub_source="stripe_webhook",
+                message="Callback made to: %s" % route_code,
+            )
+        elif route_code == "EV2":
+            events_payments_secondary_callback(status, route_payload, tran)
             log_event(
                 user="Stripe API",
                 severity="INFO",

@@ -1,5 +1,8 @@
 window.onerror =
 function (message, source, lineno, colno, error) {
+    console.log(message);
+    console.log(source);
+    console.log(lineno);
     var errorData = {
       'message': message,
       'url': source,

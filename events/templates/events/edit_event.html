@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cobalt_tags %}
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
 
@@ -219,9 +220,9 @@
               <div class="container">
                 <select class="w-100" size="10" id="session_list">
                   {% for session in sessions %}
-                  <option value="{{ session.id }}">{{ session.session_date|date:"l jS F Y" }} Session starts at {{ session.session_start }}
+                  <option value="{{ session.id }}">Session starts at {{ session.session_date|cobalt_nice_datetime }}
                     {% if session.session_end %}
-                    Ends at {{ session.session_end }}
+                    Ends at {{ session.session_end|cobalt_time }}
                     {% endif %}
                   </option>
                   {% endfor %}

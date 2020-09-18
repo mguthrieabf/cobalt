@@ -2,6 +2,45 @@
 
 {% block content %}
 
+{% if pending_payments %}
+
+<div class="card">
+  <div class="card-header card-header-danger">
+    <h2>Pending Payments</h2>
+    <h4>These entries are awaiting payment</h4>
+  </div>
+  <div class="card-body">
+    <table class="table table-responsive">
+      <thead class="text-danger">
+        <tr>
+          <th>Date</th>
+          <th>Congress</th>
+          <th>Event</th>
+          <th>Entry Status</th>
+          <th>Payment Method</th>
+          <th>Entry Fee {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for pending_payment in pending_payments %}
+        <tr>
+          <td>{{ pending_payment.event_entry.event.start_date }}</td>
+          <td><a href="{% url "events:view_congress" congress_id=pending_payment.event_entry.event.congress.id %}">{{ pending_payment.event_entry.event.congress }}</a></td>
+          <td>{{ pending_payment.event_entry.event.event_name }}</td>
+          <td style="text-align: right">{{ pending_payment.payment_status }}</td>
+          <td style="text-align: right">{{ pending_payment.get_payment_type_display }}</td>
+          <td style="text-align: right">{{ pending_payment.entry_fee }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url "events:pay_outstanding" %}" class="btn btn-success">Pay Now</a>
+  </div>
+</div>
+<br>
+{% endif %}
+
 {% if event_list %}
 
 <div class="card">
@@ -26,7 +65,7 @@
         <td>{{ event.start_date }}</td>
         <td><a href="{% url "events:view_congress" congress_id=event.congress.id %}">{{ event.congress }}</a></td>
         <td>{{ event.event_name }}</td>
-        <td>{{ event.entry_status }}</td>
+        <td style="text-align: right">{{ event.entry_status }}</td>
       </tr>
 
       {% endfor %}

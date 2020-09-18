@@ -84,6 +84,7 @@ urlpatterns = [
         views.edit_session,
         name="edit_session",
     ),
+    path("congress/teammate/checkout", views.pay_outstanding, name="pay_outstanding"),
     path(
         "congress/create/delete-event",
         ajax.delete_event_ajax,

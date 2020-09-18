@@ -26,6 +26,8 @@ urlpatterns = [
     path("update-blurb", views.blurb_form_upload, name="user_blurb"),
     path("password_reset/", views.html_email_reset, name="html_email_reset"),
     path("public-profile/<int:pk>/", views.public_profile, name="public_profile"),
+    path("add-team-mate", views.add_team_mate_ajax, name="add_team_mate_ajax"),
+    path("delete-team-mate", views.delete_team_mate_ajax, name="delete_team_mate_ajax"),
 ]
 
 # def not_found_handler(request, exception=None):

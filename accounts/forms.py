@@ -85,4 +85,5 @@ class UserSettingsForm(forms.ModelForm):
             "receive_marketing",
             "receive_monthly_masterpoints_report",
             "receive_payments_emails",
+            "system_number_search",
         ]

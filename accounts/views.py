@@ -23,7 +23,7 @@ import ipinfo
 from notifications.views import send_cobalt_email, notifications_in_english
 from logs.views import get_client_ip, log_event
 from organisations.models import MemberOrganisation
-from .models import User
+from .models import User, TeamMate
 from .tokens import account_activation_token
 from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
 from forums.models import Post, Comment1, Comment2
@@ -596,3 +596,55 @@ def user_settings(request):
         "accounts/user_settings.html",
         {"form": form, "notifications_list": notifications_list},
     )
+
+
+@login_required()
+def add_team_mate_ajax(request):
+    """ Ajax call to add a team mate
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        member = User.objects.get(pk=member_id)
+        team_mate = TeamMate(user=request.user, team_mate=member)
+        team_mate.save()
+        msg = "Success"
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def delete_team_mate_ajax(request):
+    """ Ajax call to delete a team mate
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        member = User.objects.get(pk=member_id)
+        team_mate = TeamMate.objects.filter(team_mate=member)
+        team_mate.delete()
+        msg = "Success"
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    return JsonResponse({"data": response_data})

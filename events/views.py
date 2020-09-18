@@ -808,7 +808,6 @@ def enter_event_form(event, congress, request):
         pay_types.append(
             ("my-system-dollars", f"My {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
         )
-        pay_types.append(("other-system-dollars", f"Ask them to pay"))
     if congress.payment_method_bank_transfer:
         pay_types.append(("bank-transfer", "Bank Transfer"))
     if congress.payment_method_cash:
@@ -833,6 +832,10 @@ def enter_event_form(event, congress, request):
         "name": request.user,
         "entry_fee": entry_fee,
     }
+
+    # add another option for everyone except the current user
+    if congress.payment_method_system_dollars:
+        pay_types.append(("other-system-dollars", f"Ask them to pay"))
 
     # set values for other players
     team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
@@ -917,8 +920,6 @@ def enter_event(request, congress_id, event_id):
     #       don't mind failing with an error.
 
     if request.method == "POST":
-
-        #        form = EventEntryForm(request.POST)
 
         # create event_entry
         event_entry = EventEntry()
@@ -1141,4 +1142,53 @@ def view_events(request):
         if event.start_date() >= datetime.now().date():
             event.entry_status = event.entry_status(request.user)
             event_list.append(event)
-    return render(request, "events/view_events.html", {"event_list": event_list})
+
+    # check for pending payments
+    pending_payments = EventEntryPlayer.objects.exclude(payment_status="Paid").filter(
+        player=request.user
+    )
+    return render(
+        request,
+        "events/view_events.html",
+        {"event_list": event_list, "pending_payments": pending_payments},
+    )
+
+
+@login_required()
+def pay_outstanding(request):
+    """ Pay anything that is not in a status of paid """
+
+    # Get outstanding payments for this user
+    event_entry_players = EventEntryPlayer.objects.exclude(
+        payment_status="Paid"
+    ).filter(player=request.user)
+
+    # redirect if nothing owing
+    if not event_entry_players:
+        messages.warning(
+            request, "You have nothing due to pay", extra_tags="cobalt-message-warning"
+        )
+        return redirect("events:events")
+
+    # Get total amount
+    amount = event_entry_players.aggregate(Sum("entry_fee"))
+
+    # identifier
+    unique_id = str(uuid.uuid4())
+
+    # apply identifier to each record
+    for event_entry_player in event_entry_players:
+        event_entry_player.batch_id = unique_id
+        event_entry_player.save()
+
+    # let payments API handle getting the money
+    return payment_api(
+        request=request,
+        member=request.user,
+        description="Congress Entry",
+        amount=amount["entry_fee__sum"],
+        route_code="EV2",
+        route_payload=unique_id,
+        url="/events",
+        payment_type="Entry to a congress",
+    )

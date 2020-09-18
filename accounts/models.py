@@ -54,6 +54,9 @@ class User(AbstractUser):
         "Stripe Auto Confirmed", max_length=9, choices=AUTO_STATUS, default="Off"
     )
 
+    system_number_search = models.BooleanField(
+        "Show %s number on searches" % GLOBAL_ORG, default=True
+    )
     receive_sms_results = models.BooleanField("Receive SMS Results", default=False)
     receive_sms_reminders = models.BooleanField("Receive SMS Reminders", default=False)
     receive_abf_newsletter = models.BooleanField("Receive ABF Newsletter", default=True)

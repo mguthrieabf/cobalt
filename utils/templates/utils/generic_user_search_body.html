@@ -22,7 +22,7 @@
                 <label for="id_firstname{{ search_id }}" id="id_label_firstname{{ search_id }}" class="bmd-label-static">First Name</label>
                 <input type="text" class="form-control dynamic-search{{ search_id }}" id="id_firstname{{ search_id }}" name="firstname" value="">
               </div>
-
+{% if request.user.system_number_search %}
               <div class="col-8 form-group">
                 <label for="id_system_number{{ search_id }}" id="id_label_system_number{{ search_id }}" class="bmd-label-static">{{ GLOBAL_ORG }} Number</label>
                 <input type="number" class="form-control" id="id_system_number{{ search_id }}" name="system_number" value="">
@@ -31,6 +31,7 @@
                 <button class="btn btn-sm bt-warning" id="system_number_search_button{{ search_id }}">Search</button>
 
               </div>
+{% endif %}
             </div>
           </div>
         </div>
