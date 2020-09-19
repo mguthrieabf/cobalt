@@ -2,13 +2,8 @@
 {% load static %}
 {% block content %}
 
-{% block header %}
-<link href="{% static "assets/demo/demo.css" %}" rel="stylesheet" />
-<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
-
-{% endblock %}
-
 <div class="container-fluid">
+  <p>You can edit your profile here. You can also change less personal things in <a href="{% url "accounts:user_settings" %}" class="btn btn-sm btn-danger">settings</a></p>
   <h2>{{ form.errors }}</h2>
   <h2>{{ topupform.errors }}</h2>
   <div class="row">
@@ -78,7 +73,7 @@
         </div>
         <div class="card-body">
 
-          <table class="table">
+          <table class="table" id="team_mate_table">
               <thead>
                   <tr>
                       <th>Name</th>
@@ -89,16 +84,38 @@
               <tbody>
 
                 {% for team_mate in request.user.team_mate_user.all %}
-                  <tr>
-                      <td><a href="{% url "accounts:public_profile" pk=team_mate.team_mate.id %}">{{ team_mate.team_mate.full_name }}</a></td>
-                      <td>{% if team_mate.make_payments %}Team mate - can pay for events on your behalf {% else %}Team mate{% endif %}</td>
+                  <tr id="div_for_{{ team_mate.team_mate.id }}">
+                      <td>
+                        <a href="{% url "accounts:public_profile" pk=team_mate.team_mate.id %}">
+                          {{ team_mate.team_mate.full_name }}
+                        </a>
+                      </td>
+                      <td id="status_{{ team_mate.team_mate.id }}">
+                        {% if team_mate.make_payments %}
+                          Team mate - can pay for events on your behalf
+                        {% else %}
+                          Team mate
+                        {% endif %}
+                      </td>
                       <td class="td-actions text-right">
-                          <button type="button" rel="tooltip" class="btn btn-info">
-                              <i class="material-icons">{% if team_mate.make_payments %}money_off{% else %}attach_money{% endif %}</i>
+                          <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
+                            data-toggle="tooltip"
+                            title="{% if team_mate.make_payments %}Stop {{ team_mate.team_mate.first_name }} from being able to use your money to enter you in an event{% else %}Allow {{ team_mate.team_mate.first_name }} to enter you in an event using your money{% endif %}"
+                            class="make_payments btn btn-info">
+                              <i class="material-icons">
+                                {% if team_mate.make_payments %}
+                                  money_off
+                                {% else %}
+                                  attach_money
+                                {% endif %}
+                              </i>
                           </button>
-
-                          <button type="button" rel="tooltip" class="btn btn-danger" title="Remove as a team mate">
-                              <i class="material-icons">delete</i>
+                          <button type="button" id="delete_team_mate_{{ team_mate.team_mate.id }}"
+                            data-toggle="tooltip"
+                            class="btn btn-danger delete_team_mate"
+                            title="Remove {{ team_mate.team_mate.first_name }} as a team mate. Nobody likes {{ team_mate.team_mate.first_name }}, hit the button."
+                          >
+                            <i class="material-icons">delete</i>
                           </button>
                       </td>
                   </tr>
@@ -112,24 +129,16 @@
             <div>
               <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search1">Add Team Mate</a>
             </div>
-            <div class="ml-auto">
-              <button class="btn btn-info center-text" onclick="deleteUser();" disabled>Delete Team Mate</button>
-            </div>
           </div>
         </div>
       </div>
-      </div>
-
-
-
-
-
+    </div>
 
     <div class="col-md-4">
       <form method="post" action="update-blurb" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="card card-profile">
-          <div class="card-header card-header-primary">
+          <div class="card-header card-header-info">
             <h4 class="card-title">About {{ request.user.first_name}}</h4>
               <p class="card-category">Picture and description</p>
           </div>
@@ -195,12 +204,31 @@
     // initialise Datetimepicker and Sliders
     md.initFormExtendedDatetimepickers();
 
+// initialise date time picker
     $('#id_dob').datetimepicker({
       format: 'DD/MM/YYYY'
     });
 
+// initialise tooltips
+  $('[data-toggle="tooltip"]').tooltip()
+
+// handle delete action
+    $(".delete_team_mate").click(function(){
+// get member id from element id
+      id = $(this).attr('id').split('_')[3]
+      deleteUser(id);
+    });
+
+// handle toggle payment auth
+    $(".make_payments").click(function(){
+// get member id from element id
+      id = $(this).attr('id').split('_')[3]
+      toggleUser(id);
+    });
+
   });
 
+// add a team mate
   function addUser(member_id){
     $.get("{% url "accounts:add_team_mate_ajax" %}?member_id=" + member_id)
         .done(response => {
@@ -216,14 +244,44 @@
         });
     }
 
-
 // Generic member search popup ok button pressed
-
     function cobaltMemberSearchOk() {
       addUser(member_id[1]);
     };
 
-    function deleteUser() {
+// change setting about whether payments can be made
+    function toggleUser(member_id) {
+      $.get("{% url "accounts:toggle_team_mate_ajax" %}?member_id=" + member_id)
+          .done(response => {
+
+            var msg = response['data']['message'];
+            var first_name = response['data']['first_name'];
+            var icon = $("#toggle_team_mate_" + member_id)
+            var txt_field = $("#status_" + member_id)
+
+            if (msg == false){
+
+              txt_field.html("Team mate");
+              icon.html("<i class='material-icons'>attach_money</i>");
+              var title = "Allow " + first_name + " to enter you in an event using your money";
+
+            } else {
+
+              txt_field.html("Team mate - can pay for events on your behalf");
+              icon.html("<i class='material-icons'>money_off</i>");
+              var title = "Stop " + first_name + " from being able to enter you in an event using your money";
+
+            }
+
+            icon.attr('title', title);
+            icon.attr('data-original-title', title);
+            icon.tooltip('update');
+            icon.tooltip('show');
+
+          });
+    }
+
+    function deleteUser(member_id) {
       Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to undo this!",
@@ -234,14 +292,13 @@
         confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.value) {
-          member_id = $('#user_list').val();
           $.get("{% url "accounts:delete_team_mate_ajax" %}?member_id=" + member_id)
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
                   swal.fire({ title:"Team Mate Removed", html: "Success. Team mate has been removed.", icon: "success", buttonsStyling: false})
                   .then((result) => {
-                    location.reload();
+                    $('table#team_mate_table tr#div_for_' + member_id).remove();
                   });
                 } else {
                   swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})

@@ -49,7 +49,7 @@ def browser_errors(request):
                 )
 
                 send_cobalt_email(
-                    admin[1], f"{COBALT_HOSTNAME} - Bloody Users", html_msg
+                    admin[1], f"{COBALT_HOSTNAME} - Client-side Error", html_msg
                 )
 
     return HttpResponse("ok")

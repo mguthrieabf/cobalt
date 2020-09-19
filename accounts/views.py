@@ -648,3 +648,31 @@ def delete_team_mate_ajax(request):
     response_data = {}
     response_data["message"] = msg
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def toggle_team_mate_ajax(request):
+    """ Ajax call to switch the state of a team mate
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        HTTPResponse: success, failure or error
+    """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        member = User.objects.get(pk=member_id)
+        team_mate = TeamMate.objects.filter(team_mate=member).first()
+        team_mate.make_payments = not team_mate.make_payments
+        team_mate.save()
+        msg = team_mate.make_payments
+
+    else:
+        msg = "Invalid request"
+
+    response_data = {}
+    response_data["message"] = msg
+    response_data["first_name"] = team_mate.team_mate.first_name
+    return JsonResponse({"data": response_data})
