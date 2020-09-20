@@ -6,7 +6,7 @@ from cobalt.settings import ADMINS, COBALT_HOSTNAME
 from accounts.models import User
 from notifications.views import send_cobalt_email
 from django.template.loader import render_to_string
-from forums.models import Post
+from forums.models import Post, Forum
 from forums.filters import PostFilter
 from utils.utils import cobalt_paginator
 from django.db.models import Q
@@ -64,13 +64,48 @@ def browser_errors(request):
 def search(request):
 
     query = request.POST.get("search_string")
+    include_people = request.POST.get("include_people")
+    include_forums = request.POST.get("include_forums")
+    include_posts = request.POST.get("include_posts")
 
-    people = User.objects.filter(
-        Q(first_name__icontains=query) | Q(last_name__icontains=query)
+    if query:  # don't search if no search string
+
+        # Users
+        if include_people:
+            people = User.objects.filter(
+                Q(first_name__icontains=query) | Q(last_name__icontains=query)
+            )
+        else:
+            people = []
+
+        if include_posts:
+            posts = Post.objects.filter(title__icontains=query)
+        else:
+            posts = []
+
+        if include_forums:
+            forums = Forum.objects.filter(title__icontains=query)
+        else:
+            forums = []
+
+        # combine outputs
+        results = list(chain(people, posts, forums))
+
+        # create paginator
+        things = cobalt_paginator(request, results)
+
+    else:  # no search string provided
+
+        things = []
+
+    return render(
+        request,
+        "support/search.html",
+        {
+            "things": things,
+            "search_string": query,
+            "include_people": include_people,
+            "include_forums": include_forums,
+            "include_posts": include_posts,
+        },
     )
-    posts = Post.objects.filter(title__icontains=query)
-
-    results = list(chain(people, posts))
-    things = cobalt_paginator(request, results)
-
-    return render(request, "support/search.html", {"things": things},)

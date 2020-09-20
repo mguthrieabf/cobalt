@@ -1,59 +1,103 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load cobalt_tags %}
 {% load widget_tweaks %}
 
 {% block content %}
 
-<div class="container">
+<div class="container pt-4">
   <div class="card">
-    <div class="card-header card-info">
+    <div class="card-header card-header-info">
+
+{% if search_string %}
+
+      <h2>Search Results for {{ search_string|default_if_none:"" }}</h2>
+
+{% else %}
+
       <h2>Search</h2>
+
+{% endif %}
+
     </div>
     <div class="card-body">
-      <form method="get">
+      <form method="post">
+        {% csrf_token %}
         <div>
-          <div class="row">
-            <div class="col-3">
-              {{ filter.form.author.label_tag }}
-              <span class="cobalt-form-error">{{ filter.form.author.errors|striptags }}</span>
-              {% render_field filter.form.author class+="form-control" %}
-            </div>
-            <div class="col-3">
-              <label class="bmd-label-static">{{ filter.form.forum.label_tag }}</label>
-              <span class="cobalt-form-error">{{ filter.form.forum.errors|striptags }}</span>
-              {% render_field filter.form.forum class+="form-control" %}
-            </div>
-            <div class="col-3">
-              <label class="bmd-label-static">{{ filter.form.title.label_tag }}</label>
-              <span class="cobalt-form-error">{{ filter.form.title.errors|striptags }}</span>
-              {% render_field filter.form.title class+="form-control" %}
-            </div>
-
+          <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text col-md-3">
+                    <i class="material-icons">search</i>
+                </span>
+              </div>
+              <input type="text" class="form-control" placeholder="Search Words" name="search_string" value={{ search_string|default_if_none:"" }}>
           </div>
-          <br>
-          <button class="btn btn-info" type="submit">
-            <i class="material-icons">search</i> Search
-          </button>
+          <div class="form-check form-check-inline mt-4">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" id="include_people" name="include_people" value="checked" if {% if include_people %} checked {% endif %}> People
+              <span class="form-check-sign">
+                  <span class="check"></span>
+              </span>
+            </label>
+          </div>
+
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="include_forums" name="include_forums" value="checked" if {% if include_forums %} checked {% endif %}> Forums
+            <span class="form-check-sign">
+                <span class="check"></span>
+            </span>
+          </label>
         </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="include_posts" name="include_posts" value="checked" if {% if include_posts %} checked {% endif %}> Posts
+            <span class="form-check-sign">
+                <span class="check"></span>
+            </span>
+          </label>
+        </div>
+        <div class="w-100"></div>
+        <button class="btn btn-warning mt-3" type="submit">
+          <i class="material-icons">search</i>Search
+        </button>
+      </div>
+
       </form>
 
+{% if things %}
       <table class="table table-hover">
         <thead>
-          <th>Post</th>
-          <th>User</th>
-          <th>Forum</th>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Info</th>
         </thead>
         <tbody>
           {% for thing in things %}
           <tr>
-            <td><a href="{% url "forums:post_detail" pk=thing.id %}">{{ thing.title }}</a>
-            <td><a href="{% url "accounts:public_profile" pk=thing.id %}">{{ thing.full_name }}</a>
-            <td>{{ post.author }}
-            <td>{{ post.forum }}
+            <td>{{ thing|get_class }}</td>
+
+              {% if thing|get_class == 'Post' %}
+
+                <td><a href="{% url "forums:post_detail" pk=thing.id %}">{{ thing.title }}</a></td>
+                <td>Post in <a href="{% url "forums:post_list_single_forum" forum_id=thing.forum.id %}">
+                {{ thing.forum }}</a> by <a href="{% url "accounts:public_profile" pk=thing.author.id %}">{{ thing.author.full_name }}</a></td>
+
+              {% elif thing|get_class == 'User' %}
+
+                <td><a href="{% url "accounts:public_profile" pk=thing.id %}">{{ thing.full_name }}</a></td>
+                <td><a href="{% url "accounts:public_profile" pk=thing.id %}">{{ GLOBAL_ORG}} Number: {{ thing.system_number }}</a></td>
+
+              {% elif thing|get_class == 'Forum' %}
+
+                <td><a href="{% url "forums:post_list_single_forum" forum_id=thing.id %}">{{ thing.title }}</a></td>
+                <td>{{ thing.description }} - {{ thing.forum_type }}</td>
+
+              {% endif %}
+
           </tr>
-          {% empty %}
-          No Results
+
           {% endfor %}
         </tbody>
       </table>
@@ -61,6 +105,13 @@
       {% include "pagination_footer.html" %}
 
     </div>
+
+{% else %}
+
+  <h3>No Results Found</h3>
+
+{% endif %}
+
   </div>
 </div>
 

@@ -59,3 +59,9 @@ def cobalt_user_link(user):
 
     url = reverse("accounts:public_profile", kwargs={"pk": user.id})
     return mark_safe(f"<a href='{url}'>{user}</a>")
+
+
+# return class of object - used by search
+@register.filter(name="get_class")
+def get_class(value):
+    return value.__class__.__name__
