@@ -7,7 +7,9 @@ from accounts.models import User
 from notifications.views import send_cobalt_email
 from django.template.loader import render_to_string
 from forums.models import Post, Forum
+from events.models import Congress
 from forums.filters import PostFilter
+from payments.models import MemberTransaction
 from utils.utils import cobalt_paginator
 from django.db.models import Q
 from itertools import chain
@@ -67,6 +69,8 @@ def search(request):
     include_people = request.POST.get("include_people")
     include_forums = request.POST.get("include_forums")
     include_posts = request.POST.get("include_posts")
+    include_events = request.POST.get("include_events")
+    include_payments = request.POST.get("include_payments")
 
     if query:  # don't search if no search string
 
@@ -88,8 +92,18 @@ def search(request):
         else:
             forums = []
 
+        if include_events:
+            events = Congress.objects.filter(name__icontains=query)
+        else:
+            events = []
+
+        if include_payments:
+            payments = MemberTransaction.objects.filter(description__icontains=query)
+        else:
+            payments = []
+
         # combine outputs
-        results = list(chain(people, posts, forums))
+        results = list(chain(people, posts, forums, events, payments))
 
         # create paginator
         things = cobalt_paginator(request, results)
@@ -107,5 +121,7 @@ def search(request):
             "include_people": include_people,
             "include_forums": include_forums,
             "include_posts": include_posts,
+            "include_events": include_events,
+            "include_payments": include_payments,
         },
     )
