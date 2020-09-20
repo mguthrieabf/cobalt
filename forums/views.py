@@ -21,7 +21,7 @@ from notifications.views import (
     remove_listener,
     check_listener,
 )
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from rbac.views import rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter

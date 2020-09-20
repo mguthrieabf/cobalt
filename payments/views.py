@@ -67,7 +67,7 @@ from .core import (
 )
 from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
 from accounts.models import User
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
 from rbac.views import rbac_forbidden

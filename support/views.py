@@ -5,7 +5,9 @@ from django.http import HttpResponse
 from cobalt.settings import ADMINS, COBALT_HOSTNAME
 from notifications.views import send_cobalt_email
 from django.template.loader import render_to_string
-
+from forums.models import Post
+from forums.filters import PostFilter
+from utils.utils import cobalt_paginator
 import json
 
 
@@ -53,3 +55,20 @@ def browser_errors(request):
                 )
 
     return HttpResponse("ok")
+
+
+@login_required
+def search(request):
+    post_list = Post.objects.all()
+    post_filter = PostFilter(request.GET, queryset=post_list)
+
+    filtered_qs = post_filter.qs
+
+    things = cobalt_paginator(request, filtered_qs)
+
+    #    search_string = request.GET.get("search_string")
+    #    searchparams = "author=%s&title=%s&forum=%s&" % (user, title, forum)
+
+    return render(
+        request, "support/search.html", {"filter": post_filter, "things": things},
+    )

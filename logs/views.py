@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import send_mail
 from cobalt.settings import DEFAULT_FROM_EMAIL, SUPPORT_EMAIL
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 
 
 def get_client_ip(request):

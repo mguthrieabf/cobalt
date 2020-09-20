@@ -8,7 +8,7 @@ from django.utils import timezone
 from random import randint
 from time import sleep
 from django.contrib.auth.decorators import user_passes_test
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from notifications.views import send_cobalt_email
 from cobalt.settings import COBALT_HOSTNAME

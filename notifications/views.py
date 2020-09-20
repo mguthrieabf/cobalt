@@ -16,7 +16,7 @@ from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 
 
 def send_cobalt_email(to_address, subject, msg):

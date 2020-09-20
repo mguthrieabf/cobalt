@@ -27,7 +27,7 @@ from .models import User, TeamMate
 from .tokens import account_activation_token
 from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
 from forums.models import Post, Comment1, Comment2
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from cobalt.settings import GLOBAL_ORG
 
 

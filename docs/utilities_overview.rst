@@ -16,7 +16,7 @@ for another user. In order to implement this you need to do 4 things:
 
 1. Import the body part of the HTML into your template::
 
-    {% include "generic_user_search_body.html" %}
+    {% include "generic_user_search_body.html" search_id=1 %}
 
 2. Set up a button or similar HTML element to trigger the search::
 
@@ -26,16 +26,14 @@ for another user. In order to implement this you need to do 4 things:
 
     {% block footer %}
     <script>
-    {% include 'generic_user_search_footer.html' %}
+    {% include 'generic_user_search_footer.html' search_id=1 %}
 
-4. Below the block footer, set up a function to handle a user selecting another member from the list. This also needs to clear the form::
+4. Below the block footer, set up a function to handle a user selecting another member from the list::
 
     function cobaltMemberSearchOk() {
-    // clear the form
-      clearModal();
 
     // Do whatever
-    alert(member_id);
+    alert(member_id[1]);
 
     </script>
     {% endblock %}
@@ -68,7 +66,7 @@ Pagination Formatter
 
 Pagination in views is a common thing so we have a central utility for it::
 
-    from cobalt.utils import cobalt_paginator
+    from utils.utils import cobalt_paginator
 
     my_list = ["some", "list", "to", "paginate"]
     items_per_page = 20

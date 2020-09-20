@@ -32,7 +32,7 @@ import uuid
 from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME, TIME_ZONE
 from datetime import datetime
 import itertools
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from django.utils.timezone import make_aware, now, utc
 import pytz
 

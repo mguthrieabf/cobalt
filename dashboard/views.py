@@ -7,7 +7,7 @@ from payments.core import get_balance_detail
 from events.core import get_events
 
 # from forums.views import post_list_dashboard
-from cobalt.utils import cobalt_paginator
+from utils.utils import cobalt_paginator
 from forums.models import Post, ForumFollow
 from rbac.core import rbac_user_blocked_for_model
 
