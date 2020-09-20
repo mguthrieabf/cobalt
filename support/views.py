@@ -3,11 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from cobalt.settings import ADMINS, COBALT_HOSTNAME
+from accounts.models import User
 from notifications.views import send_cobalt_email
 from django.template.loader import render_to_string
 from forums.models import Post
 from forums.filters import PostFilter
 from utils.utils import cobalt_paginator
+from django.db.models import Q
+from itertools import chain
 import json
 
 
@@ -59,16 +62,15 @@ def browser_errors(request):
 
 @login_required
 def search(request):
-    post_list = Post.objects.all()
-    post_filter = PostFilter(request.GET, queryset=post_list)
 
-    filtered_qs = post_filter.qs
+    query = request.POST.get("search_string")
 
-    things = cobalt_paginator(request, filtered_qs)
-
-    #    search_string = request.GET.get("search_string")
-    #    searchparams = "author=%s&title=%s&forum=%s&" % (user, title, forum)
-
-    return render(
-        request, "support/search.html", {"filter": post_filter, "things": things},
+    people = User.objects.filter(
+        Q(first_name__icontains=query) | Q(last_name__icontains=query)
     )
+    posts = Post.objects.filter(title__icontains=query)
+
+    results = list(chain(people, posts))
+    things = cobalt_paginator(request, results)
+
+    return render(request, "support/search.html", {"things": things},)

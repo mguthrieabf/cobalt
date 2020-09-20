@@ -45,9 +45,10 @@
           <th>Forum</th>
         </thead>
         <tbody>
-          {% for post in things %}
+          {% for thing in things %}
           <tr>
-            <td><a href="{% url "forums:post_detail" pk=post.id %}">{{ post.title }}</a>
+            <td><a href="{% url "forums:post_detail" pk=thing.id %}">{{ thing.title }}</a>
+            <td><a href="{% url "accounts:public_profile" pk=thing.id %}">{{ thing.full_name }}</a>
             <td>{{ post.author }}
             <td>{{ post.forum }}
           </tr>
