@@ -10,25 +10,10 @@
   <div class="card">
     <div class="card-header card-header-info">
 
-{% if search_string %}
-
-      <h2>Search Results for {{ search_string|default_if_none:"" }}</h2>
-
-{% else %}
-
-      <h2>Search</h2>
-
-{% endif %}
-
-{% if search_string %}
-
-      <h1>Results</h1>
-
-{% endif %}
-
+<h2>Search</h2>
     </div>
     <div class="card-body">
-      <form method="post">
+      <form method="get">
         {% csrf_token %}
         <div>
           <div class="input-group">
@@ -141,7 +126,7 @@
         </tbody>
       </table>
 
-      {% include "pagination_footer.html" %}
+      {% include "utils/pagination_footer.html" %}
 
     </div>
 

@@ -16,8 +16,6 @@ from .models import (
     BasketItem,
 )
 from accounts.models import User, TeamMate
-
-# from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -41,6 +39,8 @@ TZ = pytz.timezone(TIME_ZONE)
 
 @login_required()
 def home(request):
+    """ main screen to show congresses """
+
     congresses = Congress.objects.order_by("start_date").filter(
         start_date__gte=datetime.now()
     )
@@ -66,7 +66,9 @@ def home(request):
         else:
             grouped_by_month[month] = [congress]
 
-    admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[0]
+    # check if user has any admin rights to show link to create congress
+    admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[1]
+
     return render(
         request,
         "events/home.html",
@@ -134,11 +136,11 @@ def view_congress(request, congress_id, fullscreen=False):
                 if program["entry"]:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>View Entry</a></td>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>Edit Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
                 else:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a></td>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
                 first_row_for_event = False
             program["day"] = "<td>%s</td>" % day.session_date.strftime("%A")
 
@@ -294,8 +296,25 @@ def create_congress_wizard_1(request, step_list):
             if "copy" in request.POST:
                 congress_id = form.cleaned_data["congress"]
                 congress = get_object_or_404(Congress, pk=congress_id)
+                original_congress = get_object_or_404(Congress, pk=congress_id)
                 congress.pk = None
                 congress.save()
+
+                # Also copy events and sessions
+                print(original_congress.id)
+                print(congress.id)
+                events = Event.objects.filter(congress=original_congress)
+                print(events)
+                for event in events:
+                    sessions = Session.objects.filter(event=event)
+                    event.pk = None
+                    event.congress = congress
+                    event.save()
+                    for session in sessions:
+                        session.pk = None
+                        session.event = event
+                        session.save()
+
                 messages.success(
                     request, "Congress Copied", extra_tags="cobalt-message-success"
                 )
@@ -795,10 +814,16 @@ def edit_session(request, event_id, session_id):
     return render(request, "events/edit_session.html", {"form": form, "event": event},)
 
 
-def enter_event_form(event, congress, request):
+def enter_event_form(event, congress, request, existing_choices=None):
     """ build the form part of the enter_event view. Its not a Django form,
         we build our own as the validation won't work with a dynamic form
-        and we are validating on the client side anyway."""
+        and we are validating on the client side anyway.
+
+        If this is called by the edit entry option then it will pass in
+        existing_choices to pre-fill in the form. If this is a new entry
+        then this will be None.
+
+    """
 
     our_form = []
 
@@ -818,19 +843,36 @@ def enter_event_form(event, congress, request):
     # Get team mates for this user
     team_mates = TeamMate.objects.filter(user=request.user)
 
-    name_list = [(0, "Search...")]
+    name_list = [(0, "Search..."), (1, "TBA")]
     for team_mate in team_mates:
         item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
         name_list.append(item)
 
     # set values for player0 (the user)
     entry_fee, discount, reason = event.entry_fee_for(request.user)
+
+    if existing_choices:
+        payment_selected = existing_choices["player0"]["payment"]
+        if (
+            payment_selected == "my-system-dollars"
+        ):  # only ABF dollars go in the you column
+            entry_fee_you = entry_fee
+            entry_fee_pending = ""
+        else:
+            entry_fee_you = ""
+            entry_fee_pending = entry_fee
+    else:
+        payment_selected = pay_types[0]
+        entry_fee_pending = ""
+        entry_fee_you = entry_fee
+
     player0 = {
         "id": request.user.id,
         "payment_choices": pay_types,
-        "payment_selected": pay_types[0],
+        "payment_selected": payment_selected,
         "name": request.user,
-        "entry_fee": entry_fee,
+        "entry_fee_you": "%s" % entry_fee_you,
+        "entry_fee_pending": "%s" % entry_fee_pending,
     }
 
     # add another option for everyone except the current user
@@ -843,14 +885,49 @@ def enter_event_form(event, congress, request):
     if team_size == 6:
         min_entries = 4
     for ref in range(1, team_size):
+
+        # if we are returning then set the passed values
+        if existing_choices and "player%s" % ref in existing_choices.keys():
+            payment_selected = existing_choices["player%s" % ref]["payment"]
+            name_selected = existing_choices["player%s" % ref]["name"]
+            entry_fee = existing_choices["player%s" % ref]["entry_fee"]
+        else:
+            payment_selected = pay_types[0]
+            name_selected = None
+            entry_fee = None
+
+        # only ABF dollars go in the you column
+        if payment_selected == "my-system-dollars":
+            entry_fee_you = entry_fee
+            entry_fee_pending = ""
+        else:
+            entry_fee_you = ""
+            entry_fee_pending = entry_fee
+
+        if payment_selected == "their-system-dollars":
+            augment_payment_types = [
+                ("their-system-dollars", f"Their {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+            ]
+        else:
+            augment_payment_types = []
+
+        # set value for whether this is a new entry or an edit
+        if existing_choices:
+            entry_status = "new"
+        else:
+            entry_status = "old"
+
         item = {
             "player_no": ref,
-            "payment_choices": pay_types,
-            "payment_selected": pay_types[0],
+            "payment_choices": pay_types + augment_payment_types,
+            "payment_selected": payment_selected,
             "name_choices": name_list,
-            "name_selected": None,
-            "entry_fee": None,
+            "name_selected": name_selected,
+            "entry_fee_you": entry_fee_you,
+            "entry_fee_pending": entry_fee_pending,
+            "entry_status": entry_status,
         }
+
         our_form.append(item)
 
     # Start time of event
@@ -861,20 +938,23 @@ def enter_event_form(event, congress, request):
 
     # use reason etc from above to see if discounts apply
     alert_msg = None
-    if reason == "Early discount":
-        date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
-        alert_msg = [
-            "Early Entry Discount",
-            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
-            % (discount, date_field),
-        ]
 
-    if reason == "Youth discount":
-        alert_msg = [
-            "Youth Discount",
-            "You qualify for a youth discount for this event. A saving of $%.2f."
-            % discount,
-        ]
+    # don't alert about discounts if editing the entry
+    if not existing_choices:
+        if reason == "Early discount":
+            date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
+            alert_msg = [
+                "Early Entry Discount",
+                "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
+                % (discount, date_field),
+            ]
+
+        if reason == "Youth discount":
+            alert_msg = [
+                "Youth Discount",
+                "You qualify for a youth discount for this event. A saving of $%.2f."
+                % discount,
+            ]
 
     return render(
         request,
@@ -887,7 +967,6 @@ def enter_event_form(event, congress, request):
             "sessions": sessions,
             "event_start": event_start,
             "alert_msg": alert_msg,
-            "entry_fee": entry_fee,
             "discount": discount,
             "reason": reason,
             "min_entries": min_entries,
@@ -988,8 +1067,11 @@ def edit_event_entry(request, congress_id, event_id):
     if not event.already_entered(request.user):
         messages.info(
             request,
-            "You haven't entered ths event, yet. Taking you to the event entry screen.",
+            "You haven't entered this event, yet. Taking you to the event entry screen.",
             extra_tags="cobalt-message-info",
+        )
+        return redirect(
+            "events:enter_event", event_id=event.id, congress_id=congress_id
         )
 
     if request.method == "POST":
@@ -1050,7 +1132,26 @@ def edit_event_entry(request, congress_id, event_id):
             return redirect("events:view_congress", congress_id=event.congress.id)
 
     else:
-        return enter_event_form(event, congress, request)
+        existing_choices = {}
+        event_entry = (
+            EventEntry.objects.filter(primary_entrant=request.user)
+            .filter(event=event)
+            .first()
+        )
+        event_entry_players = event_entry.evententryplayer_set.all()
+        count = 0
+        for event_entry_player in event_entry_players:
+            existing_choices["player%s" % count] = {}
+            existing_choices["player%s" % count][
+                "payment"
+            ] = event_entry_player.payment_type
+            existing_choices["player%s" % count]["name"] = event_entry_player.player.id
+            existing_choices["player%s" % count][
+                "entry_fee"
+            ] = event_entry_player.entry_fee
+            count += 1
+
+        return enter_event_form(event, congress, request, existing_choices)
 
 
 @login_required()
@@ -1059,24 +1160,7 @@ def checkout(request):
 
     basket_items = BasketItem.objects.filter(player=request.user)
 
-    # if not congress_id:  # check if only one congress in basket
-    #     congress_list = []
-    #     for basket_item in basket_items:
-    #         congress_item = basket_item.event_entry.event.congress
-    #         if congress_item not in congress_list:
-    #             congress_list.append(congress_item)
-    #     if len(congress_list) > 1:  # multiple congresses in basket
-    #         return render(
-    #             request,
-    #             "events/congress_list_checkout.html",
-    #             {"congress_list": congress_list},
-    #         )
-
     if request.method == "POST":
-
-        # organisation = (
-        #     basket_items.first().event_entry.event.congress.congress_master.org
-        # )
 
         # Need to mark the entries that this is covering. The payment call is asynchronous so
         # we can't just load all the open basket_entries when we come back or more could have been
@@ -1191,4 +1275,18 @@ def pay_outstanding(request):
         route_payload=unique_id,
         url="/events",
         payment_type="Entry to a congress",
+    )
+
+
+@login_required()
+def view_event_entries(request, congress_id, event_id):
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+    event = get_object_or_404(Event, pk=event_id)
+    entries = EventEntry.objects.filter(event=event)
+
+    return render(
+        request,
+        "events/view_event_entries.html",
+        {"congress": congress, "event": event, "entries": entries},
     )

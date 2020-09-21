@@ -65,40 +65,49 @@ def browser_errors(request):
 @login_required
 def search(request):
 
-    query = request.POST.get("search_string")
-    include_people = request.POST.get("include_people")
-    include_forums = request.POST.get("include_forums")
-    include_posts = request.POST.get("include_posts")
-    include_events = request.POST.get("include_events")
-    include_payments = request.POST.get("include_payments")
+    query = request.GET.get("search_string")
+    include_people = request.GET.get("include_people")
+    include_forums = request.GET.get("include_forums")
+    include_posts = request.GET.get("include_posts")
+    include_events = request.GET.get("include_events")
+    include_payments = request.GET.get("include_payments")
+
+    searchparams = ""
 
     if query:  # don't search if no search string
+
+        searchparams = f"search_string={query}&"
 
         # Users
         if include_people:
             people = User.objects.filter(
                 Q(first_name__icontains=query) | Q(last_name__icontains=query)
             )
+            searchparams += "include_people=1&"
         else:
             people = []
 
         if include_posts:
             posts = Post.objects.filter(title__icontains=query)
+            searchparams += "include_posts=1&"
         else:
             posts = []
 
         if include_forums:
             forums = Forum.objects.filter(title__icontains=query)
+            searchparams += "include_forums=1&"
         else:
             forums = []
 
         if include_events:
             events = Congress.objects.filter(name__icontains=query)
+            searchparams += "include_events=1&"
         else:
             events = []
 
         if include_payments:
             payments = MemberTransaction.objects.filter(description__icontains=query)
+            searchparams += "include_payments=1&"
         else:
             payments = []
 
@@ -123,5 +132,6 @@ def search(request):
             "include_posts": include_posts,
             "include_events": include_events,
             "include_payments": include_payments,
+            "searchparams": searchparams,
         },
     )

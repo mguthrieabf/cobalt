@@ -15,6 +15,7 @@
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
   <link href="{% static "assets/css/cobalt.css" %}" rel="stylesheet" />
+  <link href="{% static "assets/css/font-awesome.5.14/css/all.min.css" %}" rel="stylesheet" />
 
   {% block headerjs %}
   <!-- These can cause problems, for example in forums with Summernote so we allow them to be overridden -->
@@ -152,7 +153,7 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-            <form class="navbar-form" method="post" action="{% url "support:search" %}">
+            <form class="navbar-form" method="get" action="{% url "support:search" %}">
               {% csrf_token %}
               <input type="hidden" name="include_people" value="checked">
               <input type="hidden" name="include_forums" value="checked">

@@ -71,10 +71,10 @@
                           {% else %}
                           &nbsp;
                           {% endif %}
-                          <input id="fee_0_now" class="pay_now" type="text" size="6" readonly value="{{ entry_fee }}">
+                          <input id="fee_0_now" class="pay_now" type="text" size="6" readonly value="{{ player0.entry_fee_you }}">
                         </nobr>
                       <td class="col">
-                        <input id="fee_0_later" class="pay_later" type="text" size="6" readonly value="">
+                        <input id="fee_0_later" class="pay_later" type="text" size="6" readonly value="{{ player0.entry_fee_pending }}">
                     </tr>
 
 {% for our_form_row in our_form %}
@@ -84,7 +84,7 @@
                       <td>
                       <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
                       <td class="col" align="right">
-                        <input id="total_now" type="text" size="6" readonly value="{{ entry_fee }}">
+                        <input id="total_now" type="text" size="6" readonly value="">
                       <td class="col">
                         <input id="total_later" type="text" size="6" readonly value="">
                     </tr>
@@ -245,6 +245,9 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
 }
 
 $(document).ready(function(){
+
+// calculate totals
+  totals();
 
 // show early discount etc msg but only once per congress
   {% if alert_msg %}

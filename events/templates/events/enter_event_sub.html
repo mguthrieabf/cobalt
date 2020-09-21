@@ -1,4 +1,14 @@
+<!--
+
+This generates the rows (apart from the entering player) for the enter event
+screen. Players are numbered from 1 up to 6. Players 5 and 6 are initially hidden.
+
+ -->
+
+
 <tr>
+
+<!-- Player name -->
 
   <td class="col text-center">
     {% if our_form_row.player_no > 3 %}
@@ -13,6 +23,7 @@
     <div id="div_id_player{{ our_form_row.player_no }}" class="form-group" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
       <select class="selectpicker cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
         {% for val,item in our_form_row.name_choices %}
+
         <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
         {% endfor %}
       </select>
@@ -20,23 +31,33 @@
   </div>
 </div>
 
+<!-- Payment choices  -->
+
   </td>
   <td class="col">
     <div id="id_player{{ our_form_row.player_no }}_paydiv" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
-    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="selectpicker payment-method" data-style="btn btn-danger" disabled>
-      {% for val,item in our_form_row.payment_choices %}
+    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="selectpicker payment-method" data-style="btn btn-danger"
 
-      <option value="{{ val }}" {% if our_form_row.payment_selected.0 == item %} selected {% endif %}>
+    {% if our_form_row.entry_status == "new" %}
+      disabled
+    {% endif %}
+
+    >
+      {% for val,item in our_form_row.payment_choices %}
+      <option value="{{ val }}" {% if our_form_row.payment_selected == val %} selected {% endif %}>
 
       {{ item }}</option>
       {% endfor %}
     </select>
     </div>
+
+<!-- entry fee and discount alert -->
+
   <td class="col" align="right" >
     <nobr>
     <span id="player{{ our_form_row.player_no }}_discount_alert">&nbsp;</span>
-    <input class="pay_now" id="fee_{{ our_form_row.player_no }}_now" type="text" size="6" readonly value="" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
+    <input class="pay_now" id="fee_{{ our_form_row.player_no }}_now" type="text" size="6" readonly value="{{ our_form_row.entry_fee_you }}" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
     </nobr>
   <td class="col">
-    <input class="pay_later" id="fee_{{ our_form_row.player_no }}_later" type="text" size="6" readonly value="" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
+    <input class="pay_later" id="fee_{{ our_form_row.player_no }}_later" type="text" size="6" readonly value="{{ our_form_row.entry_fee_pending }}" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
 </tr>
