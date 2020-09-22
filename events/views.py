@@ -1065,11 +1065,6 @@ def edit_event_entry(request, congress_id, event_id):
 
     # Check if already entered
     if not event.already_entered(request.user):
-        messages.info(
-            request,
-            "You haven't entered this event, yet. Taking you to the event entry screen.",
-            extra_tags="cobalt-message-info",
-        )
         return redirect(
             "events:enter_event", event_id=event.id, congress_id=congress_id
         )
@@ -1077,12 +1072,18 @@ def edit_event_entry(request, congress_id, event_id):
     if request.method == "POST":
 
         # get event_entry
-        event_entry_list = event.evententry_set.all().values_list("id")
+        # event_entry_list = event.evententry_set.all().values_list("id")
+        # event_entry = (
+        #     EventEntryPlayer.objects.filter(player=request.user)
+        #     .filter(event_entry__in=event_entry_list)
+        #     .first()
+        #     .event_entry
+        # )
+
         event_entry = (
-            EventEntryPlayer.objects.filter(player=request.user)
-            .filter(event_entry__in=event_entry_list)
+            EventEntry.objects.filter(primary_entrant=request.user)
+            .filter(event=event)
             .first()
-            .event_entry
         )
 
         # Get players from form
@@ -1110,6 +1111,17 @@ def edit_event_entry(request, congress_id, event_id):
             event_entry=event_entry
         )
 
+        # match them up
+        match_dict = {}
+        for p_id in range(len(players)):
+
+            # try to get player from list
+            event_entry_player = event_entry_player_list.filter(
+                player=players[p_id]
+            ).first()
+            if event_entry_player:
+                match_dict[players[p_id]] = event_entry_player
+
         # update player entries
         for p_id in range(len(players)):
             event_entry_player = event_entry_player_list.filter(
@@ -1122,7 +1134,8 @@ def edit_event_entry(request, congress_id, event_id):
                 )
                 event_entry_player.entry_fee = entry_fee
                 event_entry_player.save()
-            else:  # player name has changed -
+            else:  # player name has changed - find an unused one
+
                 print("NFI")
                 return
 
@@ -1131,7 +1144,7 @@ def edit_event_entry(request, congress_id, event_id):
         else:  # add to cart and keep shopping
             return redirect("events:view_congress", congress_id=event.congress.id)
 
-    else:
+    else:  # not a POST so build page
         existing_choices = {}
         event_entry = (
             EventEntry.objects.filter(primary_entrant=request.user)
