@@ -1,4 +1,4 @@
-from .models import BasketItem, EventEntry, EventEntryPlayer
+from .models import BasketItem, EventEntry, EventEntryPlayer, PlayerBatchId
 from django.db.models import Q
 from django.utils import timezone
 import payments.core as payments_core  # circular dependency
@@ -19,7 +19,6 @@ def events_payments_secondary_callback(status, route_payload, tran):
     if status == "Success":
 
         update_entries(route_payload)
-        send_notifications(route_payload)
 
 
 def events_payments_callback(status, route_payload, tran):
@@ -34,11 +33,17 @@ def events_payments_callback(status, route_payload, tran):
     if status == "Success":
 
         update_entries(route_payload)
+        send_notifications(route_payload)
 
 
 def update_entries(route_payload):
     """ Update the database to reflect changes and make payments for
         other members if we have access. """
+
+    # Find who is making this payment
+    pbi = PlayerBatchId.objects.filter(batch_id=route_payload).first()
+    payment_user = pbi.player
+    pbi.delete()
 
     # Update EntryEventPlayer objects
     event_entry_players = EventEntryPlayer.objects.filter(batch_id=route_payload)
@@ -46,26 +51,28 @@ def update_entries(route_payload):
         event_entry_player.payment_status = "Paid"
         event_entry_player.save()
 
+        print(f"Processing {event_entry_player.player}")
+
         # create payments in org account
         payments_core.update_organisation(
             organisation=event_entry_player.event_entry.event.congress.congress_master.org,
             amount=event_entry_player.entry_fee,
-            description="hello",
+            description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
             source="Events",
-            log_msg="hello",
+            log_msg=event_entry_player.event_entry.event.event_name,
             sub_source="events_callback",
             payment_type="Entry to an event",
-            member=event_entry_player.player,  # who we are paying for, not necessarily who paid
+            member=payment_user,
         )
 
         payments_core.update_account(
-            member=event_entry_player.player,
+            member=payment_user,
             amount=-event_entry_player.entry_fee,
-            description="goodbye",
+            description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
             source="Events",
             sub_source="events_callback",
             payment_type="Entry to an event",
-            log_msg="goodbye",
+            log_msg=event_entry_player.event_entry.event.event_name,
             organisation=event_entry_player.event_entry.event.congress.congress_master.org,
         )
 
@@ -217,7 +224,7 @@ def send_notifications(route_payload):
                 "title": "Event Entry - %s" % congress,
                 "email_body": player_email[player],
                 "host": COBALT_HOSTNAME,
-                "link": "/events",
+                "link": "/events/view",
                 "link_text": "Edit Entry",
             }
 
@@ -239,6 +246,7 @@ def send_notifications(route_payload):
 
 
 def get_basket_for_user(user):
+    """ called by base html to show basket """
     return BasketItem.objects.filter(player=user).count()
 
 

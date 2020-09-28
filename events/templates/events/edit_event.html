@@ -80,7 +80,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Event Name", "The short name of this event.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Event Name", "The short name of this event.");'>help</a>
                   </div>
                 </div>
 
@@ -95,9 +95,24 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Player Format
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_player_format" class="form-group">
+                      <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
+                      {% render_field form.player_format class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="javascript:void(0)" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
+                  </div>
+                </div><br>
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
@@ -110,7 +125,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Maximum Entries", "The maximum number of pairs, teams or individuals who can play in this depending upon the event format.");'>help</a>
                   </div>
                 </div>
 
@@ -125,7 +140,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Entry Fee", "The standard entry fee without discounts.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Entry Fee", "The standard entry fee without discounts.");'>help</a>
                   </div>
                 </div>
 
@@ -141,7 +156,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Early Payment Discount", "Discount applied for entries completed before the early entry cut off.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Early Payment Discount", "Discount applied for entries completed before the early entry cut off.");'>help</a>
                   </div>
                 </div>
                 {% endif %}
@@ -158,7 +173,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Youth Discount", "Discount applied for youth players.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Youth Discount", "Discount applied for youth players.");'>help</a>
                   </div>
                 </div>
                 {% endif %}
@@ -175,23 +190,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Event Type", "Classification of who can enter.");'>help</a>
-                  </div>
-                </div>
-                <br>
-
-                <div class="row">
-                  <div class="col-3 justify-content-center align-self-center">
-                    Player Format (optional)
-                  </div>
-                  <div class="col-7">
-                    <div id="div_id_player_format" class="form-group">
-                      <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
-                      {% render_field form.player_format class+="form-control" %}
-                    </div>
-                  </div>
-                  <div class="col-2 justify-content-center align-self-center">
-                    <a href="#" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Event Type", "Classification of who can enter.");'>help</a>
                   </div>
                 </div>
 
@@ -206,6 +205,52 @@
             </div>
           </div>
         </div>
+
+<!-- Optional categories - show by default if categories are already present
+      otherwise show a link  -->
+
+      {% if not categories %}
+        <div id="category_show">
+          <a href="javascript:void(0)" id="show_category">Add Categories (optional)</a><br><br>
+        </div>
+      {% endif %}
+
+        <div class="row justify-content-center" id="categories_div"
+      {% if not categories %}
+        style="display: none;"
+      {% endif %}
+        >
+          <div class="card col-lg-9">
+            <div class="card-header card-header-info">
+              <h3 class="card-title">Categories</h3>
+              <i>Use categories if you have a single field that you would like to split. For example
+                 if you want to include mixed, womens, open and seniors but don't have enough
+                 players to run separate events.</i>
+            </div>
+            <div class="card-body" style="text-align: center">
+              <div class="container">
+                <select class="w-100" size="10" id="categories_list">
+                  {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="d-flex">
+                <div>
+                  <button id="add_category_button" class="btn btn-success btn-sm" onclick="addCategory();return false">Add</button>
+                </div>
+                <div class="ml-auto">
+                  <button class="btn btn-danger btn-sm cobalt-save" id="delete_category_button" onclick="deleteCategory();return false">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+<!-- Show session dialog if the event has already been created  -->
 
         {% if page_type == "edit" %}
 
@@ -260,6 +305,48 @@
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
+
+// general help text display function
+  function help(title, html) {
+    swal.fire({
+      title: title,
+      html: html,
+      icon: "info",
+      buttonsStyling: false
+    })
+    return false;
+  }
+
+// Add a new category
+  function addCategory() {
+    Swal.fire({
+        title: "Add Category",
+        text: "Category Description:",
+        input: 'text',
+        showCancelButton: true
+    }).then((result) => {
+        if (result.value) {
+
+            var serializedData = {
+              "event_id": {{ event.id }},
+              "text": result.value
+            };
+
+            $.ajax({
+              url: '{% url "events:add_category_ajax" %}',
+              method: "POST",
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              data: serializedData,
+              dataType: "json"
+            }).done(function(response) {
+              location.reload();
+            });
+          }
+        });
+  }
+
+
+
   function deleteSession() {
     Swal.fire({
       title: 'Are you sure?',
@@ -293,6 +380,24 @@
                 buttonsStyling: false
               });
             }
+          });
+        }
+      });
+    }
+
+  function deleteCategory() {
+    category_id = $('#categories_list').val();
+    $.get("{% url "events:delete_category_ajax" %}?category_id=" + category_id)
+      .done(response => {
+        msg = response['data']['message'];
+        if (msg == 'Success') {
+              location.reload();
+        } else {
+          swal.fire({
+            title: "Error",
+            html: msg,
+            icon: "error",
+            buttonsStyling: false
           });
         }
       });
@@ -336,6 +441,11 @@
     $("#override_dates").show();
     $("#override_dates_toggle").hide();
   {% endif %}
+
+    $("#show_category").click(function() {
+      $("#categories_div").show();
+      $("#category_show").hide();
+    });
 
   });
 </script>

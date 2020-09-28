@@ -347,7 +347,7 @@ class Command(BaseCommand):
         # create dummy Posts
         print("\nCreating dummy forum posts")
         print("Running", end="", flush=True)
-        for post_counter in range(200):
+        for post_counter in range(20):
 
             user_list = list(self.id_array["accounts.User"].values())
             user_list.remove(self.id_array["accounts.User"]["EVERYONE"])

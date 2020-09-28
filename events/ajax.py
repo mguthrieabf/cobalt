@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.db.models import Sum, Q
 from .models import (
     Congress,
+    Category,
     CongressMaster,
     Event,
     Session,
@@ -95,6 +96,27 @@ def delete_event_ajax(request):
         return rbac_forbidden(request, role)
 
     event.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def delete_category_ajax(request):
+    """ Ajax call to delete a category from an event """
+
+    if request.method == "GET":
+        category_id = request.GET["category_id"]
+
+    category = get_object_or_404(Category, pk=category_id)
+
+    # check access
+    role = "events.org.%s.edit" % category.event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    category.delete()
 
     response_data = {}
     response_data["message"] = "Success"
@@ -218,4 +240,28 @@ def payment_options_for_user_ajax(request):
     else:
         response_data["add_entry"] = ""
         response_data["message"] = "Blocked"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def add_category_ajax(request):
+    """ Ajax call to add an event category to an event """
+
+    if request.method == "POST":
+        event_id = request.POST["event_id"]
+        text = request.POST["text"]
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # add category
+    category = Category(event=event, description=text)
+    category.save()
+
+    response_data = {}
+    response_data["message"] = "Success"
     return JsonResponse({"data": response_data})

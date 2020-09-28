@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load cobalt_tags %}
+
+{% block content %}
+
+<div class="container justify-content-center">
+  <div class="row h-100 d-flex justify-content-center">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Congress Admin View</h2>
+        <h3>{{ event.congress }}</h3>
+      </div>
+      <div class="card-body">
+
+  <div class="card">
+    <div class="card-header card-header-info">
+      <h2>{{ event.event_name }}</h2>
+    </div>
+
+    <div class="card-body table-responsive">
+      <table class="table table-hover">
+        <thead class="text-info">
+          <th>Event</th>
+          <th>Entry Id</th>
+          <th>Status</th>
+          <th>Entry By</th>
+          <th>Player</th>
+          <th>Player Payment Status</th>
+          <th>Received</th>
+          <th>Outstanding</th>
+          <th>Payment Method</th>
+          <th>Entry First Created</th>
+          <th>Entry Complete</th>
+        </thead>
+        <tbody>
+          {% for event_entry in event.evententry_set.all %}
+          {% for event_entry_player in event_entry.evententryplayer_set.all %}
+            <tr>
+              <td><a href="{% url "events:edit_event" congress_id=event.congress.id event_id=event.id %}">{{ event_entry_player.event_entry.event.event_name }}</a></td>
+
+              <td>{{ event_entry_player.event_entry.id }}</td>
+              <td>{{ event_entry.payment_status }}</td>
+              <td>{{ event_entry_player.event_entry.primary_entrant|cobalt_user_link }}</td>
+              <td>{{ event_entry_player.player|cobalt_user_link }}</td>
+              <td>{{ event_entry_player.payment_status }}</td>
+              <td>
+                {% if event_entry_player.payment_type == "my-system-dollars"%}
+                  {{ event_entry_player.entry_fee }}
+                {% else %}
+                  0.00
+                {% endif %}
+              </td>
+              <td>
+                {% if event_entry_player.payment_type != "my-system-dollars"%}
+                  {{ event_entry_player.entry_fee }}
+                {% else %}
+                  0.00
+                {% endif %}
+              </td>
+
+              <td>{{ event_entry_player.get_payment_type_display }}</td>
+              <td>{{ event_entry.first_created_date|cobalt_nice_datetime }}</td>
+              <td>{{ event_entry.entry_complete_date |cobalt_nice_datetime }}</td>
+            </tr>
+          {% endfor %}
+          {% endfor %}
+
+
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.db.models import Sum, Q
 from .models import (
     Congress,
+    Category,
     CongressMaster,
     Event,
     Session,
@@ -14,6 +15,7 @@ from .models import (
     PAYMENT_TYPES,
     EVENT_PLAYER_FORMAT_SIZE,
     BasketItem,
+    PlayerBatchId,
 )
 from accounts.models import User, TeamMate
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
@@ -33,6 +35,7 @@ import itertools
 from utils.utils import cobalt_paginator
 from django.utils.timezone import make_aware, now, utc
 import pytz
+from decimal import Decimal
 
 TZ = pytz.timezone(TIME_ZONE)
 
@@ -719,6 +722,8 @@ def edit_event(request, congress_id, event_id):
             initial["entry_close_date"] = event.entry_close_date.strftime("%d/%m/%Y")
         form = EventForm(instance=event, initial=initial)
 
+    categories = Category.objects.filter(event=event)
+
     return render(
         request,
         "events/edit_event.html",
@@ -727,6 +732,7 @@ def edit_event(request, congress_id, event_id):
             "congress": congress,
             "event": event,
             "sessions": sessions,
+            "categories": categories,
             "page_type": "edit",
         },
     )
@@ -956,6 +962,9 @@ def enter_event_form(event, congress, request, existing_choices=None):
                 % discount,
             ]
 
+    # categories
+    categories = Category.objects.filter(event=event)
+
     return render(
         request,
         "events/enter_event.html",
@@ -964,6 +973,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
             "our_form": our_form,
             "congress": congress,
             "event": event,
+            "categories": categories,
             "sessions": sessions,
             "event_start": event_start,
             "alert_msg": alert_msg,
@@ -1004,6 +1014,12 @@ def enter_event(request, congress_id, event_id):
         event_entry = EventEntry()
         event_entry.event = event
         event_entry.primary_entrant = request.user
+
+        # see if we got a category
+        category = request.POST.get("category", None)
+        if category:
+            event_entry.category = get_object_or_404(Category, pk=category)
+
         event_entry.save()
 
         # add to basket
@@ -1199,6 +1215,9 @@ def checkout(request):
             event_entry_player.batch_id = unique_id
             event_entry_player.save()
 
+        # map this user (who is paying) to the batch id
+        PlayerBatchId(player=request.user, batch_id=unique_id).save()
+
         return payment_api(
             request=request,
             member=request.user,
@@ -1208,6 +1227,7 @@ def checkout(request):
             route_payload=unique_id,
             url="/events",
             payment_type="Entry to a congress",
+            book_internals=False,
         )
 
     return render(request, "events/checkout.html", {"basket_items": basket_items})
@@ -1218,7 +1238,71 @@ def admin_summary(request, congress_id):
     """ Admin View """
 
     congress = get_object_or_404(Congress, pk=congress_id)
-    return render(request, "events/admin_summary.html", {"congress": congress})
+    events = Event.objects.filter(congress=congress)
+
+    total = {
+        "entries": 0,
+        "tables": 0.0,
+        "due": Decimal(0),
+        "paid": Decimal(0),
+        "pending": Decimal(0),
+    }
+
+    # calculate summary
+    for event in events:
+        event_entries = EventEntry.objects.filter(event=event)
+        event.entries = event_entries.count()
+        event.early_fee = event.entry_fee - event.entry_early_payment_discount
+
+        # calculate tables
+        players_per_entry = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
+
+        # Teams of 3 - only need 3 to make a table
+        if players_per_entry == 3:
+            players_per_entry = 4
+
+        # For teams we only have 4 per table
+        if event.player_format == "Teams":
+            players_per_entry = 4
+
+        event.tables = event.entries * players_per_entry / 4.0
+
+        # remove decimal if not required
+        if event.tables == int(event.tables):
+            event.tables = int(event.tables)
+
+        # Get the event entry players for this event
+        event_entry_list = event_entries.values_list("id")
+        event_entry_players = EventEntryPlayer.objects.filter(
+            event_entry__in=event_entry_list
+        )
+        event.due = event_entry_players.aggregate(Sum("entry_fee"))["entry_fee__sum"]
+        event.paid = event_entry_players.filter(payment_status="Paid").aggregate(
+            Sum("entry_fee")
+        )["entry_fee__sum"]
+        event.pending = event.due - event.paid
+
+        # update totals
+        total["entries"] += event.entries
+        total["tables"] += event.tables
+        total["due"] += event.due
+        total["paid"] += event.paid
+        total["pending"] += event.pending
+
+    return render(
+        request,
+        "events/admin_summary.html",
+        {"events": events, "total": total, "congress": congress},
+    )
+
+
+@login_required()
+def admin_event_summary(request, event_id):
+    """ Admin Event View """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    return render(request, "events/admin_event_summary.html", {"event": event})
 
 
 @login_required()

@@ -26,13 +26,11 @@ urlpatterns = [
         views.edit_event_entry,
         name="edit_event_entry",
     ),
-    #    path("congress/edit/<int:congress_id>", views.edit_congress, name="edit_congress"),
     path(
         "congress/delete/<int:congress_id>",
         views.delete_congress,
         name="delete_congress",
     ),
-    #    path("congress/create2", views.create_congress, name="create_congress"),
     path(
         "congress/create/wizard",
         views.create_congress_wizard,
@@ -83,6 +81,11 @@ urlpatterns = [
         views.admin_summary,
         name="admin_summary",
     ),
+    path(
+        "congress/admin/summary/event/<int:event_id>",
+        views.admin_event_summary,
+        name="admin_event_summary",
+    ),
     path("congress/checkout", views.checkout, name="checkout",),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",
@@ -96,9 +99,19 @@ urlpatterns = [
         name="delete_event_ajax",
     ),
     path(
+        "congress/create/delete-category",
+        ajax.delete_category_ajax,
+        name="delete_category_ajax",
+    ),
+    path(
         "congress/create/delete-session",
         ajax.delete_session_ajax,
         name="delete_session_ajax",
+    ),
+    path(
+        "congress/create/add-category",
+        ajax.add_category_ajax,
+        name="add_category_ajax",
     ),
     path(
         "congress/event/enter/fee-for-user",

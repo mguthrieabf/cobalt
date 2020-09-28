@@ -10,10 +10,14 @@ from .models import (
     CongressNewsItem,
     CongressDownload,
     BasketItem,
+    Category,
+    PlayerBatchId,
 )
 
 admin.site.register(CongressMaster)
 admin.site.register(Congress)
+admin.site.register(PlayerBatchId)
+admin.site.register(Category)
 admin.site.register(Event)
 admin.site.register(Session)
 admin.site.register(EventEntryType)

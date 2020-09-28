@@ -80,7 +80,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Organisation", "All congresses must be associated with an organisation in order for payments and other things to work properly.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Organisation", "All congresses must be associated with an organisation in order for payments and other things to work properly.");'>help</a>
                 </div>
               </div>
               <br><br>
@@ -96,7 +96,7 @@
         </div>
 
         <!-- End Organisation -->
-        <a href="#" id="advanced_link">Advanced...</a>
+        <a href="javascript:void(0)" id="advanced_link">Advanced...</a>
         <br>
         <!-- Advanced -->
         <div id="advanced" style="display: none;" class="card col-md-10">
@@ -115,7 +115,7 @@
                   {{ form.raw_html }}
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#"
+                  <a href="javascript:void(0)"
                     onclick='help("Raw HTML", "If you understand HTML you can build the page yourself and insert it here. This will override everything else. You can use the Congress builder to generate a starting point and then tweak the HTML and insert it here if you like.<br>Even if you use raw HTML you still need to set the venue location and to set all mandatory fields.");'>help</a>
                 </div>
               </div>
@@ -146,7 +146,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#"
+                  <a href="javascript:void(0)"
                     onclick='help("Congress Master", "This is the master event for this congress. Typically this will be the name of the event without the year. Congress Master is the highest level of object that we have. This can be left blank.");'>help</a>
                 </div>
               </div>
@@ -164,7 +164,7 @@
 
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Congress Year", "The year that this event will take place.");'>help</a>
                 </div>
               </div>
 
@@ -179,7 +179,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Congress Name", "The name you wish to give this congress. Typically the Congress Master plus the Year.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Congress Name", "The name you wish to give this congress. Typically the Congress Master plus the Year.");'>help</a>
                 </div>
               </div>
 
@@ -194,7 +194,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Date String", "Free format text for the dates of the congress. e.g. 23rd March 2021 to 29th March 2021.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Date String", "Free format text for the dates of the congress. e.g. 23rd March 2021 to 29th March 2021.");'>help</a>
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@
                   <h3>People</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("People", "List people and contact details.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("People", "List people and contact details.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.people|as_crispy_field }}
@@ -229,7 +229,7 @@
                   <h3>General Information</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("General Info", "This goes near the top and should describe high level things about the congress.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("General Info", "This goes near the top and should describe high level things about the congress.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.general_info|as_crispy_field }}
@@ -242,7 +242,7 @@
                   <h3>Additional Information (footer)</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Additional Info", "This is extra info for the bottom of the page if required.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Additional Info", "This is extra info for the bottom of the page if required.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.additional_info|as_crispy_field }}
@@ -274,7 +274,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Name", "The name of the venue hosting the event.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Venue Name", "The name of the venue hosting the event.");'>help</a>
                 </div>
               </div>
 
@@ -294,7 +294,7 @@
                   </div>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#"
+                  <a href="javascript:void(0)"
                     onclick='help("Venue Location", "The latitude and longitude of the venue. <br><br>You can use the lookup button to search for this. If the lookup button does not work for you then you can open another window and search in there. Find your location in Google Maps and right click on it. Choose <b>Whats Here</b> and it will show you the coordinates.");'>help</a>
                 </div>
               </div>
@@ -309,7 +309,7 @@
                   <h3>Venue Transport Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Transport", "Details of how to get to the venue such as public transport and parking options.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Venue Transport", "Details of how to get to the venue such as public transport and parking options.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.venue_transport|as_crispy_field }}
@@ -322,7 +322,7 @@
                   <h3>Venue Catering Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Catering", "Details of catering options available at the venue.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Venue Catering", "Details of catering options available at the venue.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.venue_catering|as_crispy_field }}
@@ -335,7 +335,7 @@
                   <h3>Venue Additional Info</h3>
                 </div>
                 <div class="col-2 justify-content-center align-self-center">
-                  <a href="#" onclick='help("Venue Additional Info", "Anything else you have not already covered.");'>help</a>
+                  <a href="javascript:void(0)" onclick='help("Venue Additional Info", "Anything else you have not already covered.");'>help</a>
                 </div>
                 <div class="col-12">
                   {{ form.venue_additional_info|as_crispy_field }}

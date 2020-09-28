@@ -308,6 +308,7 @@ def payment_api(
     log_msg=None,
     payment_type=None,
     url=None,
+    book_internals=True,
 ):
     """ API for payments from other parts of the application.
 
@@ -337,6 +338,11 @@ def payment_api(
     This is generally expected to return a page giving the user information,
     but it can also be called headlessly by setting request to None.
 
+    For Events the booking of the internal transactions is done in the callback
+    so that we can have individual transactions that are easier to map. The
+    optional parameter book_internals handles this. If this is set to false
+    then only the necessary Stripe transactions are executed by payment_api.
+
     args:
         request - standard request object (optional)
         description - text description of the payment
@@ -349,13 +355,14 @@ def payment_api(
         log_msg - message for the log
         payment_type - description of payment
         url - next url to go to
+        book_internals - create internal transactions
 
     returns:
         request - page for user
 
     """
 
-    if other_member and organisation:  # one or the other, not both
+    if other_member and organisation and book_internals:  # one or the other, not both
         log_event(
             user="Stripe API",
             severity="CRITICAL",
@@ -396,37 +403,38 @@ def payment_api(
 
     if amount <= balance:  # sufficient funds
 
-        update_account(
-            member=member,
-            amount=-amount,
-            organisation=organisation,
-            other_member=other_member,
-            description=description,
-            log_msg=log_msg,
-            source="Payments",
-            sub_source="payments_api",
-            payment_type=payment_type,
-        )
-
-        # If we got an organisation then make their payment too
-        if organisation:
-            update_organisation(
+        if book_internals:
+            update_account(
+                member=member,
+                amount=-amount,
                 organisation=organisation,
-                amount=amount,
+                other_member=other_member,
                 description=description,
                 log_msg=log_msg,
                 source="Payments",
                 sub_source="payments_api",
                 payment_type=payment_type,
-                member=member,
             )
 
-            if request:
-                messages.success(
-                    request,
-                    f"Payment successful! You paid ${amount:.2f} to {organisation}.",
-                    extra_tags="cobalt-message-success",
+            # If we got an organisation then make their payment too
+            if organisation:
+                update_organisation(
+                    organisation=organisation,
+                    amount=amount,
+                    description=description,
+                    log_msg=log_msg,
+                    source="Payments",
+                    sub_source="payments_api",
+                    payment_type=payment_type,
+                    member=member,
                 )
+
+                if request:
+                    messages.success(
+                        request,
+                        f"Payment successful! You paid ${amount:.2f} to {organisation}.",
+                        extra_tags="cobalt-message-success",
+                    )
 
         # If we got an other_member then make their payment too
         if other_member:
@@ -500,38 +508,39 @@ def payment_api(
             )
 
             if return_code:  # success
-                update_account(
-                    member=member,
-                    other_member=other_member,
-                    amount=-amount,
-                    organisation=organisation,
-                    description=description,
-                    log_msg=log_msg,
-                    source="Payments",
-                    sub_source="payments_api",
-                    payment_type=payment_type,
-                )
-
-                # If we got an organisation then make their payment too
-                if organisation:
-                    update_organisation(
+                if book_internals:
+                    update_account(
+                        member=member,
+                        other_member=other_member,
+                        amount=-amount,
                         organisation=organisation,
-                        amount=amount,
                         description=description,
                         log_msg=log_msg,
                         source="Payments",
                         sub_source="payments_api",
                         payment_type=payment_type,
-                        member=member,
                     )
 
-                    if request:
-                        messages.success(
-                            request,
-                            f"Payment successful! You paid \
-                                         ${amount:.2f} to {organisation}.",
-                            extra_tags="cobalt-message-success",
+                    # If we got an organisation then make their payment too
+                    if organisation:
+                        update_organisation(
+                            organisation=organisation,
+                            amount=amount,
+                            description=description,
+                            log_msg=log_msg,
+                            source="Payments",
+                            sub_source="payments_api",
+                            payment_type=payment_type,
+                            member=member,
                         )
+
+                        if request:
+                            messages.success(
+                                request,
+                                f"Payment successful! You paid \
+                                             ${amount:.2f} to {organisation}.",
+                                extra_tags="cobalt-message-success",
+                            )
 
                 # If we got an other_member then make their payment too
                 if other_member:

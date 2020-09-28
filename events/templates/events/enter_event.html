@@ -39,6 +39,18 @@
 
               <form method="POST">
                 {% csrf_token %}
+
+                {% if categories %}
+                <label for="id_category">Category</label>
+                <select class="selectpicker" data-style="btn btn-info" id="id_category" name="category">
+                  {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category }}</option>
+                  {% endfor %}
+                </select>
+                {% endif %}
+
+
+
               <table class="table-responsive">
                 <thead class="text-warning">
                   <th style="text-align: center;">Players</th>

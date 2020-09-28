@@ -22,7 +22,10 @@ PAYMENT_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    ("my-system-dollars", "My %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    (
+        "my-system-dollars",
+        "My %s %s (Credit Card)" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL),
+    ),
     ("their-system-dollars", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
     ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
@@ -180,11 +183,7 @@ class Event(models.Model):
     )
 
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
-        null=True,
-        blank=True,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
 
     def __str__(self):
@@ -193,14 +192,14 @@ class Event(models.Model):
     def is_open(self):
         """ check if this event is taking entries today """
 
-        today = timezone.now().date()
-        open_date = self.event_open_date
+        today = timezone.now()
+        open_date = self.entry_open_date
         if not open_date:
             open_date = self.congress.entry_open_date
         if today < open_date:
             return False
 
-        close_date = self.event_close_date
+        close_date = self.entry_close_date
         if not close_date:
             close_date = self.congress.entry_close_date
         if today > close_date:
@@ -272,6 +271,16 @@ class Event(models.Model):
             return event_entry.payment_status
 
 
+class Category(models.Model):
+    """ Event Categories such as <100 MPs or club members etc. Free format."""
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    description = models.CharField("Event Category", max_length=30)
+
+    def __str__(self):
+        return self.description
+
+
 class Session(models.Model):
     """ A session within an event """
 
@@ -300,6 +309,9 @@ class EventEntry(models.Model):
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
     primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return "%s - %s - %s" % (
@@ -335,6 +347,17 @@ class EventEntryPlayer(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.event_entry, self.player)
+
+
+class PlayerBatchId(models.Model):
+    """ Maps a batch Id associated with a payment to the user who made the
+        payment. We use the same approach for all players so can't assume it
+        will be the primary entrant. """
+
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    batch_id = models.CharField(
+        "Payment Batch ID", max_length=100, null=True, blank=True
+    )
 
 
 class CongressLink(models.Model):

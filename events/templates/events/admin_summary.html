@@ -12,77 +12,65 @@
       <div class="card-header card-header-warning">
         <h2>Congress Admin View</h2>
         <h3>{{ congress }}</h3>
+        <h4>{{ congress.congress_master.org }}</h4>
       </div>
       <div class="card-body">
 
-{% for event in congress.event_set.all %}
-{{ event }}
-
-  <div class="card">
-    <div class="card-header card-header-info">
-      <h2>{{ event.event_name }}</h2>
-    </div>
-
-    <div class="card-body table-responsive">
-      <table class="table table-hover">
-        <thead class="text-info">
-          <th>Event</th>
-          <th>Entry Id</th>
-          <th>Status</th>
-          <th>Entry By</th>
-          <th>Player</th>
-          <th>Player Payment Status</th>
-          <th>Received</th>
-          <th>Outstanding</th>
-          <th>Payment Method</th>
-          <th>Entry First Created</th>
-          <th>Entry Complete</th>
+        <table class="table table-responsive table-hover">
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Full Entry Fee ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th>Early Entry Fee ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th>Entries</th>
+            <th>Tables</th>
+            <th>Due ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th>Paid ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+            <th>Pending ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+          </tr>
         </thead>
         <tbody>
-          {% for event_entry in event.evententry_set.all %}
-          {% for event_entry_player in event_entry.evententryplayer_set.all %}
-            <tr>
-              <td><a href="{% url "events:edit_event" congress_id=congress.id event_id=event.id %}">{{ event_entry_player.event_entry.event.event_name }}</a></td>
-
-              <td>{{ event_entry_player.event_entry.id }}</td>
-              <td>{{ event_entry.payment_status }}</td>
-              <td>{{ event_entry_player.event_entry.primary_entrant|cobalt_user_link }}</td>
-              <td>{{ event_entry_player.player|cobalt_user_link }}</td>
-              <td>{{ event_entry_player.payment_status }}</td>
-              <td>
-                {% if event_entry_player.payment_type == "my-system-dollars"%}
-                  {{ event_entry_player.entry_fee }}
-                {% else %}
-                  0.00
-                {% endif %}
-              </td>
-              <td>
-                {% if event_entry_player.payment_type != "my-system-dollars"%}
-                  {{ event_entry_player.entry_fee }}
-                {% else %}
-                  0.00
-                {% endif %}
-              </td>
-
-              <td>{{ event_entry_player.get_payment_type_display }}</td>
-              <td>{{ event_entry.first_created_date|cobalt_nice_datetime }}</td>
-              <td>{{ event_entry.entry_complete_date |cobalt_nice_datetime }}</td>
-            </tr>
-          {% endfor %}
-          {% endfor %}
 
 
+{% for event in events %}
 
-        </tbody>
-      </table>
-    </div>
-  </div>
-
+      <tr>
+        <td><a href="{% url "events:admin_event_summary" event_id=event.id %}">{{ event.event_name }}</a></td>
+        <td>{{ event.event_type }}</td>
+        <td>{% if event.is_open %}Entries Open{% else %}Entries Closed{% endif %}</td>
+        <td class="text-right">{{ event.entry_fee }}</td>
+        <td class="text-right">{{ event.early_fee }}</td>
+        <td class="text-right">{{ event.entries }}</td>
+        <td class="text-right">{{ event.tables }}</td>
+        <td class="text-right">{{ event.due }}</td>
+        <td class="text-right">{{ event.paid }}</td>
+        <td class="text-right">{{ event.pending }}</td>
+      </tr>
 
 {% endfor %}
 
+      <tr>
+        <td class="font-weight-bold">Total</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+        <td class="text-right font-weight-bold">{{ total.entries }}</td>
+        <td class="text-right font-weight-bold">{{ total.tables }}</td>
+        <td class="text-right font-weight-bold">{{ total.due }}</td>
+        <td class="text-right font-weight-bold">{{ total.paid }}</td>
+        <td class="text-right font-weight-bold">{{ total.pending }}</td>
+      </tr>
+
+        </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
+
+
 {% endblock %}
