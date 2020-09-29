@@ -86,6 +86,21 @@ urlpatterns = [
         views.admin_event_summary,
         name="admin_event_summary",
     ),
+    path(
+        "congress/admin/detail/event-entry/<int:evententry_id>",
+        views.admin_evententry,
+        name="admin_evententry",
+    ),
+    path(
+        "congress/admin/detail/event-entry-player/<int:evententryplayer_id>",
+        views.admin_evententryplayer,
+        name="admin_evententryplayer",
+    ),
+    path(
+        "congress/admin/event-csv/<int:event_id>",
+        views.admin_event_csv,
+        name="admin_event_csv",
+    ),
     path("congress/checkout", views.checkout, name="checkout",),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",

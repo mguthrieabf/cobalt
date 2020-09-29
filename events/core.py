@@ -49,9 +49,8 @@ def update_entries(route_payload):
     event_entry_players = EventEntryPlayer.objects.filter(batch_id=route_payload)
     for event_entry_player in event_entry_players:
         event_entry_player.payment_status = "Paid"
+        event_entry_player.payment_received = event_entry_player.entry_fee
         event_entry_player.save()
-
-        print(f"Processing {event_entry_player.player}")
 
         # create payments in org account
         payments_core.update_organisation(
@@ -99,19 +98,12 @@ def update_entries(route_payload):
                     payment_type="Entry to a congress",
                 )
                 event_entry_player.payment_status = "Paid"
+                event_entry_player.payment_received = event_entry_player.entry_fee
                 event_entry_player.save()
 
     # Check if EntryEvent is now complete
     for event_entry in event_entries:
-        all_complete = True
-        for event_entry_player in event_entry.evententryplayer_set.all():
-            if event_entry_player.payment_status != "Paid":
-                all_complete = False
-                break
-        if all_complete:
-            event_entry.payment_status = "Paid"
-            event_entry.entry_complete_date = timezone.now()
-            event_entry.save()
+        event_entry.check_if_paid()
 
 
 def send_notifications(route_payload):
@@ -146,7 +138,6 @@ def send_notifications(route_payload):
 
     # now build the emails
     for congress in email_dic.keys():
-        print("Congress Loop")
 
         # build a list of all players so we can set them each up a custom email
         player_email = {}  # email to send keyed by player

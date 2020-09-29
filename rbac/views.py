@@ -91,26 +91,6 @@ def view_screen(request):
     )
 
 
-# @login_required
-# def admin_screen(request):
-#     """ Allows an administrator to control who is in a group and to create
-#     roles """
-#
-#     user_groups = RBACAdminUserGroup.objects.filter(member=request.user)
-#
-#     # split by type
-#     data = {}
-#     for user_group in user_groups:
-#         if user_group.group.name_qualifier in data:
-#             data[user_group.group.name_qualifier].append(user_group.group)
-#         else:
-#             data[user_group.group.name_qualifier] = [user_group.group]
-#     print(user_groups)
-#     print(data)
-#
-#     return render(request, "rbac/admin-screen.html", {"groups": data})
-
-
 def generic_tree_builder(groups, detail_link=None, html_type="href"):
     """ function to build an rbac tree for use with the tree viewer.
 

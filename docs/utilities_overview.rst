@@ -16,17 +16,19 @@ for another user. In order to implement this you need to do 4 things:
 
 1. Import the body part of the HTML into your template::
 
-    {% include "generic_user_search_body.html" search_id=1 %}
+    {% include "utils/generic_user_search_body.html" with search_id=1 %}
 
 2. Set up a button or similar HTML element to trigger the search::
 
-    <a class="cobalt_generic_member" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search">Add</a>
+    <a class="cobalt_generic_member" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search1">Add</a>
+
+Change 1 to whatever search_id was set to.
 
 3. Import the footer part of the HTML into your template::
 
     {% block footer %}
     <script>
-    {% include 'generic_user_search_footer.html' search_id=1 %}
+    {% include "utils/generic_user_search_footer.html" with search_id=1 %}
 
 4. Below the block footer, set up a function to handle a user selecting another member from the list::
 

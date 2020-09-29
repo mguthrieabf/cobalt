@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, RegexValidator
-from cobalt.settings import AUTO_TOP_UP_MAX_AMT, GLOBAL_ORG
+from cobalt.settings import AUTO_TOP_UP_MAX_AMT, GLOBAL_ORG, TBA_PLAYER, RBAC_EVERYONE
 
 
 class User(AbstractUser):
@@ -75,7 +75,10 @@ class User(AbstractUser):
     ]  # tells createsuperuser to ask for them
 
     def __str__(self):
-        return "%s(%s: %s)" % (self.full_name, GLOBAL_ORG, self.system_number)
+        if self.id in (TBA_PLAYER, RBAC_EVERYONE):
+            return self.first_name
+        else:
+            return "%s(%s: %s)" % (self.full_name, GLOBAL_ORG, self.system_number)
 
     @property
     def full_name(self):

@@ -28,7 +28,7 @@ class UserRegisterForm(UserCreationForm):
 
     def clean_username(self):
         """ check system_number is valid. Don't rely on client side validation """
-        print("inside")
+
         username = self.cleaned_data["username"]
         if username:
             if not system_number_available(username):

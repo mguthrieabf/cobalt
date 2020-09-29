@@ -1,5 +1,5 @@
 from django import forms
-from .models import Congress, Event, Session
+from .models import Congress, Event, Session, EventEntryPlayer
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
@@ -265,4 +265,22 @@ class SessionForm(forms.ModelForm):
             "session_date",
             "session_start",
             "session_end",
+        )
+
+
+class EventEntryPlayerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.fields["player"].label = False
+        # self.fields["payment_type"].label = False
+        # self.fields["payment_status"].label = False
+
+    class Meta:
+        model = EventEntryPlayer
+        fields = (
+            "player",
+            "payment_type",
+            "payment_status",
+            "entry_fee",
+            "payment_received",
         )

@@ -323,6 +323,22 @@ class EventEntry(models.Model):
     first_created_date = models.DateTimeField(default=timezone.now)
     entry_complete_date = models.DateTimeField(null=True, blank=True)
 
+    def check_if_paid(self):
+        """ go through sub level event entry players and see if this is now
+        complete as well. """
+
+        all_complete = True
+        for event_entry_player in self.evententryplayer_set.all():
+            if event_entry_player.payment_status != "Paid":
+                all_complete = False
+                break
+        if all_complete:
+            self.payment_status = "Paid"
+            self.entry_complete_date = timezone.now()
+        else:
+            self.payment_status = "Unpaid"
+        self.save()
+
 
 class EventEntryPlayer(models.Model):
     """ A player who is entering an event """
@@ -343,6 +359,9 @@ class EventEntryPlayer(models.Model):
     )
     entry_fee = models.DecimalField(
         "Entry Fee", decimal_places=2, max_digits=10, null=True, blank=True
+    )
+    payment_received = models.DecimalField(
+        "Payment Received", decimal_places=2, max_digits=10, null=True, blank=True
     )
 
     def __str__(self):

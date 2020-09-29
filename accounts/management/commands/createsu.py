@@ -30,9 +30,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print("Running createsu.")
+        # RBAC Everyone
         self.CreateDefaultTestUsers(
             "EVERYONE", "a@b.com", "0", "EVERYONE", "system_account"
         )
+        # TBA User for event entry
+        self.CreateDefaultTestUsers("TBA", "a@b.com", "1", "TBA", "")
         self.CreateDefaultTestUsers(
             "Mark",
             "m@rkguthrie.com",

@@ -1,8 +1,9 @@
+import csv
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
+from django.utils import timezone, dateformat
 from django.db.models import Sum, Q
 from .models import (
     Congress,
@@ -18,7 +19,13 @@ from .models import (
     PlayerBatchId,
 )
 from accounts.models import User, TeamMate
-from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
+from .forms import (
+    CongressForm,
+    NewCongressForm,
+    EventForm,
+    SessionForm,
+    EventEntryPlayerForm,
+)
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_user_has_role,
@@ -849,7 +856,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
     # Get team mates for this user
     team_mates = TeamMate.objects.filter(user=request.user)
 
-    name_list = [(0, "Search..."), (1, "TBA")]
+    name_list = [(0, "Search..."), (2, "TBA")]
     for team_mate in team_mates:
         item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
         name_list.append(item)
@@ -1276,10 +1283,17 @@ def admin_summary(request, congress_id):
         event_entry_players = EventEntryPlayer.objects.filter(
             event_entry__in=event_entry_list
         )
+
         event.due = event_entry_players.aggregate(Sum("entry_fee"))["entry_fee__sum"]
+        if event.due is None:
+            event.due = Decimal(0)
+
         event.paid = event_entry_players.filter(payment_status="Paid").aggregate(
             Sum("entry_fee")
         )["entry_fee__sum"]
+        if event.paid is None:
+            event.paid = Decimal(0)
+
         event.pending = event.due - event.paid
 
         # update totals
@@ -1288,6 +1302,10 @@ def admin_summary(request, congress_id):
         total["due"] += event.due
         total["paid"] += event.paid
         total["pending"] += event.pending
+
+    # fix total formatting
+    if total["tables"] == int(total["tables"]):
+        total["tables"] = int(total["tables"])
 
     return render(
         request,
@@ -1302,7 +1320,84 @@ def admin_event_summary(request, event_id):
 
     event = get_object_or_404(Event, pk=event_id)
 
-    return render(request, "events/admin_event_summary.html", {"event": event})
+    event_entries = EventEntry.objects.filter(event=event)
+
+    # build summary
+    for event_entry in event_entries:
+        event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
+        event_entry.received = Decimal(0)
+        event_entry.outstanding = Decimal(0)
+        event_entry.players = []
+
+        for event_entry_player in event_entry_players:
+            event_entry.received += event_entry_player.payment_received
+            event_entry.outstanding += (
+                event_entry_player.entry_fee - event_entry_player.payment_received
+            )
+            event_entry.players.append(event_entry_player)
+
+    return render(
+        request,
+        "events/admin_event_summary.html",
+        {"event": event, "event_entries": event_entries},
+    )
+
+
+@login_required()
+def admin_evententry(request, evententry_id):
+    """ Admin Event Entry View """
+
+    event_entry = get_object_or_404(EventEntry, pk=evententry_id)
+    event = event_entry.event
+    congress = event.congress
+
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    return render(
+        request,
+        "events/admin_event_entry.html",
+        {"event_entry": event_entry, "event": event, "congress": congress},
+    )
+
+
+@login_required()
+def admin_evententryplayer(request, evententryplayer_id):
+    """ Admin Event Entry Player View """
+
+    event_entry_player = get_object_or_404(EventEntryPlayer, pk=evententryplayer_id)
+
+    role = (
+        "events.org.%s.edit"
+        % event_entry_player.event_entry.event.congress.congress_master.org.id
+    )
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+        form = EventEntryPlayerForm(request.POST, instance=event_entry_player)
+        if form.is_valid():
+            form.save()
+
+            # check if event entry payment status has changed
+            event_entry_player.event_entry.check_if_paid()
+
+            messages.success(
+                request, "Entry updated", extra_tags="cobalt-message-success"
+            )
+            return redirect(
+                "events:admin_evententry",
+                evententry_id=event_entry_player.event_entry.id,
+            )
+    else:
+        form = EventEntryPlayerForm(instance=event_entry_player)
+
+    return render(
+        request,
+        "events/admin_event_entry_player.html",
+        {"event_entry_player": event_entry_player, "form": form},
+    )
 
 
 @login_required()
@@ -1387,3 +1482,41 @@ def view_event_entries(request, congress_id, event_id):
         "events/view_event_entries.html",
         {"congress": congress, "event": event, "entries": entries},
     )
+
+
+@login_required()
+def admin_event_csv(request, event_id):
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # get details
+    entries = event.evententry_set.all()
+
+    local_dt = timezone.localtime(timezone.now(), TZ)
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f"attachment; filename={event}.csv"
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [event.event_name, "Downloaded by %s" % request.user.full_name, today]
+    )
+    writer.writerow(["Players", "Received", "Outstanding", "Status"])
+
+    for row in entries:
+
+        players = ""
+        for player in row.evententryplayer_set.all():
+            players += player.player.full_name
+
+        local_dt = timezone.localtime(row.first_created_date, TZ)
+        writer.writerow(
+            [players, row.payment_status, dateformat.format(local_dt, "Y-m-d H:i:s")]
+        )
+
+    return response

@@ -12,7 +12,7 @@ from .models import InAppNotification, NotificationMapping
 from forums.models import Forum, Post
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
-from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE
+from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE, TBA_PLAYER, RBAC_EVERYONE
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -100,6 +100,10 @@ def get_notifications_for_user(user):
 
 def contact_member(member, msg, contact_type, link=None, html_msg=None, subject=None):
     """ Contact member using their preferred method """
+
+    # Ignore system accounts
+    if member.id in (RBAC_EVERYONE, TBA_PLAYER):
+        return
 
     if not subject:
         subject = "Notification from ABFTech"
