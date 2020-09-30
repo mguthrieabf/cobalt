@@ -355,8 +355,9 @@ class EventEntryPlayer(models.Model):
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
     batch_id = models.CharField(
-        "Payment Batch ID", max_length=100, null=True, blank=True
+        "Payment Batch ID", max_length=20, null=True, blank=True
     )
+    reason = models.CharField("Entry Fee Reason", max_length=20, null=True, blank=True)
     entry_fee = models.DecimalField(
         "Entry Fee", decimal_places=2, max_digits=10, null=True, blank=True
     )
@@ -411,3 +412,15 @@ class BasketItem(models.Model):
 
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     event_entry = models.ForeignKey(EventEntry, on_delete=models.CASCADE)
+
+
+class EventLog(models.Model):
+    """ log of things that happen within an event """
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    actor = models.ForeignKey(User, on_delete=models.CASCADE)
+    action_date = models.DateTimeField(default=timezone.now)
+    action = models.CharField("Action", max_length=200)
+
+    def __str__(self):
+        return "%s - %s" % (self.event, self.actor)

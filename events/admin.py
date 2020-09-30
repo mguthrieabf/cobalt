@@ -12,6 +12,7 @@ from .models import (
     BasketItem,
     Category,
     PlayerBatchId,
+    EventLog,
 )
 
 admin.site.register(CongressMaster)
@@ -26,3 +27,4 @@ admin.site.register(EventEntryPlayer)
 admin.site.register(CongressNewsItem)
 admin.site.register(CongressDownload)
 admin.site.register(BasketItem)
+admin.site.register(EventLog)

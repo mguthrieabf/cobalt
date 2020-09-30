@@ -22,8 +22,8 @@
                 <a href="{% url "organisations:org_edit" org_id=congress.congress_master.org.id %}">{{ congress.congress_master.org }}</a>
               <h5 class="card-title"><a href="{% url "events:view_congress" congress_id=congress.id %}">{{ congress }}</a></h5>
               <p>{{ congress.date_string }}</p>
-              <a class="btn btn-sm btn-warning" href="{% url "events:view_congress" congress_id=congress.id %}">View Details</a>
               {% if congress.convener %}
+              <a class="btn btn-sm btn-warning" href="{% url "events:view_congress" congress_id=congress.id %}">View Details</a>
               <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-success">Edit</a>
               <a class="btn btn-sm btn-info" href="{% url "events:admin_summary" congress_id=congress.id %}">Manage</a>
               {% endif %}

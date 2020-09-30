@@ -101,6 +101,11 @@ urlpatterns = [
         views.admin_event_csv,
         name="admin_event_csv",
     ),
+    path(
+        "congress/admin/event-offsystem/<int:event_id>",
+        views.admin_event_offsystem,
+        name="admin_event_offsystem",
+    ),
     path("congress/checkout", views.checkout, name="checkout",),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",

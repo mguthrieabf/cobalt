@@ -1064,6 +1064,7 @@ def enter_event(request, congress_id, event_id):
             event_entry_player.payment_type = player_payments[p_id]
             entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
             event_entry_player.entry_fee = entry_fee
+            event_entry_player.reason = reason
             event_entry_player.save()
 
         if "now" in request.POST:
@@ -1472,6 +1473,7 @@ def pay_outstanding(request):
 
 @login_required()
 def view_event_entries(request, congress_id, event_id):
+    """ Screen to show entries to an event """
 
     congress = get_object_or_404(Congress, pk=congress_id)
     event = get_object_or_404(Event, pk=event_id)
@@ -1486,6 +1488,7 @@ def view_event_entries(request, congress_id, event_id):
 
 @login_required()
 def admin_event_csv(request, event_id):
+    """ Download a CSV file with details of the entries """
 
     event = get_object_or_404(Event, pk=event_id)
 
@@ -1506,17 +1509,87 @@ def admin_event_csv(request, event_id):
     writer.writerow(
         [event.event_name, "Downloaded by %s" % request.user.full_name, today]
     )
-    writer.writerow(["Players", "Received", "Outstanding", "Status"])
+
+    # Event Entry details
+    writer.writerow(
+        [
+            "Players",
+            "Entry Fee",
+            "Received",
+            "Outstanding",
+            "Status",
+            "First Created Date",
+            "Entry Complete Date",
+        ]
+    )
 
     for row in entries:
 
         players = ""
+        received = Decimal(0)
+        entry_fee = Decimal(0)
+
         for player in row.evententryplayer_set.all():
-            players += player.player.full_name
+            players += player.player.full_name + " - "
+            received += player.payment_received
+            entry_fee += player.entry_fee
+        players = players[:-3]
 
         local_dt = timezone.localtime(row.first_created_date, TZ)
+        local_dt2 = timezone.localtime(row.entry_complete_date, TZ)
+
         writer.writerow(
-            [players, row.payment_status, dateformat.format(local_dt, "Y-m-d H:i:s")]
+            [
+                players,
+                entry_fee,
+                received,
+                entry_fee - received,
+                row.payment_status,
+                dateformat.format(local_dt, "Y-m-d H:i:s"),
+                dateformat.format(local_dt2, "Y-m-d H:i:s"),
+            ]
         )
 
+    # Event Entry Player details
+    writer.writerow([])
+    writer.writerow([])
+    writer.writerow(
+        [
+            "Primary Entrant",
+            "Player",
+            "Payment Type",
+            "Entry Fee",
+            "Received",
+            "Outstanding",
+            "Entry Fee Reason",
+            "Payment Status",
+        ]
+    )
+
+    payment_type_dict = dict(PAYMENT_TYPES)
+
+    for entry in entries:
+        for row in entry.evententryplayer_set.all():
+            writer.writerow(
+                [
+                    entry.primary_entrant,
+                    row.player,
+                    payment_type_dict[row.payment_type],
+                    row.entry_fee,
+                    row.payment_received,
+                    row.entry_fee - row.payment_received,
+                    row.reason,
+                    row.payment_status,
+                ]
+            )
+
     return response
+
+
+@login_required()
+def admin_event_offsystem(request, event_id):
+    """ Handle off system payments such as cheques and bank transfers """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    return render(request, "events/admin_event_offsystem.html", {"event": event},)

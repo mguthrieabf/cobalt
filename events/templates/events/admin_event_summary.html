@@ -26,6 +26,11 @@
         <div class="card">
           <div class="card-header card-header-info">
             <h2>{{ event.event_name }}</h2>
+            <div class="float-left">
+              <a href="{% url 'events:admin_event_offsystem' event_id=event.id %}" class="text-center btn btn-secondary btn-sm btn-round" style="width: 170px">
+                <i class="material-icons">arrow_downward</i>&nbsp;Off-system payments
+              </a>
+            </div>
             <div class="float-right">
               <a href="{% url 'events:admin_event_csv' event_id=event.id %}" class="text-center btn btn-secondary btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
