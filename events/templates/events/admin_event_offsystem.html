@@ -31,22 +31,25 @@
           <div class="card-body table-responsive">
             <table class="table table-hover">
               <thead class="text-info">
-                <th>Players</th>
-                <th class="text-right">Received ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                <th>Player</th>
                 <th class="text-right">Entry Fee ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                <th class="text-right">Received ({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                <th>Payment Method</th>
                 <th class="text-right">Status</th>
                 <th class="text-right">Action</th>
               </thead>
               <tbody>
-                {% for event_entry_player in event_entry.evententryplayer_set.all %}
+                {% for event_entry_player in players %}
 
                   <tr>
                     <td>
                       {{ event_entry_player.player|cobalt_user_link }}
                     </td>
-                    <td class="text-right">{{ event_entry_player.payment_received }}</td>
                     <td class="text-right">{{ event_entry_player.entry_fee }}</td>
+                    <td class="text-right">{{ event_entry_player.payment_received }}</td>
+                    <td class="text-left">{{ event_entry_player.get_payment_type_display }}</td>
                     <td class="text-right">{{ event_entry_player.payment_status }}</td>
+                    <td class="text-right"><button class="btn btn-sm btn-success button_pay" id="button_pay_{{ event_entry_player.id }}">pay</button><button class="btn btn-sm btn-info">partial</button></td>
                   </tr>
                 {% endfor %}
 
@@ -58,4 +61,37 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+
+<script>
+  $(document).ready(function(){
+
+    // pay button
+    $(".button_pay").click(function(){
+
+      // which row
+      var id = this.id.split("_")[2]
+
+      var serializedData = {
+        "event_entry_player_id": id,
+      };
+
+      $.ajax({
+        url: '{% url "events:admin_offsystem_pay_ajax" %}',
+        method: "POST",
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: serializedData,
+        dataType: "json"
+      }).done(function(response) {
+        location.reload();
+      });
+
+
+    });
+
+  });
+</script>
+
 {% endblock %}

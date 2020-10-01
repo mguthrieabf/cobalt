@@ -271,9 +271,6 @@ class SessionForm(forms.ModelForm):
 class EventEntryPlayerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields["player"].label = False
-        # self.fields["payment_type"].label = False
-        # self.fields["payment_status"].label = False
 
     class Meta:
         model = EventEntryPlayer
@@ -283,4 +280,5 @@ class EventEntryPlayerForm(forms.ModelForm):
             "payment_status",
             "entry_fee",
             "payment_received",
+            "reason",
         )

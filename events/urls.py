@@ -102,6 +102,11 @@ urlpatterns = [
         name="admin_event_csv",
     ),
     path(
+        "congress/admin/event-log/<int:event_id>",
+        views.admin_event_log,
+        name="admin_event_log",
+    ),
+    path(
         "congress/admin/event-offsystem/<int:event_id>",
         views.admin_event_offsystem,
         name="admin_event_offsystem",
@@ -142,6 +147,11 @@ urlpatterns = [
         "congress/event/enter/payment-options-for-user",
         ajax.payment_options_for_user_ajax,
         name="payment_options_for_user_ajax",
+    ),
+    path(
+        "congress/admin/off-system/pay",
+        ajax.admin_offsystem_pay_ajax,
+        name="admin_offsystem_pay_ajax",
     ),
     path("view", views.view_events, name="view_events",),
 ]

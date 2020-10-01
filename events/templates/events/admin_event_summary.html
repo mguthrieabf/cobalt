@@ -27,8 +27,11 @@
           <div class="card-header card-header-info">
             <h2>{{ event.event_name }}</h2>
             <div class="float-left">
-              <a href="{% url 'events:admin_event_offsystem' event_id=event.id %}" class="text-center btn btn-secondary btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">arrow_downward</i>&nbsp;Off-system payments
+              <a href="{% url 'events:admin_event_offsystem' event_id=event.id %}" class="text-center btn btn-primary btn-sm btn-round" style="width: 170px">
+                <i class="material-icons">attach_money</i>&nbsp;Off-system payments
+              </a>
+              <a href="{% url 'events:admin_event_log' event_id=event.id %}" class="text-center btn btn-danger btn-sm btn-round" style="width: 170px">
+                <i class="material-icons">text_snippet</i>&nbsp;Logs
               </a>
             </div>
             <div class="float-right">

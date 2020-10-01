@@ -355,7 +355,7 @@ class EventEntryPlayer(models.Model):
         "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
     )
     batch_id = models.CharField(
-        "Payment Batch ID", max_length=20, null=True, blank=True
+        "Payment Batch ID", max_length=40, null=True, blank=True
     )
     reason = models.CharField("Entry Fee Reason", max_length=20, null=True, blank=True)
     entry_fee = models.DecimalField(
@@ -376,7 +376,7 @@ class PlayerBatchId(models.Model):
 
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     batch_id = models.CharField(
-        "Payment Batch ID", max_length=100, null=True, blank=True
+        "Payment Batch ID", max_length=40, null=True, blank=True
     )
 
 

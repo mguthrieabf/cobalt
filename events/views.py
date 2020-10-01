@@ -17,6 +17,7 @@ from .models import (
     EVENT_PLAYER_FORMAT_SIZE,
     BasketItem,
     PlayerBatchId,
+    EventLog,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -1029,6 +1030,13 @@ def enter_event(request, congress_id, event_id):
 
         event_entry.save()
 
+        # Log it
+        EventLog(
+            event=event,
+            actor=event_entry.primary_entrant,
+            action=f"Event entry {event_entry.id} created",
+        ).save()
+
         # add to basket
         basket_item = BasketItem()
         basket_item.player = request.user
@@ -1066,6 +1074,13 @@ def enter_event(request, congress_id, event_id):
             event_entry_player.entry_fee = entry_fee
             event_entry_player.reason = reason
             event_entry_player.save()
+
+            # Log it
+            EventLog(
+                event=event,
+                actor=event_entry.primary_entrant,
+                action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
+            ).save()
 
         if "now" in request.POST:
             return redirect("events:checkout")
@@ -1158,6 +1173,7 @@ def edit_event_entry(request, congress_id, event_id):
                 )
                 event_entry_player.entry_fee = entry_fee
                 event_entry_player.save()
+
             else:  # player name has changed - find an unused one
 
                 print("NFI")
@@ -1222,6 +1238,13 @@ def checkout(request):
         for event_entry_player in event_entry_players:
             event_entry_player.batch_id = unique_id
             event_entry_player.save()
+
+            # Log it
+            EventLog(
+                event=event_entry_player.event_entry.event,
+                actor=request.user,
+                action=f"Checkout for event entry {event_entry_player.event_entry.id} for {event_entry_player.player}",
+            ).save()
 
         # map this user (who is paying) to the batch id
         PlayerBatchId(player=request.user, batch_id=unique_id).save()
@@ -1583,6 +1606,9 @@ def admin_event_csv(request, event_id):
                 ]
             )
 
+    # Log it
+    EventLog(event=event, actor=request.user, action=f"CSV Download of {event}").save()
+
     return response
 
 
@@ -1592,4 +1618,37 @@ def admin_event_offsystem(request, event_id):
 
     event = get_object_or_404(Event, pk=event_id)
 
-    return render(request, "events/admin_event_offsystem.html", {"event": event},)
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    players = EventEntryPlayer.objects.filter(event_entry__event=event).exclude(
+        payment_status="Paid"
+    )
+
+    return render(
+        request,
+        "events/admin_event_offsystem.html",
+        {"event": event, "players": players},
+    )
+
+
+@login_required()
+def admin_event_log(request, event_id):
+    """ Show logs for an event """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    logs = EventLog.objects.filter(event=event).order_by("-action_date")
+
+    things = cobalt_paginator(request, logs)
+
+    return render(
+        request, "events/admin_event_log.html", {"event": event, "things": things}
+    )

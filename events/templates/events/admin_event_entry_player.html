@@ -52,7 +52,7 @@
                       {% endif %}
                     {% endfor %}
                     </span>
-                    <a class="cobalt_generic_member btn btn-sm btn-primary" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search1">Change</a>
+                    <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search1">Change</a>
                   </div>
                 </td>
               </tr>
@@ -79,6 +79,19 @@
 
                     <span class="cobalt-form-error" id="id_payment_status_errors">{{ form.payment_status.errors|striptags }}</span>
                     {% render_field form.payment_status class+="form-control" %}
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                <label class="bmd-label-static px-5">Entry Fee Reason</label>
+                </td>
+                <td>
+                  <div>
+
+                    <span class="cobalt-form-error" id="id_reason_status_errors">{{ form.reason.errors|striptags }}</span>
+                    {% render_field form.reason class+="form-control" %}
                   </div>
                 </td>
               </tr>
