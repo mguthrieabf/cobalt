@@ -34,11 +34,16 @@ from rbac.core import (
     rbac_get_users_with_role,
 )
 from rbac.views import rbac_user_role_or_error
-from payments.core import payment_api, org_balance
+from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
-from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME, TIME_ZONE
+from cobalt.settings import (
+    GLOBAL_ORG,
+    GLOBAL_CURRENCY_NAME,
+    TIME_ZONE,
+    GLOBAL_CURRENCY_SYMBOL,
+)
 from datetime import datetime
 import itertools
 from utils.utils import cobalt_paginator
@@ -1663,31 +1668,104 @@ def admin_evententry_delete(request, evententry_id):
         refund_form_set = RefundFormSet(data=request.POST)
         if refund_form_set.is_valid():
             for form in refund_form_set:
-                print(form)
-        else:
-            print(refund_form_set.errors)
-            for form in refund_form_set:
-                print(form)
-            print(request.POST)
+                player = get_object_or_404(User, pk=form.cleaned_data["player_id"])
+                amount = float(form.cleaned_data["refund"])
+                amount_str = "%s%.2f" % (GLOBAL_CURRENCY_SYMBOL, amount)
 
-    # build summary
-    event_entry.received = Decimal(0)
-    initial = []
+                if amount > 0.0:
 
-    for event_entry_player in event_entry_players:
-        event_entry.received += event_entry_player.payment_received
-        initial.append(
-            {
-                "player_id": event_entry_player.player.id,
-                "player": f"{event_entry_player.player}",
-                "refund": event_entry_player.payment_received,
-            }
-        )
+                    # create payments in org account
+                    update_organisation(
+                        organisation=event_entry.event.congress.congress_master.org,
+                        amount=-amount,
+                        description=f"Refund to {player} for {event_entry.event.event_name}",
+                        source="Events",
+                        log_msg=f"Refund to {player} for {event_entry.event.event_name}",
+                        sub_source="refund",
+                        payment_type="Refund",
+                        member=player,
+                    )
 
-    refund_form_set = RefundFormSet(initial=initial)
+                    # create payment for member
+                    update_account(
+                        organisation=event_entry.event.congress.congress_master.org,
+                        amount=amount,
+                        description=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
+                        source="Events",
+                        log_msg=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
+                        sub_source="refund",
+                        payment_type="Refund",
+                        member=player,
+                    )
 
-    club = event_entry.event.congress.congress_master.org
-    club_balance = org_balance(club)
+                    # Log it
+                    EventLog(
+                        event=event_entry.event,
+                        actor=request.user,
+                        action=f"Refund of {amount_str} to {player}",
+                    ).save()
+                    messages.success(
+                        request,
+                        f"Refund of {amount_str} to {player} successful",
+                        extra_tags="cobalt-message-success",
+                    )
+
+        # Log it
+        EventLog(
+            event=event_entry.event,
+            actor=request.user,
+            action=f"Entry deleted for {event_entry.primary_entrant}",
+        ).save()
+
+        event_entry.delete()
+
+        messages.success(request, "Entry deleted", extra_tags="cobalt-message-success")
+        return redirect("events:admin_event_summary", event_id=event_entry.event.id)
+
+    else:  # not POST - build summary
+        event_entry.received = Decimal(0)
+        initial = []
+
+        # we need to default refund per player to who actually paid it, not
+        # who was entered. If Fred paid for Bill's entry then Fred should get
+        # the refund not Bill
+
+        refund_dict = {}
+        for event_entry_player in event_entry_players:
+            refund_dict[event_entry_player.player] = Decimal(0)
+
+        for event_entry_player in event_entry_players:
+            # check if we have a player who paid
+            if event_entry_player.paid_by:
+
+                # maybe this player is no longer part of the team
+                if event_entry_player.paid_by not in refund_dict.keys():
+                    refund_dict[event_entry_player.paid_by] = Decimal(0)
+
+                refund_dict[
+                    event_entry_player.paid_by
+                ] += event_entry_player.payment_received
+
+            # Not sure who paid to default it back to the entry name
+            else:
+                refund_dict[
+                    event_entry_player.player
+                ] += event_entry_player.payment_received
+
+        for player_refund in refund_dict.keys():
+            event_entry.received += refund_dict[player_refund]
+            initial.append(
+                {
+                    "player_id": player_refund.id,
+                    "player": f"{player_refund}",
+                    "refund": refund_dict[player_refund],
+                }
+            )
+
+        refund_form_set = RefundFormSet(initial=initial)
+
+        club = event_entry.event.congress.congress_master.org
+        club_balance = org_balance(club)
 
     return render(
         request,

@@ -89,7 +89,7 @@ def post_detail(request, pk):
 
     # Check access
     post = get_object_or_404(Post, pk=pk)
-    rbac_user_role_or_error(request.user, "forums.forum.%s.view" % post.forum.id)
+    rbac_user_role_or_error(request, "forums.forum.%s.view" % post.forum.id)
 
     if request.method == "POST":
 
@@ -610,7 +610,7 @@ def forum_create(request):
         HttpResponse
     """
 
-    rbac_user_role_or_error(request.user, "forums.admin.edit")
+    rbac_user_role_or_error(request, "forums.admin.edit")
 
     if request.method == "POST":
         form = ForumForm(request.POST)
@@ -646,7 +646,7 @@ def forum_delete_ajax(request, forum_id):
     """
 
     # check access
-    rbac_user_role_or_error(request.user, "forums.admin.edit")
+    rbac_user_role_or_error(request, "forums.admin.edit")
 
     forum = get_object_or_404(Forum, pk=forum_id)
     forum.delete()

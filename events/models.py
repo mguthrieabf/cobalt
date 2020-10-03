@@ -344,7 +344,10 @@ class EventEntryPlayer(models.Model):
     """ A player who is entering an event """
 
     event_entry = models.ForeignKey(EventEntry, on_delete=models.CASCADE)
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player")
+    paid_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name="paid_by"
+    )
     player_payment_record = models.ForeignKey(
         MemberTransaction, on_delete=models.CASCADE, null=True, blank=True
     )

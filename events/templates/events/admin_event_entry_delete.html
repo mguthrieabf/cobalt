@@ -59,7 +59,8 @@
               {% for form in refund_form_set %}
                 <tr>
                   <td>{{ form.player.value }}
-                    <input type="hidden" id="id_{{ form.player_id.name }}" name="{{ form.player_id.name }}" value="{{ form.player_id.value }}">
+                  {{ form.player_id.as_hidden }}
+                  {{ form.player.as_hidden }}
                   <td class="text-right">{{ form.refund }}
                 </tr>
               {% endfor %}

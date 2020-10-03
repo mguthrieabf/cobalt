@@ -50,6 +50,7 @@ def update_entries(route_payload):
     for event_entry_player in event_entry_players:
         event_entry_player.payment_status = "Paid"
         event_entry_player.payment_received = event_entry_player.entry_fee
+        event_entry_player.paid_by = payment_user
         event_entry_player.save()
 
         # create payments in org account
@@ -92,7 +93,7 @@ def update_entries(route_payload):
                 payments_core.payment_api(
                     request=None,
                     member=event_entry_player.player,
-                    description="Congress Entry",
+                    description=event_entry.event.event_name,
                     amount=event_entry_player.entry_fee,
                     organisation=event_entry_player.event_entry.event.congress.congress_master.org,
                     payment_type="Entry to a congress",

@@ -92,7 +92,7 @@ def delete_event_ajax(request):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request.user, role)
+    rbac_user_role_or_error(request, role)
 
     event.delete()
 

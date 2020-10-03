@@ -285,6 +285,11 @@ class EventEntryPlayerForm(forms.ModelForm):
 
 
 class RefundForm(forms.Form):
+    #
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['name'].widget.attrs.update({'class': 'special'})
+    #     self.fields['comment'].widget.attrs.update(size='40')
 
     player_id = forms.IntegerField()
     player = forms.CharField(max_length=100)

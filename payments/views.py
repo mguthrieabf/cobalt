@@ -247,7 +247,7 @@ def statement_admin_view(request, member_id):
     """
 
     # check access
-    rbac_user_role_or_error(request.user, "payments.global.view")
+    rbac_user_role_or_error(request, "payments.global.view")
 
     user = get_object_or_404(User, pk=member_id)
     (summary, club, balance, auto_button, events_list) = statement_common(user)
