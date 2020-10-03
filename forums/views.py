@@ -22,7 +22,7 @@ from notifications.views import (
     check_listener,
 )
 from utils.utils import cobalt_paginator
-from rbac.views import rbac_forbidden
+from rbac.views import rbac_user_role_or_error, rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
@@ -89,22 +89,12 @@ def post_detail(request, pk):
 
     # Check access
     post = get_object_or_404(Post, pk=pk)
-    if not rbac_user_has_role(request.user, "forums.forum.%s.view" % post.forum.id):
-        return rbac_forbidden(request, "forums.forum.%s.view" % post.forum.id)
+    rbac_user_role_or_error(request.user, "forums.forum.%s.view" % post.forum.id)
 
     if request.method == "POST":
 
         # Check user permissions to post
-        if not rbac_user_has_role(
-            request.user, "forums.forum.%s.create" % post.forum.id
-        ):
-            return rbac_forbidden(request, "forums.forum.%s.create" % post.forum.id)
-
-        # Check for rascals
-        # if rbac_user_has_role_exact(
-        #     request.user, "forums.forum.%s.blocked_users" % post.forum.id
-        # ):
-        #     return rbac_forbidden(request, "forums.forum.%s.blocked_users" % post.forum.id)
+        rbac_user_role_or_error(request, "forums.forum.%s.create" % post.forum.id)
 
         # identify which form submitted this - comments1 or comments2
         if "submit-c1" in request.POST:
@@ -229,62 +219,59 @@ def post_new(request, forum_id=None):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            if rbac_user_has_role(
+            # check access
+            rbac_user_role_or_error(
                 request.user, "forums.forum.%s.create" % form.cleaned_data["forum"].id
-            ):
-                post = form.save(commit=False)
-                post.author = request.user
-                post.published_date = timezone.now()
-                post.save()
+            )
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
 
-                messages.success(
-                    request, "Post created", extra_tags="cobalt-message-success"
-                )
+            messages.success(
+                request, "Post created", extra_tags="cobalt-message-success"
+            )
 
-                link = reverse("forums:post_detail", args=[post.id])
-                host = request.get_host()
-                absolute_link = "http://%s%s" % (host, link)
+            link = reverse("forums:post_detail", args=[post.id])
+            host = request.get_host()
+            absolute_link = "http://%s%s" % (host, link)
 
-                email_body = "%s created a new post in %s called '%s.'" % (
-                    post.author,
-                    post.forum.title,
-                    post.title,
-                )
+            email_body = "%s created a new post in %s called '%s.'" % (
+                post.author,
+                post.forum.title,
+                post.title,
+            )
 
-                context = {
-                    "name": request.user.first_name,
-                    "title": "New Post: %s" % post.title,
-                    "email_body": email_body,
-                    "absolute_link": absolute_link,
-                    "host": host,
-                    "link_text": "See Post",
-                }
+            context = {
+                "name": request.user.first_name,
+                "title": "New Post: %s" % post.title,
+                "email_body": email_body,
+                "absolute_link": absolute_link,
+                "host": host,
+                "link_text": "See Post",
+            }
 
-                html_msg = render_to_string(
-                    "notifications/email-notification.html", context
-                )
+            html_msg = render_to_string(
+                "notifications/email-notification.html", context
+            )
 
-                msg = "New Post %s by %s" % (post.title, post.author)
+            msg = "New Post %s by %s" % (post.title, post.author)
 
-                email_subject = "New Post in Forum: %s" % post.forum.title
+            email_subject = "New Post in Forum: %s" % post.forum.title
 
-                # Tell people
-                notify_happening(
-                    application_name="Forums",
-                    event_type="forums.post.create",
-                    msg=msg,
-                    html_msg=html_msg,
-                    topic=post.forum.id,
-                    link=link,
-                    email_subject=email_subject,
-                    user=request.user,
-                )
+            # Tell people
+            notify_happening(
+                application_name="Forums",
+                event_type="forums.post.create",
+                msg=msg,
+                html_msg=html_msg,
+                topic=post.forum.id,
+                link=link,
+                email_subject=email_subject,
+                user=request.user,
+            )
 
-                return redirect("forums:post_detail", pk=post.pk)
-            else:
-                return rbac_forbidden(
-                    request, "forums.forum.%s.create" % form.cleaned_data["forum"].id
-                )
+            return redirect("forums:post_detail", pk=post.pk)
 
     # If we got here then either it is not a post, or it is with an invalid form
 
@@ -306,22 +293,6 @@ def post_new(request, forum_id=None):
         forum = None
 
     return render(request, "forums/post_edit.html", {"form": form, "forum": forum})
-
-
-#
-# def user_is_moderator_for_forum(user, forum_id):
-#     """ check if user is a moderator for a forum.
-#
-#         For forums and moderate we can't call rbac_user_has_role as the default
-#         for forums is Allow, so everyone gets in by default.
-#     """
-#
-#     if rbac_user_has_role_exact(user, "forums.forum.%s.moderate" % forum_id):
-#         return True
-#     elif rbac_user_has_role_exact(user, "forums.forum.moderate"):
-#         return True
-#     else:
-#         return False
 
 
 @login_required()
@@ -639,8 +610,7 @@ def forum_create(request):
         HttpResponse
     """
 
-    if not rbac_user_has_role(request.user, "forums.admin.edit"):
-        return rbac_forbidden(request, "forums.admin.edit")
+    rbac_user_role_or_error(request.user, "forums.admin.edit")
 
     if request.method == "POST":
         form = ForumForm(request.POST)
@@ -675,8 +645,8 @@ def forum_delete_ajax(request, forum_id):
         HttpResponse
     """
 
-    if not rbac_user_has_role(request.user, "forums.admin.edit"):
-        rbac_forbidden(request.user, "forums.admin.edit")
+    # check access
+    rbac_user_role_or_error(request.user, "forums.admin.edit")
 
     forum = get_object_or_404(Forum, pk=forum_id)
     forum.delete()

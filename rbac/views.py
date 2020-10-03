@@ -670,3 +670,11 @@ def rbac_tests(request):
             "last_query": last_query,
         },
     )
+
+
+@login_required
+def rbac_user_role_or_error(request, role):
+    """ Check if a user has a role and if not show them the rbac error screen """
+
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)

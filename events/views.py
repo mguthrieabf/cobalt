@@ -1,5 +1,6 @@
 import csv
 from django.shortcuts import render, get_object_or_404, redirect
+from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -26,14 +27,14 @@ from .forms import (
     EventForm,
     SessionForm,
     EventEntryPlayerForm,
+    RefundForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
-    rbac_user_has_role,
     rbac_get_users_with_role,
 )
-from rbac.views import rbac_forbidden
-from payments.core import payment_api
+from rbac.views import rbac_user_role_or_error
+from payments.core import payment_api, org_balance
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
@@ -225,9 +226,9 @@ def delete_congress(request, congress_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
+    # check access
     role = "events.org.%s.edit" % congress.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     congress.delete()
     messages.success(request, "Congress deleted", extra_tags="cobalt-message-success")
@@ -259,8 +260,7 @@ def create_congress_wizard(request, step=1, congress_id=None):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     if step == 2:
         return create_congress_wizard_2(request, step_list, congress)
@@ -292,8 +292,7 @@ def create_congress_wizard_1(request, step_list):
 
                 # check access
                 role = "events.org.%s.edit" % congress_master.org.id
-                if not rbac_user_has_role(request.user, role):
-                    return rbac_forbidden(request, role)
+                rbac_user_role_or_error(request, role)
 
                 congress = Congress()
                 congress.congress_master = congress_master
@@ -670,8 +669,7 @@ def create_event(request, congress_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     if request.method == "POST":
 
@@ -704,8 +702,7 @@ def edit_event(request, congress_id, event_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     event = get_object_or_404(Event, pk=event_id)
     sessions = Session.objects.filter(event=event).order_by(
@@ -754,8 +751,7 @@ def create_session(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     if request.method == "POST":
         form = SessionForm(request.POST)
@@ -793,8 +789,7 @@ def edit_session(request, event_id, session_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
@@ -1376,8 +1371,7 @@ def admin_evententry(request, evententry_id):
     congress = event.congress
 
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     return render(
         request,
@@ -1396,8 +1390,7 @@ def admin_evententryplayer(request, evententryplayer_id):
         "events.org.%s.edit"
         % event_entry_player.event_entry.event.congress.congress_master.org.id
     )
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     if request.method == "POST":
         form = EventEntryPlayerForm(request.POST, instance=event_entry_player)
@@ -1516,8 +1509,7 @@ def admin_event_csv(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
 
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     # get details
     entries = event.evententry_set.all()
@@ -1620,8 +1612,7 @@ def admin_event_offsystem(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     players = EventEntryPlayer.objects.filter(event_entry__event=event).exclude(
         payment_status="Paid"
@@ -1642,8 +1633,7 @@ def admin_event_log(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if not rbac_user_has_role(request.user, role):
-        return rbac_forbidden(request, role)
+    rbac_user_role_or_error(request, role)
 
     logs = EventLog.objects.filter(event=event).order_by("-action_date")
 
@@ -1651,4 +1641,62 @@ def admin_event_log(request, event_id):
 
     return render(
         request, "events/admin_event_log.html", {"event": event, "things": things}
+    )
+
+
+@login_required()
+def admin_evententry_delete(request, evententry_id):
+    """ Delete an event entry """
+
+    event_entry = get_object_or_404(EventEntry, pk=evententry_id)
+
+    # check access
+    role = "events.org.%s.edit" % event_entry.event.congress.congress_master.org.id
+    rbac_user_role_or_error(request, role)
+
+    event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
+
+    # We use a formset factory to have multiple players on the same form
+    RefundFormSet = formset_factory(RefundForm, extra=0)
+
+    if request.method == "POST":
+        refund_form_set = RefundFormSet(data=request.POST)
+        if refund_form_set.is_valid():
+            for form in refund_form_set:
+                print(form)
+        else:
+            print(refund_form_set.errors)
+            for form in refund_form_set:
+                print(form)
+            print(request.POST)
+
+    # build summary
+    event_entry.received = Decimal(0)
+    initial = []
+
+    for event_entry_player in event_entry_players:
+        event_entry.received += event_entry_player.payment_received
+        initial.append(
+            {
+                "player_id": event_entry_player.player.id,
+                "player": f"{event_entry_player.player}",
+                "refund": event_entry_player.payment_received,
+            }
+        )
+
+    refund_form_set = RefundFormSet(initial=initial)
+
+    club = event_entry.event.congress.congress_master.org
+    club_balance = org_balance(club)
+
+    return render(
+        request,
+        "events/admin_event_entry_delete.html",
+        {
+            "event_entry": event_entry,
+            "event_entry_players": event_entry_players,
+            "refund_form_set": refund_form_set,
+            "club": club,
+            "club_balance": club_balance,
+        },
     )

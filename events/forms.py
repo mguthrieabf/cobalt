@@ -269,8 +269,8 @@ class SessionForm(forms.ModelForm):
 
 
 class EventEntryPlayerForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
     class Meta:
         model = EventEntryPlayer
@@ -282,3 +282,10 @@ class EventEntryPlayerForm(forms.ModelForm):
             "payment_received",
             "reason",
         )
+
+
+class RefundForm(forms.Form):
+
+    player_id = forms.IntegerField()
+    player = forms.CharField(max_length=100)
+    refund = forms.DecimalField()

@@ -92,6 +92,11 @@ urlpatterns = [
         name="admin_evententry",
     ),
     path(
+        "congress/admin/detail/event-entry-delete/<int:evententry_id>",
+        views.admin_evententry_delete,
+        name="admin_evententry_delete",
+    ),
+    path(
         "congress/admin/detail/event-entry-player/<int:evententryplayer_id>",
         views.admin_evententryplayer,
         name="admin_evententryplayer",

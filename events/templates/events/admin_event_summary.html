@@ -30,7 +30,7 @@
               <a href="{% url 'events:admin_event_offsystem' event_id=event.id %}" class="text-center btn btn-primary btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">attach_money</i>&nbsp;Off-system payments
               </a>
-              <a href="{% url 'events:admin_event_log' event_id=event.id %}" class="text-center btn btn-danger btn-sm btn-round" style="width: 170px">
+              <a href="{% url 'events:admin_event_log' event_id=event.id %}" class="text-center btn btn-success btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">text_snippet</i>&nbsp;Logs
               </a>
             </div>
@@ -62,7 +62,8 @@
                     <td class="text-right">{{ event_entry.received }}</td>
                     <td class="text-right">{{ event_entry.outstanding }}</td>
                     <td class="text-right">{{ event_entry.payment_status }}</td>
-                    <td class="text-right"><a href="{% url "events:admin_evententry" evententry_id=event_entry.id %}" class="btn btn-sm btn-info">Details</a></td>
+                    <td class="text-right"><a href="{% url "events:admin_evententry" evententry_id=event_entry.id %}" class="btn btn-sm btn-info">Details</a>
+                    <a href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}" class="btn btn-sm btn-danger">Delete</a></td>
                   </tr>
                 {% endfor %}
 

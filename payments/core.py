@@ -1323,3 +1323,26 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
         member.stripe_auto_confirmed = "No"
         member.save()
         return (False, "%s Auto Top has been disabled." % err.message)
+
+
+###################################
+# org_balance                     #
+###################################
+def org_balance(organisation):
+    """ Returns org balance
+
+    Args:
+        organisation (Organisation): Organisation object
+
+    Returns:
+        float: balance
+    """
+
+    # get balance
+    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        balance = 0.0
+
+    return float(balance)

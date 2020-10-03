@@ -70,27 +70,10 @@ from accounts.models import User
 from utils.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
-from rbac.views import rbac_forbidden
+from rbac.views import rbac_user_role_or_error, rbac_forbidden
 from django.utils.timezone import make_aware
 
 TZ = pytz.timezone(TIME_ZONE)
-
-####################
-# Home             #
-####################
-# @login_required()
-# def home(request):
-#     """ Default page.
-#
-#         Args:
-#             request (HTTPRequest): Standard request object
-#
-#         Returns:
-#             httpResponse: webpage
-#
-#     """
-#
-#     return render(request, "payments/home.html")
 
 
 @login_required()
@@ -262,8 +245,9 @@ def statement_admin_view(request, member_id):
         HTTPResponse
 
     """
-    if not rbac_user_has_role(request.user, "payments.global.view"):
-        return rbac_forbidden(request, "payments.global.view")
+
+    # check access
+    rbac_user_role_or_error(request.user, "payments.global.view")
 
     user = get_object_or_404(User, pk=member_id)
     (summary, club, balance, auto_button, events_list) = statement_common(user)
