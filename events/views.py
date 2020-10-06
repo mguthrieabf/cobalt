@@ -1792,3 +1792,8 @@ def enter_event_success(request):
         extra_tags="cobalt-message-success",
     )
     return view_events(request)
+
+
+@login_required()
+def test(request):
+    return render(request, "events/test.html")

@@ -4,6 +4,7 @@ from . import views, ajax
 app_name = "events"  # pylint: disable=invalid-name
 
 urlpatterns = [
+    path("test", views.test, name="test"),
     path("", views.home, name="events"),
     path("congress/view/<int:congress_id>", views.view_congress, name="view_congress"),
     path(
