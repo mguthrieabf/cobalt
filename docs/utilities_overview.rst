@@ -40,6 +40,12 @@ Change 1 to whatever search_id was set to.
     </script>
     {% endblock %}
 
+5. There is also a callback for cancelling the search::
+
+    function cobaltMemberSearchCancel(search_id) {
+    // do something
+    }
+
 Pagination Footer
 -----------------
 

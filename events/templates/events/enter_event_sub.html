@@ -3,6 +3,8 @@
 This generates the rows (apart from the entering player) for the enter event
 screen. Players are numbered from 1 up to 6. Players 5 and 6 are initially hidden.
 
+Player0 is the logged in player - not handled here
+
  -->
 
 
@@ -18,18 +20,16 @@ screen. Players are numbered from 1 up to 6. Players 5 and 6 are initially hidde
       </a>
     </div>
     {% endif %}
-    <div class="bs-example">
-      <div class="dropdown">
+
     <div id="div_id_player{{ our_form_row.player_no }}" class="form-group" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
       <select class="selectpicker cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
         {% for val,item in our_form_row.name_choices %}
 
         <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
+
         {% endfor %}
       </select>
     </div>
-  </div>
-</div>
 
 <!-- Payment choices  -->
 
@@ -44,9 +44,11 @@ screen. Players are numbered from 1 up to 6. Players 5 and 6 are initially hidde
 
     >
       {% for val,item in our_form_row.payment_choices %}
+
       <option value="{{ val }}" {% if our_form_row.payment_selected == val %} selected {% endif %}>
 
       {{ item }}</option>
+
       {% endfor %}
     </select>
     </div>

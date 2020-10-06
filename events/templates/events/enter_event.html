@@ -125,10 +125,12 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
 <script>
-  {% for our_form_row in our_form %}
-  {% include 'utils/generic_user_search_footer.html' with search_id=our_form_row.player_no %}
-  {% endfor %}
 
+// include all of the generic searches for each player entry
+
+  {% for our_form_row in our_form %}
+    {% include 'utils/generic_user_search_footer.html' with search_id=our_form_row.player_no %}
+  {% endfor %}
 
 // callback from generic search if user is chosen
 function cobaltMemberSearchOk(search_id) {
@@ -145,7 +147,7 @@ function cobaltMemberSearchOk(search_id) {
   if (already == true) {
     swal.fire({
         title: "Already Added",
-        html: member_name[search_id] + " is already present.",
+        html: member_name[search_id] + " is already in your team.",
         icon: "error",
         buttonsStyling: false
       })
@@ -160,8 +162,10 @@ function cobaltMemberSearchOk(search_id) {
       $("#id_player" + search_id).val(member_id[search_id]).selectpicker('refresh');
     }
 
+// check on fees and payment methods
     user_entry_fee(member_id[search_id], search_id);
     user_payment_method(member_id[search_id], search_id);
+
   }
 }
 
@@ -242,17 +246,25 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
       $("#id_player" + search_id + "_payment").val('their-system-dollars');
       later_payment.val(pay_amt);
       now_payment.val("");
+
     } else {
+
       $("#id_player" + search_id + "_payment option[value='their-system-dollars']").remove();
       $("#id_player" + search_id + "_payment").val('my-system-dollars');
       later_payment.val("");
       now_payment.val(pay_amt);
+
     }
+
+    // refresh the fussy selectpickers
     $('.selectpicker').selectpicker('refresh');
+
+    // update totals
     totals();
   });
 }
 
+// lets get ready to rumble!!!
 $(document).ready(function(){
 
 // calculate totals
@@ -271,7 +283,6 @@ $(document).ready(function(){
       path: ''
     });
 
-
     swal.fire({
         title: "{{ alert_msg.0 }}",
         html: "{{ alert_msg.1 }}",
@@ -286,12 +297,10 @@ $(document).ready(function(){
   $(".myHover").tooltip();
 
 // Handle member select
-
   previous={};
   previous_name={};
 
   // when player N identity changes get their entry fee and update table
-
   $('.cobalt-playerN').change(function(event) {
 
       var user_id = this.value;
