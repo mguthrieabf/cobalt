@@ -5,7 +5,6 @@
 {% load cobalt_tags %}
 
 {% block header %}
-<link href="{% static "assets/css/font-awesome.5.14/css/all.css" %}" rel="stylesheet">
 <style>
   select{
       width: 100px;
@@ -69,7 +68,7 @@
                         </div>
                       </td>
                       <td class="col">
-                        <select id="id_player0_payment" name="player0_payment" class="selectpicker payment-method" data-style="btn btn-danger">
+                        <select id="id_player0_payment" name="player0_payment" data-container="body" class="selectpicker payment-method" data-style="btn btn-danger">
                           {% for val,item in player0.payment_choices %}
                           <option value="{{ val }}">{{ item }}</option>
                           {% endfor %}
@@ -77,7 +76,7 @@
                       <td class="col">
                         <nobr>
                           {% if discount %}
-                          <span class="myHover" data-toggle="tooltip" title="{{ reason }} ${{ discount }}" data-delay="100" data-placement="bottom">
+                          <span class="myHover" data-toggle="tooltip" title="{{ description }}" data-delay="100" data-placement="bottom">
                             <i class="fas fa-tag"></i>
                           </span>
                           {% else %}
@@ -211,9 +210,7 @@ $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + 
     if (msg == 'Success') {
       if (response['data']['discount']>0) {
         $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
-             + response['data']['reason']
-             + ' $'
-             + response['data']['discount']
+             + response['data']['description']
              + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
         $(".myHover").tooltip();
@@ -288,31 +285,62 @@ $(document).ready(function(){
 // init tooltips
   $(".myHover").tooltip();
 
-// trigger member search
+// Handle member select
 
+  previous={};
+  previous_name={};
 
-// when player N identity changes get their entry fee and update table
-  $('.cobalt-playerN').on('change', function(event){
-    var user_id = this.value;
-    var search_id = event.target.id.slice(-1);
-    var this_id = event.target.id;
+  // when player N identity changes get their entry fee and update table
 
-// check for search id=0
-    if (user_id == 0){
-      $('#cobalt_general_member_search' + search_id).modal('show');
-    } else {
-      user_entry_fee(user_id, search_id);
-      user_payment_method(user_id, search_id);
-      // remove from other lists
+  $('.cobalt-playerN').change(function(event) {
 
-// TODO: if a user changes multiple times they don't go back on the other lists
+      var user_id = this.value;
+      var search_id = event.target.id.slice(-1);
+      var this_id = event.target.id;
 
-      $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
-        if ($(this).parent().attr('id') != this_id) {
-          $(this).remove();
-        }
-      });
-    }
+  // check for search id=0
+      if (user_id == 0){
+        $('#cobalt_general_member_search' + search_id).modal('show');
+
+      } else {
+
+  // get
+        user_entry_fee(user_id, search_id);
+        user_payment_method(user_id, search_id);
+
+// remove from other lists
+        $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
+          if ($(this).parent().attr('id') != this_id) {
+            $(this).remove();
+          }
+        });
+
+      }
+      console.log(previous[this_id]);
+      console.log(previous_name[this_id]);
+
+// if we had a previous value then add that back in to the other lists
+      if (previous[this_id]) {
+        console.log("previous value found")
+        $(".cobalt-playerN").each(function(i, obj){
+          console.log($(this));
+          console.log(previous_name[this_id]);
+          if ($(this).id != this_id){
+            $(this).append('<option value=' + previous[this_id] + '>' + previous_name[this_id] + '</option>');
+          }
+          // var opt = document.createElement('option');
+          // opt.value = previous[this_id];
+          // opt.innerHTML = previous_name[this_id];
+          // dom_object = $(this)[0];
+          // dom_object.appendChild(opt);
+
+        });
+      };
+      $('.selectpicker').selectpicker('refresh');
+      $('#id_player1').selectpicker('refresh');
+      previous[this_id] = this.value;
+      previous_name[this_id] = $('#' + this_id).find('option:selected').text();
+
 
 // see if form is now complete
     var complete = 1;
@@ -375,16 +403,6 @@ $(document).ready(function(){
     $('#plus_5').hide();
     return false;
   });
-
-// fix dropdown being stuck in box
-  // $('.dropdown').on('show.bs.dropdown', function() {
-  //   $('body').append($('.dropdown').css({
-  //     position: 'absolute',
-  //     left: $('.dropdown').offset().left,
-  //     top: $('.dropdown').offset().top
-  //   }).detach());
-  // });
-
 
 });
 </script>

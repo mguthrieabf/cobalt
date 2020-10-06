@@ -131,7 +131,7 @@
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Entry Fee ({{ GLOBAL_CURRENCY_SYMBOL }})
+                    Entry Fee per entry({{ GLOBAL_CURRENCY_SYMBOL }})
                   </div>
                   <div class="col-7">
                     <div id="div_id_entry_fee" class="form-group">
@@ -140,7 +140,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="javascript:void(0)" onclick='help("Entry Fee", "The standard entry fee without discounts.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Entry Fee", "The standard entry fee without discounts. This is the fee per pair or team, not per player.");'>help</a>
                   </div>
                 </div>
 
@@ -164,7 +164,7 @@
                 {% if congress.allow_youth_payment_discount %}
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Youth Discount ({{ GLOBAL_CURRENCY_SYMBOL }})
+                    Youth Discount (%)
                   </div>
                   <div class="col-7">
                     <div id="div_id_entry_early_payment_discount" class="form-group">
@@ -173,7 +173,7 @@
                     </div>
                   </div>
                   <div class="col-2 justify-content-center align-self-center">
-                    <a href="javascript:void(0)" onclick='help("Youth Discount", "Discount applied for youth players.");'>help</a>
+                    <a href="javascript:void(0)" onclick='help("Youth Discount", "Discount applied for youth players as a percentage. Only one discount will be applied (whichever is largest).");'>help</a>
                   </div>
                 </div>
                 {% endif %}

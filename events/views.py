@@ -859,11 +859,11 @@ def enter_event_form(event, congress, request, existing_choices=None):
 
     name_list = [(0, "Search..."), (2, "TBA")]
     for team_mate in team_mates:
-        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate)
+        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate.full_name)
         name_list.append(item)
 
     # set values for player0 (the user)
-    entry_fee, discount, reason = event.entry_fee_for(request.user)
+    entry_fee, discount, reason, description = event.entry_fee_for(request.user)
 
     if existing_choices:
         payment_selected = existing_choices["player0"]["payment"]
@@ -882,9 +882,9 @@ def enter_event_form(event, congress, request, existing_choices=None):
 
     player0 = {
         "id": request.user.id,
-        "payment_choices": pay_types,
+        "payment_choices": pay_types.copy(),
         "payment_selected": payment_selected,
-        "name": request.user,
+        "name": request.user.full_name,
         "entry_fee_you": "%s" % entry_fee_you,
         "entry_fee_pending": "%s" % entry_fee_pending,
     }
@@ -986,7 +986,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
             "event_start": event_start,
             "alert_msg": alert_msg,
             "discount": discount,
-            "reason": reason,
+            "description": description,
             "min_entries": min_entries,
         },
     )
@@ -1070,7 +1070,9 @@ def enter_event(request, congress_id, event_id):
             event_entry_player.event_entry = event_entry
             event_entry_player.player = players[p_id]
             event_entry_player.payment_type = player_payments[p_id]
-            entry_fee, discount, reason = event.entry_fee_for(event_entry_player.player)
+            entry_fee, discount, reason, description = event.entry_fee_for(
+                event_entry_player.player
+            )
             event_entry_player.entry_fee = entry_fee
             event_entry_player.reason = reason
             event_entry_player.save()
@@ -1168,7 +1170,7 @@ def edit_event_entry(request, congress_id, event_id):
             ).first()
             if event_entry_player:  # found a match
                 event_entry_player.payment_type = player_payments[p_id]
-                entry_fee, discount, reason = event.entry_fee_for(
+                entry_fee, discount, reason, description = event.entry_fee_for(
                     event_entry_player.player
                 )
                 event_entry_player.entry_fee = entry_fee
@@ -1256,7 +1258,7 @@ def checkout(request):
             amount=amount["entry_fee__sum"],
             route_code="EVT",
             route_payload=unique_id,
-            url="/events",
+            url=reverse("events:enter_event_success"),
             payment_type="Entry to a congress",
             book_internals=False,
         )
@@ -1487,7 +1489,7 @@ def pay_outstanding(request):
         amount=amount["entry_fee__sum"],
         route_code="EV2",
         route_payload=unique_id,
-        url="/events",
+        url=reverse("events:enter_event_success"),
         payment_type="Entry to a congress",
     )
 
@@ -1778,3 +1780,15 @@ def admin_evententry_delete(request, evententry_id):
             "club_balance": club_balance,
         },
     )
+
+
+@login_required()
+def enter_event_success(request):
+    """ url for payments to go to after successful entry """
+    print("in here")
+    messages.success(
+        request,
+        "Payment complete. You will receive a confirmation email.",
+        extra_tags="cobalt-message-success",
+    )
+    return view_events(request)

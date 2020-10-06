@@ -178,8 +178,8 @@ class Event(models.Model):
     entry_early_payment_discount = models.DecimalField(
         "Early Payment Discount", max_digits=12, decimal_places=2, null=True, blank=True
     )
-    entry_youth_payment_discount = models.DecimalField(
-        "Youth Discount", max_digits=12, decimal_places=2, null=True, blank=True
+    entry_youth_payment_discount = models.IntegerField(
+        "Youth Discount Percentage", null=True, blank=True
     )
 
     player_format = models.CharField(
@@ -211,19 +211,24 @@ class Event(models.Model):
         """ return entry fee for user based on age and date """
 
         # default
-        entry_fee = self.entry_fee
         discount = 0.0
         reason = "Full fee"
+        description = reason
+        players_per_entry = EVENT_PLAYER_FORMAT_SIZE[self.player_format]
+        entry_fee = self.entry_fee / players_per_entry
 
         # date
         if self.congress.allow_early_payment_discount:
             today = timezone.now()
             if self.congress.early_payment_discount_date >= today:
-                entry_fee = self.entry_fee - self.entry_early_payment_discount
-                reason = "Early discount"
+                entry_fee = (
+                    self.entry_fee - self.entry_early_payment_discount
+                ) / players_per_entry
                 discount = self.entry_early_payment_discount
+                reason = "Early discount"
+                description = f"Early discount {GLOBAL_CURRENCY_SYMBOL}{discount}"
 
-        # youth
+        # youth - you get only one discount, whichever is bigger
         if self.congress.allow_youth_payment_discount:
             if user.dob:  # skip if no date of birth set
                 dob = datetime.datetime.combine(user.dob, datetime.time(0, 0))
@@ -232,13 +237,20 @@ class Event(models.Model):
                     year=dob.year + self.congress.youth_payment_discount_age
                 )
                 if self.congress.youth_payment_discount_date <= ref_date:
-                    youth_fee = self.entry_fee - self.entry_youth_payment_discount
+                    youth_fee = (
+                        float(self.entry_fee / players_per_entry)
+                        * self.entry_youth_payment_discount
+                        / 100.0
+                    )
                     if youth_fee < entry_fee:
-                        entry_fee = youth_fee
+                        entry_fee = "%.2f" % youth_fee
                         reason = "Youth discount"
-                        discount = self.entry_youth_payment_discount
+                        description = (
+                            "Youth discount %s%%" % self.entry_youth_payment_discount
+                        )
+                        discount = float(self.entry_fee) - float(entry_fee)
 
-        return entry_fee, discount, reason
+        return entry_fee, discount, reason, description
 
     def already_entered(self, user):
         """ check if a user has already entered """

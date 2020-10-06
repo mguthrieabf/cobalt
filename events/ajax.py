@@ -152,9 +152,15 @@ def fee_for_user_ajax(request):
     event = get_object_or_404(Event, pk=event_id)
     user = get_object_or_404(User, pk=user_id)
 
-    entry_fee, discount, reason = event.entry_fee_for(user)
+    entry_fee, discount, reason, description = event.entry_fee_for(user)
 
-    response_data = {"entry_fee": entry_fee, "reason": reason, "discount": discount}
+    print(description)
+
+    response_data = {
+        "entry_fee": entry_fee,
+        "description": description,
+        "discount": discount,
+    }
     response_data["message"] = "Success"
     return JsonResponse({"data": response_data})
 
@@ -205,7 +211,7 @@ def payment_options_for_user_ajax(request):
             user_balance = get_balance(user)
             user_committed = 0.0
             event = get_object_or_404(Event, pk=event_id)
-            entry_fee, discount, reason = event.entry_fee_for(user)
+            entry_fee, discount, reason, description = event.entry_fee_for(user)
 
             # get all events with user committed
             basket_items = BasketItem.objects.all()
@@ -215,20 +221,20 @@ def payment_options_for_user_ajax(request):
                 ).aggregate(Sum("entry_fee"))
                 if already["entry_fee__sum"]:  # ignore None response
                     user_committed += float(already["entry_fee__sum"])
-            print(
-                f"balance: {user_balance} user_committed: {user_committed} entry_fee: {entry_fee}"
-            )
+            # print(
+            #     f"balance: {user_balance} user_committed: {user_committed} entry_fee: {entry_fee}"
+            # )
 
             if user_balance - user_committed - float(entry_fee) >= 0.0:
                 reply = True
             else:
                 if user_committed > 0.0:
                     response_data[
-                        "reason"
+                        "description"
                     ] = f"{user.first_name} has insufficient funds taking into account other pending event entries."
                 else:
                     response_data[
-                        "reason"
+                        "description"
                     ] = f"{user.first_name} has insufficient funds."
 
     if reply:

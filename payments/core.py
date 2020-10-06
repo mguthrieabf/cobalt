@@ -473,6 +473,7 @@ def payment_api(
                         return_msg = msg
                         messages.error(request, msg, extra_tags="cobalt-message-error")
 
+        print(url)
         return redirect(url)
 
     else:  # insufficient funds
@@ -1001,8 +1002,6 @@ def callback_router(route_code=None, route_payload=None, tran=None, status="Succ
     Returns:
         Nothing
     """
-    print("callback_router")
-    print(route_code)
 
     if route_code:  # do nothing in no route_code passed
 

@@ -36,7 +36,7 @@ screen. Players are numbered from 1 up to 6. Players 5 and 6 are initially hidde
   </td>
   <td class="col">
     <div id="id_player{{ our_form_row.player_no }}_paydiv" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
-    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="selectpicker payment-method" data-style="btn btn-danger"
+    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="selectpicker payment-method" data-container="body" data-style="btn btn-danger"
 
     {% if our_form_row.entry_status == "new" %}
       disabled
