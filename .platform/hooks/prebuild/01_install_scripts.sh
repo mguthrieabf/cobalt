@@ -91,6 +91,7 @@ do
         *) echo "invalid option ";;
     esac
 done
+EOF
 chmod 755 /usr/local/bin/tlog
 
 # help file
