@@ -441,7 +441,7 @@
       $('#id_entry_open_date').data("DateTimePicker").maxDate(e.date);
     });
 
-  {% if form.entry_open_date or form.entry_close_date %}
+  {% if form.entry_open_date.value or form.entry_close_date.value %}
     $("#override_dates").show();
     $("#override_dates_toggle").hide();
   {% endif %}
