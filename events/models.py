@@ -152,7 +152,7 @@ class Congress(models.Model):
     )
 
     def __str__(self):
-        return "%s - %s" % (self.congress_master, self.year)
+        return self.name
 
     def user_is_convener(self, user):
         """ check if a user has convener rights to this congress """

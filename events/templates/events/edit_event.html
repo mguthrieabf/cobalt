@@ -210,9 +210,12 @@
       otherwise show a link  -->
 
       {% if not categories %}
-        <div id="category_show">
-          <a href="javascript:void(0)" id="show_category">Add Categories (optional)</a><br><br>
-        </div>
+
+        {% if page_type == "Edit "%}
+          <div id="category_show">
+            <a href="javascript:void(0)" id="show_category">Add Categories (optional)</a><br><br>
+          </div>
+        {% endif %}
       {% endif %}
 
         <div class="row justify-content-center" id="categories_div"
@@ -318,6 +321,7 @@
   }
 
 // Add a new category
+  {% if event %}
   function addCategory() {
     Swal.fire({
         title: "Add Category",
@@ -344,7 +348,7 @@
           }
         });
   }
-
+  {% endif %}
 
 
   function deleteSession() {
