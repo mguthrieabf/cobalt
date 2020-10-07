@@ -329,11 +329,21 @@ $(document).ready(function(){
       console.log(previous_name[this_id]);
 
 // if we had a previous value then add that back in to the other lists
+// Doing this by simply updating the selectpicker and refreshing it
+// doesn't work on Chrome so we need to replace the whole div 
       if (previous[this_id]) {
         console.log("previous value found")
-        $(".cobalt-playerN").each(function(i, obj){
+        $(".player-selectpicker").each(function(i, obj){
           console.log($(this));
           console.log(previous_name[this_id]);
+
+
+          var options='<select class="selectpicker cobalt-playerN" data-style="btn btn-info" title="Select" id="id_player0" name="player0"><option value="4" selected>Fruitloop</option><option value="6" selected>Toblerone</option><option value="65" selected>Fishes</option></select>'
+
+                //  $(this).append(options);
+                //  $(this).append(options);
+                  list.html(options);
+
           if ($(this).id != this_id){
             $(this).append('<option value=' + previous[this_id] + '>' + previous_name[this_id] + '</option>');
           }

@@ -22,13 +22,15 @@ Player0 is the logged in player - not handled here
     {% endif %}
 
     <div id="div_id_player{{ our_form_row.player_no }}" class="form-group" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
-      <select class="selectpicker cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
-        {% for val,item in our_form_row.name_choices %}
+      <div class="player-selectpicker" id="div_id_player_sub_{{ our_form_row.player_no }}">
+        <select class="selectpicker cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
+          {% for val,item in our_form_row.name_choices %}
 
-        <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
+          <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
 
-        {% endfor %}
-      </select>
+          {% endfor %}
+        </select>
+      </div>
     </div>
 
 <!-- Payment choices  -->
