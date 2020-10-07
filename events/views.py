@@ -362,7 +362,6 @@ def create_congress_wizard_2(request, step_list, congress):
     if request.method == "POST":
         form = CongressForm(request.POST)
         if form.is_valid():
-            congress.default_email = form.cleaned_data["default_email"]
             congress.year = form.cleaned_data["year"]
             congress.name = form.cleaned_data["name"]
             congress.date_string = form.cleaned_data["date_string"]
@@ -387,7 +386,6 @@ def create_congress_wizard_2(request, step_list, congress):
             initial["end_date"] = congress.end_date.strftime("%d/%m/%Y")
         form = CongressForm(instance=congress, initial=initial)
 
-    form.fields["default_email"].required = True
     form.fields["year"].required = True
     form.fields["name"].required = True
     form.fields["start_date"].required = True
@@ -577,8 +575,6 @@ def create_congress_wizard_7(request, step_list, congress):
 
     if not congress.name:
         errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Congress name is missing"))
-    if not congress.default_email:
-        errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Default email is missing"))
     if not congress.additional_info:
         warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Additional is missing"))
     if not congress.start_date:
@@ -1079,6 +1075,7 @@ def enter_event(request, congress_id, event_id):
             else:
                 event_entry_player.entry_fee = 0
                 event_entry_player.reason = "Team > 4"
+                event_entry_player.payment_status = "Paid"
             event_entry_player.save()
 
             # Log it
@@ -1360,10 +1357,11 @@ def admin_event_summary(request, event_id):
         event_entry.players = []
 
         for event_entry_player in event_entry_players:
-            event_entry.received += event_entry_player.payment_received
-            event_entry.outstanding += (
-                event_entry_player.entry_fee - event_entry_player.payment_received
-            )
+            if event_entry_player.payment_received:
+                event_entry.received += event_entry_player.payment_received
+                event_entry.outstanding += (
+                    event_entry_player.entry_fee - event_entry_player.payment_received
+                )
             event_entry.players.append(event_entry_player)
 
     return render(

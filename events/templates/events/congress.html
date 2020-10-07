@@ -185,11 +185,10 @@
     {% if msg %}
     $('html,body').animate({scrollTop: $("#program").offset().top},'slow');
     swal.fire({
-      title: "You're In!",
-      html: "Event entry complete",
+      title: "Entry Added",
+      html: "Remember to checkout to complete entry. You can click on the cart at the top left whenever you are ready.",
       icon: "success",
       buttonsStyling: false,
-      confirmButtonClass: "btn"
     });
     {% endif %}
 

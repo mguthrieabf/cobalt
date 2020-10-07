@@ -81,9 +81,6 @@ class Congress(models.Model):
     lies in the view. """
 
     name = models.CharField("Name", max_length=100, null=True, blank=True)
-    default_email = models.CharField(
-        "Default Email Address", max_length=100, null=True, blank=True
-    )
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     date_string = models.CharField("Dates", max_length=100, null=True, blank=True)

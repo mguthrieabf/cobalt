@@ -33,7 +33,6 @@ class CongressForm(forms.ModelForm):
         self.fields["venue_catering"].label = False
         self.fields["venue_additional_info"].label = False
         self.fields["additional_info"].label = False
-        self.fields["default_email"].label = False
         self.fields["sponsors"].label = False
         self.fields["payment_method_system_dollars"].label = False
         self.fields["payment_method_bank_transfer"].label = False
@@ -68,7 +67,6 @@ class CongressForm(forms.ModelForm):
         self.fields["venue_catering"].required = False
         self.fields["venue_additional_info"].required = False
         self.fields["additional_info"].required = False
-        self.fields["default_email"].required = False
         self.fields["payment_method_system_dollars"].required = False
         self.fields["payment_method_bank_transfer"].required = False
         self.fields["payment_method_cash"].required = False
@@ -217,7 +215,6 @@ class CongressForm(forms.ModelForm):
             "youth_payment_discount_age",
             "allow_youth_payment_discount",
             "early_payment_discount_date",
-            "default_email",
             "bank_transfer_details",
             "cheque_details",
         )
