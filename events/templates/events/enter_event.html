@@ -105,8 +105,8 @@
               <br>
               <div class="row">
                 <div class="col text-center">
-                  <button id="id_checkout" type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
-                  <button id="id_cart" type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px" disabled>Add to Cart</button>
+                  <button id="id_checkout" type="submit" name="now" onclick="this.disabled=true,this.form.submit();" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
+                  <button id="id_cart" type="submit" name="cart" onclick="this.disabled=true,this.form.submit();" class="btn btn-success cobalt-save" style="width:150px" disabled>Add to Cart</button>
                 </div>
               </div>
             </form>
@@ -163,9 +163,12 @@ function cobaltMemberSearchOk(search_id) {
     }
 
 // check on fees and payment methods
-    user_entry_fee(member_id[search_id], search_id);
-    user_payment_method(member_id[search_id], search_id);
 
+// for teams don't charge for players 5 and 6 (4 and 5 in computer counting)
+    if (search_id<4){
+      user_entry_fee(member_id[search_id], search_id);
+      user_payment_method(member_id[search_id], search_id);
+    }
   }
 }
 
@@ -208,28 +211,28 @@ function totals(){
 
 // get entry fee for user
 function user_entry_fee(user_id, search_id){
-$.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
-  .done(response => {
-    msg = response['data']['message'];
-    if (msg == 'Success') {
-      if (response['data']['discount']>0) {
-        $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
-             + response['data']['description']
-             + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
-        $(".myHover").tooltip();
-    }
-      $("#fee_" + search_id + "_now").val(response['data']['entry_fee']);
-      $("#fee_" + search_id + "_later").val("");
+  $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
+    .done(response => {
+      msg = response['data']['message'];
+      if (msg == 'Success') {
+        if (response['data']['discount']>0) {
+          $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
+               + response['data']['description']
+               + '" data-delay="100" data-placement="bottom"><i class="fas fa-tag"></i></span>');
 
-  // enable payment type - must refresh selectpickers
-      $("#id_player" + search_id + "_payment").prop("disabled", false);
-      $('.selectpicker').selectpicker('refresh');
-      totals();
-    }
+          $(".myHover").tooltip();
+      }
+        $("#fee_" + search_id + "_now").val(response['data']['entry_fee']);
+        $("#fee_" + search_id + "_later").val("");
+
+    // enable payment type - must refresh selectpickers
+        $("#id_player" + search_id + "_payment").prop("disabled", false);
+        $('.selectpicker').selectpicker('refresh');
+        totals();
+      }
   });
 }
-
 // update payment method if team mates
 function user_payment_method(user_id, search_id){
 $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&entering_user_id={{ request.user.id }}&other_user_id=" + user_id)
@@ -313,50 +316,34 @@ $(document).ready(function(){
 
       } else {
 
-  // get
-        user_entry_fee(user_id, search_id);
-        user_payment_method(user_id, search_id);
-
+  // get entry fee and payment methods 
+        if (search_id<4){
+          user_entry_fee(user_id, search_id);
+          user_payment_method(user_id, search_id);
+        }
 // remove from other lists
-        $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
-          if ($(this).parent().attr('id') != this_id) {
-            $(this).remove();
-          }
-        });
-
+        if (user_id != {{ TBA_PLAYER }}) {
+          $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
+            if ($(this).parent().attr('id') != this_id) {
+              $(this).remove();
+            }
+          });
+        }
       }
-      console.log(previous[this_id]);
-      console.log(previous_name[this_id]);
 
 // if we had a previous value then add that back in to the other lists
-// Doing this by simply updating the selectpicker and refreshing it
-// doesn't work on Chrome so we need to replace the whole div 
+// This took a while to work out - selectpicker creates a wrapper around
+// the select and you get two matches back. Need to look at the first
+// child and see if it is SELECT (real object).
       if (previous[this_id]) {
-        console.log("previous value found")
-        $(".player-selectpicker").each(function(i, obj){
-          console.log($(this));
-          console.log(previous_name[this_id]);
-
-
-          var options='<select class="selectpicker cobalt-playerN" data-style="btn btn-info" title="Select" id="id_player0" name="player0"><option value="4" selected>Fruitloop</option><option value="6" selected>Toblerone</option><option value="65" selected>Fishes</option></select>'
-
-                //  $(this).append(options);
-                //  $(this).append(options);
-                  list.html(options);
-
-          if ($(this).id != this_id){
-            $(this).append('<option value=' + previous[this_id] + '>' + previous_name[this_id] + '</option>');
-          }
-          // var opt = document.createElement('option');
-          // opt.value = previous[this_id];
-          // opt.innerHTML = previous_name[this_id];
-          // dom_object = $(this)[0];
-          // dom_object.appendChild(opt);
-
+        $(".cobalt-playerN").each(function(){
+            var realthis = $(this)[0];
+            if (realthis.tagName == "SELECT"){
+              $(this).append('<option value="' + previous[this_id] + '">' + previous_name[this_id] + '</option>');
+            }
         });
       };
       $('.selectpicker').selectpicker('refresh');
-      $('#id_player1').selectpicker('refresh');
       previous[this_id] = this.value;
       previous_name[this_id] = $('#' + this_id).find('option:selected').text();
 

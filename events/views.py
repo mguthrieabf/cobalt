@@ -1073,8 +1073,12 @@ def enter_event(request, congress_id, event_id):
             entry_fee, discount, reason, description = event.entry_fee_for(
                 event_entry_player.player
             )
-            event_entry_player.entry_fee = entry_fee
-            event_entry_player.reason = reason
+            if p_id < 4:
+                event_entry_player.entry_fee = entry_fee
+                event_entry_player.reason = reason
+            else:
+                event_entry_player.entry_fee = 0
+                event_entry_player.reason = "Team > 4"
             event_entry_player.save()
 
             # Log it
@@ -1785,7 +1789,6 @@ def admin_evententry_delete(request, evententry_id):
 @login_required()
 def enter_event_success(request):
     """ url for payments to go to after successful entry """
-    print("in here")
     messages.success(
         request,
         "Payment complete. You will receive a confirmation email.",

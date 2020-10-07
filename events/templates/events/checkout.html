@@ -50,7 +50,7 @@
                   {{ event_entry_player.entry_fee }}
                 {% endif %}
               </td>
-              <td>{{ event_entry_player.payment_type }}{{ event_entry_player.batch_id }}</td>
+              <td>{{ event_entry_player.get_payment_type_display }}</td>
             </tr>
           {% endfor %}
 
