@@ -96,4 +96,9 @@ urlpatterns = [
         views.statement_org_summary_ajax,
         name="statement_org_summary_ajax",
     ),
+    path(
+        "member-transfer-org/<int:org_id>",
+        views.member_transfer_org,
+        name="member_transfer_org",
+    ),
 ]

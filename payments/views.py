@@ -32,12 +32,12 @@ import stripe
 import pytz
 from django.utils import timezone, dateformat
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.db.models import Sum
 from django.contrib import messages
-
-# from easy_pdf.rendering import render_to_pdf_response
+from notifications.views import contact_member
 from logs.views import log_event
 from cobalt.settings import (
     STRIPE_SECRET_KEY,
@@ -47,11 +47,14 @@ from cobalt.settings import (
     GLOBAL_ORG,
     GLOBAL_ORG_ID,
     GLOBAL_CURRENCY_SYMBOL,
+    GLOBAL_CURRENCY_NAME,
     TIME_ZONE,
+    COBALT_HOSTNAME,
 )
 from .forms import (
     TestTransaction,
     MemberTransfer,
+    MemberTransferOrg,
     ManualTopup,
     SettlementForm,
     AdjustMemberForm,
@@ -321,7 +324,7 @@ def statement_org(request, org_id):
         organisation=organisation
     ).order_by("-created_date")
 
-    things = cobalt_paginator(request, events_list, 5)
+    things = cobalt_paginator(request, events_list)
 
     page_balance = {}
 
@@ -1683,4 +1686,98 @@ def admin_view_stripe_transactions(request):
 
     return render(
         request, "payments/admin_view_stripe_transactions.html", {"form": form}
+    )
+
+
+@login_required()
+def member_transfer_org(request, org_id):
+    """ Allows an organisation to transfer money to a member
+
+    Args:
+        request (HTTPRequest): standard request object
+        org_id (int): organisation doing the transfer
+
+    Returns:
+        HTTPResponse
+    """
+
+    organisation = get_object_or_404(Organisation, pk=org_id)
+
+    if not rbac_user_has_role(request.user, "payments.manage.%s.view" % org_id):
+        if not rbac_user_has_role(request.user, "payments.global.view"):
+            return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
+
+    if request.method == "POST":
+        form = MemberTransferOrg(request.POST)
+        if form.is_valid():
+            member = form.cleaned_data["transfer_to"]
+            amount = form.cleaned_data["amount"]
+            description = form.cleaned_data["description"]
+
+            # Org transaction
+            update_organisation(
+                organisation=organisation,
+                description=description,
+                amount=-amount,
+                log_msg=f"Transfer from {organisation} to {member}",
+                source="payments",
+                sub_source="member_transfer_org",
+                payment_type="Member Transfer",
+                member=member,
+            )
+
+            update_account(
+                member=member,
+                amount=amount,
+                description=description,
+                log_msg=f"Transfer to {member} from {organisation}",
+                source="payments",
+                sub_source="manual_adjust_member",
+                payment_type="Manual Adjustment",
+                organisation=organisation,
+            )
+
+            # Notify member
+            email_body = f"<b>{organisation}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account.<br><br>The description was: {description}.<br><br>Please contact {organisation} directly if you have any queries. This transfer was made by {request.user}.<br><br>"
+            context = {
+                "name": member.first_name,
+                "title": "Transfer from %s" % organisation,
+                "email_body": email_body,
+                "host": COBALT_HOSTNAME,
+                "link": "/payments",
+                "link_text": "View Statement",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=member,
+                msg="Transfer from %s - %s%s"
+                % (organisation, GLOBAL_CURRENCY_SYMBOL, amount),
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/payments",
+                subject="Transfer from %s" % organisation,
+            )
+
+            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            messages.success(request, msg, extra_tags="cobalt-message-success")
+            return redirect("payments:statement_org", org_id=organisation.id)
+        else:
+            print(form.errors)
+    else:
+        form = MemberTransferOrg()
+
+    # get balance
+    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        balance = "Nil"
+
+    return render(
+        request,
+        "payments/member_transfer_org.html",
+        {"form": form, "balance": balance, "org": organisation},
     )

@@ -19,6 +19,8 @@
           {{ player.player|cobalt_user_link }}
         {% endfor %}
         - {{ entry.payment_status }}
+      {% empty %}
+      <h3>No entries yet</h3>
       {% endfor %}
       </ul>
     </div>

@@ -34,6 +34,14 @@ class MemberTransfer(forms.Form):
         super(MemberTransfer, self).__init__(*args, **kwargs)
 
 
+class MemberTransferOrg(forms.Form):
+    """ Org to Member transfer form """
+
+    transfer_to = forms.ModelChoiceField(queryset=User.objects.all())
+    amount = forms.DecimalField(label="Amount", max_digits=8, decimal_places=2)
+    description = forms.CharField(label="Description", max_length=80)
+
+
 class ManualTopup(forms.Form):
     """ Manual top up form """
 

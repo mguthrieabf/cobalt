@@ -249,7 +249,7 @@ def member_details_ajax(request):
 
 @login_required()
 def search_ajax(request):
-    """ Ajax member search function. ONLY USED MEMBER TRANSFER. REPLACE.
+    """ Ajax member search function. ONLY USED BY MEMBER TRANSFER. REPLACE.
 
     Used to search for members by the Member to Member transfer part of Payments.
     Currently very specific to payments. Could be made more generic if other

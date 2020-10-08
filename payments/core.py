@@ -46,7 +46,9 @@ from cobalt.settings import (
     STRIPE_PUBLISHABLE_KEY,
     AUTO_TOP_UP_LOW_LIMIT,
     GLOBAL_CURRENCY_SYMBOL,
+    GLOBAL_CURRENCY_NAME,
     COBALT_HOSTNAME,
+    GLOBAL_ORG,
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
 from notifications.views import contact_member
@@ -447,6 +449,30 @@ def payment_api(
                 payment_type=payment_type,
                 other_member=member,
                 member=other_member,
+            )
+
+            # Notify member
+            email_body = f"<b>{member}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
+            context = {
+                "name": other_member.first_name,
+                "title": "Transfer from %s" % member.full_name,
+                "email_body": email_body,
+                "host": COBALT_HOSTNAME,
+                "link": "/payments",
+                "link_text": "View Statement",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=other_member,
+                msg="Transfer from %s - %s%s"
+                % (member.full_name, GLOBAL_CURRENCY_SYMBOL, amount),
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/payments",
+                subject="Transfer from %s" % member,
             )
 
             if request:

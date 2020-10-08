@@ -1,11 +1,13 @@
 import csv
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone, dateformat
 from django.db.models import Sum, Q
+from notifications.views import contact_member
 from .models import (
     Congress,
     Category,
@@ -43,6 +45,7 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_NAME,
     TIME_ZONE,
     GLOBAL_CURRENCY_SYMBOL,
+    COBALT_HOSTNAME,
 )
 from datetime import datetime
 import itertools
@@ -1713,6 +1716,42 @@ def admin_evententry_delete(request, evententry_id):
                         f"Refund of {amount_str} to {player} successful",
                         extra_tags="cobalt-message-success",
                     )
+
+                # Notify member
+                email_body = f"""{request.user.full_name} has cancelled your entry to
+                                <b>{event_entry.event.event_name}</b> in
+                                <b>{event_entry.event.congress.name}.</b><br><br>
+                              """
+                if amount > 0.0:
+                    email_body += f"""A refund of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f}
+                                    has been credited to your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}
+                                    account.<br><br>
+                                  """
+
+                email_body += f"Please contact {request.user.first_name} directly if you have any queries.<br><br>"
+
+                context = {
+                    "name": player.first_name,
+                    "title": "Entry to %s cancelled" % event_entry.event,
+                    "email_body": email_body,
+                    "host": COBALT_HOSTNAME,
+                    "link": "/events/view",
+                    "link_text": "View Congresses",
+                }
+
+                html_msg = render_to_string(
+                    "notifications/email_with_button.html", context
+                )
+
+                # send
+                contact_member(
+                    member=player,
+                    msg="Entry to %s cancelled" % event_entry.event.event_name,
+                    contact_type="Email",
+                    html_msg=html_msg,
+                    link="/events/view",
+                    subject="Event Entry Cancelled - %s" % event_entry.event,
+                )
 
         # Log it
         EventLog(
