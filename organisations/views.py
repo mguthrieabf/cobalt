@@ -8,6 +8,7 @@ from .models import Organisation
 from rbac.core import rbac_user_has_role
 from rbac.views import rbac_forbidden
 from .forms import OrgForm
+from payments.models import OrganisationTransaction
 
 
 @login_required()
@@ -109,3 +110,20 @@ def org_edit(request, org_id):
         form = OrgForm(instance=org)
 
     return render(request, "organisations/edit_org.html", {"form": form})
+
+
+def org_balance(org, text=None):
+    """ return organisation balance. If balance is zero return 0.0 unless
+        text is True, then return "Nil" """
+
+    # get balance
+    last_tran = OrganisationTransaction.objects.filter(organisation=org).last()
+    if last_tran:
+        balance = last_tran.balance
+    else:
+        if text:
+            balance = "Nil"
+        else:
+            balance = 0.0
+
+    return balance

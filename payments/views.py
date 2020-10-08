@@ -68,6 +68,7 @@ from .core import (
     update_organisation,
     update_account,
 )
+from organisations.views import org_balance
 from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
 from accounts.models import User
 from utils.utils import cobalt_paginator
@@ -297,11 +298,7 @@ def statement_org(request, org_id):
             return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
 
     # get balance
-    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
-    if last_tran:
-        balance = last_tran.balance
-    else:
-        balance = "Nil"
+    balance = org_balance(organisation, True)
 
     # get summary
     today = timezone.now()
@@ -1707,8 +1704,10 @@ def member_transfer_org(request, org_id):
         if not rbac_user_has_role(request.user, "payments.global.view"):
             return rbac_forbidden(request, "payments.manage.%s.view" % org_id)
 
+    balance = org_balance(organisation)
+
     if request.method == "POST":
-        form = MemberTransferOrg(request.POST)
+        form = MemberTransferOrg(request.POST, balance=balance)
         if form.is_valid():
             member = form.cleaned_data["transfer_to"]
             amount = form.cleaned_data["amount"]
@@ -1767,14 +1766,7 @@ def member_transfer_org(request, org_id):
         else:
             print(form.errors)
     else:
-        form = MemberTransferOrg()
-
-    # get balance
-    last_tran = OrganisationTransaction.objects.filter(organisation=organisation).last()
-    if last_tran:
-        balance = last_tran.balance
-    else:
-        balance = "Nil"
+        form = MemberTransferOrg(balance=balance)
 
     return render(
         request,

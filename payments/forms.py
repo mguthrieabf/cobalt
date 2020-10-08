@@ -9,6 +9,7 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_SYMBOL,
 )
 from .models import TRANSACTION_TYPE, MemberTransaction, OrganisationTransaction
+from django.core.exceptions import ValidationError
 
 
 class TestTransaction(forms.Form):
@@ -40,6 +41,19 @@ class MemberTransferOrg(forms.Form):
     transfer_to = forms.ModelChoiceField(queryset=User.objects.all())
     amount = forms.DecimalField(label="Amount", max_digits=8, decimal_places=2)
     description = forms.CharField(label="Description", max_length=80)
+
+    # We need the balance to take it as a parameter
+    def __init__(self, *args, **kwargs):
+        self.balance = kwargs.pop("balance", 0.0)
+        super(MemberTransferOrg, self).__init__(*args, **kwargs)
+
+    def clean_amount(self):
+        """ check the balance is sufficient for the payment """
+
+        amount = self.cleaned_data["amount"]
+        if amount > self.balance:
+            raise ValidationError("Insuficient funds")
+        return amount
 
 
 class ManualTopup(forms.Form):
