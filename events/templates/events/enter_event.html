@@ -105,7 +105,7 @@
               <br>
               <div class="row">
                 <div class="col text-center">
-                  <button id="id_checkout" type="submit" name="now" onclick="this.disabled=true,this.form.submit();" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
+                  <button id="id_checkout" type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>
                   <button id="id_cart" type="submit" name="cart" onclick="this.disabled=true,this.form.submit();" class="btn btn-success cobalt-save" style="width:150px" disabled>Add to Cart</button>
                 </div>
               </div>
@@ -124,6 +124,7 @@
 <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
+<!-- <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script> -->
 <script>
 
 // include all of the generic searches for each player entry
@@ -316,7 +317,7 @@ $(document).ready(function(){
 
       } else {
 
-  // get entry fee and payment methods 
+  // get entry fee and payment methods
         if (search_id<4){
           user_entry_fee(user_id, search_id);
           user_payment_method(user_id, search_id);
@@ -409,6 +410,7 @@ $(document).ready(function(){
     $('#plus_5').hide();
     return false;
   });
+
 
 });
 </script>

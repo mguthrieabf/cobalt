@@ -297,7 +297,11 @@ class Command(BaseCommand):
                             setattr(instance, field, datetime_local)
                         if key[:2] == "d.":
                             field = key[2:]
-                            dy, mt, yr = value.split("/")
+#                            dy, mt, yr = value.split("/")
+                            val_str = "%s" % value
+                            yr = val_str[:4]
+                            mt = val_str[4:6]
+                            dy = val_str[6:8]
                             this_date = make_aware(
                                 datetime.datetime(int(yr), int(mt), int(dy), 0, 0), TZ,
                             )

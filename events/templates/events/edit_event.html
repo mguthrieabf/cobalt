@@ -279,8 +279,8 @@
 
               <div class="d-flex">
                 <div>
-                  <a href="/events/congress/create/add-session/{{ event.id }}" class="btn btn-success btn-sm colbalt-save">Add</a>
-                  <button id="edit_button" class="btn btn-primary btn-sm colbalt-save" disabled>Edit</button>
+                  <a href="/events/congress/create/add-session/{{ event.id }}" class="btn btn-success btn-sm cobalt-save">Add</a>
+                  <button id="edit_button" class="btn btn-primary btn-sm cobalt-save" disabled>Edit</button>
                 </div>
                 <div class="ml-auto">
                   <button class="btn btn-danger btn-sm cobalt-save" disabled id="delete_button" onclick="deleteSession();return false">Delete</button>
@@ -303,7 +303,6 @@
 
 {% endblock %}
 {% block footer %}
-<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/moment.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>

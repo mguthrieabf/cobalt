@@ -5,7 +5,7 @@ import payments.core as payments_core  # circular dependency
 from notifications.views import contact_member
 from cobalt.settings import COBALT_HOSTNAME
 from django.template.loader import render_to_string
-
+from datetime import datetime
 
 def events_payments_secondary_callback(status, route_payload, tran):
     """ This gets called when a payment has been made for us.
@@ -244,4 +244,13 @@ def get_basket_for_user(user):
 
 def get_events(user):
     """ called by dashboard to get upcoming events """
-    return EventEntryPlayer.objects.filter(player=user)
+
+    event_entry_players = EventEntryPlayer.objects.filter(player=user)
+
+    # Only include the ones in the future
+    upcoming = []
+    for event_entry_player in event_entry_players:
+        if event_entry_player.event_entry.event.start_date() >= datetime.now().date():
+            upcoming.append(event_entry_player)
+
+    return upcoming

@@ -46,6 +46,7 @@ from cobalt.settings import (
     TIME_ZONE,
     GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
+    TBA_PLAYER,
 )
 from datetime import datetime
 import itertools
@@ -70,9 +71,9 @@ def home(request):
 
         # Comment field
         if congress.entry_open_date > make_aware(datetime.now(), TZ):
-            congress.msg = "Entries open on %s" % congress.entry_open_date
+            congress.msg = "Entries open on " + congress.entry_open_date.strftime('%d %b %Y')
         elif congress.entry_close_date > make_aware(datetime.now(), TZ):
-            congress.msg = "Entries close on %s" % congress.entry_close_date
+            congress.msg = "Entries close on " + congress.entry_close_date.strftime('%d %b %Y')
         else:
             congress.msg = "Congress entries are closed"
 
@@ -853,10 +854,16 @@ def enter_event_form(event, congress, request, existing_choices=None):
     if congress.payment_method_cheques:
         pay_types.append(("cheque", "Cheque"))
 
-    # Get team mates for this user
-    team_mates = TeamMate.objects.filter(user=request.user)
+    # Get team mates for this user - exclude anyone entered already
+    all_team_mates = TeamMate.objects.filter(user=request.user)
+    team_mates_list = all_team_mates.values_list('team_mate')
+    print(team_mates_list)
+    entered_team_mates = EventEntryPlayer.objects.filter(event_entry__event=event).filter(player__in=team_mates_list).values_list('player')
+    print(entered_team_mates)
+    team_mates = all_team_mates.exclude(team_mate__in=entered_team_mates)
+    print(team_mates)
 
-    name_list = [(0, "Search..."), (2, "TBA")]
+    name_list = [(0, "Search..."), (TBA_PLAYER, "TBA")]
     for team_mate in team_mates:
         item = (team_mate.team_mate.id, "%s" % team_mate.team_mate.full_name)
         name_list.append(item)
@@ -1001,11 +1008,15 @@ def enter_event(request, congress_id, event_id):
 
     # Check if already entered
     if event.already_entered(request.user):
-        messages.error(
-            request,
-            "You have already entered ths event",
-            extra_tags="cobalt-message-error",
-        )
+        return redirect("events:edit_event_entry", event_id=event.id)
+
+    # Check if entries are open
+    if not event.is_open():
+        return render(request, "events/event_closed.html", {"event": event})
+
+    # Check if full
+    if event.is_full():
+        return render(request, "events/event_full.html", {"event": event})
 
     # check if POST.
     # Note: this works a bit differently to most forms in Cobalt.
@@ -1088,7 +1099,9 @@ def enter_event(request, congress_id, event_id):
                 action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
             ).save()
 
+        print(request.POST)
         if "now" in request.POST:
+            print("ok")
             return redirect("events:checkout")
         else:  # add to cart and keep shopping
             msg = "Added to your cart"

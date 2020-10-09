@@ -279,6 +279,17 @@ class Event(models.Model):
         if event_entry:
             return event_entry.payment_status
 
+    def is_full(self):
+        """ check if event is already full """
+
+        if self.max_entries is None:
+            return False
+
+        entries = EventEntry.objects.filter(event=self).count()
+        if entries >= self.max_entries:
+            return True
+        else:
+            return False
 
 class Category(models.Model):
     """ Event Categories such as <100 MPs or club members etc. Free format."""
