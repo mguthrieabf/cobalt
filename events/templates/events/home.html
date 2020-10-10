@@ -9,32 +9,33 @@
   <div class="card-body">
     {% if admin %}
     <div class="text-right">
-    <a class="text-right" href="{% url "events:create_congress_wizard" %}">Create New Congress</a>
+      <a class="text-right" href="{% url "events:create_congress_wizard" %}">Create New Congress</a>
     </div>
     {% endif %}
 
-      {% for month, congresses in grouped_by_month.items %}
+    {% for month, congresses in grouped_by_month.items %}
 
-        <h2>{{ month }}</h2>
-          {% for congress in congresses %}
-          <div class="card text-center col-md-6">
-            <div class="card-body">
-                <a href="{% url "organisations:org_edit" org_id=congress.congress_master.org.id %}">{{ congress.congress_master.org }}</a>
-              <h5 class="card-title"><a href="{% url "events:view_congress" congress_id=congress.id %}">{{ congress }}</a></h5>
-              <p>{{ congress.date_string }}</p>
-              {% if congress.convener %}
-              <a class="btn btn-sm btn-warning" href="{% url "events:view_congress" congress_id=congress.id %}">View Details</a>
-              <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-success">Edit</a>
-              <a class="btn btn-sm btn-info" href="{% url "events:admin_summary" congress_id=congress.id %}">Manage</a>
-              {% endif %}
-            </div>
-            <div class="card-footer text-muted">
-              {{ congress.msg }}
-            </div>
-          </div>
+    <h2>{{ month }}</h2>
+    {% for congress in congresses %}
+    <div class="card text-center col-md-6">
+      <div class="card-body">
+        <a class="btn btn-sm btn-danger" href="{% url "events:view_congress" congress_id=congress.id %}">{{ congress }}
+        by {{ congress.congress_master.org }}
+        </a>
+        <p>{{ congress.date_string }}</p>
+        {% if congress.convener %}
+        <a class="btn btn-sm btn-warning" href="{% url "events:view_congress" congress_id=congress.id %}">View Details</a>
+        <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-success">Edit</a>
+        <a class="btn btn-sm btn-info" href="{% url "events:admin_summary" congress_id=congress.id %}">Manage</a>
+        {% endif %}
+      </div>
+      <div class="card-footer text-muted">
+        {{ congress.msg }}
+      </div>
+    </div>
 
-      {% endfor %}
-      {% endfor %}
+    {% endfor %}
+    {% endfor %}
 
   </div>
 </div>

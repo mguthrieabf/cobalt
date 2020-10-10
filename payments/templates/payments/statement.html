@@ -25,7 +25,7 @@
     <div class="card-header card-header-primary">
       <h1>{{ GLOBAL_ORG }} {{ GLOBAL_CURRENCY_NAME}}s - {{ user.full_name }}</h1>
       <h3>{% if summary.IsActive %}{{club}}{% else %}Inactive - Used to play at {{club}}{% endif %}</h3>
-      <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}{{ balance|intcomma }}</h2>
+      <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}<span id="balance">{{ balance|intcomma }}</span></h2>
 
       <div class="float-left">
 
@@ -93,6 +93,9 @@
 {% block footer %}
 
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/countUp.2.0.7/countUp.umd.js" %}"></script>
+<!-- <script src="{% static "assets/js/countUp/countUp.umd.js" %}"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/countupjs/1.8.5/countUp.min.js"></script> -->
 
 <script>
   $(document).ready(function() {
@@ -101,7 +104,19 @@
       // refresh to make sure auto top up status is correct
       location.reload();
     }
-  });
+
+{% if balance != "Nil" %}
+      const options = {
+        decimalPlaces: 2,
+      };
+      let demo = new countUp.CountUp('balance', {{ balance }}, options);
+      if (!demo.error) {
+        demo.start();
+      } else {
+        console.error(demo.error);
+      }
+
+{% endif %}
 
   // change to auto top up toggle
   $(function() {
@@ -113,6 +128,7 @@
       }
     })
   })
+});
 </script>
 
 {% endblock %}

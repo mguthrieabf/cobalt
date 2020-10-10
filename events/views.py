@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone, dateformat
 from django.db.models import Sum, Q
 from notifications.views import contact_member
+from logs.views import log_event
 from .models import (
     Congress,
     Category,
@@ -71,9 +72,13 @@ def home(request):
 
         # Comment field
         if congress.entry_open_date > make_aware(datetime.now(), TZ):
-            congress.msg = "Entries open on " + congress.entry_open_date.strftime('%d %b %Y')
+            congress.msg = "Entries open on " + congress.entry_open_date.strftime(
+                "%d %b %Y"
+            )
         elif congress.entry_close_date > make_aware(datetime.now(), TZ):
-            congress.msg = "Entries close on " + congress.entry_close_date.strftime('%d %b %Y')
+            congress.msg = "Entries close on " + congress.entry_close_date.strftime(
+                "%d %b %Y"
+            )
         else:
             congress.msg = "Congress entries are closed"
 
@@ -856,9 +861,13 @@ def enter_event_form(event, congress, request, existing_choices=None):
 
     # Get team mates for this user - exclude anyone entered already
     all_team_mates = TeamMate.objects.filter(user=request.user)
-    team_mates_list = all_team_mates.values_list('team_mate')
+    team_mates_list = all_team_mates.values_list("team_mate")
     print(team_mates_list)
-    entered_team_mates = EventEntryPlayer.objects.filter(event_entry__event=event).filter(player__in=team_mates_list).values_list('player')
+    entered_team_mates = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .filter(player__in=team_mates_list)
+        .values_list("player")
+    )
     print(entered_team_mates)
     team_mates = all_team_mates.exclude(team_mate__in=entered_team_mates)
     print(team_mates)

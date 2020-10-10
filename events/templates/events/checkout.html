@@ -68,14 +68,20 @@
     </div>
   </div>
 
-
+{% empty %}
+<h3>There is nothing in your basket.</h3>
+<br>
 {% endfor %}
 
-        <form method='post'>
-          {% csrf_token %}
-          <button type="submit" class="btn btn-success cobalt-save" style="width:150px">Pay</button>
-          <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel</button>
-        </form>
+{% if basket_items %}
+  <form method='post'>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success cobalt-save" style="width:150px">Pay</button>
+    <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel</button>
+  </form>
+{% else %}
+  <a class="btn btn-info" href="{% url "events:events" %}">Browse Events</a>
+{% endif %}
       </div>
     </div>
   </div>

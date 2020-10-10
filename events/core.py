@@ -3,9 +3,11 @@ from django.db.models import Q
 from django.utils import timezone
 import payments.core as payments_core  # circular dependency
 from notifications.views import contact_member
+from logs.views import log_event
 from cobalt.settings import COBALT_HOSTNAME
 from django.template.loader import render_to_string
 from datetime import datetime
+
 
 def events_payments_secondary_callback(status, route_payload, tran):
     """ This gets called when a payment has been made for us.
@@ -15,6 +17,14 @@ def events_payments_secondary_callback(status, route_payload, tran):
 
         This is for the case where a secondary user (not the person making
         the initial entry) has made their payment."""
+
+    log_event(
+        user="Unknown",
+        severity="INFO",
+        source="Events",
+        sub_source="events_payments_secondary_callback",
+        message=f"Secondary Callback - Status: {status} route_payload: {route_payload}",
+    )
 
     if status == "Success":
 
@@ -29,6 +39,14 @@ def events_payments_callback(status, route_payload, tran):
 
         This gets called when the primary user who is entering the congress
         has made a payment."""
+
+    log_event(
+        user="Unknown",
+        severity="INFO",
+        source="Events",
+        sub_source="events_payments_callback",
+        message=f"Secondary Callback - Status: {status} route_payload: {route_payload}",
+    )
 
     if status == "Success":
 

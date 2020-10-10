@@ -21,7 +21,7 @@
           </div>
           <p class="card-category">Account Balance</p>
 
-            <h3 class="card-title">{{ payments.balance|intcomma }}</h3>
+            <h3 class="card-title"><span class="text-nowrap">{{ payments.balance|intcomma }}</span></h3>
         </div>
         <div class="card-footer">
           <div class="stats">
@@ -67,7 +67,7 @@
           </div>
           <p class="card-category">Masterpoints</p>
 
-            <h3 class="card-title"> <span style="color: black;">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
+            <h3 class="card-title"><span class="text-nowrap text-dark">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
 
         </div>
         <div class="card-footer">

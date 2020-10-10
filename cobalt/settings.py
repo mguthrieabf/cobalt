@@ -266,9 +266,9 @@ EMAIL_SUBJECT_PREFIX = "[%s] " % COBALT_HOSTNAME
 
 GLOBAL_ORG = "ABF"
 GLOBAL_TITLE = "ABF Technology"
-GLOBAL_CONTACT = "https://abf.com.au"
+GLOBAL_CONTACT = "https://abf.com.au/contact"
 GLOBAL_ABOUT = "https://abf.com.au"
-GLOBAL_PRIVACY = "https://abf.com.au"
+GLOBAL_PRIVACY = "https://abf.com.au/privacy"
 GLOBAL_PRODUCTION = "abftech.com.au"
 GLOBAL_CURRENCY_SYMBOL = "$"
 GLOBAL_CURRENCY_NAME = "Dollar"
