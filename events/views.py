@@ -1289,7 +1289,8 @@ def checkout(request):
             book_internals=False,
         )
 
-    return render(request, "events/checkout.html", {"basket_items": basket_items})
+    # The name basket_items is used by the base template so use a different name
+    return render(request, "events/checkout.html", {"basket_items_list": basket_items})
 
 
 @login_required()

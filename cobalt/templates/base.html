@@ -194,9 +194,11 @@
 
               {% if basket_items %}
               <li class="nav-item dropdown">
-                <a href="{% url "events:checkout" %}">
-
+                <a class="nav-link mx-0" href="{% url "events:checkout" %}" id="navbarDropdownMenuLink"  aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">shopping_cart</i>
+                  {% if basket_items > 1 %}
+                  <span class="notification">{{ notification_count }}</span>
+                  {% endif %}
                 </a>
               </li>
               {% endif %}

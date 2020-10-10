@@ -14,7 +14,7 @@
       </div>
       <div class="card-body">
 
-{% for item in basket_items %}
+{% for item in basket_items_list %}
 
   <div class="card">
     <div class="card-header card-header-info">
@@ -73,11 +73,11 @@
 <br>
 {% endfor %}
 
-{% if basket_items %}
+{% if basket_items_list %}
   <form method='post'>
     {% csrf_token %}
     <button type="submit" class="btn btn-success cobalt-save" style="width:150px">Pay</button>
-    <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel</button>
+    <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel Entry - to do</button>
   </form>
 {% else %}
   <a class="btn btn-info" href="{% url "events:events" %}">Browse Events</a>
