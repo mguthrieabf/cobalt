@@ -134,7 +134,7 @@
     </div>
     <div class="main-panel">
       <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
         <div class="container-fluid">
           <div class="navbar-wrapper">
             <span>
@@ -174,10 +174,10 @@
 
               <li class="nav-item dropdown">
 
-                <a class="nav-link" href="javascript:void(0)" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link px-0 mx-2" href="javascript:void(0)" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">notifications</i>
 
-                  <span class="notification">{{ notification_count }}</span>
+                  <span class="notification ml-5">{{ notification_count }}</span>
 
                   <p class="d-lg-none d-md-block">
                     Notification{{ notification_count|pluralize }}
@@ -194,7 +194,7 @@
 
               {% if basket_items %}
               <li class="nav-item dropdown">
-                <a class="nav-link mx-0" href="{% url "events:checkout" %}" id="navbarDropdownMenuLink"  aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link px-0 mx-0" href="{% url "events:checkout" %}" id="navbarDropdownMenuLink"  aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">shopping_cart</i>
                   {% if basket_items > 1 %}
                   <span class="notification">{{ notification_count }}</span>
@@ -204,7 +204,7 @@
               {% endif %}
 
               <li class="nav-item dropdown">
-                <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link px-0 mx-0" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">person</i>
                   <p class="d-lg-none d-md-block">
                     Account

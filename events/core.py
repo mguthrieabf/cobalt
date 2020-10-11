@@ -263,7 +263,7 @@ def get_basket_for_user(user):
 def get_events(user):
     """ called by dashboard to get upcoming events """
 
-    event_entry_players = EventEntryPlayer.objects.filter(player=user)
+    event_entry_players = EventEntryPlayer.objects.filter(player=user)[:4]
 
     # Only include the ones in the future
     upcoming = []

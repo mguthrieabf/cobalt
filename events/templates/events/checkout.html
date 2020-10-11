@@ -15,6 +15,15 @@
       <div class="card-body">
 
 {% for item in basket_items_list %}
+  <table>
+    <tr>
+      <td>{{ item.event_entry.event.congress }}</td>
+    </tr>
+  </table>
+{% endfor %}
+
+
+{% for item in basket_items_list %}
 
   <div class="card">
     <div class="card-header card-header-info">
