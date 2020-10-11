@@ -263,11 +263,15 @@ def get_basket_for_user(user):
 def get_events(user):
     """ called by dashboard to get upcoming events """
 
-    event_entry_players = EventEntryPlayer.objects.filter(player=user)[:4]
+    # get last 50
+    event_entry_players = EventEntryPlayer.objects.filter(player=user).order_by('-id')[:50]
+
+    event_entry_players_list = list(event_entry_players)
+    event_entry_players_list.reverse()
 
     # Only include the ones in the future
     upcoming = []
-    for event_entry_player in event_entry_players:
+    for event_entry_player in event_entry_players_list:
         if event_entry_player.event_entry.event.start_date() >= datetime.now().date():
             upcoming.append(event_entry_player)
 
