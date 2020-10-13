@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load cobalt_tags %}
 {% block headerjs %}
 
 
@@ -50,7 +51,7 @@
     </a>
     <div class="card-title d-flex justify-content-between">
       <div>
-        {{ post.created_date }}
+        {{ post.created_date|cobalt_nice_datetime }}
       </div>
       <div>
         Forum: {{ post.forum.title }}
@@ -68,7 +69,7 @@
 </div>
 
 {% if post.last_change_date %}
-<p style="font-size: 12px;"><i>{{ user.first_name }} edited this on {{ post.last_change_date }}</i></p>
+<p style="font-size: 12px;"><i>{{ user.first_name }} edited this on {{ post.last_change_date|cobalt_nice_datetime }}</i></p>
 {% endif %}
 <!-- End post -->
 
@@ -106,7 +107,7 @@
         </div>
       </a>
       <div>
-        {{ c1.created_date }}
+        {{ c1.created_date|cobalt_nice_datetime }}
       </div>
     </div>
     <div>
@@ -127,7 +128,7 @@
   </div>
 </div>
 {% if c1.last_changed_by %}
-<p class="m-2" style="font-size: 12px;"><i>{{ c1.last_changed_by }} edited this on {{ c1.last_change_date }}</i></p>
+<p class="m-2" style="font-size: 12px;"><i>{{ c1.last_changed_by }} edited this on {{ c1.last_change_date|cobalt_nice_datetime }}</i></p>
 {% endif %}
 
 <!-- end Comment 1 -->
@@ -149,7 +150,7 @@
             </div>
           </a>
           <div>
-            {{ c2.created_date }}
+            {{ c2.created_date|cobalt_nice_datetime }}
           </div>
         </div>
         <div>
@@ -170,7 +171,7 @@
       </div>
     </div>
     {% if c2.last_changed_by %}
-    <p class="m-0 p-0" style="font-size: 12px;"><i>{{ c2.last_changed_by }} edited this on {{ c2.last_change_date }}</i></p>
+    <p class="m-0 p-0" style="font-size: 12px;"><i>{{ c2.last_changed_by }} edited this on {{ c2.last_change_date|cobalt_nice_datetime }}</i></p>
     {% endif %}
     {% endfor %}
 

@@ -225,7 +225,7 @@ class Event(models.Model):
                 ) / players_per_entry
                 discount = self.entry_early_payment_discount / players_per_entry
                 reason = "Early discount"
-                description = f"Early discount {GLOBAL_CURRENCY_SYMBOL}{discount}"
+                description = f"Early discount {GLOBAL_CURRENCY_SYMBOL}{discount:.2f}"
 
         # youth - you get only one discount, whichever is bigger
         if self.congress.allow_youth_payment_discount:

@@ -297,7 +297,7 @@ class Command(BaseCommand):
                             setattr(instance, field, datetime_local)
                         if key[:2] == "d.":
                             field = key[2:]
-#                            dy, mt, yr = value.split("/")
+                            #                            dy, mt, yr = value.split("/")
                             val_str = "%s" % value
                             yr = val_str[:4]
                             mt = val_str[4:6]
@@ -351,7 +351,7 @@ class Command(BaseCommand):
         # create dummy Posts
         print("\nCreating dummy forum posts")
         print("Running", end="", flush=True)
-        for post_counter in range(20):
+        for post_counter in range(2000000):
 
             user_list = list(self.id_array["accounts.User"].values())
             user_list.remove(self.id_array["accounts.User"]["EVERYONE"])
