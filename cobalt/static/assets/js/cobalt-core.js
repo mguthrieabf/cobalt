@@ -40,13 +40,18 @@ $(document).ready(function () {
   var unsaved = false;
 
   $(":input").change(function(){
+
+    // check if object has class cobalt-save and ignore
+    // else set unsaved to true
+    var myClass = $(this).attr("class");
+    if (myClass.indexOf("cobalt-save") == -1){
       unsaved = true;
+    }
   });
 
   $('.cobalt-save').click(function() {
       unsaved = false;
   });
-
 
   function unloadPage(){
       if(unsaved){

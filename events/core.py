@@ -28,7 +28,13 @@ def events_payments_secondary_callback(status, route_payload, tran):
 
     if status == "Success":
 
-        update_entries(route_payload)
+        # get name of person who made the entry
+        primary_entrant = (
+            EventEntryPlayer.objects.filter(batch_id=route_payload)
+            .first()
+            .event_entry.primary_entrant
+        )
+    update_entries(route_payload, primary_entrant)
 
 
 def events_payments_callback(status, route_payload, tran):
@@ -45,23 +51,34 @@ def events_payments_callback(status, route_payload, tran):
         severity="INFO",
         source="Events",
         sub_source="events_payments_callback",
-        message=f"Secondary Callback - Status: {status} route_payload: {route_payload}",
+        message=f"Primary Callback - Status: {status} route_payload: {route_payload}",
     )
 
     if status == "Success":
+        # Find who is making this payment
+        pbi = PlayerBatchId.objects.filter(batch_id=route_payload).first()
 
-        update_entries(route_payload)
-        send_notifications(route_payload)
+        # catch error
+        if pbi is None:
+            log_event(
+                user="Unknown",
+                severity="CRITICAL",
+                source="Events",
+                sub_source="events_payments_callback",
+                message=f"No matching player for route_payload: {route_payload}",
+            )
+            return
+
+        payment_user = pbi.player
+        pbi.delete()
+
+        update_entries(route_payload, payment_user)
+        send_notifications(route_payload, payment_user)
 
 
-def update_entries(route_payload):
+def update_entries(route_payload, payment_user):
     """ Update the database to reflect changes and make payments for
         other members if we have access. """
-
-    # Find who is making this payment
-    pbi = PlayerBatchId.objects.filter(batch_id=route_payload).first()
-    payment_user = pbi.player
-    pbi.delete()
 
     # Update EntryEventPlayer objects
     event_entry_players = EventEntryPlayer.objects.filter(batch_id=route_payload)
@@ -83,6 +100,7 @@ def update_entries(route_payload):
             member=payment_user,
         )
 
+        # create payment for user
         payments_core.update_account(
             member=payment_user,
             amount=-event_entry_player.entry_fee,
@@ -125,22 +143,15 @@ def update_entries(route_payload):
         event_entry.check_if_paid()
 
 
-def send_notifications(route_payload):
+def send_notifications(route_payload, payment_user):
     """ Send the notification emails """
-
-    # get name of person who made the entry
-    primary_entrant = (
-        EventEntryPlayer.objects.filter(batch_id=route_payload)
-        .first()
-        .event_entry.primary_entrant
-    )
 
     # Go through the basket and notify people
     # We send one email per congress
     # email_dic will be email_dic[congress][event][player]
     email_dic = {}
 
-    basket_items = BasketItem.objects.filter(player=primary_entrant)
+    basket_items = BasketItem.objects.filter(player=payment_user)
 
     for basket_item in basket_items:
         # Get players in event
@@ -161,6 +172,7 @@ def send_notifications(route_payload):
         # build a list of all players so we can set them each up a custom email
         player_email = {}  # email to send keyed by player
         player_included = {}  # flag for whether player is in this event
+
         for event in email_dic[congress].keys():
             for player in email_dic[congress][event]:
                 if player.player not in player_email.keys():
@@ -169,7 +181,7 @@ def send_notifications(route_payload):
 
         # build start of email for this congress
         for player in player_email.keys():
-            if player == primary_entrant:
+            if player == payment_user:
                 player_email[
                     player
                 ] = f"""
@@ -179,7 +191,7 @@ def send_notifications(route_payload):
                 player_email[
                     player
                 ] = f"""
-                    <p>{primary_entrant.full_name} has entered you into <b>{congress.name}</b>
+                    <p>{payment_user.full_name} has entered you into <b>{congress.name}</b>
                     """
 
             player_email[
@@ -213,13 +225,38 @@ def send_notifications(route_payload):
             # Close table
             player_email[player] += "</table><br>"
 
-            # Check status
-            if (
+            # Get details
+            event_entry_players = (
                 EventEntryPlayer.objects.exclude(payment_status="Paid")
                 .filter(player=player)
                 .filter(event_entry__event__congress=congress)
-                .exists()
-            ):
+            )
+
+            print("####Player")
+            print(player)
+            print("####EEP")
+            print(event_entry_players)
+
+            # Check status
+            if event_entry_players.exists():
+
+                # Outstanding payments due. Check for bank and cheque
+                if event_entry_players.filter(payment_type="bank-transfer").exists():
+                    player_email[player] += (
+                        "<h3>Bank Details</h3> %s<br><br>"
+                        % event_entry_players[
+                            0
+                        ].event_entry.event.congress.bank_transfer_details
+                    )
+
+                if event_entry_players.filter(payment_type="cheque").exists():
+                    player_email[player] += (
+                        "<h3>Cheques</h3> %s<br><br>"
+                        % event_entry_players[
+                            0
+                        ].event_entry.event.congress.cheque_details
+                    )
+
                 player_email[
                     player
                 ] += "You have outstanding payments to make to complete this entry. Click on the button below to view your payments. Note that entries are not complete until all payments have been received.<br><br>"
@@ -264,7 +301,9 @@ def get_events(user):
     """ called by dashboard to get upcoming events """
 
     # get last 50
-    event_entry_players = EventEntryPlayer.objects.filter(player=user).order_by('-id')[:50]
+    event_entry_players = EventEntryPlayer.objects.filter(player=user).order_by("-id")[
+        :50
+    ]
 
     event_entry_players_list = list(event_entry_players)
     event_entry_players_list.reverse()

@@ -26,8 +26,8 @@ def log_event(user, severity, source, sub_source, message, request=None):
     logevent.user = user
     logevent.ip = ip
     logevent.severity = severity
-    logevent.source = source
-    logevent.sub_source = sub_source
+    logevent.source = source[:30]
+    logevent.sub_source = sub_source[:50]
     logevent.message = message[:199]
     logevent.save()
 

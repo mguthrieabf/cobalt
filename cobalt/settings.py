@@ -65,7 +65,7 @@ EMAIL_HOST = set_value("EMAIL_HOST")
 EMAIL_HOST_USER = set_value("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = set_value("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = set_value("DEFAULT_FROM_EMAIL", "notset@fake.com")
-SUPPORT_EMAIL = set_value("SUPPORT_EMAIL", "[m@rkguthrie.com]")
+SUPPORT_EMAIL = set_value("SUPPORT_EMAIL", ["m@rkguthrie.com"])
 
 # stripe
 STRIPE_SECRET_KEY = set_value("STRIPE_SECRET_KEY")

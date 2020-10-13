@@ -16,6 +16,7 @@
 
 {% block content %}
 
+
 <div class="container justify-content-center">
   <div class="row h-100 d-flex justify-content-center">
     <div class="card">
@@ -47,8 +48,6 @@
                   {% endfor %}
                 </select>
                 {% endif %}
-
-
 
               <table class="table-responsive">
                 <thead class="text-warning">
@@ -103,6 +102,12 @@
                 </tbody>
               </table>
               <br>
+              {% if event.free_format_question %}
+                <label for="id_category">{{ event.free_format_question }}</label>
+                <input type="text" size="60" id="id_free_format_answer" name="free_format_answer">
+                <br>
+                <br>
+              {% endif %}
               <div class="row">
                 <div class="col text-center">
                   <button id="id_checkout" type="submit" name="now" class="btn btn-success cobalt-save" style="width:150px" disabled>Checkout Now</button>

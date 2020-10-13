@@ -37,6 +37,7 @@ from rbac.core import (
     rbac_get_users_with_role,
 )
 from rbac.views import rbac_user_role_or_error
+from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
 from django.contrib import messages
@@ -325,10 +326,8 @@ def create_congress_wizard_1(request, step_list):
                 congress.save()
 
                 # Also copy events and sessions
-                print(original_congress.id)
-                print(congress.id)
                 events = Event.objects.filter(congress=original_congress)
-                print(events)
+
                 for event in events:
                     sessions = Session.objects.filter(event=event)
                     event.pk = None
@@ -862,15 +861,12 @@ def enter_event_form(event, congress, request, existing_choices=None):
     # Get team mates for this user - exclude anyone entered already
     all_team_mates = TeamMate.objects.filter(user=request.user)
     team_mates_list = all_team_mates.values_list("team_mate")
-    print(team_mates_list)
     entered_team_mates = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
         .filter(player__in=team_mates_list)
         .values_list("player")
     )
-    print(entered_team_mates)
     team_mates = all_team_mates.exclude(team_mate__in=entered_team_mates)
-    print(team_mates)
 
     name_list = [(0, "Search..."), (TBA_PLAYER, "TBA")]
     for team_mate in team_mates:
@@ -1108,9 +1104,7 @@ def enter_event(request, congress_id, event_id):
                 action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
             ).save()
 
-        print(request.POST)
         if "now" in request.POST:
-            print("ok")
             return redirect("events:checkout")
         else:  # add to cart and keep shopping
             msg = "Added to your cart"
@@ -1256,38 +1250,45 @@ def checkout(request):
         event_entry_players = (
             EventEntryPlayer.objects.filter(event_entry__in=event_entries)
             .exclude(payment_status="Paid")
-            .filter(Q(player=request.user) | Q(payment_type="my-system-dollars"))
+            #        .filter(Q(player=request.user) | Q(payment_type="my-system-dollars"))
+            .filter(payment_type="my-system-dollars")
             .distinct()
         )
-
-        # Get total amount
-        amount = event_entry_players.aggregate(Sum("entry_fee"))
-
-        for event_entry_player in event_entry_players:
-            event_entry_player.batch_id = unique_id
-            event_entry_player.save()
-
-            # Log it
-            EventLog(
-                event=event_entry_player.event_entry.event,
-                actor=request.user,
-                action=f"Checkout for event entry {event_entry_player.event_entry.id} for {event_entry_player.player}",
-            ).save()
 
         # map this user (who is paying) to the batch id
         PlayerBatchId(player=request.user, batch_id=unique_id).save()
 
-        return payment_api(
-            request=request,
-            member=request.user,
-            description="Congress Entry",
-            amount=amount["entry_fee__sum"],
-            route_code="EVT",
-            route_payload=unique_id,
-            url=reverse("events:enter_event_success"),
-            payment_type="Entry to a congress",
-            book_internals=False,
-        )
+        # Get total amount
+        amount = event_entry_players.aggregate(Sum("entry_fee"))
+
+        if amount["entry_fee__sum"]:  # something for Payments to do
+
+            for event_entry_player in event_entry_players:
+                event_entry_player.batch_id = unique_id
+                event_entry_player.save()
+
+                # Log it
+                EventLog(
+                    event=event_entry_player.event_entry.event,
+                    actor=request.user,
+                    action=f"Checkout for event entry {event_entry_player.event_entry.id} for {event_entry_player.player}",
+                ).save()
+
+            return payment_api(
+                request=request,
+                member=request.user,
+                description="Congress Entry",
+                amount=amount["entry_fee__sum"],
+                route_code="EVT",
+                route_payload=unique_id,
+                url=reverse("events:enter_event_success"),
+                payment_type="Entry to a congress",
+                book_internals=False,
+            )
+
+        else:  # no payment required go straight to the callback
+
+            events_payments_callback("Success", unique_id, None)
 
     # The name basket_items is used by the base template so use a different name
     return render(request, "events/checkout.html", {"basket_items_list": basket_items})
@@ -1508,6 +1509,16 @@ def pay_outstanding(request):
     for event_entry_player in event_entry_players:
         event_entry_player.batch_id = unique_id
         event_entry_player.save()
+
+    # Log it
+    EventLog(
+        event=event_entry_player.event_entry.event,
+        actor=request.user,
+        action=f"Checkout for {request.user}",
+    ).save()
+
+    # map this user (who is paying) to the batch id
+    PlayerBatchId(player=request.user, batch_id=unique_id).save()
 
     # let payments API handle getting the money
     return payment_api(
@@ -1812,14 +1823,18 @@ def admin_evententry_delete(request, evententry_id):
                     event_entry_player.paid_by
                 ] += event_entry_player.payment_received
 
-            # Not sure who paid to default it back to the entry name
+            # Not sure who paid so default it back to the entry name
             else:
-                refund_dict[
-                    event_entry_player.player
-                ] += event_entry_player.payment_received
+                try:
+                    refund_dict[
+                        event_entry_player.player
+                    ] += event_entry_player.payment_received
+                except TypeError:
+                    pass
 
         for player_refund in refund_dict.keys():
             event_entry.received += refund_dict[player_refund]
+
             initial.append(
                 {
                     "player_id": player_refund.id,

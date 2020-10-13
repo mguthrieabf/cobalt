@@ -196,6 +196,22 @@
 
                 <br>
                 <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
+                    Question (optional)
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_free_format_question" class="form-group">
+                      <span class="cobalt-form-error" id="id_event_type_errors">{{ form.free_format_question.errors|striptags }}</span>
+                      {% render_field form.free_format_question class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="javascript:void(0)" onclick='help("Question", "If you would like to get additional information from entrants such a dietary requirements, you can ask for that information here.");'>help</a>
+                  </div>
+                </div>
+
+                <br>
+                <div class="row">
                   <div class="col text-center">
                     <button class="btn btn-success btn-sm cobalt-save">Save</button>
                     <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=6 %}" class="btn btn-info btn-sm">Return to Congress</a>
@@ -211,7 +227,7 @@
 
       {% if not categories %}
 
-        {% if page_type == "Edit "%}
+        {% if page_type == "edit" %}
           <div id="category_show">
             <a href="javascript:void(0)" id="show_category">Add Categories (optional)</a><br><br>
           </div>

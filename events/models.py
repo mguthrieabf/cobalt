@@ -178,9 +178,11 @@ class Event(models.Model):
     entry_youth_payment_discount = models.IntegerField(
         "Youth Discount Percentage", null=True, blank=True
     )
-
     player_format = models.CharField(
         "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+    )
+    free_format_question = models.CharField(
+        "Free Format Question", max_length=60, null=True, blank=True
     )
 
     def __str__(self):
@@ -291,6 +293,7 @@ class Event(models.Model):
         else:
             return False
 
+
 class Category(models.Model):
     """ Event Categories such as <100 MPs or club members etc. Free format."""
 
@@ -331,6 +334,9 @@ class EventEntry(models.Model):
     primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, null=True, blank=True
+    )
+    free_format_answer = models.CharField(
+        "Free Format Answer", max_length=60, null=True, blank=True
     )
 
     def __str__(self):

@@ -1287,6 +1287,29 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
             stripe_transaction=stripe_tran,
         )
 
+        # Notify member
+        email_body = f"Auto top up of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account was successful.<br><br>"
+        context = {
+            "name": member.first_name,
+            "title": "Auto top up successful",
+            "email_body": email_body,
+            "host": COBALT_HOSTNAME,
+            "link": "/payments",
+            "link_text": "View Statement",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=member,
+            msg="Auto top up of %s%s successful" % (GLOBAL_CURRENCY_SYMBOL, amount),
+            contact_type="Email",
+            html_msg=html_msg,
+            link="/payments",
+            subject="Auto top up successful",
+        )
+
         return (
             True,
             "Top up successful. %s%.2f added to your account \

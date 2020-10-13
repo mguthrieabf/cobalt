@@ -31,7 +31,7 @@
 
         <b>Auto Top Up</b>
         {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
-        <input id="auto-button" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm" {% if auto_button %} checked {% endif %}>
+        <input id="auto-button" class="cobalt-save another" type="checkbox" data-toggle="toggle" data-onstyle="success" data-size="sm" {% if auto_button %} checked {% endif %}>
         {% if auto_button %}
         &nbsp;<a class="btn btn-sm btn-secondary" href="{% url "payments:setup_autotopup" %}">Update</a>
         {% endif %}
@@ -109,11 +109,11 @@
       const options = {
         decimalPlaces: 2,
       };
-      let demo = new countUp.CountUp('balance', {{ balance }}, options);
-      if (!demo.error) {
-        demo.start();
+      let counter = new countUp.CountUp('balance', {{ balance }}, options);
+      if (!counter.error) {
+        counter.start();
       } else {
-        console.error(demo.error);
+        console.error(counter.error);
       }
 
 {% endif %}

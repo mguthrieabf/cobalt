@@ -252,6 +252,7 @@ class EventForm(forms.ModelForm):
             "entry_fee",
             "entry_early_payment_discount",
             "entry_youth_payment_discount",
+            "free_format_question",
         )
 
 
