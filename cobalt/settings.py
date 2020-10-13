@@ -111,6 +111,8 @@ else:
         }
     }
 
+# Test Only - Dummy data count
+DUMMY_DATA_COUNT = set_value("DUMMY_DATA_COUNT", 20)
 
 #########################################
 # Dynamic settings.                     #
@@ -269,6 +271,7 @@ GLOBAL_TITLE = "ABF Technology"
 GLOBAL_CONTACT = "https://abf.com.au/contact"
 GLOBAL_ABOUT = "https://abf.com.au"
 GLOBAL_PRIVACY = "https://abf.com.au/privacy"
+GLOBAL_COOKIES = "/support/cookies"
 GLOBAL_PRODUCTION = "abftech.com.au"
 GLOBAL_CURRENCY_SYMBOL = "$"
 GLOBAL_CURRENCY_NAME = "Dollar"

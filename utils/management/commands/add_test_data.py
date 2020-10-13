@@ -1,6 +1,6 @@
 """ Script to create cobalt test data """
 
-from cobalt.settings import RBAC_EVERYONE, TIME_ZONE
+from cobalt.settings import RBAC_EVERYONE, TIME_ZONE, DUMMY_DATA_COUNT
 from accounts.models import User
 from events.models import CongressMaster
 from django.core.management.base import BaseCommand
@@ -351,7 +351,8 @@ class Command(BaseCommand):
         # create dummy Posts
         print("\nCreating dummy forum posts")
         print("Running", end="", flush=True)
-        for post_counter in range(2000000):
+        count = 0
+        for post_counter in range(DUMMY_DATA_COUNT * 5):
 
             user_list = list(self.id_array["accounts.User"].values())
             user_list.remove(self.id_array["accounts.User"]["EVERYONE"])
@@ -365,4 +366,7 @@ class Command(BaseCommand):
             post.save()
             print(".", end="", flush=True)
             self.add_comments(post, user_list)
+            count += 1
+            if count % 100 == 0:
+                print(count, flush=True)
         print("\n")

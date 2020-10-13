@@ -63,14 +63,14 @@
           </li> -->
           <li class="nav-item {% if request.path|slice:":13" == "/masterpoints" %}active{% endif %} ">
             <a class="nav-link" href="/masterpoints">
-              <i class="material-icons">shopping_basket</i>
+              <i class="material-icons">call_made</i>
               <p>Masterpoints</p>
             </a>
           </li>
           <li class="nav-item {% if request.path|slice:":7" == "/events" %}active{% endif %} ">
             <a class="nav-link" href="/events">
-              <i class="material-icons">library_books</i>
-              <p>Events</p>
+              <i class="material-icons">book_online</i>
+              <p>Congresses</p>
             </a>
           </li>
           <li class="nav-item {% if request.path|slice:":9" == "/calendar" %}active{% endif %} ">
@@ -82,7 +82,7 @@
           <li class="nav-item {% if request.path|slice:":7" == "/forums" %}active{% endif %} ">
 
             <a class="nav-link" href="/forums">
-              <i class="material-icons">bubble_chart</i>
+              <i class="material-icons">chat</i>
               <p>Forums</p>
             </a>
           </li>
@@ -242,6 +242,11 @@
               <li>
                 <a href=" {{ GLOBAL_PRIVACY }}">
                   Privacy
+                </a>
+              </li>
+              <li>
+                <a href=" {{ GLOBAL_COOKIES }}">
+                  Cookies
                 </a>
               </li>
             </ul>

@@ -45,172 +45,177 @@
 {% block content %}
 <div class="card">
   <div class="card-header card-header-warning">
-    <h1>Frequently Asked Questions</h1>
+    <h1>Frequently Asked Questions...</h1>
   </div>
   <div class="card-body">
+    <div class="container justify-content-center">
+      <img src="{% static "assets/img/faq2.jpg" %}" alt="FAQ" width="200px" class="mx-auto">
 
-<!-- security -->
+      <!-- security -->
 
-    <div class="card col-md-8">
-      <div class="card-header card-header-primary">
-        <h2>Security</h2>
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-primary">
+          <h2>Security</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion">How do I logout?</button>
+          <div class="panel">
+            <p>You can logout by clicking on the person icon
+              at the top right hand corner of every screen. <i class="material-icons">person</i>.
+            </p>
+            <p>
+              Then choose Logout.
+            </p>
+            <p><b>Always</b> logout after using a shared computer.</p>
+          </div>
+          <button class="accordion">How do I change my password?</button>
+          <div class="panel">
+            <p>You can change your password through your <a href="{% url "accounts:user_profile" %}">Profile</a>
+              which you can get to by clicking on the person icon
+              at the top right hand corner of every screen. <i class="material-icons">person</i>.
+            </p>
+            <p>
+              You can also go
+              to the <a href="{% url "accounts:change_password" %}">Password Change Screen here</a>.
+            </p>
+          </div>
+
+          <button class="accordion">Is this system secure?</button>
+          <div class="panel">
+            <p>Yes.
+            </p>
+            <p>
+              Here are some of the security features:
+            </p>
+            <ul>
+              <li>Data is encrypted at rest.
+              <li>Data is encypted in transit using TLS1.2.
+              <li>Production data is not used in any other environment e.g. Test.
+              <li>The system is built in Django, one of the most secure web frameworks available.
+            </ul>
+          </div>
+
+          <button class="accordion">I have forgotten my password. How do I reset it?</button>
+          <div class="panel">
+            <p>There is a password reset option on the login screen. You will be sent
+              a link in email to reset your password.
+            </p>
+          </div>
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
+      <br>
 
-    <button class="accordion">How do I logout?</button>
-    <div class="panel">
-      <p>You can logout by clicking on the person icon
-        at the top right hand corner of every screen. <i class="material-icons">person</i>.
-      </p>
-      <p>
-        Then choose Logout.
-      </p>
-      <p><b>Always</b> logout after using a shared computer.</p>
-    </div>
-    <button class="accordion">How do I change my password?</button>
-    <div class="panel">
-      <p>You can change your password through your <a href="{% url "accounts:user_profile" %}">Profile</a>
-        which you can get to by clicking on the person icon
-        at the top right hand corner of every screen. <i class="material-icons">person</i>.
-      </p>
-      <p>
-        You can also go
-        to the <a href="{% url "accounts:change_password" %}">Password Change Screen here</a>.
-      </p>
-    </div>
+      <!-- ABF Dollars -->
 
-    <button class="accordion">Is this system secure?</button>
-    <div class="panel">
-      <p>Yes.
-      </p>
-      <p>
-        Here are some of the security features:
-      </p>
-      <ul>
-        <li>Data is encrypted at rest.
-        <li>Data is encypted in transit using TLS1.2.
-        <li>Production data is not used in any other environment e.g. Test.
-        <li>The system is built in Django, one of the most secure web frameworks available.
-      </ul>
-    </div>
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>{{ GLOBAL_ORG}} {{ GLOBAL_CURRENCY_NAME }}s</h2>
+        </div>
+        <div class="card-body">
 
-    <button class="accordion">I have forgotten my password. How do I reset it?</button>
-    <div class="panel">
-      <p>There is a password reset option on the login screen. You will be sent
-        a link in email to reset your password.
-      </p>
-    </div>
+          <button class="accordion">What are {{ GLOBAL_ORG}} {{ GLOBAL_CURRENCY_NAME }}s?</button>
+          <div class="panel">
+            <p>You can logout by clicking on the person icon
+              at the top right hand corner of every screen. <i class="material-icons">person</i>.
+            </p>
+            <p>
+              Then choose Logout.
+            </p>
+            <p><b>Always</b> logout after using a shared computer.</p>
+          </div>
+          <button class="accordion">What Credit Cards are supported?</button>
+          <div class="panel">
+            <p>You can change your password through your <a href="{% url "accounts:user_profile" %}">Profile</a>
+              which you can get to by clicking on the person icon
+              at the top right hand corner of every screen. <i class="material-icons">person</i>.
+            </p>
+            <p>
+              You can also go
+              to the <a href="{% url "accounts:change_password" %}">Password Change Screen here</a>.
+            </p>
+          </div>
 
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
+          <button class="accordion">Where are my card details kept?</button>
+          <div class="panel">
+            <p>Yes.
+            </p>
+            <p>
+              Here are some of the security features:
+            </p>
+            <ul>
+              <li>Data is encrypted at rest.
+              <li>Data is encypted in transit using TLS1.2.
+              <li>Production data is not used in any other environment e.g. Test.
+              <li>The system is built in Django, one of the most secure web frameworks available.
+            </ul>
+          </div>
 
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
+          <button class="accordion">What is Auto Top Up?</button>
+          <div class="panel">
+            <p>There is a password reset option on the login screen. You will be sent
+              a link in email to reset your password.
+            </p>
+          </div>
+          <button class="accordion">How can I set up Auto Top Up?</button>
+          <div class="panel">
+            <p>There is a password reset option on the login screen. You will be sent
+              a link in email to reset your password.
+            </p>
+          </div>
 
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
 
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
-  </div>
-  </div>
-  <br>
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
 
-<!-- ABF Dollars -->
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
 
-    <div class="card col-md-8">
-      <div class="card-header card-header-success">
-        <h2>{{ GLOBAL_ORG}} {{ GLOBAL_CURRENCY_NAME }}s</h2>
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+
+        </div>
       </div>
-      <div class="card-body">
-
-    <button class="accordion">What are {{ GLOBAL_ORG}} {{ GLOBAL_CURRENCY_NAME }}s?</button>
-    <div class="panel">
-      <p>You can logout by clicking on the person icon
-        at the top right hand corner of every screen. <i class="material-icons">person</i>.
-      </p>
-      <p>
-        Then choose Logout.
-      </p>
-      <p><b>Always</b> logout after using a shared computer.</p>
     </div>
-    <button class="accordion">What Credit Cards are supported?</button>
-    <div class="panel">
-      <p>You can change your password through your <a href="{% url "accounts:user_profile" %}">Profile</a>
-        which you can get to by clicking on the person icon
-        at the top right hand corner of every screen. <i class="material-icons">person</i>.
-      </p>
-      <p>
-        You can also go
-        to the <a href="{% url "accounts:change_password" %}">Password Change Screen here</a>.
-      </p>
-    </div>
-
-    <button class="accordion">Where are my card details kept?</button>
-    <div class="panel">
-      <p>Yes.
-      </p>
-      <p>
-        Here are some of the security features:
-      </p>
-      <ul>
-        <li>Data is encrypted at rest.
-        <li>Data is encypted in transit using TLS1.2.
-        <li>Production data is not used in any other environment e.g. Test.
-        <li>The system is built in Django, one of the most secure web frameworks available.
-      </ul>
-    </div>
-
-    <button class="accordion">What is Auto Top Up?</button>
-    <div class="panel">
-      <p>There is a password reset option on the login screen. You will be sent
-        a link in email to reset your password.
-      </p>
-    </div>
-    <button class="accordion">How can I set up Auto Top Up?</button>
-    <div class="panel">
-      <p>There is a password reset option on the login screen. You will be sent
-        a link in email to reset your password.
-      </p>
-    </div>
-
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
-
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
-
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
-
-    <button class="accordion"></button>
-    <div class="panel">
-      <p>
-      </p>
-    </div>
-
-
   </div>
 </div>
 

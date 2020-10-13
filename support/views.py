@@ -23,6 +23,12 @@ def home(request):
 
 
 @login_required
+def cookies(request):
+
+    return render(request, "support/cookies.html")
+
+
+@login_required
 @csrf_exempt
 def browser_errors(request):
     """ receive errors from browser code and notify support """

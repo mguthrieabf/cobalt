@@ -7,4 +7,5 @@ urlpatterns = [
     path("", views.home, name="support"),
     path("browser-errors", views.browser_errors, name="browser_errors"),
     path("search", views.search, name="search"),
+    path("cookies", views.cookies, name="cookies"),
 ]
