@@ -5,16 +5,20 @@
 
 {% block content %}
 
-{% get_admin_log 10 as admin_log %}
-<h3>Recent Admin Activity</h3>
-{% for adm in admin_log %}
-{{ adm.user }} {{ adm }}<br>
-{% endfor %}
+
 
 <div class="col-md-12">
   <div class="card">
     <div class="card-header card-header-warning">
-      <h4 class="card-title">Logs</h4>
+      <h2>
+        <div class="d-flex justify-content-between">
+          <div>
+            Logs
+          </div>
+          <div>
+            <i class="material-icons" style="font-size:50px">build</i>
+          </div>
+      </h2>
     </div>
     <div class="card-body table-responsive">
       <table class="table table-hover">
