@@ -223,7 +223,7 @@ class Event(models.Model):
                 entry_fee = (
                     self.entry_fee - self.entry_early_payment_discount
                 ) / players_per_entry
-                discount = self.entry_early_payment_discount
+                discount = self.entry_early_payment_discount / players_per_entry
                 reason = "Early discount"
                 description = f"Early discount {GLOBAL_CURRENCY_SYMBOL}{discount}"
 
