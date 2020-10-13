@@ -67,7 +67,7 @@
           </div>
           <p class="card-category">Masterpoints</p>
 
-            <h3 class="card-title"><span id="odometer" class="text-nowrap text-dark odometer">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
+            <h3 class="card-title"><span id="masterpoints" class="text-nowrap text-dark">{{ mp.points|floatformat:2|intcomma }}</span> </h3>
 
         </div>
         <div class="card-footer">
@@ -237,10 +237,6 @@
 <script src="{% static "assets/js/waypoints/jquery.waypoints.min.js" %}"></script>
 <script src="{% static "assets/js/waypoints/shortcuts/infinite.min.js" %}"></script>
 <script src="{% static "assets/js/countUp.2.0.7/countUp.umd.js" %}"></script>
-<script src="{% static "assets/js/odometer/0.4.6/odometer.min.js" %}"></script>
-<link rel="stylesheet" href="{% static "assets/css/odometer-theme-minimal.css" %}" />
-<!-- <link rel="stylesheet" href="http://github.hubspot.com/odometer/themes/odometer-theme-car.css" />
-<script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
 
 <script>
 $(document).ready(function() {
@@ -284,16 +280,14 @@ $(document).ready(function() {
 {% endif %}
 
 // Masterpoints
-  // let counter3 = new countUp.CountUp('masterpoints', {{ mp.points }}, options);
-  // if (!counter3.error) {
-  //   counter3.start();
-  // } else {
-  //   console.error(counter3.error);
-  // }
+  let counter3 = new countUp.CountUp('masterpoints', {{ mp.points }}, options);
+  if (!counter3.error) {
+    counter3.start();
+  } else {
+    console.error(counter3.error);
+  }
 
 
-// var odometer = new Odometer({ el: $('#masterpoints')[0], value: 123,  });
-// odometer.render();
 
 });
 </script>
