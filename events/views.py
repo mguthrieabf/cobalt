@@ -500,6 +500,13 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.youth_payment_discount_date = form.cleaned_data[
                 "youth_payment_discount_date"
             ]
+            congress.senior_age = form.cleaned_data[
+                "senior_age"
+            ]
+            congress.senior_date = form.cleaned_data[
+                "senior_date"
+            ]
+
             congress.bank_transfer_details = form.cleaned_data["bank_transfer_details"]
             congress.cheque_details = form.cleaned_data["cheque_details"]
             congress.save()
@@ -537,6 +544,8 @@ def create_congress_wizard_5(request, step_list, congress):
     form.fields["allow_partnership_desk"].required = True
     form.fields["allow_early_payment_discount"].required = True
     form.fields["bank_transfer_details"].required = True
+    form.fields["senior_date"].required = True
+    form.fields["senior_age"].required = True
     form.fields["cheque_details"].required = True
 
     return render(
