@@ -284,7 +284,7 @@
               <div class="container">
                 <select class="w-100" size="10" id="session_list">
                   {% for session in sessions %}
-                  <option value="{{ session.id }}">Session starts at {{ session.session_date|cobalt_nice_datetime }}
+                  <option value="{{ session.id }}">Session starts on {{ session.session_date|cobalt_nice_date }} at {{ session.session_start|cobalt_time }}
                     {% if session.session_end %}
                     Ends at {{ session.session_end|cobalt_time }}
                     {% endif %}
@@ -438,7 +438,7 @@
 
     $("#edit_button").click(function() {
       var session_id = $("#session_list").val();
-      window.location = "/events/congress/create/edit-session/{{congress.id}}/" + session_id;
+      window.location = "/events/congress/create/edit-session/{{event.id}}/" + session_id;
       return false;
     });
 

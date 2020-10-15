@@ -80,7 +80,7 @@ class Congress(models.Model):
     save partial data as we go. The validation for completeness of data
     lies in the view. """
 
-    name = models.CharField("Name", max_length=100, null=True, blank=True)
+    name = models.CharField("Name", max_length=100)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     date_string = models.CharField("Dates", max_length=100, null=True, blank=True)

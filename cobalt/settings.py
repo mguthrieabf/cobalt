@@ -112,7 +112,7 @@ else:
     }
 
 # Test Only - Dummy data count
-DUMMY_DATA_COUNT = set_value("DUMMY_DATA_COUNT", 20)
+DUMMY_DATA_COUNT = int(set_value("DUMMY_DATA_COUNT", 20))
 
 #########################################
 # Dynamic settings.                     #

@@ -72,11 +72,11 @@ def home(request):
     for congress in congresses:
 
         # Comment field
-        if congress.entry_open_date > make_aware(datetime.now(), TZ):
+        if congress.entry_open_date and congress.entry_open_date > make_aware(datetime.now(), TZ):
             congress.msg = "Entries open on " + congress.entry_open_date.strftime(
                 "%d %b %Y"
             )
-        elif congress.entry_close_date > make_aware(datetime.now(), TZ):
+        elif congress.entry_close_date and congress.entry_close_date > make_aware(datetime.now(), TZ):
             congress.msg = "Entries close on " + congress.entry_close_date.strftime(
                 "%d %b %Y"
             )
@@ -829,7 +829,7 @@ def edit_session(request, event_id, session_id):
 
         form = SessionForm(instance=event, initial=initial)
 
-    return render(request, "events/edit_session.html", {"form": form, "event": event},)
+    return render(request, "events/edit_session.html", {"form": form, "event": event, "session": session},)
 
 
 def enter_event_form(event, congress, request, existing_choices=None):
