@@ -1,10 +1,10 @@
-from django.urls import path
-from . import views, ajax
+from django.urls import path, include
+from . import views, ajax, congress_builder, congress_admin
 
 app_name = "events"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path("test", views.test, name="test"),
+    # path("congress-builder", include("events.urls_congress_builder", namespace="congress_builder")),
     path("", views.home, name="events"),
     path("congress/view/<int:congress_id>", views.view_congress, name="view_congress"),
     path(
@@ -34,22 +34,22 @@ urlpatterns = [
     ),
     path(
         "congress/delete/<int:congress_id>",
-        views.delete_congress,
+        congress_builder.delete_congress,
         name="delete_congress",
     ),
     path(
         "congress/create/wizard",
-        views.create_congress_wizard,
+        congress_builder.create_congress_wizard,
         name="create_congress_wizard",
     ),
     path(
         "congress/create/wizard/<int:step>",
-        views.create_congress_wizard,
+        congress_builder.create_congress_wizard,
         name="create_congress_wizard",
     ),
     path(
         "congress/create/wizard/<int:congress_id>/<int:step>",
-        views.create_congress_wizard,
+        congress_builder.create_congress_wizard,
         name="create_congress_wizard",
     ),
     path(
@@ -69,63 +69,63 @@ urlpatterns = [
     ),
     path(
         "congress/create/add-event/<int:congress_id>",
-        views.create_event,
+        congress_builder.create_event,
         name="create_event",
     ),
     path(
         "congress/create/edit-event/<int:congress_id>/<int:event_id>",
-        views.edit_event,
+        congress_builder.edit_event,
         name="edit_event",
     ),
     path(
         "congress/create/add-session/<int:event_id>",
-        views.create_session,
+        congress_builder.create_session,
         name="create_session",
     ),
     path(
         "congress/admin/summary/<int:congress_id>",
-        views.admin_summary,
+        congress_admin.admin_summary,
         name="admin_summary",
     ),
     path(
         "congress/admin/summary/event/<int:event_id>",
-        views.admin_event_summary,
+        congress_admin.admin_event_summary,
         name="admin_event_summary",
     ),
     path(
         "congress/admin/detail/event-entry/<int:evententry_id>",
-        views.admin_evententry,
+        congress_admin.admin_evententry,
         name="admin_evententry",
     ),
     path(
         "congress/admin/detail/event-entry-delete/<int:evententry_id>",
-        views.admin_evententry_delete,
+        congress_admin.admin_evententry_delete,
         name="admin_evententry_delete",
     ),
     path(
         "congress/admin/detail/event-entry-player/<int:evententryplayer_id>",
-        views.admin_evententryplayer,
+        congress_admin.admin_evententryplayer,
         name="admin_evententryplayer",
     ),
     path(
         "congress/admin/event-csv/<int:event_id>",
-        views.admin_event_csv,
+        congress_admin.admin_event_csv,
         name="admin_event_csv",
     ),
     path(
         "congress/admin/event-log/<int:event_id>",
-        views.admin_event_log,
+        congress_admin.admin_event_log,
         name="admin_event_log",
     ),
     path(
         "congress/admin/event-offsystem/<int:event_id>",
-        views.admin_event_offsystem,
+        congress_admin.admin_event_offsystem,
         name="admin_event_offsystem",
     ),
     path("congress/checkout", views.checkout, name="checkout",),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",
-        views.edit_session,
+        congress_builder.edit_session,
         name="edit_session",
     ),
     path("congress/teammate/checkout", views.pay_outstanding, name="pay_outstanding"),

@@ -34,7 +34,6 @@
         </a>
         <p>{{ congress.date_string }}</p>
         {% if congress.convener %}
-        <a class="btn btn-sm btn-warning" href="{% url "events:view_congress" congress_id=congress.id %}">View Details</a>
         <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-success">Edit</a>
         <a class="btn btn-sm btn-info" href="{% url "events:admin_summary" congress_id=congress.id %}">Manage</a>
         {% endif %}

@@ -88,9 +88,6 @@ class Congress(models.Model):
         CongressMaster, on_delete=models.CASCADE, null=True, blank=True
     )
     year = models.IntegerField("Congress Year", null=True, blank=True)
-    # org = models.ForeignKey(
-    #     Organisation, on_delete=models.CASCADE, null=True, blank=True
-    # )
     venue_name = models.CharField("Venue Name", max_length=100, null=True, blank=True)
     venue_location = models.CharField(
         "Venue Location", max_length=100, null=True, blank=True
@@ -118,19 +115,19 @@ class Congress(models.Model):
     payment_method_cheques = models.BooleanField(default=False)
     cheque_details = models.TextField("Cheque Details", null=True, blank=True)
     allow_early_payment_discount = models.BooleanField(default=False)
-    early_payment_discount_date = models.DateTimeField(
+    early_payment_discount_date = models.DateField(
         "Last day for early discount", null=True, blank=True
     )
     allow_youth_payment_discount = models.BooleanField(default=False)
-    youth_payment_discount_date = models.DateTimeField(
+    youth_payment_discount_date = models.DateField(
         "Date for age check", null=True, blank=True
     )
     youth_payment_discount_age = models.IntegerField("Cut off age", default=30)
-    senior_date = models.DateTimeField("Date for age check", null=True, blank=True)
+    senior_date = models.DateField("Date for age check", null=True, blank=True)
     senior_age = models.IntegerField("Cut off age", default=60)
     # Open and close dates can be overriden at the event level
-    entry_open_date = models.DateTimeField(null=True, blank=True)
-    entry_close_date = models.DateTimeField(null=True, blank=True)
+    entry_open_date = models.DateField(null=True, blank=True)
+    entry_close_date = models.DateField(null=True, blank=True)
     allow_partnership_desk = models.BooleanField(default=False)
     author = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="author", null=True, blank=True
@@ -169,8 +166,8 @@ class Event(models.Model):
         "Event Type", max_length=14, choices=EVENT_TYPES, null=True, blank=True
     )
     # Open and close dates can be overriden at the event level
-    entry_open_date = models.DateTimeField(null=True, blank=True)
-    entry_close_date = models.DateTimeField(null=True, blank=True)
+    entry_open_date = models.DateField(null=True, blank=True)
+    entry_close_date = models.DateField(null=True, blank=True)
     entry_fee = models.DecimalField("Entry Fee", max_digits=12, decimal_places=2)
     entry_early_payment_discount = models.DecimalField(
         "Early Payment Discount", max_digits=12, decimal_places=2, null=True, blank=True
@@ -191,7 +188,7 @@ class Event(models.Model):
     def is_open(self):
         """ check if this event is taking entries today """
 
-        today = timezone.now()
+        today = timezone.now().date()
         open_date = self.entry_open_date
         if not open_date:
             open_date = self.congress.entry_open_date
