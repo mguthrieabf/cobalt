@@ -1,3 +1,5 @@
+""" The file has the code relating to a convener managing an existing event """
+
 import csv
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -79,7 +81,10 @@ def admin_summary(request, congress_id):
     for event in events:
         event_entries = EventEntry.objects.filter(event=event)
         event.entries = event_entries.count()
-        event.early_fee = event.entry_fee - event.entry_early_payment_discount
+        if event.entry_early_payment_discount:
+            event.early_fee = event.entry_fee - event.entry_early_payment_discount
+        else:
+            event.early_fee = event.entry_fee
 
         # calculate tables
         players_per_entry = EVENT_PLAYER_FORMAT_SIZE[event.player_format]

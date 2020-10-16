@@ -295,7 +295,7 @@
 
               <div class="d-flex">
                 <div>
-                  <a href="/events/congress/create/add-session/{{ event.id }}" class="btn btn-success btn-sm cobalt-save">Add</a>
+                  <a href="{% url "events:create_session" event_id=event.id %}" class="btn btn-success btn-sm cobalt-save">Add</a>
                   <button id="edit_button" class="btn btn-primary btn-sm cobalt-save" disabled>Edit</button>
                 </div>
                 <div class="ml-auto">
