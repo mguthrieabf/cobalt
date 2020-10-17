@@ -215,7 +215,7 @@ class Event(models.Model):
 
         # date
         if self.congress.allow_early_payment_discount:
-            today = timezone.now()
+            today = timezone.now().date()
             if self.congress.early_payment_discount_date >= today:
                 entry_fee = (
                     self.entry_fee - self.entry_early_payment_discount

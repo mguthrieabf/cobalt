@@ -112,7 +112,7 @@
 
     $("#edit_button").click(function() {
       var event_id = $("#event_list").val();
-      window.location = "/events/congress/create/edit-event/{{congress.id}}/" + event_id;
+      window.location = "{% url "events:edit_event" congress_id=congress.id %}/" + event_id;
       return false;
     });
 

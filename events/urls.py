@@ -4,13 +4,11 @@ from . import views, ajax, congress_builder, congress_admin
 app_name = "events"  # pylint: disable=invalid-name
 
 urlpatterns = [
-
-#################################
-# Screens for normal players    #
-#################################
+    #################################
+    # Screens for normal players    #
+    #################################
     path("", views.home, name="events"),
     path("congress/view/<int:congress_id>", views.view_congress, name="view_congress"),
-
     path(
         "congress/view/<int:congress_id>/<int:fullscreen>",
         views.view_congress,
@@ -59,9 +57,9 @@ urlpatterns = [
         name="payment_options_for_user_ajax",
     ),
     path("view", views.view_events, name="view_events",),
-########################################################################
-# Congress Builder screens for conveners to create and edit congresses #
-########################################################################
+    ########################################################################
+    # Congress Builder screens for conveners to create and edit congresses #
+    ########################################################################
     path(
         "congress-builder/delete/<int:congress_id>",
         congress_builder.delete_congress,
@@ -107,6 +105,12 @@ urlpatterns = [
         congress_builder.edit_event,
         name="edit_event",
     ),
+    # javascript parameter missing call for function above
+    path(
+        "congress-builder/create/edit-event/<int:congress_id>",
+        congress_builder.edit_event,
+        name="edit_event",
+    ),
     path(
         "congress-builder/create/add-session/<int:event_id>",
         congress_builder.create_session,
@@ -127,10 +131,9 @@ urlpatterns = [
         ajax.add_category_ajax,
         name="add_category_ajax",
     ),
-
-########################################################################
-# Congress Admin screens for conveners to manage an existing congress  #
-########################################################################
+    ########################################################################
+    # Congress Admin screens for conveners to manage an existing congress  #
+    ########################################################################
     path(
         "congress-admin/summary/<int:congress_id>",
         congress_admin.admin_summary,
