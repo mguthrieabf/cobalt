@@ -10,13 +10,13 @@ from datetime import datetime
 
 
 def events_payments_secondary_callback(status, route_payload, tran):
-    """ This gets called when a payment has been made for us.
+    """This gets called when a payment has been made for us.
 
-        We supply the route_payload when we ask for the payment to be made and
-        use it to update the status of payments.
+    We supply the route_payload when we ask for the payment to be made and
+    use it to update the status of payments.
 
-        This is for the case where a secondary user (not the person making
-        the initial entry) has made their payment."""
+    This is for the case where a secondary user (not the person making
+    the initial entry) has made their payment."""
 
     log_event(
         user="Unknown",
@@ -38,13 +38,13 @@ def events_payments_secondary_callback(status, route_payload, tran):
 
 
 def events_payments_callback(status, route_payload, tran):
-    """ This gets called when a payment has been made for us.
+    """This gets called when a payment has been made for us.
 
-        We supply the route_payload when we ask for the payment to be made and
-        use it to update the status of payments.
+    We supply the route_payload when we ask for the payment to be made and
+    use it to update the status of payments.
 
-        This gets called when the primary user who is entering the congress
-        has made a payment."""
+    This gets called when the primary user who is entering the congress
+    has made a payment."""
 
     log_event(
         user="Unknown",
@@ -77,8 +77,8 @@ def events_payments_callback(status, route_payload, tran):
 
 
 def update_entries(route_payload, payment_user):
-    """ Update the database to reflect changes and make payments for
-        other members if we have access. """
+    """Update the database to reflect changes and make payments for
+    other members if we have access."""
 
     # Update EntryEventPlayer objects
     event_entry_players = EventEntryPlayer.objects.filter(batch_id=route_payload)
@@ -231,11 +231,6 @@ def send_notifications(route_payload, payment_user):
                 .filter(player=player)
                 .filter(event_entry__event__congress=congress)
             )
-
-            print("####Player")
-            print(player)
-            print("####EEP")
-            print(event_entry_players)
 
             # Check status
             if event_entry_players.exists():
