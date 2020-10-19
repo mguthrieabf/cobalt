@@ -102,7 +102,7 @@
 
         <div class="card-body table-responsive">
           {% for event in events %}
-            <a class="card-link" href="{% url "events:view_congress" congress_id=event.event_entry.event.congress.id %}">{{ event.event_entry.event }}</a><br>
+            <a class="card-link" href="{% url "events:view_congress" congress_id=event.event_entry.event.congress.id %}">{{ event.event_entry.event.start_date }} - {{ event.event_entry.event }}</a><br>
           {% empty %}
             <span class="card-link">Nothing booked</span>
           {% endfor %}
