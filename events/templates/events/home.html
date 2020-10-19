@@ -15,7 +15,7 @@
     </div>
   </h2>
   </div>
-  <div class="card-body">
+  <div class="card-body text-center">
 
     <div class="d-flex justify-content-between">
           <div>
@@ -32,14 +32,21 @@
      </div>
 
     {% for month, congresses in grouped_by_month.items %}
+      <div>
 
     <img src="{% static "assets/img/congress.jpg "%}" alt="congress" width="200px">
     <h2>{{ month }}</h2>
     {% for congress in congresses %}
-    <div class="card text-center col-md-6">
+    <div class="card col-md-6 mx-auto">
       <div class="card-body">
-        <a class="btn btn-sm btn-danger" href="{% url "events:view_congress" congress_id=congress.id %}">{{ congress }}
-        by {{ congress.congress_master.org }}
+        <a class="btn btn-sm btn-danger" href="{% url "events:view_congress" congress_id=congress.id %}">
+          <span style="font-size: 22px">
+          {{ congress }}
+          </span>
+        <br><span class="cobalt-text-transform-off " style="font-size: 14px">by</span><br>
+        <span style="font-size: 16px">
+          {{ congress.congress_master.org }}
+        </span>
         </a>
         <p>{{ congress.date_string }}</p>
         {% if congress.convener %}
@@ -53,6 +60,7 @@
     </div>
 
     {% endfor %}
+    </div>
     {% endfor %}
 
   </div>

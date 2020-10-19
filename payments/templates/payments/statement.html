@@ -117,6 +117,7 @@
 {% if balance != "Nil" %}
       const options = {
         decimalPlaces: 2,
+        duration: <1 className="5">  </1>,
       };
       let counter = new countUp.CountUp('balance', {{ balance }}, options);
       if (!counter.error) {
