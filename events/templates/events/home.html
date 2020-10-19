@@ -16,11 +16,20 @@
   </h2>
   </div>
   <div class="card-body">
-    {% if admin %}
-    <div class="text-right">
-      <a class="text-right" href="{% url "events:create_congress_wizard" %}">Create New Congress</a>
-    </div>
-    {% endif %}
+
+    <div class="d-flex justify-content-between">
+          <div>
+            {% if draft_congress_flag %}
+              <a class="text-left" href="{% url "events:view_draft_congresses" %}">View Draft Congresses</a>
+            {% endif %}
+            </div>
+
+          <div class="pb-5">
+            {% if admin %}
+              <a class="text-right" href="{% url "events:create_congress_wizard" %}">Create New Congress</a>
+            {% endif %}
+          </div>
+     </div>
 
     {% for month, congresses in grouped_by_month.items %}
 

@@ -154,8 +154,6 @@ def fee_for_user_ajax(request):
 
     entry_fee, discount, reason, description = event.entry_fee_for(user)
 
-    print(description)
-
     response_data = {
         "entry_fee": entry_fee,
         "description": description,
@@ -167,20 +165,20 @@ def fee_for_user_ajax(request):
 
 @login_required()
 def payment_options_for_user_ajax(request):
-    """ Ajax call to get payment methods - basically team mate relationships
+    """Ajax call to get payment methods - basically team mate relationships
 
-        We turn on this option if the other user has allowed the logged in user
-        to make payments for them AND they either have auto top up enabled OR
-        enough funds taking away events they have already entered but not paid for.
-        This could be with ANY user as the person entering.
+    We turn on this option if the other user has allowed the logged in user
+    to make payments for them AND they either have auto top up enabled OR
+    enough funds taking away events they have already entered but not paid for.
+    This could be with ANY user as the person entering.
 
-        e.g. Fred is entering with Bob as his partner. Bob has allowed Fred to
-        do this but doesn't have auto top up enabled. Bob has $100 in his account
-        and this event will cost $20. Fred already has another event in his
-        basket with Bob as his partner for $50. Jane is also entering an event
-        with Bob and has $20 for Bob to pay in her basket. Bob's current total
-        commitment is $70, so the $20 for this event is okay. If this event was
-        $31 then it would fail."""
+    e.g. Fred is entering with Bob as his partner. Bob has allowed Fred to
+    do this but doesn't have auto top up enabled. Bob has $100 in his account
+    and this event will cost $20. Fred already has another event in his
+    basket with Bob as his partner for $50. Jane is also entering an event
+    with Bob and has $20 for Bob to pay in her basket. Bob's current total
+    commitment is $70, so the $20 for this event is okay. If this event was
+    $31 then it would fail."""
 
     if request.method == "GET":
         entering_user_id = request.GET["entering_user_id"]
@@ -303,3 +301,20 @@ def admin_offsystem_pay_ajax(request):
     response_data = {}
     response_data["message"] = "Success"
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def delete_basket_item_ajax(request):
+    """ Delete an item from a users basket (and delete the event entry) """
+
+    if request.method == "GET":
+        basket_id = request.GET["basket_id"]
+
+    basket_item = get_object_or_404(BasketItem, pk=basket_id)
+
+    if basket_item.player == request.user:
+        basket_item.event_entry.delete()
+        basket_item.delete()
+
+        response_data = {"message": "Success"}
+        return JsonResponse({"data": response_data})

@@ -15,6 +15,11 @@ PAYMENT_STATUSES = [
     ("Unpaid", "Entry Unpaid"),
 ]
 
+ENTRY_STATUSES = [
+    ("Incomplete", "Incomplete"),
+    ("Complete", "Complete"),
+]
+
 # my-system-dollars - you can pay for your own or other people's entries with
 # your money.
 # their-system-dollars - you can use a team mates money to pay for their
@@ -58,13 +63,22 @@ EVENT_PLAYER_FORMAT_SIZE = {
     "Teams": 6,
 }
 
+PEOPLE_DEFAULT = """<table class="table"><tbody><tr><td><span style="font-weight: normal;">
+Organiser:</span></td><td><span style="font-weight: normal;">Jane Doe</span></td>
+</tr><tr><td><span style="font-weight: normal;">Phone:</span></td><td>
+<span style="font-weight: normal;">040404040444</span></td></tr><tr><td>
+<span style="font-weight: normal;">Email:</span></td><td><span style="font-weight: normal;">
+me@club.com</span></td></tr><tr><td><span style="font-weight: normal;">
+Chief Tournament Director:</span></td><td><span style="font-weight: normal;">
+Alan Partidge</span></td></tr></tbody></table><p><br></p>"""
+
 
 class CongressMaster(models.Model):
-    """ Master List of congresses. E.g. GCC. This is not an instance
-       of a congress, just a list of the regular recurring ones.
-       Congresses can only belong to one club at a time. Control for
-       who can setup a congress as an instance of a congress master
-       is handled by who is a convener for a club """
+    """Master List of congresses. E.g. GCC. This is not an instance
+    of a congress, just a list of the regular recurring ones.
+    Congresses can only belong to one club at a time. Control for
+    who can setup a congress as an instance of a congress master
+    is handled by who is a convener for a club"""
 
     name = models.CharField("Congress Master Name", max_length=100)
     org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
@@ -74,11 +88,11 @@ class CongressMaster(models.Model):
 
 
 class Congress(models.Model):
-    """ A specific congress including year
+    """A specific congress including year
 
     We set all values to be optional so we can use the wizard format and
     save partial data as we go. The validation for completeness of data
-    lies in the view. """
+    lies in the view."""
 
     name = models.CharField("Name", max_length=100)
     start_date = models.DateField(null=True, blank=True)
@@ -102,7 +116,7 @@ class Congress(models.Model):
         "Congress Additional Information", null=True, blank=True
     )
     raw_html = models.TextField("Raw HTML", null=True, blank=True)
-    people = models.TextField("People", null=True, blank=True)
+    people = models.TextField("People", null=True, blank=True, default=PEOPLE_DEFAULT)
 
     general_info = models.TextField("General Information", null=True, blank=True)
     links = models.TextField("Links", null=True, blank=True)
@@ -176,7 +190,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -189,17 +205,20 @@ class Event(models.Model):
         """ check if this event is taking entries today """
 
         today = timezone.now().date()
+
         open_date = self.entry_open_date
         if not open_date:
             open_date = self.congress.entry_open_date
-        if today < open_date:
-            return False
+            if open_date:
+                if today < open_date:
+                    return False
 
         close_date = self.entry_close_date
         if not close_date:
             close_date = self.congress.entry_close_date
-        if today > close_date:
-            return False
+        if close_date:
+            if today > close_date:
+                return False
 
         return True
 
@@ -276,7 +295,7 @@ class Event(models.Model):
         """ returns the status of the team/pairs/individual entry """
         event_entry = EventEntry.objects.filter(event=self).first()
         if event_entry:
-            return event_entry.payment_status
+            return event_entry.entry_status
 
     def is_full(self):
         """ check if event is already full """
@@ -325,8 +344,8 @@ class EventEntry(models.Model):
     """ An entry to an event """
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    payment_status = models.CharField(
-        "Payment Status", max_length=20, choices=PAYMENT_STATUSES, default="Unpaid"
+    entry_status = models.CharField(
+        "Entry Status", max_length=20, choices=ENTRY_STATUSES, default="Incomplete"
     )
     primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(
@@ -347,8 +366,8 @@ class EventEntry(models.Model):
     entry_complete_date = models.DateTimeField(null=True, blank=True)
 
     def check_if_paid(self):
-        """ go through sub level event entry players and see if this is now
-        complete as well. """
+        """go through sub level event entry players and see if this is now
+        complete as well."""
 
         all_complete = True
         for event_entry_player in self.evententryplayer_set.all():
@@ -356,10 +375,10 @@ class EventEntry(models.Model):
                 all_complete = False
                 break
         if all_complete:
-            self.payment_status = "Paid"
+            self.entry_status = "Complete"
             self.entry_complete_date = timezone.now()
         else:
-            self.payment_status = "Unpaid"
+            self.entry_status = "Incomplete"
         self.save()
 
 
@@ -388,7 +407,7 @@ class EventEntryPlayer(models.Model):
         "Entry Fee", decimal_places=2, max_digits=10, null=True, blank=True
     )
     payment_received = models.DecimalField(
-        "Payment Received", decimal_places=2, max_digits=10, null=True, blank=True
+        "Payment Received", decimal_places=2, max_digits=10, default=0.0
     )
 
     def __str__(self):
@@ -396,9 +415,9 @@ class EventEntryPlayer(models.Model):
 
 
 class PlayerBatchId(models.Model):
-    """ Maps a batch Id associated with a payment to the user who made the
-        payment. We use the same approach for all players so can't assume it
-        will be the primary entrant. """
+    """Maps a batch Id associated with a payment to the user who made the
+    payment. We use the same approach for all players so can't assume it
+    will be the primary entrant."""
 
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     batch_id = models.CharField(

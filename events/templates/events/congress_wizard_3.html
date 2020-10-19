@@ -161,7 +161,6 @@
         allowOutsideClick: () => !Swal.isLoading()
       }).then((result) => {
         if (result.value) {
-          console.log(result.value);
           $("#id_venue_location").val(result.value.data.lat + "," + result.value.data.lon);
           googlemap(result.value.data.lat, result.value.data.lon);
 
@@ -170,7 +169,6 @@
     });
 
     // set map at start if we have coordinates
-
 
       {% if form.venue_location.value %}
 

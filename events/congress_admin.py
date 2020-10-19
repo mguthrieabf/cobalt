@@ -150,17 +150,26 @@ def admin_event_summary(request, event_id):
     # build summary
     for event_entry in event_entries:
         event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
-        event_entry.received = Decimal(0)
-        event_entry.outstanding = Decimal(0)
+        event_entry.received = Decimal(0.0)
+        event_entry.outstanding = Decimal(0.0)
         event_entry.players = []
 
         for event_entry_player in event_entry_players:
+
             if event_entry_player.payment_received:
-                event_entry.received += event_entry_player.payment_received
-                event_entry.outstanding += (
-                    event_entry_player.entry_fee - event_entry_player.payment_received
-                )
+                received = event_entry_player.payment_received
+            else:
+                received = Decimal(0.0)
+
+            event_entry.received += received
+            event_entry.outstanding += event_entry_player.entry_fee - received
             event_entry.players.append(event_entry_player)
+
+    for ee in event_entries:
+        print(ee)
+        print(ee.players)
+        print(ee.received)
+        print(ee.outstanding)
 
     return render(
         request,
@@ -248,17 +257,20 @@ def admin_event_csv(request, event_id):
     )
 
     # Event Entry details
-    writer.writerow(
-        [
-            "Players",
-            "Entry Fee",
-            "Received",
-            "Outstanding",
-            "Status",
-            "First Created Date",
-            "Entry Complete Date",
-        ]
-    )
+    header = [
+        "Players",
+        "Entry Fee",
+        "Received",
+        "Outstanding",
+        "Status",
+        "First Created Date",
+        "Entry Complete Date",
+    ]
+
+    if event.free_format_question:
+        header.append(f"'{event.free_format_question}'")
+
+    writer.writerow(header)
 
     for row in entries:
 
@@ -268,24 +280,30 @@ def admin_event_csv(request, event_id):
 
         for player in row.evententryplayer_set.all():
             players += player.player.full_name + " - "
-            received += player.payment_received
+            try:
+                received += player.payment_received
+            except TypeError:
+                pass  # ignore if payment_received is None
             entry_fee += player.entry_fee
         players = players[:-3]
 
         local_dt = timezone.localtime(row.first_created_date, TZ)
         local_dt2 = timezone.localtime(row.entry_complete_date, TZ)
 
-        writer.writerow(
-            [
-                players,
-                entry_fee,
-                received,
-                entry_fee - received,
-                row.payment_status,
-                dateformat.format(local_dt, "Y-m-d H:i:s"),
-                dateformat.format(local_dt2, "Y-m-d H:i:s"),
-            ]
-        )
+        this_row = [
+            players,
+            entry_fee,
+            received,
+            entry_fee - received,
+            row.entry_status,
+            dateformat.format(local_dt, "Y-m-d H:i:s"),
+            dateformat.format(local_dt2, "Y-m-d H:i:s"),
+        ]
+
+        if event.free_format_question:
+            this_row.append(row.free_format_answer)
+
+        writer.writerow(this_row)
 
     # Event Entry Player details
     writer.writerow([])
@@ -307,6 +325,10 @@ def admin_event_csv(request, event_id):
 
     for entry in entries:
         for row in entry.evententryplayer_set.all():
+            if row.payment_received:
+                outstanding = row.entry_fee - row.payment_received
+            else:
+                outstanding = row.entry_fee
             writer.writerow(
                 [
                     entry.primary_entrant,
@@ -314,7 +336,7 @@ def admin_event_csv(request, event_id):
                     payment_type_dict[row.payment_type],
                     row.entry_fee,
                     row.payment_received,
-                    row.entry_fee - row.payment_received,
+                    outstanding,
                     row.reason,
                     row.payment_status,
                 ]

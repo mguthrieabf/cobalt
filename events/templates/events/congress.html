@@ -6,8 +6,6 @@
 {{ congress.raw_html|safe }}
 {% else %}
 
-
-
 <div class="col-lg-12 col-md-12">
   <div class="card">
     <div class="card-header card-header-warning">
@@ -111,7 +109,7 @@
       <div class="col-lg-8 col-md-8 mx-auto">
         <div class="card">
           <div class="card-header card-header-warning">
-            <h4 class="card-title">Additonal Information</h4>
+            <h4 class="card-title">Venue Additional Information</h4>
           </div>
           <div class="card-body table-responsive">
             {{ congress.venue_additional_info|safe }}
@@ -187,7 +185,7 @@
     $('html,body').animate({scrollTop: $("#program").offset().top},'slow');
     swal.fire({
       title: "Entry Added",
-      html: "Remember to checkout to complete entry. You can click on the cart at the top left whenever you are ready.",
+      html: "Remember to checkout to complete entry. You can click on the cart at the top right whenever you are ready.",
       icon: "success",
       buttonsStyling: false,
     });

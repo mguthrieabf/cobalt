@@ -76,3 +76,14 @@ img.cobalt-rounded {
 .pagination-next {
     color: #3354AA;
 }
+
+/**
+ * Disabled button - use class
+ */
+button.disabled,
+button[disabled] {
+	box-shadow: none;
+	cursor: not-allowed;
+	opacity: 0.5;
+	pointer-events: none;
+}

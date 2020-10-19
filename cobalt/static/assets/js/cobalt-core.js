@@ -22,6 +22,9 @@ function (message, source, lineno, colno, error) {
 function disable_submit_button() {
     $(".cobalt-save").each(function() {
       $(this).prop('disabled', true);
+      // $(this).classList.add('disabled');
+      // $(this).setAttribute('data-original', btn.textContent);
+      // $(this).textContent = "Running..."
   });
 };
 
@@ -32,7 +35,15 @@ $(document).ready(function () {
   // a cobalt-save button is clicked
 
   $(".cobalt-save").click(function () {
-      setTimeout(function () { disable_submit_button(); }, 0);
+
+    // only disable buttons if client side validation has passed
+    // uses jquery validation plugin
+    var form = $(this.form);
+    form.validate();
+      if ($(this.form).valid()){
+        setTimeout(function () { disable_submit_button(); }, 0);
+      }
+
   });
 
   // prompt for unsaved changes unless button is cobalt-save

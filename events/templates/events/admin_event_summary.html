@@ -3,6 +3,7 @@
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
 {% load cobalt_tags %}
+{% load humanize %}
 
 {% block content %}
 
@@ -59,9 +60,9 @@
                         {{ event_entry_player.player.full_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                     </td>
-                    <td class="text-right">{{ event_entry.received }}</td>
-                    <td class="text-right">{{ event_entry.outstanding }}</td>
-                    <td class="text-right">{{ event_entry.payment_status }}</td>
+                    <td class="text-right">{{ event_entry.received|floatformat:2 }}</td>
+                    <td class="text-right">{{ event_entry.outstanding|floatformat:2 }}</td>
+                    <td class="text-right">{{ event_entry.entry_status }}</td>
                     <td class="text-right"><a href="{% url "events:admin_evententry" evententry_id=event_entry.id %}" class="btn btn-sm btn-info">Details</a>
                     <a href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}" class="btn btn-sm btn-danger">Delete</a></td>
                   </tr>

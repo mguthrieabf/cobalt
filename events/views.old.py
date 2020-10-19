@@ -72,11 +72,17 @@ def home(request):
     for congress in congresses:
 
         # Comment field
-        if congress.entry_open_date and congress.entry_open_date > datetime.now().date():
+        if (
+            congress.entry_open_date
+            and congress.entry_open_date > datetime.now().date()
+        ):
             congress.msg = "Entries open on " + congress.entry_open_date.strftime(
                 "%d %b %Y"
             )
-        elif congress.entry_close_date and congress.entry_close_date > datetime.now().date():
+        elif (
+            congress.entry_close_date
+            and congress.entry_close_date > datetime.now().date()
+        ):
             congress.msg = "Entries close on " + congress.entry_close_date.strftime(
                 "%d %b %Y"
             )
@@ -105,7 +111,7 @@ def home(request):
 
 @login_required()
 def view_congress(request, congress_id, fullscreen=False):
-    """ basic view of an event.
+    """basic view of an event.
 
     Args:
         request(HTTPRequest): standard user request
@@ -229,7 +235,7 @@ def view_congress(request, congress_id, fullscreen=False):
 
 @login_required()
 def delete_congress(request, congress_id):
-    """ delete a congress
+    """delete a congress
 
     Args:
         request(HTTPRequest): standard user request
@@ -252,7 +258,7 @@ def delete_congress(request, congress_id):
 
 @login_required()
 def create_congress_wizard(request, step=1, congress_id=None):
-    """ create a new congress using a wizard format.
+    """create a new congress using a wizard format.
 
     There are a number of steps. Step 1 creates a congress either from
     scratch or by copying another one. All other steps edit data on the
@@ -502,12 +508,8 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.youth_payment_discount_date = form.cleaned_data[
                 "youth_payment_discount_date"
             ]
-            congress.senior_age = form.cleaned_data[
-                "senior_age"
-            ]
-            congress.senior_date = form.cleaned_data[
-                "senior_date"
-            ]
+            congress.senior_age = form.cleaned_data["senior_age"]
+            congress.senior_date = form.cleaned_data["senior_date"]
 
             congress.bank_transfer_details = form.cleaned_data["bank_transfer_details"]
             congress.cheque_details = form.cleaned_data["cheque_details"]
@@ -577,14 +579,18 @@ def create_congress_wizard_7(request, step_list, congress):
             congress.status = "Published"
             congress.save()
             messages.success(
-                request, "Congress published", extra_tags="cobalt-message-success",
+                request,
+                "Congress published",
+                extra_tags="cobalt-message-success",
             )
             return redirect(request, "events:view_congress", congress_id=congress.id)
 
         if "Delete" in request.POST:
             congress.delete()
             messages.success(
-                request, "Congress deleted", extra_tags="cobalt-message-success",
+                request,
+                "Congress deleted",
+                extra_tags="cobalt-message-success",
             )
             return redirect(request, "events:events")
 
@@ -796,7 +802,9 @@ def create_session(request, event_id):
         form = SessionForm()
 
     return render(
-        request, "events/create_session.html", {"form": form, "event": event},
+        request,
+        "events/create_session.html",
+        {"form": form, "event": event},
     )
 
 
@@ -840,17 +848,21 @@ def edit_session(request, event_id, session_id):
 
         form = SessionForm(instance=event, initial=initial)
 
-    return render(request, "events/edit_session.html", {"form": form, "event": event, "session": session},)
+    return render(
+        request,
+        "events/edit_session.html",
+        {"form": form, "event": event, "session": session},
+    )
 
 
 def enter_event_form(event, congress, request, existing_choices=None):
-    """ build the form part of the enter_event view. Its not a Django form,
-        we build our own as the validation won't work with a dynamic form
-        and we are validating on the client side anyway.
+    """build the form part of the enter_event view. Its not a Django form,
+    we build our own as the validation won't work with a dynamic form
+    and we are validating on the client side anyway.
 
-        If this is called by the edit entry option then it will pass in
-        existing_choices to pre-fill in the form. If this is a new entry
-        then this will be None.
+    If this is called by the edit entry option then it will pass in
+    existing_choices to pre-fill in the form. If this is a new entry
+    then this will be None.
 
     """
 
@@ -1616,7 +1628,7 @@ def admin_event_csv(request, event_id):
                 entry_fee,
                 received,
                 entry_fee - received,
-                row.payment_status,
+                row.entry_status,
                 dateformat.format(local_dt, "Y-m-d H:i:s"),
                 dateformat.format(local_dt2, "Y-m-d H:i:s"),
             ]

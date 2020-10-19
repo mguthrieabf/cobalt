@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load cobalt_tags %}
+
+{% block header %}
+<style>
+.total {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.accordion:hover {
+  background-color: #ccc;
+}
+
+.accordion:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: left;
+  margin-right: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container justify-content-center">
+  <div class="row h-100 d-flex justify-content-center">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Congress Checkout</h2>
+      </div>
+      <div class="card-body">
+
+<img src="{% static "assets/img/checkout.jpg" %}" alt="checkout" width="200px">
+
+<div class="total mx-auto my-2 card-header card-header-primary">
+  Total
+</div>
+
+{% for item in basket_items_list %}
+
+      <button class="accordion card-header card-header-info mx-auto my-2">{{ item.event_entry.event.congress }}</button>
+      <div class="panel mx-auto">
+
+        <div class="card">
+
+
+          <div class="card-body table-responsive">
+            <table class="table table-hover">
+              <thead class="text-info">
+
+                <th>Event</th>
+                <th>Type</th>
+
+                <th>Player</th>
+                <th>Your Payments Now</th>
+                <th>Later Payments</th>
+                <th>Payment Method</th>
+              </thead>
+              <tbody>
+                {% for event_entry_player in item.event_entry.evententryplayer_set.all %}
+                  <tr>
+                    <td>{{ event_entry_player.event_entry.event.event_name }}</td>
+                    <td>{{ item.event_entry.event.player_format }}</td>
+
+                    <td>{{ event_entry_player.player|cobalt_user_link }}</td>
+                    <td>
+                      {% if event_entry_player.payment_type == "my-system-dollars"%}
+                        {{ event_entry_player.entry_fee }}
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if event_entry_player.payment_type != "my-system-dollars"%}
+                        {{ event_entry_player.entry_fee }}
+                      {% endif %}
+                    </td>
+                    <td>{{ event_entry_player.get_payment_type_display }}</td>
+                  </tr>
+                {% endfor %}
+
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>{{ item.event_entry.primary_entrant_payment }}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+{% empty %}
+<h3>There is nothing in your basket.</h3>
+<br>
+{% endfor %}
+
+{% if basket_items_list %}
+  <form method='post'>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success cobalt-save" style="width:150px">Confirm</button>
+    <button type="submit" name="cart" class="btn btn-success cobalt-save" style="width:150px">Cancel Entry - to do</button>
+  </form>
+{% else %}
+  <a class="btn btn-info" href="{% url "events:events" %}">Browse Events</a>
+{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+}
+
+</script>
+
+{% endblock %}

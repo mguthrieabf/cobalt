@@ -13,6 +13,7 @@
         <h2>Congress Admin View</h2>
         <h3>{{ congress }}</h3>
         <h4>{{ congress.congress_master.org }}</h4>
+        <a href="{% url "events:create_congress_wizard" congress_id=congress.id step=2 %}" class="btn btn-sm btn-secondary">Edit Congress</a>
       </div>
       <div class="card-body">
 

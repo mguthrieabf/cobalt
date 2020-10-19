@@ -211,7 +211,7 @@ def send_notifications(route_payload, payment_user):
                 sub_msg += f"{player.player.full_name}<br>"
                 player_included[player.player] = True
 
-            sub_msg += f"<td style='text-align: right' class='receipt-figure'>{player.event_entry.payment_status}</tr>"
+            sub_msg += f"<td style='text-align: right' class='receipt-figure'>{player.event_entry.entry_status}</tr>"
 
             # add this row if player is in the event - no point otherwise
             for player in player_email.keys():

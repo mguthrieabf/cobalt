@@ -38,6 +38,7 @@ from .forms import (
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_get_users_with_role,
+    rbac_user_has_role,
 )
 from rbac.views import rbac_user_role_or_error
 from .core import events_payments_callback
@@ -62,9 +63,10 @@ from decimal import Decimal
 
 TZ = pytz.timezone(TIME_ZONE)
 
+
 @login_required()
 def delete_congress(request, congress_id):
-    """ delete a congress
+    """delete a congress
 
     Args:
         request(HTTPRequest): standard user request
@@ -77,17 +79,23 @@ def delete_congress(request, congress_id):
     congress = get_object_or_404(Congress, pk=congress_id)
 
     # check access
-    role = "events.org.%s.edit" % congress.org.id
+    role = "events.org.%s.edit" % congress.congress_master.org.id
     rbac_user_role_or_error(request, role)
 
-    congress.delete()
-    messages.success(request, "Congress deleted", extra_tags="cobalt-message-success")
-    return redirect("events:events")
+    if request.method == "POST":
+
+        congress.delete()
+        messages.success(
+            request, "Congress deleted", extra_tags="cobalt-message-success"
+        )
+        return redirect("events:events")
+
+    return render(request, "events/delete_congress.html", {"congress": congress})
 
 
 @login_required()
 def create_congress_wizard(request, step=1, congress_id=None):
-    """ create a new congress using a wizard format.
+    """create a new congress using a wizard format.
 
     There are a number of steps. Step 1 creates a congress either from
     scratch or by copying another one. All other steps edit data on the
@@ -335,12 +343,8 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.youth_payment_discount_date = form.cleaned_data[
                 "youth_payment_discount_date"
             ]
-            congress.senior_age = form.cleaned_data[
-                "senior_age"
-            ]
-            congress.senior_date = form.cleaned_data[
-                "senior_date"
-            ]
+            congress.senior_age = form.cleaned_data["senior_age"]
+            congress.senior_date = form.cleaned_data["senior_date"]
 
             congress.bank_transfer_details = form.cleaned_data["bank_transfer_details"]
             congress.cheque_details = form.cleaned_data["cheque_details"]
@@ -395,6 +399,10 @@ def create_congress_wizard_6(request, step_list, congress):
 
     events = Event.objects.filter(congress=congress)
 
+    if request.method == "POST":
+        return redirect(
+            "events:create_congress_wizard", step=7, congress_id=congress.id
+        )
     return render(
         request,
         "events/congress_wizard_6.html",
@@ -410,16 +418,20 @@ def create_congress_wizard_7(request, step_list, congress):
             congress.status = "Published"
             congress.save()
             messages.success(
-                request, "Congress published", extra_tags="cobalt-message-success",
+                request,
+                "Congress published",
+                extra_tags="cobalt-message-success",
             )
-            return redirect(request, "events:view_congress", congress_id=congress.id)
+            return redirect("events:view_congress", congress_id=congress.id)
 
-        if "Delete" in request.POST:
-            congress.delete()
+        if "Unpublish" in request.POST:
+            congress.status = "Draft"
+            congress.save()
             messages.success(
-                request, "Congress deleted", extra_tags="cobalt-message-success",
+                request,
+                "Congress returned to Draft status",
+                extra_tags="cobalt-message-success",
             )
-            return redirect(request, "events:events")
 
     url = "%s/%s/" % (reverse("events:create_congress_wizard"), congress.id)
     errors = []
@@ -460,7 +472,7 @@ def create_congress_wizard_7(request, step_list, congress):
             "<a href='%s%s'>%s</a>"
             % (
                 url,
-                2,
+                5,
                 "Entry open date is missing. Entries will be accepted any time before closing date.",
             )
         )
@@ -469,7 +481,7 @@ def create_congress_wizard_7(request, step_list, congress):
             "<a href='%s%s'>%s</a>"
             % (
                 url,
-                2,
+                5,
                 "Entry close date is missing. Entries will be accepted even after the congress has started.",
             )
         )
@@ -629,7 +641,9 @@ def create_session(request, event_id):
         form = SessionForm()
 
     return render(
-        request, "events/create_session.html", {"form": form, "event": event},
+        request,
+        "events/create_session.html",
+        {"form": form, "event": event},
     )
 
 
@@ -673,4 +687,26 @@ def edit_session(request, event_id, session_id):
 
         form = SessionForm(instance=event, initial=initial)
 
-    return render(request, "events/edit_session.html", {"form": form, "event": event, "session": session},)
+    return render(
+        request,
+        "events/edit_session.html",
+        {"form": form, "event": event, "session": session},
+    )
+
+
+@login_required
+def view_draft_congresses(request):
+    """ Show any draft congresses that the user can edit """
+
+    draft_congresses = Congress.objects.filter(status="Draft")
+    draft_congress_list = []
+    for draft_congress in draft_congresses:
+        role = "events.org.%s.edit" % draft_congress.congress_master.org.id
+        if rbac_user_has_role(request.user, role):
+            draft_congress_list.append(draft_congress)
+
+    return render(
+        request,
+        "events/view_draft_congresses.html",
+        {"congress_list": draft_congress_list},
+    )

@@ -18,7 +18,7 @@
         {% for player in entry.evententryplayer_set.all %}
           {{ player.player|cobalt_user_link }}
         {% endfor %}
-        - {{ entry.payment_status }}
+        - {{ entry.entry_status }}
       {% empty %}
       <h3>No entries yet</h3>
       {% endfor %}

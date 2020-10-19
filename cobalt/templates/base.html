@@ -25,6 +25,8 @@
   <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
   {% endblock %}
   <script src="{% static "assets/js/cobalt-core.js" %}"></script>
+  <script src="{% static "assets/js/jquery-validation-1.19.2/jquery.validate.min.js" %}"></script>
+  <script src="{% static "assets/js/jquery-validation-1.19.2/additional-methods.min.js" %}"></script>
 
   {% block header %}
   {% endblock %}
@@ -171,14 +173,10 @@
 
             <ul class="navbar-nav">
               {% if notifications %}
-
               <li class="nav-item dropdown">
-
-                <a class="nav-link px-0 mx-2" href="javascript:void(0)" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link" href="javascript:void(0)" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">notifications</i>
-
-                  <span class="notification ml-5">{{ notification_count }}</span>
-
+                  <span class="notification">{{ notification_count }}</span>
                   <p class="d-lg-none d-md-block">
                     Notification{{ notification_count|pluralize }}
                   </p>
@@ -188,23 +186,25 @@
                   <a class="dropdown-item" href=" {{ msg.1 }}">{{ msg.0 }}</a>
                   {% endfor %}
                 </div>
-
               </li>
               {% endif %}
 
               {% if basket_items %}
               <li class="nav-item dropdown">
-                <a class="nav-link px-0 mx-0" href="{% url "events:checkout" %}" id="navbarDropdownMenuLink"  aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link " href="{% url "events:checkout" %}" id="navbarDropdownMenuLink2"  aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">shopping_cart</i>
                   {% if basket_items > 1 %}
                   <span class="notification">{{ basket_items }}</span>
                   {% endif %}
+                  <p class="d-lg-none d-md-block">
+                    Basket Item{{ basket_items|pluralize }}
+                  </p>
                 </a>
               </li>
               {% endif %}
 
               <li class="nav-item dropdown">
-                <a class="nav-link px-0 mx-0" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">person</i>
                   <p class="d-lg-none d-md-block">
                     Account

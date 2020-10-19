@@ -35,6 +35,7 @@ from .forms import (
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_get_users_with_role,
+    rbac_user_has_role,
 )
 from rbac.views import rbac_user_role_or_error
 from .core import events_payments_callback
@@ -64,19 +65,36 @@ TZ = pytz.timezone(TIME_ZONE)
 def home(request):
     """ main screen to show congresses """
 
-    congresses = Congress.objects.order_by("start_date").filter(
-        start_date__gte=datetime.now()
+    congresses = (
+        Congress.objects.order_by("start_date")
+        .filter(start_date__gte=datetime.now())
+        .filter(status="Published")
     )
+
+    # get draft congresses
+    draft_congresses = Congress.objects.filter(status="Draft")
+    draft_congress_flag = False
+    for draft_congress in draft_congresses:
+        role = "events.org.%s.edit" % draft_congress.congress_master.org.id
+        if rbac_user_has_role(request.user, role):
+            draft_congress_flag = True
+            break
 
     grouped_by_month = {}
     for congress in congresses:
 
         # Comment field
-        if congress.entry_open_date and congress.entry_open_date > datetime.now().date():
+        if (
+            congress.entry_open_date
+            and congress.entry_open_date > datetime.now().date()
+        ):
             congress.msg = "Entries open on " + congress.entry_open_date.strftime(
                 "%d %b %Y"
             )
-        elif congress.entry_close_date and congress.entry_close_date > datetime.now().date():
+        elif (
+            congress.entry_close_date
+            and congress.entry_close_date > datetime.now().date()
+        ):
             congress.msg = "Entries close on " + congress.entry_close_date.strftime(
                 "%d %b %Y"
             )
@@ -99,13 +117,17 @@ def home(request):
     return render(
         request,
         "events/home.html",
-        {"grouped_by_month": grouped_by_month, "admin": admin},
+        {
+            "grouped_by_month": grouped_by_month,
+            "admin": admin,
+            "draft_congress_flag": draft_congress_flag,
+        },
     )
 
 
 @login_required()
 def view_congress(request, congress_id, fullscreen=False):
-    """ basic view of an event.
+    """basic view of an event.
 
     Args:
         request(HTTPRequest): standard user request
@@ -228,13 +250,13 @@ def view_congress(request, congress_id, fullscreen=False):
 
 
 def enter_event_form(event, congress, request, existing_choices=None):
-    """ build the form part of the enter_event view. Its not a Django form,
-        we build our own as the validation won't work with a dynamic form
-        and we are validating on the client side anyway.
+    """build the form part of the enter_event view. Its not a Django form,
+    we build our own as the validation won't work with a dynamic form
+    and we are validating on the client side anyway.
 
-        If this is called by the edit entry option then it will pass in
-        existing_choices to pre-fill in the form. If this is a new entry
-        then this will be None.
+    If this is called by the edit entry option then it will pass in
+    existing_choices to pre-fill in the form. If this is a new entry
+    then this will be None.
 
     """
 
@@ -418,6 +440,10 @@ def enter_event(request, congress_id, event_id):
     if event.is_full():
         return render(request, "events/event_full.html", {"event": event})
 
+    # Check if drwaft
+    if congress.status != "Published":
+        return render(request, "events/event_closed.html", {"event": event})
+
     # check if POST.
     # Note: this works a bit differently to most forms in Cobalt.
     #       We build our own form and use client side code to validate and
@@ -437,6 +463,11 @@ def enter_event(request, congress_id, event_id):
         category = request.POST.get("category", None)
         if category:
             event_entry.category = get_object_or_404(Category, pk=category)
+
+        # see if we got a free format answer
+        answer = request.POST.get("free_format_answer", None)
+        if answer:
+            event_entry.free_format_answer = answer
 
         event_entry.save()
 
@@ -636,8 +667,6 @@ def checkout(request):
         # we can't just load all the open basket_entries when we come back or more could have been
         # added.
 
-        unique_id = str(uuid.uuid4())
-
         # Get list of event_entry_player records to include.
         event_entries = BasketItem.objects.filter(player=request.user).values_list(
             "event_entry"
@@ -649,6 +678,8 @@ def checkout(request):
             .filter(payment_type="my-system-dollars")
             .distinct()
         )
+
+        unique_id = str(uuid.uuid4())
 
         # map this user (who is paying) to the batch id
         PlayerBatchId(player=request.user, batch_id=unique_id).save()
@@ -685,9 +716,74 @@ def checkout(request):
 
             events_payments_callback("Success", unique_id, None)
 
-    # The name basket_items is used by the base template so use a different name
-    return render(request, "events/checkout.html", {"basket_items_list": basket_items})
+    # Not a POST, build the form
 
+    # Get list of event_entry_player records to include.
+    event_entries = BasketItem.objects.filter(player=request.user).values_list(
+        "event_entry"
+    )
+    event_entry_players = EventEntryPlayer.objects.filter(
+        event_entry__in=event_entries
+    ).exclude(payment_status="Paid")
+
+    # get totals per congress
+    congress_total = {}
+    total_today = Decimal(0)
+    total_entry_fee = Decimal(0)
+
+    for event_entry_player in event_entry_players:
+
+        congress = event_entry_player.event_entry.event.congress
+
+        if congress not in congress_total.keys():
+
+            congress_total[congress] = {}
+            congress_total[congress]["entry_fee"] = event_entry_player.entry_fee
+            if event_entry_player.payment_type == "my-system-dollars":
+                congress_total[congress]["today"] = event_entry_player.entry_fee
+                total_today += event_entry_player.entry_fee
+                congress_total[congress]["later"] = Decimal(0.0)
+            else:
+                congress_total[congress]["later"] = event_entry_player.entry_fee
+                congress_total[congress]["today"] = Decimal(0.0)
+
+        else:
+            congress_total[congress]["entry_fee"] += event_entry_player.entry_fee
+            if event_entry_player.payment_type == "my-system-dollars":
+                congress_total[congress]["today"] += event_entry_player.entry_fee
+                total_today += event_entry_player.entry_fee
+            else:
+                congress_total[congress]["later"] += event_entry_player.entry_fee
+
+    grouped_by_congress = {}
+    for event_entry_player in event_entry_players:
+
+        congress = event_entry_player.event_entry.event.congress
+
+        data = {
+            "event_entry_player": event_entry_player,
+            "entry_fee": congress_total[congress]["entry_fee"],
+            "today": congress_total[congress]["today"],
+            "later": congress_total[congress]["later"],
+        }
+
+        if congress in grouped_by_congress:
+            grouped_by_congress[congress].append(data)
+        else:
+            grouped_by_congress[congress] = [data]
+
+    # The name basket_items is used by the base template so use a different name
+    return render(
+        request,
+        "events/checkout.html",
+        {
+            "grouped_by_congress": grouped_by_congress,
+            "total_today": total_today,
+            "total_entry_fee": total_entry_fee,
+            "total_outstanding": total_entry_fee - total_today,
+            "basket_items_list": basket_items,
+        },
+    )
 
 
 @login_required()
