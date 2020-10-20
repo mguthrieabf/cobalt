@@ -47,6 +47,7 @@ import uuid
 from cobalt.settings import (
     GLOBAL_ORG,
     GLOBAL_CURRENCY_NAME,
+    BRIDGE_CREDITS,
     TIME_ZONE,
     GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
@@ -467,7 +468,7 @@ def admin_evententry_delete(request, evententry_id):
                               """
                 if amount > 0.0:
                     email_body += f"""A refund of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f}
-                                    has been credited to your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}
+                                    has been credited to your {BRIDGE_CREDITS}
                                     account.<br><br>
                                   """
 

@@ -46,6 +46,7 @@ import uuid
 from cobalt.settings import (
     GLOBAL_ORG,
     GLOBAL_CURRENCY_NAME,
+    BRIDGE_CREDITS,
     TIME_ZONE,
     GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
@@ -275,9 +276,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
     # get payment types for this congress
     pay_types = []
     if congress.payment_method_system_dollars:
-        pay_types.append(
-            ("my-system-dollars", f"My {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
-        )
+        pay_types.append(("my-system-dollars", f"My {BRIDGE_CREDITS}"))
     if congress.payment_method_bank_transfer:
         pay_types.append(("bank-transfer", "Bank Transfer"))
     if congress.payment_method_cash:
@@ -358,7 +357,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
 
         if payment_selected == "their-system-dollars":
             augment_payment_types = [
-                ("their-system-dollars", f"Their {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME}s")
+                ("their-system-dollars", f"Their {BRIDGE_CREDITS}")
             ]
         else:
             augment_payment_types = []

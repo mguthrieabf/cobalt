@@ -273,7 +273,7 @@ GLOBAL_ABOUT = "https://abf.com.au"
 GLOBAL_PRIVACY = "https://abf.com.au/privacy"
 GLOBAL_COOKIES = "/support/cookies"
 GLOBAL_PRODUCTION = "abftech.com.au"
-GLOBAL_CURRENCY_SYMBOL = "$"
+GLOBAL_CURRENCY_SYMBOL = ""
 GLOBAL_CURRENCY_NAME = "Dollar"
 BRIDGE_CREDITS = "Bridge Credits"
 

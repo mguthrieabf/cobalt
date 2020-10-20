@@ -48,6 +48,7 @@ from cobalt.settings import (
     GLOBAL_ORG_ID,
     GLOBAL_CURRENCY_SYMBOL,
     GLOBAL_CURRENCY_NAME,
+    BRIDGE_CREDITS,
     TIME_ZONE,
     COBALT_HOSTNAME,
 )
@@ -1737,7 +1738,7 @@ def member_transfer_org(request, org_id):
             )
 
             # Notify member
-            email_body = f"<b>{organisation}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account.<br><br>The description was: {description}.<br><br>Please contact {organisation} directly if you have any queries. This transfer was made by {request.user}.<br><br>"
+            email_body = f"<b>{organisation}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {organisation} directly if you have any queries. This transfer was made by {request.user}.<br><br>"
             context = {
                 "name": member.first_name,
                 "title": "Transfer from %s" % organisation,

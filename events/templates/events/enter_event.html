@@ -251,7 +251,7 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
     var pay_amt = now_payment.val() || later_payment.val();
 
     if (msg == 'Allowed') {
-      $("#id_player" + search_id + "_payment").prepend('<option value="their-system-dollars" selected="">Their ABF Dollars</option>');
+      $("#id_player" + search_id + "_payment").prepend('<option value="their-system-dollars" selected="">Their {{ BRIDGE_CREDITS }}</option>');
       $("#id_player" + search_id + "_payment").prop("disabled", false);
       $("#id_player" + search_id + "_payment").val('their-system-dollars');
       later_payment.val(pay_amt);

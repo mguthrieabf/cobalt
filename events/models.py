@@ -5,7 +5,12 @@ from django.contrib.humanize.templatetags.humanize import ordinal
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
-from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL, TIME_ZONE
+from cobalt.settings import (
+    GLOBAL_ORG,
+    GLOBAL_CURRENCY_SYMBOL,
+    TIME_ZONE,
+    BRIDGE_CREDITS,
+)
 import datetime
 import pytz
 from rbac.core import rbac_user_has_role
@@ -28,11 +33,8 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    (
-        "my-system-dollars",
-        "My %s %s (Credit Card)" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL),
-    ),
-    ("their-system-dollars", "Their %s %s" % (GLOBAL_ORG, GLOBAL_CURRENCY_SYMBOL)),
+    ("my-system-dollars", f"My {BRIDGE_CREDITS}",),
+    ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
     ("cash", "Cash"),
@@ -195,9 +197,7 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True

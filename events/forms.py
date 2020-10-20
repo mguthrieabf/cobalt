@@ -3,7 +3,7 @@ from .models import Congress, Event, Session, EventEntryPlayer
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
-from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME
+from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME, BRIDGE_CREDITS
 
 
 class CongressForm(forms.ModelForm):

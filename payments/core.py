@@ -49,6 +49,7 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_NAME,
     COBALT_HOSTNAME,
     GLOBAL_ORG,
+    BRIDGE_CREDITS,
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
 from notifications.views import contact_member
@@ -456,7 +457,7 @@ def payment_api(
             )
 
             # Notify member
-            email_body = f"<b>{member}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
+            email_body = f"<b>{member}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
             context = {
                 "name": other_member.first_name,
                 "title": "Transfer from %s" % member.full_name,
@@ -1292,7 +1293,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
         )
 
         # Notify member
-        email_body = f"Auto top up of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {GLOBAL_ORG} {GLOBAL_CURRENCY_NAME} account was successful.<br><br>"
+        email_body = f"Auto top up of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {BRIDGE_CREDITS} account was successful.<br><br>"
         context = {
             "name": member.first_name,
             "title": "Auto top up successful",
