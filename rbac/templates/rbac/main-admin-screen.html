@@ -106,4 +106,20 @@
   </div>
 </div>
 {% endif %}
+{% if events_site_admin %}
+<div class="card col-lg-9">
+  <div class="card-header card-header-info">
+    <h3 class="card-title">Global Events</h3>
+  </div>
+  <div class="card-body" style="text-align: left">
+    <div class="container">
+      <div class="row">
+        <ul>
+          <li><a href="{% url "events:global_admin_congress_masters" %}">Manage Congress Masters</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

@@ -1,4 +1,4 @@
-from .models import BasketItem, EventEntry, EventEntryPlayer, PlayerBatchId
+from .models import BasketItem, EventEntry, EventEntryPlayer, PlayerBatchId, EventLog
 from django.db.models import Q
 from django.utils import timezone
 import payments.core as payments_core  # circular dependency
@@ -86,7 +86,14 @@ def update_entries(route_payload, payment_user):
         event_entry_player.payment_status = "Paid"
         event_entry_player.payment_received = event_entry_player.entry_fee
         event_entry_player.paid_by = payment_user
+        event_entry_player.entry_complete_date = datetime.now()
         event_entry_player.save()
+
+        EventLog(
+            event=event_entry_player.event_entry.event,
+            actor=event_entry_player.player,
+            action=f"Paid with their system dollars",
+        ).save()
 
         # create payments in org account
         payments_core.update_organisation(
@@ -135,8 +142,16 @@ def update_entries(route_payload, payment_user):
                     payment_type="Entry to a congress",
                 )
                 event_entry_player.payment_status = "Paid"
+                event_entry_player.entry_complete_date = datetime.now()
+                event_entry_player.paid_by = event_entry_player.player
                 event_entry_player.payment_received = event_entry_player.entry_fee
                 event_entry_player.save()
+
+                EventLog(
+                    event=event_entry.event,
+                    actor=event_entry_player.player,
+                    action=f"Paid with their system dollars",
+                ).save()
 
     # Check if EntryEvent is now complete
     for event_entry in event_entries:

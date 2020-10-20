@@ -4,7 +4,6 @@ from .models import (
     Congress,
     Event,
     Session,
-    EventEntryType,
     EventEntry,
     EventEntryPlayer,
     CongressNewsItem,
@@ -21,7 +20,6 @@ admin.site.register(PlayerBatchId)
 admin.site.register(Category)
 admin.site.register(Event)
 admin.site.register(Session)
-admin.site.register(EventEntryType)
 admin.site.register(EventEntry)
 admin.site.register(EventEntryPlayer)
 admin.site.register(CongressNewsItem)

@@ -37,8 +37,8 @@ from organisations.models import Organisation
 
 @login_required
 def rbac_forbidden(request, role):
-    """ RBAC screen for fobidden access - gives the user more info than a
-    normal error screen """
+    """RBAC screen for fobidden access - gives the user more info than a
+    normal error screen"""
 
     groups = rbac_get_groups_for_role(role)
 
@@ -58,10 +58,16 @@ def main_admin_screen(request):
 
     payments_site_admin = rbac_user_has_role(request.user, "payments.global.view")
 
+    events_site_admin = rbac_user_has_role(request.user, "events.global.edit")
+
     return render(
         request,
         "rbac/main-admin-screen.html",
-        {"payments_admin": orgs, "payments_site_admin": payments_site_admin},
+        {
+            "payments_admin": orgs,
+            "payments_site_admin": payments_site_admin,
+            "events_site_admin": events_site_admin,
+        },
     )
 
 
@@ -92,7 +98,7 @@ def view_screen(request):
 
 
 def generic_tree_builder(groups, detail_link=None, html_type="href"):
-    """ function to build an rbac tree for use with the tree viewer.
+    """function to build an rbac tree for use with the tree viewer.
 
     Args:
         groups - queryset of RBACGroup or RBACAdminGroup
@@ -118,7 +124,7 @@ def generic_tree_builder(groups, detail_link=None, html_type="href"):
      items["abf.animals.cats"]=["felix"]
      items["abf.animals.dogs.rover"]=2
      items["abf.animals.cats.felix"]=21
-     """
+    """
 
     items = {}
     items_description = {}

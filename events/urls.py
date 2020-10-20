@@ -197,4 +197,17 @@ urlpatterns = [
         ajax.admin_offsystem_pay_ajax,
         name="admin_offsystem_pay_ajax",
     ),
+    path(
+        "congress-admin/off-system/unpay",
+        ajax.admin_offsystem_unpay_ajax,
+        name="admin_offsystem_unpay_ajax",
+    ),
+    #######################################################
+    # higher level admin functions                        #
+    #######################################################
+    path(
+        "system-admin/congress-masters",
+        views.global_admin_congress_masters,
+        name="global_admin_congress_masters",
+    ),
 ]

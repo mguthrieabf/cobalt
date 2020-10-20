@@ -49,7 +49,11 @@
                     <td class="text-right">{{ event_entry_player.payment_received }}</td>
                     <td class="text-left">{{ event_entry_player.get_payment_type_display }}</td>
                     <td class="text-right">{{ event_entry_player.payment_status }}</td>
-                    <td class="text-right"><button class="btn btn-sm btn-success button_pay" id="button_pay_{{ event_entry_player.id }}">pay</button>
+                    {% if event_entry_player.payment_status == "Paid" %}
+                    <td class="text-right"><button class="btn btn-sm btn-danger button_unpay" id="button_unpay_{{ event_entry_player.id }}">Revert to Unpaid</button>
+                    {% else %}
+                    <td class="text-right"><button class="btn btn-sm btn-success button_pay" id="button_pay_{{ event_entry_player.id }}">Mark as Paid</button>
+                    {% endif %}
                   </tr>
                 {% endfor %}
 
@@ -87,8 +91,27 @@
       }).done(function(response) {
         location.reload();
       });
+    });
 
+    // unpay button
+    $(".button_unpay").click(function(){
 
+      // which row
+      var id = this.id.split("_")[2]
+
+      var serializedData = {
+        "event_entry_player_id": id,
+      };
+
+      $.ajax({
+        url: '{% url "events:admin_offsystem_unpay_ajax" %}',
+        method: "POST",
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: serializedData,
+        dataType: "json"
+      }).done(function(response) {
+        location.reload();
+      });
     });
 
   });

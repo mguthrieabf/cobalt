@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% load cobalt_tags %}
+
+{% block content %}
+
+
+<div class="container justify-content-center">
+  <div class="row h-100 d-flex justify-content-center">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Congress Master Admin - Placeholder</h2>
+        <h3>This needs to allow users to edit and create congress masters. Also probably to add users to groups so they can run congresses. Shouldn't allow deletion.</h3>
+      </div>
+      <div class="card-body">
+        <ul>
+          {% for cm in congress_masters %}
+          <li>{{ cm }} - {{ cm.org }}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

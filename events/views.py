@@ -906,3 +906,18 @@ def enter_event_success(request):
         extra_tags="cobalt-message-success",
     )
     return view_events(request)
+
+
+@login_required()
+def global_admin_congress_masters(request):
+    """ administration of congress masters """
+
+    rbac_user_role_or_error(request, "events.global.edit")
+
+    congress_masters = CongressMaster.objects.all()
+
+    return render(
+        request,
+        "events/global_admin_congress_masters.html",
+        {"congress_masters": congress_masters},
+    )

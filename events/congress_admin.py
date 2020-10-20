@@ -148,10 +148,15 @@ def admin_event_summary(request, event_id):
     event_entries = EventEntry.objects.filter(event=event)
 
     # build summary
+    total_received = Decimal(0.0)
+    total_outstanding = Decimal(0.0)
+    total_entry_fee = Decimal(0.0)
+
     for event_entry in event_entries:
         event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
         event_entry.received = Decimal(0.0)
         event_entry.outstanding = Decimal(0.0)
+        event_entry.entry_fee = Decimal(0.0)
         event_entry.players = []
 
         for event_entry_player in event_entry_players:
@@ -163,18 +168,23 @@ def admin_event_summary(request, event_id):
 
             event_entry.received += received
             event_entry.outstanding += event_entry_player.entry_fee - received
+            event_entry.entry_fee += event_entry_player.entry_fee
             event_entry.players.append(event_entry_player)
 
-    for ee in event_entries:
-        print(ee)
-        print(ee.players)
-        print(ee.received)
-        print(ee.outstanding)
+            total_received += received
+            total_outstanding += event_entry_player.entry_fee - received
+            total_entry_fee += event_entry_player.entry_fee
 
     return render(
         request,
         "events/admin_event_summary.html",
-        {"event": event, "event_entries": event_entries},
+        {
+            "event": event,
+            "event_entries": event_entries,
+            "total_received": total_received,
+            "total_outstanding": total_outstanding,
+            "total_entry_fee": total_entry_fee,
+        },
     )
 
 
@@ -358,8 +368,9 @@ def admin_event_offsystem(request, event_id):
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
     rbac_user_role_or_error(request, role)
 
+    # get players with manual payment methods
     players = EventEntryPlayer.objects.filter(event_entry__event=event).exclude(
-        payment_status="Paid"
+        payment_type__in=["my-system-dollars", "their-system-dollars"]
     )
 
     return render(

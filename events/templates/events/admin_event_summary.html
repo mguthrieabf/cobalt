@@ -46,8 +46,9 @@
             <table class="table table-hover">
               <thead class="text-info">
                 <th>Players</th>
-                <th class="text-right">Received</th>
-                <th class="text-right">Outstanding</th>
+                <th class="text-right">Due {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                <th class="text-right">Paid {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                <th class="text-right">Pending {{ GLOBAL_CURRENCY_SYMBOL }}</th>
                 <th class="text-right">Status</th>
                 <th class="text-right">Action</th>
               </thead>
@@ -60,6 +61,7 @@
                         {{ event_entry_player.player.full_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                     </td>
+                    <td class="text-right">{{ event_entry.entry_fee|floatformat:2 }}</td>
                     <td class="text-right">{{ event_entry.received|floatformat:2 }}</td>
                     <td class="text-right">{{ event_entry.outstanding|floatformat:2 }}</td>
                     <td class="text-right">{{ event_entry.entry_status }}</td>
@@ -67,6 +69,17 @@
                     <a href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}" class="btn btn-sm btn-danger">Delete</a></td>
                   </tr>
                 {% endfor %}
+
+                <tr>
+                  <td class="font-weight-bold">
+                    TOTAL
+                  </td>
+                  <td class="text-right font-weight-bold">{{ total_entry_fee|floatformat:2 }}</td>
+                  <td class="text-right font-weight-bold">{{ total_received|floatformat:2 }}</td>
+                  <td class="text-right font-weight-bold">{{ total_outstanding|floatformat:2 }}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
 
               </tbody>
             </table>

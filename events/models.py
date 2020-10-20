@@ -195,7 +195,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -380,15 +382,16 @@ class Session(models.Model):
     session_end = models.TimeField(null=True, blank=True)
 
 
-class EventEntryType(models.Model):
-    """ A type of event entry - e.g. full, junior, senior """
-
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    event_entry_type = models.CharField("Event Entry Type", max_length=20)
-    entry_fee = models.DecimalField("Full Entry Fee", decimal_places=2, max_digits=10)
-
-    def __str__(self):
-        return "%s - %s" % (self.event, self.event_entry_type)
+#
+# class EventEntryType(models.Model):
+#     """ A type of event entry - e.g. full, junior, senior """
+#
+#     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+#     event_entry_type = models.CharField("Event Entry Type", max_length=20)
+#     entry_fee = models.DecimalField("Full Entry Fee", decimal_places=2, max_digits=10)
+#
+#     def __str__(self):
+#         return "%s - %s" % (self.event, self.event_entry_type)
 
 
 class EventEntry(models.Model):
@@ -441,9 +444,6 @@ class EventEntryPlayer(models.Model):
     paid_by = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, blank=True, related_name="paid_by"
     )
-    player_payment_record = models.ForeignKey(
-        MemberTransaction, on_delete=models.CASCADE, null=True, blank=True
-    )
     payment_type = models.CharField(
         "Payment Type", max_length=20, choices=PAYMENT_TYPES, default="Unknown"
     )
@@ -460,6 +460,8 @@ class EventEntryPlayer(models.Model):
     payment_received = models.DecimalField(
         "Payment Received", decimal_places=2, max_digits=10, default=0.0
     )
+    first_created_date = models.DateTimeField(default=timezone.now)
+    entry_complete_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.event_entry, self.player)
