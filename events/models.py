@@ -17,7 +17,7 @@ PAYMENT_STATUSES = [
 ]
 
 ENTRY_STATUSES = [
-    ("Incomplete", "Incomplete"),
+    ("Pending", "Pending"),
     ("Complete", "Complete"),
 ]
 
@@ -399,7 +399,7 @@ class EventEntry(models.Model):
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     entry_status = models.CharField(
-        "Entry Status", max_length=20, choices=ENTRY_STATUSES, default="Incomplete"
+        "Entry Status", max_length=20, choices=ENTRY_STATUSES, default="Pending"
     )
     primary_entrant = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(
@@ -432,7 +432,7 @@ class EventEntry(models.Model):
             self.entry_status = "Complete"
             self.entry_complete_date = timezone.now()
         else:
-            self.entry_status = "Incomplete"
+            self.entry_status = "Pending"
         self.save()
 
 

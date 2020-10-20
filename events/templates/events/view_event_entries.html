@@ -12,7 +12,7 @@
       <h3>{{ date_string }} - {{ event.start_time|cobalt_time }} Start</h3>
       <h4>{{ entries|length }} entries
         {% if event.max_entries %}
-        out of maximum of {{ event.max_entries }}
+        out of a maximum of {{ event.max_entries }}
         {% endif %}
       </h4>
     </div>

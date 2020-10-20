@@ -921,3 +921,30 @@ def global_admin_congress_masters(request):
         "events/global_admin_congress_masters.html",
         {"congress_masters": congress_masters},
     )
+
+
+@login_required()
+def edit_event_entry2(request, congress_id, event_id):
+    """ edit an event entry """
+
+    # Load the event
+    event = get_object_or_404(Event, pk=event_id)
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # Check if already entered
+    if not event.already_entered(request.user):
+        return redirect(
+            "events:enter_event", event_id=event.id, congress_id=congress_id
+        )
+
+    event_entry = (
+        EventEntry.objects.filter(primary_entrant=request.user)
+        .filter(event=event)
+        .first()
+    )
+
+    return render(
+        request,
+        "events/edit_event_entry2.html",
+        {"event": event, "congress": congress, "event_entry": event_entry},
+    )

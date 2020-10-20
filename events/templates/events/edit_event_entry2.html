@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cobalt_tags %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row text-center">
+    <div class="card">
+      <div class="card-header card-header-warning">
+        <h2>Edit Entry to {{ event.event_name }} in {{ congress.name }}</h2>
+      </div>
+      <div class="card-body text-center mx-auto">
+
+        <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
+
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="show_details">Show details
+            <span class="form-check-sign">
+                <span class="check"></span>
+            </span>
+          </label>
+        </div>
+
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" id="enable_edit">Edit Details
+            <span class="form-check-sign">
+                <span class="check"></span>
+            </span>
+          </label>
+        </div>
+
+        <div class="container">
+          <table class="table table-responsive table-hover mx-auto" id="entrytable">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th class="editable" style="display:none"></th>
+                <th>Payment Method</th>
+                <th>Entry Fee</th>
+                <th class="extras" style="display:none">Paid</th>
+                <th class="extras" style="display:none">Payment Date</th>
+                <th class="extras" style="display:none">Payment By</th>
+                <th>Status</th>
+                {% if event_entry.entry_status != "Complete" %}
+                <th class="editable" style="display:none">Action</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+
+          {% for event_entry_player in event_entry.evententryplayer_set.all %}
+            <tr>
+              <td class="px-0 py-1 mx-0 my-2">
+
+                <div class="px-0 py-0 mx-0 my-0 text-center">
+                  <img id="cobalt-pic" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px;" src="/media/{{ event_entry_player.player.pic }}" />
+                  <p class="px-0 py-0  mx-0 my-0">
+                    {{ event_entry_player.player.full_name }}
+                  </p>
+                </div>
+
+                </td>
+              <td class="editable" style="display:none">
+                <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search{{ event_entry_player.player.id }}">Change Player</a>
+              </td>
+              <td>{{ event_entry_player.get_payment_type_display }}</td>
+              <td>{{ event_entry_player.entry_fee }}</td>
+              <td class="extras" style="display:none">{{ event_entry_player.payment_received }}</td>
+              <td class="extras" style="display:none">{{ event_entry_player.entry_complete_date|cobalt_nice_datetime|default_if_none:"-" }}</td>
+              <td class="extras" style="display:none">{{ event_entry_player.paid_by.full_name|default_if_none:"-" }}</td>
+              <td>
+                <div>
+
+                  <div>
+                {% if event_entry_player.payment_status == "Paid" %}
+                  <span class="text-success"><i class="material-icons">check_circle</i></span>
+                {% else %}
+                  <span class="text-primary"><i class="material-icons">warning</i></span>
+                {% endif %}
+                  </div>
+                  <div>
+                {{ event_entry_player.payment_status }}
+                  </div>
+                </div>
+              </td>
+
+              {% if event_entry_player.payment_status != "Paid" %}
+              <td class="editable" style="display:none">
+                <button class="btn btn-sm btn-info">Pay Now</button>
+              </td>
+              {% else %}
+                {% if event_entry.entry_status != "Complete" %}
+              <td></td>
+                {% endif %}
+              {% endif %}
+
+            </tr>
+          {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+        <button class="editable btn btn-primary text-left" style="display:none">Add Player to Team</button>
+        <div class="text-center">
+          <button class="btn btn-danger">Withdraw From Entry!!!</button>
+          <button class="btn btn-success">Exit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+
+$(document).ready(function() {
+
+// show extra columns if selected
+$("#show_details").click(function(){
+  $(".extras").each(function() {
+    $(this).toggle(100);
+//    $('#entrytable').bootstrapTable('refresh');
+  });
+});
+
+// show edit info if selected
+$("#enable_edit").click(function(){
+  $(".editable").each(function() {
+    $(this).toggle(100);
+//        $('#entrytable').bootstrapTable('refresh');
+  });
+});
+
+});
+</script>
+{% endblock %}
