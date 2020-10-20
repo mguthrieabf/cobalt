@@ -403,10 +403,22 @@ def create_congress_wizard_6(request, step_list, congress):
         return redirect(
             "events:create_congress_wizard", step=7, congress_id=congress.id
         )
+
+    # add start date and sort by start date
+    events_list = {}
+    events_list_sorted = {}
+    for event in events:
+        event.event_start_date = event.start_date()
+        events_list[event] = event.event_start_date
+        events_list_sorted = {
+            key: value
+            for key, value in sorted(events_list.items(), key=lambda item: item[1])
+        }
+
     return render(
         request,
         "events/congress_wizard_6.html",
-        {"step_list": step_list, "congress": congress, "events": events},
+        {"step_list": step_list, "congress": congress, "events": events_list_sorted},
     )
 
 
@@ -418,9 +430,7 @@ def create_congress_wizard_7(request, step_list, congress):
             congress.status = "Published"
             congress.save()
             messages.success(
-                request,
-                "Congress published",
-                extra_tags="cobalt-message-success",
+                request, "Congress published", extra_tags="cobalt-message-success",
             )
             return redirect("events:view_congress", congress_id=congress.id)
 
@@ -440,7 +450,9 @@ def create_congress_wizard_7(request, step_list, congress):
     if not congress.name:
         errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Congress name is missing"))
     if not congress.additional_info:
-        warnings.append("<a href='%s%s'>%s</a>" % (url, 2, "Additional is missing"))
+        warnings.append(
+            "<a href='%s%s'>%s</a>" % (url, 2, "Congress Additional Info is missing")
+        )
     if not congress.start_date:
         errors.append("<a href='%s%s'>%s</a>" % (url, 2, "Start date is missing"))
     if not congress.end_date:
@@ -486,11 +498,19 @@ def create_congress_wizard_7(request, step_list, congress):
             )
         )
 
-    events = Event.objects.filter(congress=congress).count()
-    if events == 0:
+    events = Event.objects.filter(congress=congress)
+    if events.count() == 0:
         errors.append(
             "<a href='%s%s'>%s</a>" % (url, 6, "This congress has no events defined")
         )
+
+    for event in events:
+        sessions = Session.objects.filter(event=event).count()
+        if sessions == 0:
+            errors.append(
+                "<a href='%s%s'>%s</a>"
+                % (url, 6, f"{event.event_name} has no sessions defined")
+            )
 
     return render(
         request,
@@ -550,7 +570,12 @@ def create_event(request, congress_id):
             print(form.errors)
 
     else:
-        form = EventForm()
+        # default youth discount to 50% if used
+        initial = {}
+        if congress.allow_youth_payment_discount:
+            initial["entry_youth_payment_discount"] = 50
+
+        form = EventForm(initial=initial)
 
     return render(
         request,
@@ -641,9 +666,7 @@ def create_session(request, event_id):
         form = SessionForm()
 
     return render(
-        request,
-        "events/create_session.html",
-        {"form": form, "event": event},
+        request, "events/create_session.html", {"form": form, "event": event},
     )
 
 

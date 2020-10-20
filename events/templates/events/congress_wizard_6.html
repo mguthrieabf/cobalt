@@ -2,6 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
+{% load cobalt_tags %}
 {% block headerjs %}
 {% include "events/congress_wizard_include_header.html" %}
 {% endblock %}
@@ -29,7 +30,7 @@
                   <div class="container">
                     <select class="w-100" size="10" id="event_list">
                       {% for event in events %}
-                      <option value="{{ event.id }}">{{ event.event_name }}</option>
+                      <option value="{{ event.id }}">{{ event.event_name }} ({{ event.event_start_date|cobalt_nice_date|default_if_none:"No Sessions Defined" }})</option>
                       {% endfor %}
                     </select>
                   </div>

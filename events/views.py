@@ -160,11 +160,21 @@ def view_congress(request, congress_id, fullscreen=False):
     # get all events for this congress so we can build the program table
     events = congress.event_set.all()
 
+    # add start date and sort by start date
+    events_list = {}
+    for event in events:
+        event.event_start_date = event.start_date()
+        events_list[event] = event.event_start_date
+        events_list_sorted = {
+            key: value
+            for key, value in sorted(events_list.items(), key=lambda item: item[1])
+        }
+
     # program_list will be passed to the template, each entry is a <tr> element
     program_list = []
 
     # every day of an event gets its own row so we use rowspan for event name and links
-    for event in events:
+    for event in events_list_sorted:
         program = {}
 
         # see if user has entered already
@@ -181,7 +191,7 @@ def view_congress(request, congress_id, fullscreen=False):
             if first_row_for_event:
                 program[
                     "event"
-                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</span></td>"
+                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</td><td rowspan='{rows}'><span class='title'>{GLOBAL_CURRENCY_SYMBOL}{event.entry_fee}</span></td>"
                 if program["entry"]:
                     program[
                         "links"
@@ -873,11 +883,17 @@ def view_event_entries(request, congress_id, event_id):
     congress = get_object_or_404(Congress, pk=congress_id)
     event = get_object_or_404(Event, pk=event_id)
     entries = EventEntry.objects.filter(event=event)
+    date_string = event.print_dates()
 
     return render(
         request,
         "events/view_event_entries.html",
-        {"congress": congress, "event": event, "entries": entries},
+        {
+            "congress": congress,
+            "event": event,
+            "entries": entries,
+            "date_string": date_string,
+        },
     )
 
 

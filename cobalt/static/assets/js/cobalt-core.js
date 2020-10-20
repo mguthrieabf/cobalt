@@ -38,11 +38,19 @@ $(document).ready(function () {
 
     // only disable buttons if client side validation has passed
     // uses jquery validation plugin
-    var form = $(this.form);
-    form.validate();
-      if ($(this.form).valid()){
-        setTimeout(function () { disable_submit_button(); }, 0);
-      }
+    try {
+      // may not be a form to use try catch
+      var form = $(this.form);
+      form.validate();
+        if ($(this.form).valid()){
+          setTimeout(function () { disable_submit_button(); }, 0);
+        }
+    } catch (error) {
+      // if no form then we don't need to disable the buttons 
+      console.error(error);
+    }
+
+
 
   });
 

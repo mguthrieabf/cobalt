@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.humanize.templatetags.humanize import ordinal
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
@@ -49,6 +50,10 @@ EVENT_TYPES = [
     ("Novice", "Novice"),
     ("Senior", "Senior"),
     ("Youth", "Youth"),
+    ("Rookies", "Rookies"),
+    ("Veterans", "Veterans"),
+    ("Womens", "Womens"),
+    ("Intermediate", "Intermediate"),
 ]
 EVENT_PLAYER_FORMAT = [
     ("Individual", "Individual"),
@@ -190,9 +195,7 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -283,13 +286,61 @@ class Event(models.Model):
         else:
             return None
 
-    def start_date(self):
+    def start_time(self):
         """ return the start date of this event """
-        session = Session.objects.filter(event=self).earliest("session_date")
+        session = Session.objects.filter(event=self)
         if session:
-            return session.session_date
+            return session.earliest("session_date").session_start
         else:
             return None
+
+    def start_date(self):
+        """ return the start date of this event """
+        session = Session.objects.filter(event=self)
+        if session:
+            return session.earliest("session_date").session_date
+        else:
+            return None
+
+    def end_date(self):
+        """ return the end date of this event """
+        session = Session.objects.filter(event=self)
+        if session:
+            return session.latest("session_date").session_date
+        else:
+            return None
+
+    def print_dates(self):
+        """ returns nicely formatted date string for event """
+        start = self.start_date()
+        end = self.end_date()
+
+        if not start:  # no start will also mean no end
+            return None
+
+        if start == end:
+            return "%s %s" % (ordinal(start.strftime("%d")), start.strftime("%B %Y"))
+
+        start_day = ordinal(start.strftime("%d"))
+        start_month = start.strftime("%B")
+        start_year = start.strftime("%Y")
+        end_day = ordinal(end.strftime("%d"))
+        end_month = end.strftime("%B")
+        end_year = end.strftime("%Y")
+
+        if start_year == end_year:
+            start_year = ""
+
+        if start_month == end_month:
+            start_month = ""
+        else:
+            start_month = " " + start_month
+            if start_year != "":
+                start_year = " " + start_year
+
+        return (
+            f"{start_day}{start_month}{start_year} to {end_day} {end_month} {end_year}"
+        )
 
     def entry_status(self, user):
         """ returns the status of the team/pairs/individual entry """

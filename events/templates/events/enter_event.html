@@ -22,6 +22,7 @@
     <div class="card">
       <div class="card-header card-header-warning">
         <h2>{{ event.event_name }}</h2>
+        <h3>{{ event.description|default_if_none:"" }}</h3>
         <h3>{{ congress.name }}</h3>
         <h4>{{ event_start.session_date|cobalt_nice_date }} {{ event_start.session_start|cobalt_time }}</h4>
       </div>

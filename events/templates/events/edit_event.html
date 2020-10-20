@@ -71,6 +71,21 @@
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
+                    Player Format
+                  </div>
+                  <div class="col-7">
+                    <div id="div_id_player_format" class="form-group">
+                      <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
+                      {% render_field form.player_format class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-2 justify-content-center align-self-center">
+                    <a href="javascript:void(0)" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
+                  </div>
+                </div><br>
+
+                <div class="row">
+                  <div class="col-3 justify-content-center align-self-center">
                     Event Name
                   </div>
                   <div class="col-7">
@@ -98,21 +113,6 @@
                     <a href="javascript:void(0)" onclick='help("Description", "A Slightly longer definition of the event than the event name.");'>help</a>
                   </div>
                 </div>
-
-                <div class="row">
-                  <div class="col-3 justify-content-center align-self-center">
-                    Player Format
-                  </div>
-                  <div class="col-7">
-                    <div id="div_id_player_format" class="form-group">
-                      <span class="cobalt-form-error" id="id_player_format_errors">{{ form.player_format.errors|striptags }}</span>
-                      {% render_field form.player_format class+="form-control" %}
-                    </div>
-                  </div>
-                  <div class="col-2 justify-content-center align-self-center">
-                    <a href="javascript:void(0)" onclick='help("Player Format", "Structure of entries - individual, pairs or teams.");'>help</a>
-                  </div>
-                </div><br>
 
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
@@ -147,7 +147,7 @@
                 {% if congress.allow_early_payment_discount %}
                 <div class="row">
                   <div class="col-3 justify-content-center align-self-center">
-                    Early Entry Discount ({{ GLOBAL_CURRENCY_SYMBOL }})
+                    Early Entry Discount per entry ({{ GLOBAL_CURRENCY_SYMBOL }})
                   </div>
                   <div class="col-7">
                     <div id="div_id_entry_early_payment_discount" class="form-group">
@@ -461,9 +461,20 @@
     $("#override_dates_toggle").hide();
   {% endif %}
 
+// show categories
     $("#show_category").click(function() {
       $("#categories_div").show();
       $("#category_show").hide();
+    });
+
+// set event name to event type when type changes if not already set
+    $("#id_player_format").on("change", function() {
+      var name_field = $("#id_event_name");
+      var format = $(this).val();
+
+      if (name_field.val() === ""){
+        name_field.val(format);
+      }
     });
 
   });

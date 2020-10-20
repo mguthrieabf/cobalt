@@ -16,6 +16,7 @@
       </div>
       <div class="card-body">
         <div class="container">
+          <h3>Congress Dates: {{ congress.date_string }}</h3>
           <form method="POST">
             {% csrf_token %}
 
@@ -94,14 +95,14 @@
                 <div class="row" id="youth_discount_date" style="display:none;">
                   <div class="col-6">
                     <div class="form-group">
-                      <label class="bmd-label-float" style="font-size:11px">Cut off date</label>
+                      <label class="bmd-label-float" style="font-size:11px">Youth cut off date</label>
                       <input type="text" name="youth_payment_discount_date" id="id_youth_payment_discount_date" class="form-control datepicker" value="{{ form.youth_payment_discount_date.value|default_if_none:'' }}">
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="form-group">
                       <span class="cobalt-form-error" id="id_youth_payment_discount_age_errors">{{ form.youth_payment_discount_age.errors|striptags }}</span>
-                      <label class="bmd-label-float" style="font-size:11px">Youth cut off date</label>
+                      <label class="bmd-label-float" style="font-size:11px">Youth age at cut off date</label>
                       {% render_field form.youth_payment_discount_age class+="form-control" %}
                     </div>
                   </div>
