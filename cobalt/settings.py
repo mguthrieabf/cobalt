@@ -275,6 +275,7 @@ GLOBAL_COOKIES = "/support/cookies"
 GLOBAL_PRODUCTION = "abftech.com.au"
 GLOBAL_CURRENCY_SYMBOL = "$"
 GLOBAL_CURRENCY_NAME = "Dollar"
+BRIDGE_CREDITS = "Bridge Credits"
 
 # Payments auto amounts
 AUTO_TOP_UP_LOW_LIMIT = 20

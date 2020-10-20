@@ -20,6 +20,7 @@ def global_settings(request):
         "notifications": notifications,
         "basket_items": basket_items,
         "COBALT_HOSTNAME": settings.COBALT_HOSTNAME,
+        "BRIDGE_CREDITS": settings.BRIDGE_CREDITS,
         "GLOBAL_ORG": settings.GLOBAL_ORG,
         "GLOBAL_TITLE": settings.GLOBAL_TITLE,
         "GLOBAL_CONTACT": settings.GLOBAL_CONTACT,
