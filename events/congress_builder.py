@@ -55,7 +55,7 @@ from cobalt.settings import (
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )
-from datetime import datetime
+from datetime import datetime, date
 import itertools
 from utils.utils import cobalt_paginator
 from django.utils.timezone import make_aware, now, utc
@@ -410,11 +410,18 @@ def create_congress_wizard_6(request, step_list, congress):
     events_list_sorted = {}
     for event in events:
         event.event_start_date = event.start_date()
-        events_list[event] = event.event_start_date
-        events_list_sorted = {
-            key: value
-            for key, value in sorted(events_list.items(), key=lambda item: item[1])
-        }
+        if event.event_start_date:
+            events_list[event] = event.event_start_date
+        else:
+            events_list[event] = date(year=1967, month=5, day=3)
+    print("\n\n\n")
+    print(congress)
+    print(events_list)
+    print("\n\n\n")
+    events_list_sorted = {
+        key: value
+        for key, value in sorted(events_list.items(), key=lambda item: item[1])
+    }
 
     return render(
         request,

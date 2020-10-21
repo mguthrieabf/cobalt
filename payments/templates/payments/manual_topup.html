@@ -63,11 +63,7 @@
     const amount = $("#id_amount");
     const amount_err = $("#id_amount_errors");
     amount_err.html("");
-    if (amount.val() < {
-        {
-          AUTO_TOP_UP_MIN_AMT
-        }
-      }) {
+    if (amount.val() < {{ AUTO_TOP_UP_MIN_AMT }}) {
       amount_err.html("Insufficient amount. Minimum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MIN_AMT }}.");
       amount.focus();
       return false;
