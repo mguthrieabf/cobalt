@@ -126,7 +126,9 @@ def update_entries(route_payload, payment_user):
         .values_list("event_entry")
     )
 
-    event_entries = EventEntry.objects.filter(pk__in=event_entry_list)
+    event_entries = EventEntry.objects.filter(pk__in=event_entry_list).exclude(
+        entry_status="Cancelled"
+    )
 
     # Now process their system dollar transactions - same loop as below but
     # easier to understand as 2 separate bits of code

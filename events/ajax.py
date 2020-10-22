@@ -200,7 +200,6 @@ def payment_options_for_user_ajax(request):
 
     if allowed:
         if user.stripe_auto_confirmed == "On":
-            print("auto")
             reply = True
         else:
 
@@ -219,9 +218,6 @@ def payment_options_for_user_ajax(request):
                 ).aggregate(Sum("entry_fee"))
                 if already["entry_fee__sum"]:  # ignore None response
                     user_committed += float(already["entry_fee__sum"])
-            # print(
-            #     f"balance: {user_balance} user_committed: {user_committed} entry_fee: {entry_fee}"
-            # )
 
             if user_balance - user_committed - float(entry_fee) >= 0.0:
                 reply = True

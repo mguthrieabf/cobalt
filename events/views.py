@@ -579,6 +579,7 @@ def edit_event_entry(request, congress_id, event_id):
         event_entry = (
             EventEntry.objects.filter(primary_entrant=request.user)
             .filter(event=event)
+            .exclude(entry_status="Cancelled")
             .first()
         )
 
@@ -801,9 +802,10 @@ def view_events(request):
 
     # get event entries with event entry player entries for this user
     event_entries_list = (
-        EventEntry.objects.filter(evententryplayer__player=request.user)
+        EventEntry.objects.filter(evententryplayer__player=request.user).exclude(
+            entry_status="Cancelled"
+        )
     ).values_list("id")
-
     # get events where event_entries_list is entered
     events = Event.objects.filter(evententry__in=event_entries_list)
 
@@ -830,9 +832,11 @@ def pay_outstanding(request):
     """ Pay anything that is not in a status of paid """
 
     # Get outstanding payments for this user
-    event_entry_players = EventEntryPlayer.objects.exclude(
-        payment_status="Paid"
-    ).filter(player=request.user)
+    event_entry_players = (
+        EventEntryPlayer.objects.exclude(payment_status="Paid")
+        .filter(player=request.user)
+        .filter(evententry__entry_status="Cancelled")
+    )
 
     # redirect if nothing owing
     if not event_entry_players:
@@ -881,7 +885,7 @@ def view_event_entries(request, congress_id, event_id):
 
     congress = get_object_or_404(Congress, pk=congress_id)
     event = get_object_or_404(Event, pk=event_id)
-    entries = EventEntry.objects.filter(event=event)
+    entries = EventEntry.objects.filter(event=event).exclude(entry_status="Cancelled")
     date_string = event.print_dates()
 
     return render(
@@ -939,6 +943,7 @@ def edit_event_entry2(request, congress_id, event_id):
     event_entry = (
         EventEntry.objects.filter(primary_entrant=request.user)
         .filter(event=event)
+        .exclude(entry_status="Cancelled")
         .first()
     )
 

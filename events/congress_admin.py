@@ -80,7 +80,9 @@ def admin_summary(request, congress_id):
 
     # calculate summary
     for event in events:
-        event_entries = EventEntry.objects.filter(event=event)
+        event_entries = EventEntry.objects.filter(event=event).exclude(
+            entry_status="Cancelled"
+        )
         event.entries = event_entries.count()
         if event.entry_early_payment_discount:
             event.early_fee = event.entry_fee - event.entry_early_payment_discount
@@ -146,7 +148,9 @@ def admin_event_summary(request, event_id):
 
     event = get_object_or_404(Event, pk=event_id)
 
-    event_entries = EventEntry.objects.filter(event=event)
+    event_entries = EventEntry.objects.filter(event=event).exclude(
+        entry_status="Cancelled"
+    )
 
     # build summary
     total_received = Decimal(0.0)
@@ -454,6 +458,7 @@ def admin_evententry_delete(request, evententry_id):
                         event=event_entry.event,
                         actor=request.user,
                         action=f"Refund of {amount_str} to {player}",
+                        event_entry=event_entry,
                     ).save()
                     messages.success(
                         request,
@@ -502,11 +507,15 @@ def admin_evententry_delete(request, evententry_id):
             event=event_entry.event,
             actor=request.user,
             action=f"Entry deleted for {event_entry.primary_entrant}",
+            event_entry=event_entry,
         ).save()
 
-        event_entry.delete()
+        event_entry.entry_status = "Cancelled"
+        event_entry.save()
 
-        messages.success(request, "Entry deleted", extra_tags="cobalt-message-success")
+        messages.success(
+            request, "Entry cancelled", extra_tags="cobalt-message-success"
+        )
         return redirect("events:admin_event_summary", event_id=event_entry.event.id)
 
     else:  # not POST - build summary

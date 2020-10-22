@@ -90,18 +90,15 @@ function showSingleMember{{search_id}}(id) {
 
       // listen for ok button
       $(".cobalt-search-ok{{ search_id }}").click(function(event){
-        var search_id = event.target.id.slice(-1);
-        okSearch(search_id);
+        okSearch({{ search_id }});
       });
 
       // listen for cancel button
       $(".cobalt-search-cancel{{ search_id }}").click(function(event){
-        var search_id = event.target.id.slice(-1);
-        cancelSearch(search_id);
+        cancelSearch({{ search_id }});
       });
 
       // hide search boxes
-      console.log($("#id-cobalt-search-top{{ search_id }}"));
       $("#id-cobalt-search-top{{ search_id }}").hide();
 
     })

@@ -24,6 +24,7 @@ PAYMENT_STATUSES = [
 ENTRY_STATUSES = [
     ("Pending", "Pending"),
     ("Complete", "Complete"),
+    ("Cancelled", "Cancelled"),
 ]
 
 # my-system-dollars - you can pay for your own or other people's entries with
@@ -33,7 +34,10 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    ("my-system-dollars", f"My {BRIDGE_CREDITS}",),
+    (
+        "my-system-dollars",
+        f"My {BRIDGE_CREDITS}",
+    ),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
@@ -197,7 +201,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -235,6 +241,9 @@ class Event(models.Model):
         reason = "Full fee"
         description = reason
         players_per_entry = EVENT_PLAYER_FORMAT_SIZE[self.player_format]
+        # Need a better approach for teams
+        if self.player_format == "Teams":
+            players_per_entry = 4
         entry_fee = self.entry_fee / players_per_entry
 
         # date
@@ -280,6 +289,7 @@ class Event(models.Model):
         event_entry_player = (
             EventEntryPlayer.objects.filter(player=user)
             .filter(event_entry__in=event_entry_list)
+            .exclude(event_entry__entry_status="Cancelled")
             .first()
         )
 
@@ -346,7 +356,11 @@ class Event(models.Model):
 
     def entry_status(self, user):
         """ returns the status of the team/pairs/individual entry """
-        event_entry = EventEntry.objects.filter(event=self).first()
+        event_entry = (
+            EventEntry.objects.filter(event=self)
+            .exclude(entry_status="Cancelled")
+            .first()
+        )
         if event_entry:
             return event_entry.entry_status
 
@@ -517,6 +531,9 @@ class EventLog(models.Model):
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     actor = models.ForeignKey(User, on_delete=models.CASCADE)
+    event_entry = models.ForeignKey(
+        EventEntry, on_delete=models.SET_NULL, null=True, blank=True
+    )
     action_date = models.DateTimeField(default=timezone.now)
     action = models.CharField("Action", max_length=200)
 

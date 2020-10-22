@@ -25,7 +25,7 @@
 
         <div class="card col-md-8">
           <div class="card-header card-header-info">
-            <h2>{{ event_entry.event.event_name }} - Delete Entry</h2>
+            <h2>{{ event_entry.event.event_name }} - Cancel Entry</h2>
             <h3 class="py-0 my-0">
               {% for event_entry_player in event_entry_players %}
                   {{ event_entry_player.player.full_name }}{% if not forloop.last %}, {% endif %}
@@ -67,7 +67,7 @@
 
               </tbody>
             </table>
-            <button type="submit" name="refund" class="btn btn-success cobalt-save">Delete</button>
+            <button type="submit" name="refund" class="btn btn-success cobalt-save">Cancel Entry</button>
             </form>
           </div>
         </div>

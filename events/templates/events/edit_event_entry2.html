@@ -57,6 +57,7 @@
             <tbody>
 
           {% for event_entry_player in event_entry.evententryplayer_set.all %}
+            {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.player.id %}
             <tr>
               <td class="px-0 py-1 mx-0 my-2">
 
@@ -111,7 +112,7 @@
         </div>
         <button class="editable btn btn-primary text-left" style="display:none">Add Player to Team</button>
         <div class="text-center">
-          <button class="btn btn-danger">Withdraw From Entry!!!</button>
+          <button class="btn btn-danger">Withdraw From Event!!!</button>
           <button class="btn btn-success">Exit</button>
         </div>
       </div>
@@ -121,7 +122,24 @@
 {% endblock %}
 
 {% block footer %}
+
 <script>
+
+  {% for event_entry_player in event_entry.evententryplayer_set.all %}
+    {% include "utils/generic_user_search_footer.html" with search_id=event_entry_player.player.id %}
+  {% endfor %}
+
+  // edit player
+function cobaltMemberSearchOk(search_id) {
+
+  // Update player details
+  console.log(search_id);
+  console.log(member_id);
+  console.log(member_name[search_id]);
+  console.log(member_id[search_id]);
+
+
+}
 
 $(document).ready(function() {
 

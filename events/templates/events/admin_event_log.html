@@ -34,6 +34,7 @@
                 <th>Date</th>
                 <th>User</th>
                 <th>Action</th>
+                <th>Entry</th>
               </thead>
               <tbody>
                 {% for thing in things %}
@@ -42,6 +43,7 @@
                     <td>{{ thing.action_date|cobalt_nice_datetime }}</td>
                     <td>{{ thing.actor }}</td>
                     <td>{{ thing.action }}</td>
+                    <td>{{ thing.event_entry|default_if_none:"" }}</td>
                   </tr>
                 {% endfor %}
 
