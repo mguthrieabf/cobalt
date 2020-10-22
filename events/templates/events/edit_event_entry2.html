@@ -4,6 +4,8 @@
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
 
+
+
 {% block content %}
 
 <div class="container">
@@ -34,8 +36,9 @@
           </label>
         </div>
 
-        <div class="container">
-          <table class="table table-responsive table-hover mx-auto" id="entrytable">
+        <div class="container table-responsive">
+        <div class="row table-responsive">
+          <table class="table table-responsive table-hover" >
             <thead>
               <tr>
                 <th>Player</th>
@@ -104,6 +107,7 @@
 
             </tbody>
           </table>
+          </div>
         </div>
         <button class="editable btn btn-primary text-left" style="display:none">Add Player to Team</button>
         <div class="text-center">
