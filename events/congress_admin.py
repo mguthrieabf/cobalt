@@ -70,6 +70,10 @@ def admin_summary(request, congress_id):
     congress = get_object_or_404(Congress, pk=congress_id)
     events = Event.objects.filter(congress=congress)
 
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    rbac_user_role_or_error(request, role)
+
     total = {
         "entries": 0,
         "tables": 0.0,
@@ -147,6 +151,10 @@ def admin_event_summary(request, event_id):
     """ Admin Event View """
 
     event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    rbac_user_role_or_error(request, role)
 
     event_entries = EventEntry.objects.filter(event=event).exclude(
         entry_status="Cancelled"

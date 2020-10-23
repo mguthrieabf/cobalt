@@ -242,7 +242,7 @@ def member_details_ajax(request):
                         "search_id": search_id,
                     },
                 )
-                data_dict = {"data": html, "member": "%s" % member}
+                data_dict = {"data": html, "member": "%s" % member, "pic": f"{member.pic}"}
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={"error": "Invalid request"})
 

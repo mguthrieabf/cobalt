@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.template.loader import render_to_string
 from django.db.models import Sum, Q
 from .models import (
     Congress,
@@ -17,7 +18,7 @@ from .models import (
     EventLog,
 )
 from accounts.models import User, TeamMate
-
+from notifications.views import contact_member
 # from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
@@ -29,7 +30,8 @@ from payments.core import payment_api, get_balance
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
-
+from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME
+from .core import notify_conveners
 
 @login_required()
 def get_conveners_ajax(request, org_id):
@@ -350,3 +352,111 @@ def delete_basket_item_ajax(request):
 
         response_data = {"message": "Success"}
         return JsonResponse({"data": response_data})
+
+@login_required()
+def check_player_entry_ajax(request):
+    """ Check if a player is already entered in an event """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        event_id = request.GET["event_id"]
+
+        member = get_object_or_404(User, pk=member_id)
+        event = get_object_or_404(Event, pk=event_id)
+
+        if member.id == TBA_PLAYER:
+            return JsonResponse({"message": "Not Entered"})
+
+        event_entry = EventEntryPlayer.objects.filter(player=member).filter(event_entry__event=event).exclude(event_entry__entry_status="Cancelled").count()
+
+        if event_entry:
+            return JsonResponse({"message": "Already Entered"})
+        else:
+            return JsonResponse({"message": "Not Entered"})
+
+
+@login_required()
+def change_player_entry_ajax(request):
+    """ Change a player in an event """
+
+    if request.method == "GET":
+        member_id = request.GET["member_id"]
+        event_entry_player_id = request.GET["player_event_entry"]
+
+        member = get_object_or_404(User, pk=member_id)
+        event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
+        event_entry = get_object_or_404(EventEntry, pk=event_entry_player.event_entry.id)
+        event = get_object_or_404(Event, pk=event_entry.event.id)
+        congress = get_object_or_404(Congress, pk=event.congress.id)
+
+        # check access on the parent event_entry
+        if not event_entry_player.event_entry.user_can_change(request.user):
+            return JsonResponse({"message": "Access Denied"})
+
+        # update
+        old_player = event_entry_player.player
+        event_entry_player.player = member
+        event_entry_player.save()
+
+        # Log it
+        EventLog(
+            event=event,
+            actor=request.user,
+            event_entry=event_entry,
+            action=f"Swapped {member} in for {old_player}",
+        ).save()
+
+        # notify both members
+        context = {
+            "name": event_entry_player.player.first_name,
+            "title": "Event Entry - %s" % congress,
+            "email_body": f"{request.user.full_name} has added you to {event}.<br><br>",
+            "host": COBALT_HOSTNAME,
+            "link": "/events/view",
+            "link_text": "View Entry",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=event_entry_player.player,
+            msg="Entry to %s" % congress,
+            contact_type="Email",
+            html_msg=html_msg,
+            link="/events/view",
+            subject="Event Entry - %s" % congress,
+        )
+
+        context = {
+            "name": old_player.first_name,
+            "title": "Event Entry - %s" % congress,
+            "email_body": f"{request.user.full_name} has removed you from {event}.<br><br>",
+            "host": COBALT_HOSTNAME,
+            "link": "/events/view",
+            "link_text": "View Entry",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=old_player,
+            msg="Entry to %s" % congress,
+            contact_type="Email",
+            html_msg=html_msg,
+            link="/events/view",
+            subject="Event Entry - %s" % congress,
+        )
+
+        # tell the conveners
+        msg = f"""{request.user.full_name} has changed an entry for {event.event_name} in {congress}.
+                  <br><br>
+                  <b>{old_player}</b> has been removed.
+                  <br><br>
+                  <b>{event_entry_player.player}</b> has been added.
+                  <br><br>
+                  """
+        notify_conveners(congress, event, f"{event} - {event_entry_player.player} added to entry", msg)
+
+        return JsonResponse({"message": "Success"})

@@ -12,7 +12,8 @@
   <div class="row text-center">
     <div class="card">
       <div class="card-header card-header-warning">
-        <h2>Edit Entry to {{ event.event_name }} in {{ congress.name }}</h2>
+        <h1>Edit Entry</h1>
+        <h2>{{ event.event_name }} in {{ congress.name }}</h2>
       </div>
       <div class="card-body text-center mx-auto">
 
@@ -57,20 +58,20 @@
             <tbody>
 
           {% for event_entry_player in event_entry.evententryplayer_set.all %}
-            {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.player.id %}
+            {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.id %}
             <tr>
               <td class="px-0 py-1 mx-0 my-2">
 
                 <div class="px-0 py-0 mx-0 my-0 text-center">
-                  <img id="cobalt-pic" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px;" src="/media/{{ event_entry_player.player.pic }}" />
-                  <p class="px-0 py-0  mx-0 my-0">
+                  <img id="cobalt-pic-{{ event_entry_player.id }}" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px;" src="/media/{{ event_entry_player.player.pic }}" />
+                  <p class="px-0 py-0  mx-0 my-0" id="player-name-{{ event_entry_player.id }}">
                     {{ event_entry_player.player.full_name }}
                   </p>
                 </div>
 
                 </td>
               <td class="editable" style="display:none">
-                <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search{{ event_entry_player.player.id }}">Change Player</a>
+                <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search{{ event_entry_player.id }}">Change Player</a>
               </td>
               <td>{{ event_entry_player.get_payment_type_display }}</td>
               <td>{{ event_entry_player.entry_fee }}</td>
@@ -122,21 +123,54 @@
 {% endblock %}
 
 {% block footer %}
-
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
 
   {% for event_entry_player in event_entry.evententryplayer_set.all %}
-    {% include "utils/generic_user_search_footer.html" with search_id=event_entry_player.player.id %}
+    {% include "utils/generic_user_search_footer.html" with search_id=event_entry_player.id %}
   {% endfor %}
 
   // edit player
 function cobaltMemberSearchOk(search_id) {
+  var member = member_id[search_id];
+  var name = member_name[search_id];
+  var pic = member_pic[search_id];
 
-  // Update player details
-  console.log(search_id);
-  console.log(member_id);
-  console.log(member_name[search_id]);
-  console.log(member_id[search_id]);
+  // Check if player entered already
+
+    $.getJSON("{% url "events:check_player_entry_ajax" %}" + "?member_id=" + member + "&event_id={{ event.id }}")
+      .done(response => {
+
+  // already entered
+        if (response['message'] == "Already Entered"){
+          swal.fire({
+              title: "Error",
+              html: name + " is already entered in this event",
+              icon: "error",
+              buttonsStyling: false
+            })
+
+        } else {
+
+  // not entered so swap player - the search_id is the id of the player event entry
+          $.getJSON("{% url "events:change_player_entry_ajax" %}" + "?member_id=" + member + "&player_event_entry=" + search_id)
+            .done(response => {
+              if (response['message'] == "Success"){
+              // update page
+                $("#cobalt-pic-" + search_id).attr("src", "/media/" + pic);
+                $("#player-name-" + search_id).html(name);
+                Swal.fire({
+                  title: 'Player Changed',
+                  html: 'Player successfully changed',
+                });
+              }
+            });
+        }
+
+      })
+
+
+
 
 
 }

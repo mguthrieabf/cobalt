@@ -7,7 +7,9 @@ from logs.views import log_event
 from cobalt.settings import COBALT_HOSTNAME
 from django.template.loader import render_to_string
 from datetime import datetime
-
+from rbac.core import rbac_get_users_with_role
+from django.urls import reverse
+from notifications.views import contact_member
 
 def events_payments_secondary_callback(status, route_payload, tran):
     """This gets called when a payment has been made for us.
@@ -299,6 +301,8 @@ def send_notifications(route_payload, payment_user):
                 subject="Event Entry - %s" % congress,
             )
 
+
+
     # empty basket - if user added things after they went to the
     # checkout screen then they will be lost
     basket_items.delete()
@@ -327,3 +331,39 @@ def get_events(user):
             upcoming.append(event_entry_player)
 
     return upcoming
+
+def get_conveners_for_congress(congress):
+    """ get list of conveners for a congress """
+
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    return rbac_get_users_with_role(role)
+
+
+def notify_conveners(congress, event, subject, msg):
+    """ Let conveners know about things that change """
+
+    conveners = get_conveners_for_congress(congress)
+    link = reverse("events:admin_event_summary", kwargs={'event_id': event.id})
+
+    for convener in conveners:
+
+        context = {
+            "name": convener.first_name,
+            "title": subject,
+            "email_body": f"{msg}<br><br>",
+            "host": COBALT_HOSTNAME,
+            "link": link,
+            "link_text": "View Event",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=convener,
+            msg=msg,
+            contact_type="Email",
+            html_msg=html_msg,
+            link=link,
+            subject=subject,
+        )

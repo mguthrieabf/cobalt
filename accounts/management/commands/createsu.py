@@ -35,7 +35,7 @@ class Command(BaseCommand):
             "EVERYONE", "a@b.com", "0", "EVERYONE", "system_account"
         )
         # TBA User for event entry
-        self.CreateDefaultTestUsers("TBA", "a@b.com", "1", "TBA", "")
+        self.CreateDefaultTestUsers("TBA", "a@b.com", "1", "TBA", "", "Player entry to be advised", "pic_folder/tba.png")
         self.CreateDefaultTestUsers(
             "Mark",
             "m@rkguthrie.com",

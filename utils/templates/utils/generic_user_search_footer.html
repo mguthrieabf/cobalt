@@ -20,17 +20,18 @@ const system_number_search{{ search_id }} = '{% url "accounts:system_number_sear
 
 var member_id = {};
 var member_name = {};
+var member_pic = {};
 
 //
 // user selected from form
 //
 
-function okSearch(search_id){
+function okSearch{{ search_id }}(id){
 
-  clearModal(search_id);
+  clearModal{{ search_id }}();
 
   try {
-    cobaltMemberSearchOk(search_id);
+    cobaltMemberSearchOk(id);
   } catch (error) {
     // no function defined in calling module - just ignore
   }
@@ -41,12 +42,12 @@ function okSearch(search_id){
 // cancel the form
 //
 
-function cancelSearch(search_id){
+function cancelSearch{{ search_id }}(){
 
-  clearModal(search_id);
+  clearModal{{ search_id }}();
 
   try {
-    cobaltMemberSearchCancel(search_id);
+    cobaltMemberSearchCancel({{ search_id }});
   } catch (error) {
     // no cancel function defined in calling module - just ignore
   }
@@ -57,17 +58,17 @@ function cancelSearch(search_id){
 // Clear and hide generic member search popup
 //
 
-function clearModal(search_id){
-  $('.dynamic_search' + search_id).each(function(i, obj) {
+function clearModal{{ search_id }}(){
+  $('.dynamic_search{{ search_id}}').each(function(i, obj) {
     obj.val("");
   })
-  $('#search-results' + search_id).html("");
-  $('#cobalt-member' + search_id).html("");
+  $('#search-results{{ search_id }}').html("");
+  $('#cobalt-member{{ search_id }}').html("");
 
   // show search boxes
   $("#id-cobalt-search-top{{ search_id }}").show();
 
-  $('#cobalt_general_member_search' + search_id).modal('hide');
+  $('#cobalt_general_member_search{{ search_id }}').modal('hide');
 }
 
 
@@ -84,18 +85,19 @@ function showSingleMember{{search_id}}(id) {
       // show the member
       member_display{{ search_id }}.html(response['data']);
 
-      // set member_id and name
+      // set member_id, name and picture
       member_id[{{ search_id }}] = id;
       member_name[{{ search_id }}] = response['member'];
+      member_pic[{{ search_id }}] = response['pic'];
 
       // listen for ok button
       $(".cobalt-search-ok{{ search_id }}").click(function(event){
-        okSearch({{ search_id }});
+        okSearch{{ search_id }}({{ search_id }});
       });
 
       // listen for cancel button
       $(".cobalt-search-cancel{{ search_id }}").click(function(event){
-        cancelSearch({{ search_id }});
+        cancelSearch{{ search_id }}();
       });
 
       // hide search boxes
@@ -162,7 +164,7 @@ jQuery(document).ready(function() {
 //
 
   $("#close{{search_id}}").click(function(event){
-    cancelSearch({{search_id}});
+    cancelSearch{{search_id}}();
   });
 
 }); // end document ready

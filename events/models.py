@@ -449,6 +449,18 @@ class EventEntry(models.Model):
             self.entry_status = "Pending"
         self.save()
 
+    def user_can_change(self, member):
+        """ Check if a user has access to change this entry.
+
+            Either the primary_entrant who created the entry or
+            any of the players can change the entry. """
+
+        if member == self.primary_entrant:
+            return True
+
+        allowed = EventEntryPlayer.objects.filter(event_entry=self).filter(player=member).exclude(event_entry__entry_status="Cancelled").count()
+
+        return allowed
 
 class EventEntryPlayer(models.Model):
     """ A player who is entering an event """

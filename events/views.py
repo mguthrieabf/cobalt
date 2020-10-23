@@ -449,7 +449,7 @@ def enter_event(request, congress_id, event_id):
     if event.is_full():
         return render(request, "events/event_full.html", {"event": event})
 
-    # Check if drwaft
+    # Check if draft
     if congress.status != "Published":
         return render(request, "events/event_closed.html", {"event": event})
 
