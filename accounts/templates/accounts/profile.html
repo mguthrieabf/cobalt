@@ -92,9 +92,11 @@
                       </td>
                       <td id="status_{{ team_mate.team_mate.id }}">
                         {% if team_mate.make_payments %}
-                          Team mate - Can use your bridge credits to enter you in an event
+                          Team Mate<a href="javascript:void(0)" onclick='help("Team Mate Plus", "This person can use your bridge credits to enter you in an event");'>
+                            <i class="material-icons">add_box</i>
+                          </a>
                         {% else %}
-                          Team mate
+                          Team mate - basic
                         {% endif %}
                       </td>
                       <td class="td-actions text-right">
@@ -308,6 +310,10 @@
       })
     }
 
+    function help(title, html){
+      swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+      return false;
+    }
 
 </script>
 {% endblock %}
