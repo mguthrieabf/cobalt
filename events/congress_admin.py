@@ -34,6 +34,7 @@ from .forms import (
     SessionForm,
     EventEntryPlayerForm,
     RefundForm,
+    EventPlayerDiscountForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -597,6 +598,47 @@ def admin_event_player_discount(request, event_id):
     event_player_discounts = EventPlayerDiscount.objects.filter(event=event)
 
     if request.method == "POST":
-        print("post")
+        form = EventPlayerDiscountForm(request.POST)
+        if form.is_valid():
 
-    return render(request, "events/admin_event_player_discount.html", {"event": event, "event_player_discounts": event_player_discounts})
+
+            player = form.cleaned_data['player']
+            reason = form.cleaned_data['reason']
+
+            already = EventPlayerDiscount.objects.filter(event=event, player=player).count()
+
+            if already:
+                messages.error(
+                    request, f"There is already a discount for {player}", extra_tags="cobalt-message-error"
+                )
+
+            else:
+
+                entry_fee = form.cleaned_data['entry_fee']
+                event_player_discount = EventPlayerDiscount()
+                event_player_discount.player = player
+                event_player_discount.admin = request.user
+                event_player_discount.event = event
+                event_player_discount.reason = reason
+                event_player_discount.entry_fee = entry_fee
+                event_player_discount.save()
+
+                messages.success(
+                    request, "Entry added", extra_tags="cobalt-message-success"
+                )
+
+# check if player is entered
+    for event_player_discount in event_player_discounts:
+        if event_player_discount.event.already_entered(event_player_discount.player):
+            event_player_discount.status = "Entered - "
+
+            # check status of entry
+            event_entry_player = EventEntryPlayer.objects.filter(event_entry__event=event).filter(player=event_player_discount.player).exclude(event_entry__entry_status="Cancelled").first()
+            event_player_discount.status += "%s" % event_entry_player.payment_status
+            event_player_discount.event_entry_player_id = event_entry_player.id
+        else:
+            event_player_discount.status = "Not Entered"
+
+    form = EventPlayerDiscountForm()
+
+    return render(request, "events/admin_event_player_discount.html", {"event": event, "event_player_discounts": event_player_discounts, "form": form})

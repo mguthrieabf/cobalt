@@ -60,6 +60,17 @@ def cobalt_user_link(user):
     url = reverse("accounts:public_profile", kwargs={"pk": user.id})
     return mark_safe(f"<a href='{url}'>{user}</a>")
 
+# custom filter for user which includes link to public profile
+# Short version - name only, no system number
+@register.filter(name="cobalt_user_link_short", is_safe=True)
+def cobalt_user_link_short(user):
+
+    if not user:
+        return None
+
+    url = reverse("accounts:public_profile", kwargs={"pk": user.id})
+    return mark_safe(f"<a href='{url}'>{user.full_name}</a>")
+
 
 # return class of object - used by search
 @register.filter(name="get_class")

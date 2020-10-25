@@ -234,7 +234,7 @@ class Event(models.Model):
         return True
 
     def entry_fee_for(self, user):
-        """ return entry fee for user based on age and date """
+        """ return entry fee for user based on age and date. Also any EventPlayerDiscount applied """
 
         # default
         discount = 0.0
@@ -278,6 +278,17 @@ class Event(models.Model):
                             "Youth discount %s%%" % self.entry_youth_payment_discount
                         )
                         discount = float(self.entry_fee) - float(entry_fee)
+
+        # EventPlayerDiscount
+        event_player_discount = EventPlayerDiscount.objects.filter(event=self).filter(player=user).first()
+
+        if event_player_discount:
+            discount_fee = event_player_discount.entry_fee
+            if discount_fee < entry_fee:
+                entry_fee = "%.2f" % discount_fee
+                reason = event_player_discount.reason
+                description = f"Manual override {reason}"
+                discount = float(self.entry_fee) - float(entry_fee)        
 
         return entry_fee, discount, reason, description
 
@@ -564,4 +575,4 @@ class EventPlayerDiscount(models.Model):
     create_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{event} - {player}"
+        return f"{self.event} - {self.player}"

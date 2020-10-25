@@ -222,6 +222,11 @@ urlpatterns = [
         ajax.admin_offsystem_unpay_ajax,
         name="admin_offsystem_unpay_ajax",
     ),
+    path(
+        "congress-admin/player-discount/delete",
+        ajax.admin_player_discount_delete_ajax,
+        name="admin_player_discount_delete_ajax",
+    ),
     #######################################################
     # higher level admin functions                        #
     #######################################################

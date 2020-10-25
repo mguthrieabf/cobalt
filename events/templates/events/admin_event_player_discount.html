@@ -10,9 +10,8 @@
 <nav aria-label="breadcrumb" role="navigation">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url "events:admin_summary" congress_id=event.congress.id %}">{{ event.congress.name }}</a></li>
-    <li class="breadcrumb-item"><a href="{% url "events:admin_summary" congress_id=event.congress.id %}">{{ event.congress.name }}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ event.event_name }}</li>
-    <li class="breadcrumb-item active" aria-current="page">player Discounts</li>
+    <li class="breadcrumb-item"><a href="{% url "events:admin_event_summary" event_id=event.id %}">{{ event.event_name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Player Discounts</li>
   </ol>
 </nav>
 
@@ -22,12 +21,100 @@
       <div class="card-header card-header-warning">
         <h2>Player Discounts</h2>
         <h3>{{ event.event_name }} in {{ event.congress }}</h3>
-
+        <p>Player discounts are used to grant specific players modified entry fees for specific events.
+        They can be used to give a player a free entry or a reduced entry to any event.</p>
       </div>
-      <div class="card-body">
+      <div class="card-body mx-auto">
+
+        {% if event_player_discounts %}
+
+        <table class="table table-responsive">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Reason</th>
+              <th class="text-right">Entry Fee</th>
+              <th>Created by</th>
+              <th>Created Date</th>
+              <th>Entry Status</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event_player_discount in event_player_discounts %}
+              <tr>
+                <td>{{ event_player_discount.player|cobalt_user_link_short }}</td>
+                <td>{{ event_player_discount.reason }}</td>
+                {% if event_player_discount.entry_fee == 0 %}
+                  <td class="text-right">Free</td>
+                {% else %}
+                  <td class="text-right">{{ event_player_discount.entry_fee }} credits</td>
+                {% endif %}
+                <td>{{ event_player_discount.admin|cobalt_user_link_short }}</td>
+                <td>{{ event_player_discount.create_date|cobalt_nice_datetime }}</td>
+                <td>
+                  {% if event_player_discount.event_entry_player_id %}
+                    <a href="{% url "events:admin_evententryplayer" evententryplayer_id=event_player_discount.event_entry_player_id %}">
+                      {{ event_player_discount.status }}
+                    </a>
+                  {% else %}
+                    {{ event_player_discount.status }}
+                  {% endif %}
+                </td>
+                <td><button class="btn btn-sm btn-danger delete_button cobalt-save" id="{{ event_player_discount.id }}">Delete Discount</button></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+
+        {% else %}
+        <h3>No discounts applied to this event yet</h3>
+        {% endif %}
+
+        <div class="card col-8 mx-auto pt-3">
+          <div class="card-header card-header-info">
+            <h3>Add Discount</h3>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <button class="btn btn-success">Add</button>
+            </form>
+          </div>
+        </div>
 
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+
+<script>
+  $(document).ready(function(){
+
+    // pay button
+    $(".delete_button").click(function(){
+
+      var serializedData = {
+        "event_player_discount_id": this.id,
+      };
+
+      $.ajax({
+        url: '{% url "events:admin_player_discount_delete_ajax" %}',
+        method: "POST",
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: serializedData,
+        dataType: "json"
+      }).done(function(response) {
+        location.reload();
+      });
+    });
+  });
+
+</script>
+
 {% endblock %}

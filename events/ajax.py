@@ -16,6 +16,7 @@ from .models import (
     PAYMENT_TYPES,
     BasketItem,
     EventLog,
+    EventPlayerDiscount,
 )
 from accounts.models import User, TeamMate
 from notifications.views import contact_member
@@ -352,6 +353,38 @@ def delete_basket_item_ajax(request):
 
         response_data = {"message": "Success"}
         return JsonResponse({"data": response_data})
+
+@login_required()
+def admin_player_discount_delete_ajax(request):
+    """ Delete a player discount record """
+
+    if request.method == "POST":
+        discount_id = request.POST["event_player_discount_id"]
+
+        event_player_discount = get_object_or_404(EventPlayerDiscount, pk=discount_id)
+
+        # check access
+        role = "events.org.%s.edit" % event_player_discount.event.congress.congress_master.org.id
+        rbac_user_role_or_error(request, role)
+
+        # Log it
+        EventLog(
+            event=event_player_discount.event,
+            actor=request.user,
+            action=f"Deleted Event Player Discount for {event_player_discount.player}",
+        ).save()
+
+        # Delete it
+        event_player_discount.delete()
+
+        response_data = {"message": "Success"}
+
+    else:
+
+        response_data = {"message": "Incorrect call"}
+
+    return JsonResponse({"data": response_data})
+
 
 @login_required()
 def check_player_entry_ajax(request):

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Congress, Event, Session, EventEntryPlayer
+from .models import Congress, Event, Session, EventEntryPlayer, EventPlayerDiscount
 from organisations.models import Organisation
 from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
@@ -267,8 +267,6 @@ class SessionForm(forms.ModelForm):
 
 
 class EventEntryPlayerForm(forms.ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
 
     class Meta:
         model = EventEntryPlayer
@@ -283,12 +281,18 @@ class EventEntryPlayerForm(forms.ModelForm):
 
 
 class RefundForm(forms.Form):
-    #
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields['name'].widget.attrs.update({'class': 'special'})
-    #     self.fields['comment'].widget.attrs.update(size='40')
 
     player_id = forms.IntegerField()
     player = forms.CharField(max_length=100)
     refund = forms.DecimalField()
+
+
+class EventPlayerDiscountForm(forms.ModelForm):
+
+    class Meta:
+        model = EventPlayerDiscount
+        fields = (
+            "player",
+            "reason",
+            "entry_fee",
+        )
