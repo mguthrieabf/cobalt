@@ -551,3 +551,17 @@ class EventLog(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.event, self.actor)
+
+class EventPlayerDiscount(models.Model):
+    """ Maps player discounts to events. For example if someone is given free
+        entry to an event. """
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player_discount")
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin_discount")
+    entry_fee = models.DecimalField("Entry Fee", max_digits=12, decimal_places=2)
+    reason = models.CharField("Reason", max_length=200)
+    create_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{event} - {player}"

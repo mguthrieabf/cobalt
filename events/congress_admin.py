@@ -24,6 +24,7 @@ from .models import (
     BasketItem,
     PlayerBatchId,
     EventLog,
+    EventPlayerDiscount,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -586,3 +587,16 @@ def admin_evententry_delete(request, evententry_id):
             "club_balance": club_balance,
         },
     )
+
+@login_required()
+def admin_event_player_discount(request, event_id):
+    """ Manage discounted entry to events """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    event_player_discounts = EventPlayerDiscount.objects.filter(event=event)
+
+    if request.method == "POST":
+        print("post")
+
+    return render(request, "events/admin_event_player_discount.html", {"event": event, "event_player_discounts": event_player_discounts})
