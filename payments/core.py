@@ -45,11 +45,11 @@ from cobalt.settings import (
     STRIPE_SECRET_KEY,
     STRIPE_PUBLISHABLE_KEY,
     AUTO_TOP_UP_LOW_LIMIT,
-    GLOBAL_CURRENCY_SYMBOL,
     GLOBAL_CURRENCY_NAME,
     COBALT_HOSTNAME,
     GLOBAL_ORG,
     BRIDGE_CREDITS,
+    GLOBAL_CURRENCY_SYMBOL,
 )
 from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
 from notifications.views import contact_member
@@ -457,7 +457,7 @@ def payment_api(
             )
 
             # Notify member
-            email_body = f"<b>{member}</b> has transferred {GLOBAL_CURRENCY_SYMBOL}{amount:.2f} into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
+            email_body = f"<b>{member}</b> has transferred {amount:.2f} into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
             context = {
                 "name": other_member.first_name,
                 "title": "Transfer from %s" % member.full_name,
@@ -472,8 +472,7 @@ def payment_api(
             # send
             contact_member(
                 member=other_member,
-                msg="Transfer from %s - %s%s"
-                % (member.full_name, GLOBAL_CURRENCY_SYMBOL, amount),
+                msg="Transfer from %s - %s" % (member.full_name, amount),
                 contact_type="Email",
                 html_msg=html_msg,
                 link="/payments",

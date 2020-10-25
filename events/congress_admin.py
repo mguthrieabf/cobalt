@@ -35,6 +35,7 @@ from .forms import (
     EventEntryPlayerForm,
     RefundForm,
     EventPlayerDiscountForm,
+    EmailForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -51,7 +52,6 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_NAME,
     BRIDGE_CREDITS,
     TIME_ZONE,
-    GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )
@@ -435,7 +435,7 @@ def admin_evententry_delete(request, evententry_id):
             for form in refund_form_set:
                 player = get_object_or_404(User, pk=form.cleaned_data["player_id"])
                 amount = float(form.cleaned_data["refund"])
-                amount_str = "%s%.2f" % (GLOBAL_CURRENCY_SYMBOL, amount)
+                amount_str = "%.2f credits" % amount
 
                 if amount > 0.0:
 
@@ -482,8 +482,8 @@ def admin_evententry_delete(request, evententry_id):
                                 <b>{event_entry.event.congress.name}.</b><br><br>
                               """
                 if amount > 0.0:
-                    email_body += f"""A refund of {GLOBAL_CURRENCY_SYMBOL}{amount:.2f}
-                                    has been credited to your {BRIDGE_CREDITS}
+                    email_body += f"""A refund of {amount:.2f} credits
+                                    has been transferred to your {BRIDGE_CREDITS}
                                     account.<br><br>
                                   """
 
@@ -589,11 +589,16 @@ def admin_evententry_delete(request, evententry_id):
         },
     )
 
+
 @login_required()
 def admin_event_player_discount(request, event_id):
     """ Manage discounted entry to events """
 
     event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    rbac_user_role_or_error(request, role)
 
     event_player_discounts = EventPlayerDiscount.objects.filter(event=event)
 
@@ -601,20 +606,23 @@ def admin_event_player_discount(request, event_id):
         form = EventPlayerDiscountForm(request.POST)
         if form.is_valid():
 
+            player = form.cleaned_data["player"]
+            reason = form.cleaned_data["reason"]
 
-            player = form.cleaned_data['player']
-            reason = form.cleaned_data['reason']
-
-            already = EventPlayerDiscount.objects.filter(event=event, player=player).count()
+            already = EventPlayerDiscount.objects.filter(
+                event=event, player=player
+            ).count()
 
             if already:
                 messages.error(
-                    request, f"There is already a discount for {player}", extra_tags="cobalt-message-error"
+                    request,
+                    f"There is already a discount for {player}",
+                    extra_tags="cobalt-message-error",
                 )
 
             else:
 
-                entry_fee = form.cleaned_data['entry_fee']
+                entry_fee = form.cleaned_data["entry_fee"]
                 event_player_discount = EventPlayerDiscount()
                 event_player_discount.player = player
                 event_player_discount.admin = request.user
@@ -627,13 +635,18 @@ def admin_event_player_discount(request, event_id):
                     request, "Entry added", extra_tags="cobalt-message-success"
                 )
 
-# check if player is entered
+    # check if player is entered
     for event_player_discount in event_player_discounts:
         if event_player_discount.event.already_entered(event_player_discount.player):
             event_player_discount.status = "Entered - "
 
             # check status of entry
-            event_entry_player = EventEntryPlayer.objects.filter(event_entry__event=event).filter(player=event_player_discount.player).exclude(event_entry__entry_status="Cancelled").first()
+            event_entry_player = (
+                EventEntryPlayer.objects.filter(event_entry__event=event)
+                .filter(player=event_player_discount.player)
+                .exclude(event_entry__entry_status="Cancelled")
+                .first()
+            )
             event_player_discount.status += "%s" % event_entry_player.payment_status
             event_player_discount.event_entry_player_id = event_entry_player.id
         else:
@@ -641,4 +654,78 @@ def admin_event_player_discount(request, event_id):
 
     form = EventPlayerDiscountForm()
 
-    return render(request, "events/admin_event_player_discount.html", {"event": event, "event_player_discounts": event_player_discounts, "form": form})
+    return render(
+        request,
+        "events/admin_event_player_discount.html",
+        {
+            "event": event,
+            "event_player_discounts": event_player_discounts,
+            "form": form,
+        },
+    )
+
+
+@login_required()
+def admin_event_email(request, event_id):
+    """ Email all entrants to an event """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    rbac_user_role_or_error(request, role)
+
+    form = EmailForm(request.POST or None)
+
+    # who will receive this
+    recipients_qs = EventEntryPlayer.objects.filter(event_entry__event=event).exclude(
+        event_entry__entry_status="Cancelled"
+    )
+
+    if request.method == "POST":
+        if form.is_valid():
+            subject = form.cleaned_data["subject"]
+            body = form.cleaned_data["body"]
+
+            if "test" in request.POST:
+                recipients = [request.user]
+            else:
+                recipients = []
+                for recipient in recipients_qs:
+                    recipients.append(recipient.player)
+            for recipient in recipients:
+                context = {
+                    "name": recipient.first_name,
+                    "title": subject,
+                    "email_body": body,
+                    "host": COBALT_HOSTNAME,
+                    "link": "/events/view",
+                    "link_text": "View Entry",
+                }
+
+                html_msg = render_to_string(
+                    "notifications/email_with_button.html", context
+                )
+
+                # send
+                contact_member(
+                    member=recipient,
+                    msg=f"Email about {event}",
+                    contact_type="Email",
+                    html_msg=html_msg,
+                    link="/events/view",
+                    subject=subject,
+                )
+
+            if "test" in request.POST:
+                msg = "Test message sent"
+            else:
+                msg = "%s message(s) sent" % (len(recipients))
+
+            messages.success(request, msg, extra_tags="cobalt-message-success")
+
+    return render(
+        request,
+        "events/admin_email.html",
+        {"form": form, "event": event, "count": recipients_qs.count()},
+    )

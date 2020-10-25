@@ -51,7 +51,6 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_NAME,
     BRIDGE_CREDITS,
     TIME_ZONE,
-    GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )

@@ -267,7 +267,6 @@ class SessionForm(forms.ModelForm):
 
 
 class EventEntryPlayerForm(forms.ModelForm):
-
     class Meta:
         model = EventEntryPlayer
         fields = (
@@ -288,7 +287,6 @@ class RefundForm(forms.Form):
 
 
 class EventPlayerDiscountForm(forms.ModelForm):
-
     class Meta:
         model = EventPlayerDiscount
         fields = (
@@ -296,3 +294,23 @@ class EventPlayerDiscountForm(forms.ModelForm):
             "reason",
             "entry_fee",
         )
+
+
+class EmailForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(EmailForm, self).__init__(*args, **kwargs)
+
+        # Hide the crispy labels
+        self.fields["body"].label = False
+
+    subject = forms.CharField(max_length=100)
+    body = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>Enter the body of your email. Do not insert pictures as they will not work.",
+                }
+            }
+        )
+    )

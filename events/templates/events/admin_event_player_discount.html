@@ -26,6 +26,8 @@
       </div>
       <div class="card-body mx-auto">
 
+        {% include "utils/generic_user_search_body.html" with search_id=1 %}
+
         {% if event_player_discounts %}
 
         <table class="table table-responsive">
@@ -79,8 +81,36 @@
           <div class="card-body">
             <form method="post">
               {% csrf_token %}
-              {{ form|crispy }}
-              <button class="btn btn-success">Add</button>
+              <div class="px-0 py-0 mx-0 my-0 text-center">
+                <a class="cobalt_generic_member btn btn-warning btn-sm mb-4" data-toggle="modal" id="id_generic_search" data-target="#cobalt_general_member_search1">Choose Player</a>
+                <input type="hidden" id="id_player" name="player">
+                <br>
+                <img id="cobalt-pic" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px; display: none;"/>
+                <p class="px-0 py-0  mx-0 my-0" id="player-name"></p>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="bmd-label-static">Reason</label>
+                    <span class="cobalt-form-error" id="id_reason_errors">{{ form.reason.errors|striptags }}</span>
+                    {% render_field form.reason class+="form-control" %}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="bmd-label-static">Entry Fee</label>
+                    <span class="cobalt-form-error" id="id_player_errors">{{ form.entry_fee.errors|striptags }}</span>
+                    {% render_field form.entry_fee class+="form-control" %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center">
+              <button class="btn btn-success cobalt-save">Add</button>
+              </div>
             </form>
           </div>
         </div>
@@ -92,8 +122,18 @@
 {% endblock %}
 
 {% block footer %}
-
 <script>
+{% include "utils/generic_user_search_footer.html" with search_id=1 %}
+
+function cobaltMemberSearchOk() {
+
+  $("#id_player").val(member_id[1]);
+  $("#cobalt-pic").attr("src", "/media/" + member_pic[1]);
+  $("#player-name" ).html(member_name[1]);
+  $("#cobalt-pic" ).show();
+
+}
+
   $(document).ready(function(){
 
     // pay button

@@ -48,7 +48,6 @@ from cobalt.settings import (
     GLOBAL_CURRENCY_NAME,
     BRIDGE_CREDITS,
     TIME_ZONE,
-    GLOBAL_CURRENCY_SYMBOL,
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )
@@ -192,7 +191,7 @@ def view_congress(request, congress_id, fullscreen=False):
             if first_row_for_event:
                 program[
                     "event"
-                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</td><td rowspan='{rows}'><span class='title'>{GLOBAL_CURRENCY_SYMBOL}{event.entry_fee}</span></td>"
+                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</td><td rowspan='{rows}'><span class='title'>{event.entry_fee} credits</span></td>"
                 if program["entry"]:
                     program[
                         "links"

@@ -37,6 +37,9 @@
               <a href="{% url 'events:admin_event_player_discount' event_id=event.id %}" class="text-center btn btn-default btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">person_remove</i>&nbsp;Player Discounts
               </a>
+              <a href="{% url 'events:admin_event_email' event_id=event.id %}" class="text-center btn btn-danger btn-sm btn-round" style="width: 170px">
+                <i class="material-icons">email</i>&nbsp;Email
+              </a>
             </div>
             <div class="float-right">
               <a href="{% url 'events:admin_event_csv' event_id=event.id %}" class="text-center btn btn-secondary btn-sm btn-round" style="width: 170px">
@@ -49,9 +52,9 @@
             <table class="table table-hover">
               <thead class="text-info">
                 <th>Players</th>
-                <th class="text-right">Due {{ GLOBAL_CURRENCY_SYMBOL }}</th>
-                <th class="text-right">Paid {{ GLOBAL_CURRENCY_SYMBOL }}</th>
-                <th class="text-right">Pending {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                <th class="text-right">Due</th>
+                <th class="text-right">Paid</th>
+                <th class="text-right">Pending</th>
                 <th class="text-right">Status</th>
                 <th class="text-right">Action</th>
               </thead>

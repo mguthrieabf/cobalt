@@ -7,7 +7,6 @@ from accounts.models import User
 from payments.models import MemberTransaction
 from cobalt.settings import (
     GLOBAL_ORG,
-    GLOBAL_CURRENCY_SYMBOL,
     TIME_ZONE,
     BRIDGE_CREDITS,
 )
@@ -34,10 +33,7 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    (
-        "my-system-dollars",
-        f"My {BRIDGE_CREDITS}",
-    ),
+    ("my-system-dollars", f"My {BRIDGE_CREDITS}",),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
@@ -201,9 +197,7 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -255,7 +249,7 @@ class Event(models.Model):
                 ) / players_per_entry
                 discount = self.entry_early_payment_discount / players_per_entry
                 reason = "Early discount"
-                description = f"Early discount {GLOBAL_CURRENCY_SYMBOL}{discount:.2f}"
+                description = f"Early discount {discount:.2f} credits"
 
         # youth - you get only one discount, whichever is bigger
         if self.congress.allow_youth_payment_discount:
@@ -280,7 +274,9 @@ class Event(models.Model):
                         discount = float(self.entry_fee) - float(entry_fee)
 
         # EventPlayerDiscount
-        event_player_discount = EventPlayerDiscount.objects.filter(event=self).filter(player=user).first()
+        event_player_discount = (
+            EventPlayerDiscount.objects.filter(event=self).filter(player=user).first()
+        )
 
         if event_player_discount:
             discount_fee = event_player_discount.entry_fee
@@ -288,7 +284,7 @@ class Event(models.Model):
                 entry_fee = "%.2f" % discount_fee
                 reason = event_player_discount.reason
                 description = f"Manual override {reason}"
-                discount = float(self.entry_fee) - float(entry_fee)        
+                discount = float(self.entry_fee) - float(entry_fee)
 
         return entry_fee, discount, reason, description
 
@@ -469,9 +465,15 @@ class EventEntry(models.Model):
         if member == self.primary_entrant:
             return True
 
-        allowed = EventEntryPlayer.objects.filter(event_entry=self).filter(player=member).exclude(event_entry__entry_status="Cancelled").count()
+        allowed = (
+            EventEntryPlayer.objects.filter(event_entry=self)
+            .filter(player=member)
+            .exclude(event_entry__entry_status="Cancelled")
+            .count()
+        )
 
         return allowed
+
 
 class EventEntryPlayer(models.Model):
     """ A player who is entering an event """
@@ -563,13 +565,18 @@ class EventLog(models.Model):
     def __str__(self):
         return "%s - %s" % (self.event, self.actor)
 
+
 class EventPlayerDiscount(models.Model):
     """ Maps player discounts to events. For example if someone is given free
         entry to an event. """
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    player = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player_discount")
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin_discount")
+    player = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="player_discount"
+    )
+    admin = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="admin_discount"
+    )
     entry_fee = models.DecimalField("Entry Fee", max_digits=12, decimal_places=2)
     reason = models.CharField("Reason", max_length=200)
     create_date = models.DateTimeField(default=timezone.now)

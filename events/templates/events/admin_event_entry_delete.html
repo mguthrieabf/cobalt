@@ -33,7 +33,7 @@
             </h3>
             <h3 class="py-0 my-0">
               {% if event_entry.received > 0 %}
-                Paid - {{ GLOBAL_CURRENCY_SYMBOL }}{{ event_entry.received }}
+                Paid - {{ event_entry.received }} credits
               {% else %}
                 No funds received
               {% endif %}
@@ -48,12 +48,12 @@
             <i>Refunds are at the discretion of the convener. Funds will be transferred
             from the club account to the entrant's account and could result in the
             club being overdrawn. <span class="font-weight-bold">{{ club }}</span> has a balance of
-            <span class="font-weight-bold">{{ GLOBAL_CURRENCY_SYMBOL}}{{ club_balance|floatformat:2 }}</span>.</i><br><br>
+            <span class="font-weight-bold">{{ club_balance|floatformat:2 }} credits</span>.</i><br><br>
             <i>If you don't want to give a refund then set the amount to zero.</i><br><br>
             <table class="table table-hover">
               <thead class="text-info">
                 <th>Player</th>
-                <th class="text-right">Refund {{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                <th class="text-right">Refund</th>
               </thead>
               <tbody>
               {% for form in refund_form_set %}
