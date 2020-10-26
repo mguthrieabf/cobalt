@@ -33,7 +33,10 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    ("my-system-dollars", f"My {BRIDGE_CREDITS}",),
+    (
+        "my-system-dollars",
+        f"My {BRIDGE_CREDITS}",
+    ),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "Default"),
     ("bank-transfer", "Bank Transfer"),
@@ -197,7 +200,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -259,7 +264,8 @@ class Event(models.Model):
                 ref_date = dob.replace(
                     year=dob.year + self.congress.youth_payment_discount_age
                 )
-                if self.congress.youth_payment_discount_date <= ref_date:
+                if self.congress.youth_payment_discount_date <= ref_date.date():
+                    print("hello")
                     youth_fee = (
                         float(self.entry_fee / players_per_entry)
                         * self.entry_youth_payment_discount
@@ -457,10 +463,10 @@ class EventEntry(models.Model):
         self.save()
 
     def user_can_change(self, member):
-        """ Check if a user has access to change this entry.
+        """Check if a user has access to change this entry.
 
-            Either the primary_entrant who created the entry or
-            any of the players can change the entry. """
+        Either the primary_entrant who created the entry or
+        any of the players can change the entry."""
 
         if member == self.primary_entrant:
             return True
@@ -567,8 +573,8 @@ class EventLog(models.Model):
 
 
 class EventPlayerDiscount(models.Model):
-    """ Maps player discounts to events. For example if someone is given free
-        entry to an event. """
+    """Maps player discounts to events. For example if someone is given free
+    entry to an event."""
 
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     player = models.ForeignKey(
