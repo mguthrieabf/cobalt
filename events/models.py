@@ -265,7 +265,6 @@ class Event(models.Model):
                     year=dob.year + self.congress.youth_payment_discount_age
                 )
                 if self.congress.youth_payment_discount_date <= ref_date.date():
-                    print("hello")
                     youth_fee = (
                         float(self.entry_fee / players_per_entry)
                         * self.entry_youth_payment_discount

@@ -35,11 +35,15 @@ urlpatterns = [
         name="edit_event_entry",
     ),
     path(
-        "congress/event/change-entry2/<int:congress_id>/<int:event_id>",
-        views.edit_event_entry2,
-        name="edit_event_entry2",
+        "congress/event/delete-entry/<int:event_entry_id>",
+        views.delete_event_entry,
+        name="delete_event_entry",
     ),
-    path("congress/checkout", views.checkout, name="checkout",),
+    path(
+        "congress/checkout",
+        views.checkout,
+        name="checkout",
+    ),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",
         congress_builder.edit_session,
@@ -76,7 +80,11 @@ urlpatterns = [
         ajax.change_player_entry_ajax,
         name="change_player_entry_ajax",
     ),
-    path("view", views.view_events, name="view_events",),
+    path(
+        "view",
+        views.view_events,
+        name="view_events",
+    ),
     ########################################################################
     # Congress Builder screens for conveners to create and edit congresses #
     ########################################################################

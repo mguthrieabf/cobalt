@@ -463,6 +463,11 @@ def admin_evententry_delete(request, evententry_id):
                         member=player,
                     )
 
+                    # update payment records
+                    for event_entry_player in event_entry_players:
+                        event_entry_player.payment_received = Decimal(0)
+                        event_entry_player.save()
+
                     # Log it
                     EventLog(
                         event=event_entry.event,

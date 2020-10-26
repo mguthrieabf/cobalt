@@ -4,8 +4,18 @@
 {% load widget_tweaks %}
 {% load crispy_forms_tags %}
 
+{% block header %}
+<style>
+  .cobalt-left {
+    text-align: left;
+    padding-right: 20px;
+  }
 
-
+  .cobalt-table {
+    margin: 0px auto;
+  }
+</style>
+{% endblock %}
 {% block content %}
 
 <div class="container">
@@ -21,15 +31,6 @@
 
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input class="form-check-input" type="checkbox" id="show_details">Show details
-            <span class="form-check-sign">
-                <span class="check"></span>
-            </span>
-          </label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
             <input class="form-check-input" type="checkbox" id="enable_edit">Edit Entry
             <span class="form-check-sign">
                 <span class="check"></span>
@@ -42,13 +43,11 @@
           <table class="table table-responsive table-hover" >
             <thead>
               <tr>
+                <th></th>
                 <th>Player</th>
                 <th class="editable" style="display:none"></th>
                 <th>Payment Method</th>
                 <th>Entry Fee</th>
-                <th class="extras" style="display:none">Paid</th>
-                <th class="extras" style="display:none">Payment Date</th>
-                <th class="extras" style="display:none">Payment By</th>
                 <th>Status</th>
                 {% if event_entry.entry_status != "Complete" %}
                 <th class="editable" style="display:none">Action</th>
@@ -60,6 +59,47 @@
           {% for event_entry_player in event_entry.evententryplayer_set.all %}
             {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.id %}
             <tr>
+              <td><a href="javascript:void(0)" onclick="
+                                swal.fire({
+                                          title: '{{ Details }}',
+                                          showClass: {
+                                            popup: 'animate__animated animate__fadeInDown'
+                                          },
+                                          hideClass: {
+                                            popup: 'animate__animated animate__fadeOutUp'
+                                          },
+                                          html: '<table class=cobalt-table>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Player: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.player }}</td>\
+                                                  </tr>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Payment Method: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.get_payment_type_display }}</td>\
+                                                  </tr>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Entry Fee: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.entry_fee|cobalt_credits }}</td>\
+                                                  </tr>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Paid: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.payment_received|cobalt_credits }}</td>\
+                                                  </tr>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Payment Date: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.entry_complete_date|cobalt_nice_datetime|default_if_none:"" }}</td>\
+                                                  </tr>\
+                                                  <tr>\
+                                                    <td class=cobalt-left>Payment By: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.paid_by }}</td>\
+                                                  </tr>\
+                                                  </table>',
+                                          icon: 'info',
+                                          confirmButtonColor: '#3085d6',
+                                          cancelButtonColor: '#d33',
+                                          confirmButtonText: 'Dismiss'
+                                        })">
+                  <i class="material-icons">info</i></a></td>
               <td class="px-0 py-1 mx-0 my-2">
 
                 <div class="px-0 py-0 mx-0 my-0 text-center">
@@ -73,11 +113,8 @@
               <td class="editable" style="display:none">
                 <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search{{ event_entry_player.id }}">Change Player</a>
               </td>
-              <td>{{ event_entry_player.get_payment_type_display }}</td>
-              <td>{{ event_entry_player.entry_fee }}</td>
-              <td class="extras" style="display:none">{{ event_entry_player.payment_received }}</td>
-              <td class="extras" style="display:none">{{ event_entry_player.entry_complete_date|cobalt_nice_datetime|default_if_none:"-" }}</td>
-              <td class="extras" style="display:none">{{ event_entry_player.paid_by.full_name|default_if_none:"-" }}</td>
+              <td style="white-space: nowrap;">{{ event_entry_player.get_payment_type_display }}</td>
+              <td>{{ event_entry_player.entry_fee|cobalt_credits }}</td>
               <td>
                 <div>
 
@@ -113,7 +150,7 @@
         </div>
         <button class="editable btn btn-primary text-left" style="display:none">Add Player to Team</button>
         <div class="text-center">
-          <button class="btn btn-danger">Withdraw From Event!!!</button>
+          <a href="{% url "events:delete_event_entry" event_entry_id=event_entry.id %}" class="btn btn-danger">Withdraw From Event!!!</a>
           <button class="btn btn-success">Exit</button>
         </div>
       </div>
@@ -176,14 +213,6 @@ function cobaltMemberSearchOk(search_id) {
 }
 
 $(document).ready(function() {
-
-// show extra columns if selected
-$("#show_details").click(function(){
-  $(".extras").each(function() {
-    $(this).toggle(100);
-//    $('#entrytable').bootstrapTable('refresh');
-  });
-});
 
 // show edit info if selected
 $("#enable_edit").click(function(){

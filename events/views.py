@@ -438,7 +438,9 @@ def enter_event(request, congress_id, event_id):
 
     # Check if already entered
     if event.already_entered(request.user):
-        return redirect("events:edit_event_entry", event_id=event.id)
+        return redirect(
+            "events:edit_event_entry", event_id=event.id, congress_id=event.congress.id
+        )
 
     # Check if entries are open
     if not event.is_open():
@@ -550,8 +552,9 @@ def enter_event(request, congress_id, event_id):
         return enter_event_form(event, congress, request)
 
 
+# DELETE ME LATER
 @login_required()
-def edit_event_entry(request, congress_id, event_id):
+def edit_event_entry_old(request, congress_id, event_id):
     """ edit an event entry """
 
     # Load the event
@@ -926,28 +929,210 @@ def global_admin_congress_masters(request):
 
 
 @login_required()
-def edit_event_entry2(request, congress_id, event_id):
+def edit_event_entry(request, congress_id, event_id):
     """ edit an event entry """
 
     # Load the event
     event = get_object_or_404(Event, pk=event_id)
     congress = get_object_or_404(Congress, pk=congress_id)
 
-    # Check if already entered
-    if not event.already_entered(request.user):
+    # find matching event entries
+    event_entry_player = (
+        EventEntryPlayer.objects.filter(player=request.user)
+        .exclude(event_entry__entry_status="Cancelled")
+        .first()
+    )
+    if event_entry_player:
+        event_entry = event_entry_player.event_entry
+
+    else:
         return redirect(
             "events:enter_event", event_id=event.id, congress_id=congress_id
         )
 
-    event_entry = (
-        EventEntry.objects.filter(primary_entrant=request.user)
-        .filter(event=event)
-        .exclude(entry_status="Cancelled")
-        .first()
+    return render(
+        request,
+        "events/edit_event_entry.html",
+        {"event": event, "congress": congress, "event_entry": event_entry},
     )
+
+
+@login_required()
+def delete_event_entry(request, event_entry_id):
+    """ Delete an entry to an event """
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+    if event_entry.entry_status == "Cancelled":
+        error = "This entry is already in a cancelled state."
+
+        title = "This entry is already cancelled"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
+
+    event_entry_players_me = event_entry_players.filter(player=request.user)
+
+    if not event_entry_players_me or event_entry.primary_entrant != request.user:
+        error = """You are not the person who made this entry or one of the players.
+                   You cannot change this entry."""
+
+        title = "You do not have permission"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    if request.method == "POST":
+
+        event_entry.entry_status = "Cancelled"
+        event_entry.save()
+
+        EventLog(
+            event=event_entry.event,
+            actor=request.user,
+            action=f"Event entry {event_entry.id} cancelled",
+            event_entry=event_entry,
+        ).save()
+
+        # dict of people getting money and what they are getting
+        refunds = {}
+
+        # list of people getting cancelled
+        cancelled = []
+
+        # Update records and return paid money
+        for event_entry_player in event_entry_players:
+
+            # check for refunds
+            amount = float(event_entry_player.payment_received)
+            if amount > 0.0:
+                event_entry_player.payment_received = Decimal(0)
+                event_entry_player.save()
+
+                amount_str = "%.2f credits" % amount
+
+                # create payments in org account
+                update_organisation(
+                    organisation=event_entry.event.congress.congress_master.org,
+                    amount=-amount,
+                    description=f"Refund to {event_entry_player.paid_by} for {event_entry.event.event_name}",
+                    source="Events",
+                    log_msg=f"Refund to {event_entry_player.paid_by} for {event_entry.event.event_name}",
+                    sub_source="refund",
+                    payment_type="Refund",
+                    member=event_entry_player.paid_by,
+                )
+
+                # create payment for member
+                update_account(
+                    organisation=event_entry.event.congress.congress_master.org,
+                    amount=amount,
+                    description=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
+                    source="Events",
+                    log_msg=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
+                    sub_source="refund",
+                    payment_type="Refund",
+                    member=event_entry_player.paid_by,
+                )
+
+                # Log it
+                EventLog(
+                    event=event_entry.event,
+                    actor=request.user,
+                    action=f"Refund of {amount_str} to {event_entry_player.paid_by}",
+                    event_entry=event_entry,
+                ).save()
+                messages.success(
+                    request,
+                    f"Refund of {amount_str} to {event_entry_player.paid_by} successful",
+                    extra_tags="cobalt-message-success",
+                )
+
+                # record refund amount
+                if event_entry_player.paid_by in refunds.keys():
+                    refunds[event_entry_player.paid_by] += amount
+                else:
+                    refunds[event_entry_player.paid_by] = amount
+
+                # also record players getting cancelled
+                if event_entry_player.player not in cancelled:
+                    cancelled.append(event_entry_player.player)
+
+        # new loop, refunds have been made so notify people
+        for member in refunds.keys():
+
+            # Notify users
+
+            # tailor message to recipient
+            if member == request.user:
+                start_msg = "You have"
+            else:
+                start_msg = f"{request.user.full_name} has"
+
+            # cancelled and refunds are not necessarily the same
+            # someone can enter an event and then be swapped out
+            if member in cancelled:
+                msg = (
+                    f"{start_msg} cancelled your entry to {event_entry.event}.<br><br>"
+                )
+                cancelled.remove(member)  # already taken care of
+            else:
+                msg = f"{start_msg} cancelled an entry to {event_entry.event} which you paid for.<br><br>"
+
+            msg += f"You have been refunded {refunds[member]} credits.<br><br>"
+
+            context = {
+                "name": member.first_name,
+                "title": "Event Entry - %s Cancelled" % event_entry.event.congress,
+                "email_body": msg,
+                "host": COBALT_HOSTNAME,
+                "link": "/events/view",
+                "link_text": "View Entry",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=member,
+                msg="Entry to %s" % event_entry.event.congress,
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="Entry Cancelled - %s" % event_entry.event,
+            )
+
+        # There can be people left on cancelled who didn't pay for their entry - let them know
+        for member in cancelled:
+
+            if member == request.user:
+                msg = f"You have cancelled your entry to {event_entry.event}.<br><br>"
+            else:
+                msg = f"{request.user.full_name} has cancelled your entry to {event_entry.event}.<br><br>"
+
+            context = {
+                "name": member.first_name,
+                "title": "Event Entry - %s Cancelled" % event_entry.event.congress,
+                "email_body": msg,
+                "host": COBALT_HOSTNAME,
+                "link": "/events/view",
+                "link_text": "View Entry",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=member,
+                msg="Entry to %s" % event_entry.event.congress,
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="Entry Cancelled - %s" % event_entry.event,
+            )
+
+        return redirect("events:view_events")
 
     return render(
         request,
-        "events/edit_event_entry2.html",
-        {"event": event, "congress": congress, "event_entry": event_entry},
+        "events/delete_event_entry.html",
+        {"event_entry": event_entry, "event_entry_players": event_entry_players},
     )

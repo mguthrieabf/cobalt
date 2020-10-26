@@ -30,7 +30,7 @@
                 <span class="cobalt-form-error" id="id_session_date_errors">{{ form.session_date.errors|striptags }}</span>
                 <div class="form-group">
                   <label class="bmd-label-float" style="font-size:11px">Date</label>
-                  <input type="text" name="session_date" id="id_session_date" class="form-control datepicker date" value="{{ form.session_date.value|default_if_none:'' }}">
+                  <input type="text" name="session_date" id="id_session_date" class="form-control datepicker" value="{{ form.session_date.value|default_if_none:'' }}">
                 </div>
               </div>
               <div class="col-md-4">

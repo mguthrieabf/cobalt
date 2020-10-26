@@ -60,6 +60,7 @@ def cobalt_user_link(user):
     url = reverse("accounts:public_profile", kwargs={"pk": user.id})
     return mark_safe(f"<a href='{url}'>{user}</a>")
 
+
 # custom filter for user which includes link to public profile
 # Short version - name only, no system number
 @register.filter(name="cobalt_user_link_short", is_safe=True)
@@ -70,6 +71,23 @@ def cobalt_user_link_short(user):
 
     url = reverse("accounts:public_profile", kwargs={"pk": user.id})
     return mark_safe(f"<a href='{url}'>{user.full_name}</a>")
+
+
+# return formatted bridge credit number
+@register.filter(name="cobalt_credits", is_safe=True)
+def cobalt_credits(credits):
+
+    if credits == 1.0:
+        word = "credit"
+    else:
+        word = "credits"
+
+    if int(credits) == credits:
+        credits = int(credits)
+
+    ret = f"{credits:,} {word}"
+
+    return mark_safe(ret)
 
 
 # return class of object - used by search
