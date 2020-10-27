@@ -9954,7 +9954,7 @@ var dropdown = renderer["a" /* default */].create('<div class="note-dropdown-men
     var option = _typeof(item) === 'object' ? item.option : undefined;
     var dataValue = 'data-value="' + value + '"';
     var dataOption = option !== undefined ? ' data-option="' + option + '"' : '';
-    return '<a class="dropdown-item" href="#" ' + (dataValue + dataOption) + ' role="listitem" aria-label="' + value + '">' + content + '</a>';
+    return '<a class="dropdown-item" href="javascript:void(0)" ' + (dataValue + dataOption) + ' role="listitem" aria-label="' + value + '">' + content + '</a>';
   }).join('') : options.items;
   $node.html(markup).attr({
     'aria-label': options.title
@@ -9969,7 +9969,7 @@ var dropdownCheck = renderer["a" /* default */].create('<div class="note-dropdow
   var markup = Array.isArray(options.items) ? options.items.map(function (item) {
     var value = typeof item === 'string' ? item : item.value || '';
     var content = options.template ? options.template(item) : item;
-    return '<a class="dropdown-item" href="#" data-value="' + value + '" role="listitem" aria-label="' + item + '">' + icon(options.checkClassName) + ' ' + content + '</a>';
+    return '<a class="dropdown-item" href="javascript:void(0)" data-value="' + value + '" role="listitem" aria-label="' + item + '">' + icon(options.checkClassName) + ' ' + content + '</a>';
   }).join('') : options.items;
   $node.html(markup).attr({
     'aria-label': options.title
