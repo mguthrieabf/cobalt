@@ -18,6 +18,7 @@
 
 <link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
 <script src="{% static "assets/js/bootstrap4-toggle.min.js" %}"></script>
+<link href="{% static "assets/css/animate.4.0.0/animate.min.css" %}" rel="stylesheet">
 
 {% endblock %}
 {% block content %}
@@ -27,8 +28,7 @@
 <div class="container">
   <div class="row text-center">
     <div class="card">
-      <div class="card-header card-header-warning">
-        <h1></h1>
+      <div class="card-header card-header-primary">
 
         <h1>
           <div class="d-flex justify-content-between">
@@ -42,19 +42,19 @@
 
 
         <h2>{{ event.event_name }} in {{ congress.name }}</h2>
+
+<!-- Edit checkbox -->
+        <div class="text-left">
+                <span class="font-weight-bold" style="font-size: 120%">Edit Entry</span>
+                <input type="checkbox" id="enable_edit" data-toggle="toggle" data-size="sm"
+                data-onstyle="danger"
+                {% if edit_flag %} checked {% endif %}
+                >
+        </div>
       </div>
       <div class="card-body text-center mx-auto">
 
         <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
-
-<!-- Edit checkbox -->
-
-<div class="my-4">
-        <span class="font-weight-bold" style="font-size: 120%">Edit Entry</span>
-        <input type="checkbox" id="enable_edit" data-toggle="toggle" data-size="sm"
-        {% if edit_flag %} checked {% endif %}
-        >
-</div>
 
  <!-- categories -->
  {% if categories %}
@@ -125,7 +125,7 @@
                                                   </tr>\
                                                   <tr>\
                                                     <td class=cobalt-left>Payment By: </td>\
-                                                    <td class=cobalt-left>{{ event_entry_player.paid_by }}</td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.paid_by|default_if_none:"" }}</td>\
                                                   </tr>\
                                                   </table>',
                                           icon: 'info',
@@ -139,7 +139,10 @@
 <!-- name and picture -->
               <td class="px-0 py-1 mx-0 my-2">
                 <div class="px-0 py-0 mx-0 my-0 text-center">
-                  <img id="cobalt-pic-{{ event_entry_player.id }}" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px;" src="/media/{{ event_entry_player.player.pic }}" />
+                  <img id="cobalt-pic-{{ event_entry_player.id }}"
+                  class="cobalt-rounded text-center px-0 py-0  mx-0 my-0"
+                  style="height: 60px; width: 60px;"
+                  src="/media/{{ event_entry_player.player.pic }}" />
                   <p class="px-0 py-0  mx-0 my-0" id="player-name-{{ event_entry_player.id }}">
                     {{ event_entry_player.player.full_name }}
                   </p>
@@ -173,8 +176,7 @@
                         {% endif %}
                   {% endif %}
 
-
-
+<!-- Button to swap players -->
                         <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
                           data-toggle="modal"
                           data-target="#cobalt_general_member_search{{ event_entry_player.id }}"
@@ -240,7 +242,7 @@
           </div>
         <div class="text-center">
           <a href="{% url "events:delete_event_entry" event_entry_id=event_entry.id %}" class="btn btn-danger cobalt-save">Withdraw From Event</a>
-          <button class="btn btn-success">Exit</button>
+          <a href="{% url "events:events" %}" class="btn btn-success">Exit</a>
         </div>
       </div>
     </div>

@@ -267,7 +267,7 @@ $(document).ready(function() {
 // countup settings
 
 // ABF$
-{% if payments.balance %}
+{% if payments.balance_num %}
   const options = {
     decimalPlaces: 2,
     duration: 1.5
@@ -281,13 +281,15 @@ $(document).ready(function() {
 {% endif %}
 
 // Masterpoints
+
+{% if  mp.points != "Not found" %}
   let counter3 = new countUp.CountUp('masterpoints', {{ mp.points }}, options);
   if (!counter3.error) {
     counter3.start();
   } else {
     console.error(counter3.error);
   }
-
+{% endif %}
 
 
 });
