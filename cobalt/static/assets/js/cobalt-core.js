@@ -46,7 +46,7 @@ $(document).ready(function () {
           setTimeout(function () { disable_submit_button(); }, 0);
         }
     } catch (error) {
-      // if no form then we don't need to disable the buttons 
+      // if no form then we don't need to disable the buttons
       console.error(error);
     }
 
@@ -63,8 +63,10 @@ $(document).ready(function () {
     // check if object has class cobalt-save and ignore
     // else set unsaved to true
     var myClass = $(this).attr("class");
-    if (myClass.indexOf("cobalt-save") == -1){
-      unsaved = true;
+    if (myClass != null) {
+      if (myClass.indexOf("cobalt-save") == -1){
+        unsaved = true;
+      }
     }
   });
 
@@ -73,9 +75,14 @@ $(document).ready(function () {
   });
 
   function unloadPage(){
+// check if this page wants to be ignored
+// if any object is called ignore_cobalt_save then do nothing
+    var ignore=$("#ignore_cobalt_save");
+    if (ignore == null){
       if(unsaved){
           return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
       }
+    }
   }
 
   window.onbeforeunload = unloadPage;

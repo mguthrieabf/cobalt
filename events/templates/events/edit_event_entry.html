@@ -18,6 +18,8 @@
 {% endblock %}
 {% block content %}
 
+<div class="ignore_cobalt_save"></div>
+
 <div class="container">
   <div class="row text-center">
     <div class="card">
@@ -29,6 +31,8 @@
 
         <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
 
+<!-- Edit checkbox -->
+
         <div class="form-check form-check-inline">
           <label class="form-check-label">
             <input class="form-check-input" type="checkbox" id="enable_edit">Edit Entry
@@ -38,6 +42,8 @@
           </label>
         </div>
 
+<!-- table -->
+
         <div class="container table-responsive">
         <div class="row table-responsive">
           <table class="table table-responsive table-hover" >
@@ -45,7 +51,7 @@
               <tr>
                 <th></th>
                 <th>Player</th>
-                <th class="editable" style="display:none"></th>
+                <th class="editable" style="display:none">Change</th>
                 <th>Payment Method</th>
                 <th>Entry Fee</th>
                 <th>Status</th>
@@ -59,9 +65,12 @@
           {% for event_entry_player in event_entry.evententryplayer_set.all %}
             {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.id %}
             <tr>
+
+<!-- nasty code to enable popup -->
+
               <td><a href="javascript:void(0)" onclick="
                                 swal.fire({
-                                          title: '{{ Details }}',
+                                          title: 'Details',
                                           showClass: {
                                             popup: 'animate__animated animate__fadeInDown'
                                           },
@@ -71,7 +80,7 @@
                                           html: '<table class=cobalt-table>\
                                                   <tr>\
                                                     <td class=cobalt-left>Player: </td>\
-                                                    <td class=cobalt-left>{{ event_entry_player.player }}</td>\
+                                                    <td class=cobalt-left id=popup-name-{{ event_entry_player.id }}>{{ event_entry_player.player }}</td>\
                                                   </tr>\
                                                   <tr>\
                                                     <td class=cobalt-left>Payment Method: </td>\
@@ -99,28 +108,60 @@
                                           cancelButtonColor: '#d33',
                                           confirmButtonText: 'Dismiss'
                                         })">
-                  <i class="material-icons">info</i></a></td>
-              <td class="px-0 py-1 mx-0 my-2">
+                  <i class="material-icons">info</i></a>
+                </td>
 
+<!-- name and picture -->
+              <td class="px-0 py-1 mx-0 my-2">
                 <div class="px-0 py-0 mx-0 my-0 text-center">
                   <img id="cobalt-pic-{{ event_entry_player.id }}" class="cobalt-rounded text-center px-0 py-0  mx-0 my-0" style="height: 60px; width: 60px;" src="/media/{{ event_entry_player.player.pic }}" />
                   <p class="px-0 py-0  mx-0 my-0" id="player-name-{{ event_entry_player.id }}">
                     {{ event_entry_player.player.full_name }}
                   </p>
                 </div>
-
                 </td>
-              <td class="editable" style="display:none">
-                <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search{{ event_entry_player.id }}">Change Player</a>
-              </td>
+
+
+<!-- action buttons - hidden by default -->
+                    <td class="td-actions text-right editable" style="display:none">
+                      <div style="white-space: nowrap;">
+                        <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
+                          data-toggle="modal"
+                          data-target="#cobalt_general_member_search{{ event_entry_player.id }}"
+                          class="btn btn-info cobalt_generic_member btn-sm">
+                            <i class="material-icons"
+                               title="Swap {{ event_entry_player.player.first_name }} for someone else"
+                               data-toggle="tooltip"
+                            >
+                              swap_vertical_circle
+                            </i>
+                        </button>
+
+<!-- only show delete if player isn't already TBA -->
+                        {% if event_entry_player.player.id != TBA_PLAYER %}
+                        <button type="button" id="delete_team_mate_{{ event_entry_player.id }}"
+                          data-toggle="tooltip"
+                          class="btn btn-danger delete_team_mate"
+                          title="Remove {{ event_entry_player.player.first_name }} from entry and replace with TBA."
+                        >
+                          <i class="material-icons">delete_forever</i>
+                        </button>
+                        {% endif %}
+                        </div>
+                    </td>
+
+  <!-- Payment method -->
               <td style="white-space: nowrap;">{{ event_entry_player.get_payment_type_display }}</td>
               <td>{{ event_entry_player.entry_fee|cobalt_credits }}</td>
               <td>
                 <div>
 
+<!-- Status -->
                   <div>
                 {% if event_entry_player.payment_status == "Paid" %}
                   <span class="text-success"><i class="material-icons">check_circle</i></span>
+                {% elif event_entry_player.payment_status == "Free" %}
+                  <span class="text-success"><i class="material-icons">favorite</i></span>
                 {% else %}
                   <span class="text-primary"><i class="material-icons">warning</i></span>
                 {% endif %}
@@ -131,7 +172,8 @@
                 </div>
               </td>
 
-              {% if event_entry_player.payment_status != "Paid" %}
+<!-- Action - hidden by default -->
+              {% if event_entry_player.payment_status != "Paid" and event_entry_player.payment_status != "Free" %}
               <td class="editable" style="display:none">
                 <button class="btn btn-sm btn-info">Pay Now</button>
               </td>
@@ -147,10 +189,16 @@
             </tbody>
           </table>
           </div>
-        </div>
-        <button class="editable btn btn-primary text-left" style="display:none">Add Player to Team</button>
+
+          <!-- Show add player button if allowed -->
+            {% if event_entry.evententryplayer_set.count == 4  or event_entry.evententryplayer_set.count == 5 %}
+            <div class="row table-responsive text-left">
+              <button id="add_player" class="editable btn btn-sm btn-primary text-left" style="display:none"><i class="fas fa-plus-circle display-5"></i>&nbsp;Add Player to Team</button>
+            </div>
+            {% endif %}
+          </div>
         <div class="text-center">
-          <a href="{% url "events:delete_event_entry" event_entry_id=event_entry.id %}" class="btn btn-danger">Withdraw From Event!!!</a>
+          <a href="{% url "events:delete_event_entry" event_entry_id=event_entry.id %}" class="btn btn-danger cobalt-save">Withdraw From Event</a>
           <button class="btn btn-success">Exit</button>
         </div>
       </div>
@@ -172,7 +220,10 @@ function cobaltMemberSearchOk(search_id) {
   var member = member_id[search_id];
   var name = member_name[search_id];
   var pic = member_pic[search_id];
+  editPlayer(member, name, pic, search_id);
+}
 
+function editPlayer(member, name, pic, search_id) {
   // Check if player entered already
 
     $.getJSON("{% url "events:check_player_entry_ajax" %}" + "?member_id=" + member + "&event_id={{ event.id }}")
@@ -196,6 +247,7 @@ function cobaltMemberSearchOk(search_id) {
               // update page
                 $("#cobalt-pic-" + search_id).attr("src", "/media/" + pic);
                 $("#player-name-" + search_id).html(name);
+                $("#popup-name-" + search_id).html(name);
                 Swal.fire({
                   title: 'Player Changed',
                   html: 'Player successfully changed',
@@ -203,24 +255,38 @@ function cobaltMemberSearchOk(search_id) {
               }
             });
         }
-
       })
-
-
-
-
-
 }
 
 $(document).ready(function() {
+
+// initialise tooltips
+$('[data-toggle="tooltip"]').tooltip()
 
 // show edit info if selected
 $("#enable_edit").click(function(){
   $(".editable").each(function() {
     $(this).toggle(100);
-//        $('#entrytable').bootstrapTable('refresh');
   });
 });
+
+// handle delete button - replace player with TBA
+$(".delete_team_mate").click(function(){
+    var search_id = $(this).attr('id').split("_")[3];
+    editPlayer({{ TBA_PLAYER }}, "TBA", "pic_folder/tba.png", search_id);
+});
+
+// handle add player
+$("#add_player").click(function(){
+
+  $.getJSON("{% url "events:add_player_to_existing_entry_ajax" %}?event_entry_id={{ event_entry.id }}")
+    .done(response => {
+      if (response['message'] == "Success"){
+          location.reload();
+      }
+  });
+});
+
 
 });
 </script>

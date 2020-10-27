@@ -17,9 +17,11 @@ from .models import (
     BasketItem,
     EventLog,
     EventPlayerDiscount,
+    EVENT_PLAYER_FORMAT_SIZE,
 )
 from accounts.models import User, TeamMate
 from notifications.views import contact_member
+
 # from .core import basket_amt_total, basket_amt_paid, basket_amt_this_user_only, basket_amt_owing_this_user_only
 from .forms import CongressForm, NewCongressForm, EventForm, SessionForm
 from rbac.core import (
@@ -33,6 +35,7 @@ from django.contrib import messages
 import uuid
 from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME
 from .core import notify_conveners
+
 
 @login_required()
 def get_conveners_ajax(request, org_id):
@@ -292,6 +295,7 @@ def admin_offsystem_pay_ajax(request):
         event=event_entry_player.event_entry.event,
         actor=request.user,
         action=f"Marked {event_entry_player.player} as paid",
+        event_entry=event_entry_player.event_entry,
     ).save()
 
     # Check if parent complete
@@ -328,6 +332,7 @@ def admin_offsystem_unpay_ajax(request):
         event=event_entry_player.event_entry.event,
         actor=request.user,
         action=f"Marked {event_entry_player.player} as unpaid",
+        event_entry=event_entry_player.event_entry,
     ).save()
 
     # Check if parent complete
@@ -354,6 +359,7 @@ def delete_basket_item_ajax(request):
         response_data = {"message": "Success"}
         return JsonResponse({"data": response_data})
 
+
 @login_required()
 def admin_player_discount_delete_ajax(request):
     """ Delete a player discount record """
@@ -364,7 +370,10 @@ def admin_player_discount_delete_ajax(request):
         event_player_discount = get_object_or_404(EventPlayerDiscount, pk=discount_id)
 
         # check access
-        role = "events.org.%s.edit" % event_player_discount.event.congress.congress_master.org.id
+        role = (
+            "events.org.%s.edit"
+            % event_player_discount.event.congress.congress_master.org.id
+        )
         rbac_user_role_or_error(request, role)
 
         # Log it
@@ -400,7 +409,12 @@ def check_player_entry_ajax(request):
         if member.id == TBA_PLAYER:
             return JsonResponse({"message": "Not Entered"})
 
-        event_entry = EventEntryPlayer.objects.filter(player=member).filter(event_entry__event=event).exclude(event_entry__entry_status="Cancelled").count()
+        event_entry = (
+            EventEntryPlayer.objects.filter(player=member)
+            .filter(event_entry__event=event)
+            .exclude(event_entry__entry_status="Cancelled")
+            .count()
+        )
 
         if event_entry:
             return JsonResponse({"message": "Already Entered"})
@@ -417,8 +431,12 @@ def change_player_entry_ajax(request):
         event_entry_player_id = request.GET["player_event_entry"]
 
         member = get_object_or_404(User, pk=member_id)
-        event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
-        event_entry = get_object_or_404(EventEntry, pk=event_entry_player.event_entry.id)
+        event_entry_player = get_object_or_404(
+            EventEntryPlayer, pk=event_entry_player_id
+        )
+        event_entry = get_object_or_404(
+            EventEntry, pk=event_entry_player.event_entry.id
+        )
         event = get_object_or_404(Event, pk=event_entry.event.id)
         congress = get_object_or_404(Congress, pk=event.congress.id)
 
@@ -490,6 +508,58 @@ def change_player_entry_ajax(request):
                   <b>{event_entry_player.player}</b> has been added.
                   <br><br>
                   """
-        notify_conveners(congress, event, f"{event} - {event_entry_player.player} added to entry", msg)
+        notify_conveners(
+            congress,
+            event,
+            f"{event} - {event_entry_player.player} added to entry",
+            msg,
+        )
+
+        return JsonResponse({"message": "Success"})
+
+
+@login_required()
+def add_player_to_existing_entry_ajax(request):
+    """ Add a player to a team from the edit entry screen """
+
+    if request.method == "GET":
+        event_entry_id = request.GET["event_entry_id"]
+        event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+        # check access
+        if not event_entry.user_can_change(request.user):
+            return JsonResponse({"message": "Access Denied"})
+
+        # check if already full
+        event_entry_player_count = (
+            EventEntryPlayer.objects.filter(event_entry=event_entry)
+            .exclude(event_entry__entry_status="Cancelled")
+            .count()
+        )
+
+        if (
+            event_entry_player_count
+            >= EVENT_PLAYER_FORMAT_SIZE[event_entry.event.player_format]
+        ):
+            return JsonResponse({"message": "Maximum player number reached"})
+
+        # if we got here everything is okay, create new player
+        # this will always be the 5th or 6th player in a team and will be free
+        event_entry_player = EventEntryPlayer()
+        tba = get_object_or_404(User, pk=TBA_PLAYER)
+        event_entry_player.player = tba
+        event_entry_player.event_entry = event_entry
+        event_entry_player.entry_fee = 0
+        event_entry_player.payment_status = "Free"
+        event_entry_player.payment_type = "Free"
+        event_entry_player.save()
+
+        # log it
+        EventLog(
+            event=event_entry.event,
+            actor=request.user,
+            action="Added a player",
+            event_entry=event_entry,
+        ).save()
 
         return JsonResponse({"message": "Success"})

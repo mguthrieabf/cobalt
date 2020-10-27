@@ -18,6 +18,7 @@ PAYMENT_STATUSES = [
     ("Paid", "Entry Paid"),
     ("Pending Manual", "Pending Manual Payment"),
     ("Unpaid", "Entry Unpaid"),
+    ("Free", "Free"),
 ]
 
 ENTRY_STATUSES = [
@@ -35,14 +36,15 @@ ENTRY_STATUSES = [
 PAYMENT_TYPES = [
     (
         "my-system-dollars",
-        f"My {BRIDGE_CREDITS}",
+        BRIDGE_CREDITS,
     ),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
-    ("other-system-dollars", "Default"),
+    ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
     ("cash", "Cash"),
     ("cheque", "Cheque"),
     ("unknown", "Unknown"),
+    ("Free", "Free"),
 ]
 CONGRESS_STATUSES = [
     ("Draft", "Draft"),
@@ -368,13 +370,18 @@ class Event(models.Model):
 
     def entry_status(self, user):
         """ returns the status of the team/pairs/individual entry """
-        event_entry = (
-            EventEntry.objects.filter(event=self)
-            .exclude(entry_status="Cancelled")
+
+        event_entry_player = (
+            EventEntryPlayer.objects.filter(player=user)
+            .exclude(event_entry__entry_status="Cancelled")
+            .filter(event_entry__event=self)
             .first()
         )
-        if event_entry:
-            return event_entry.entry_status
+
+        if event_entry_player:
+            return event_entry_player.event_entry.entry_status
+
+        return None
 
     def is_full(self):
         """ check if event is already full """

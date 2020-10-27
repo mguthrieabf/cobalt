@@ -71,14 +71,19 @@ urlpatterns = [
         name="delete_basket_item_ajax",
     ),
     path(
-        "congress/event/check_player_entry",
+        "congress/event/check-player-entry",
         ajax.check_player_entry_ajax,
         name="check_player_entry_ajax",
     ),
     path(
-        "congress/event/change_player_entry",
+        "congress/event/change-player-entry",
         ajax.change_player_entry_ajax,
         name="change_player_entry_ajax",
+    ),
+    path(
+        "congress/event/add-player-to-entry",
+        ajax.add_player_to_existing_entry_ajax,
+        name="add_player_to_existing_entry_ajax",
     ),
     path(
         "view",

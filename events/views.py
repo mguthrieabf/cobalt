@@ -195,7 +195,7 @@ def view_congress(request, congress_id, fullscreen=False):
                 if program["entry"]:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>Edit Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>View Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
                 else:
                     program[
                         "links"
@@ -486,6 +486,7 @@ def enter_event(request, congress_id, event_id):
             event=event,
             actor=event_entry.primary_entrant,
             action=f"Event entry {event_entry.id} created",
+            event_entry=event_entry,
         ).save()
 
         # add to basket
@@ -538,6 +539,7 @@ def enter_event(request, congress_id, event_id):
                 event=event,
                 actor=event_entry.primary_entrant,
                 action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
+                event_entry=event_entry,
             ).save()
 
         if "now" in request.POST:
@@ -710,6 +712,7 @@ def checkout(request):
                     event=event_entry_player.event_entry.event,
                     actor=request.user,
                     action=f"Checkout for event entry {event_entry_player.event_entry.id} for {event_entry_player.player}",
+                    event_entry=event_entry_player.event_entry,
                 ).save()
 
             return payment_api(
@@ -808,6 +811,7 @@ def view_events(request):
             entry_status="Cancelled"
         )
     ).values_list("id")
+
     # get events where event_entries_list is entered
     events = Event.objects.filter(evententry__in=event_entries_list)
 
@@ -863,6 +867,7 @@ def pay_outstanding(request):
         event=event_entry_player.event_entry.event,
         actor=request.user,
         action=f"Checkout for {request.user}",
+        event_entry=event_entry_player.event_entry,
     ).save()
 
     # map this user (who is paying) to the batch id
@@ -963,10 +968,21 @@ def delete_event_entry(request, event_entry_id):
 
     event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
 
+    # check if already cancelled
     if event_entry.entry_status == "Cancelled":
         error = "This entry is already in a cancelled state."
-
         title = "This entry is already cancelled"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    # check if in future
+    if event_entry.event.start_date() < datetime.now().date():
+        error = "You cannot change an entry after the start date of the event."
+        title = "This Event has already started"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    if event_entry.event.start_date() == datetime.now().date():
+        error = "You need to contact the convener directly to make any changes on the same day."
+        title = "This Event starts today"
         return render(request, "events/error.html", {"title": title, "error": error})
 
     event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)

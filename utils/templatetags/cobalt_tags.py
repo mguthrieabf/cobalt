@@ -82,10 +82,12 @@ def cobalt_credits(credits):
     else:
         word = "credits"
 
-    if int(credits) == credits:
-        credits = int(credits)
-
-    ret = f"{credits:,} {word}"
+    try:
+        if int(credits) == credits:
+            credits = int(credits)
+        ret = f"{credits:,} {word}"
+    except TypeError:
+        ret = None
 
     return mark_safe(ret)
 

@@ -214,10 +214,17 @@ def admin_evententry(request, evententry_id):
     role = "events.org.%s.edit" % congress.congress_master.org.id
     rbac_user_role_or_error(request, role)
 
+    event_logs = EventLog.objects.filter(event_entry=event_entry)
+
     return render(
         request,
         "events/admin_event_entry.html",
-        {"event_entry": event_entry, "event": event, "congress": congress},
+        {
+            "event_entry": event_entry,
+            "event": event,
+            "congress": congress,
+            "event_logs": event_logs,
+        },
     )
 
 
