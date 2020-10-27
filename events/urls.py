@@ -34,6 +34,12 @@ urlpatterns = [
         views.edit_event_entry,
         name="edit_event_entry",
     ),
+    # as above but accepts edit=1 to open window with edit enabled
+    path(
+        "congress/event/change-entry/<int:congress_id>/<int:event_id>/edit=<int:edit_flag>",
+        views.edit_event_entry,
+        name="edit_event_entry",
+    ),
     path(
         "congress/event/delete-entry/<int:event_entry_id>",
         views.delete_event_entry,
@@ -84,6 +90,11 @@ urlpatterns = [
         "congress/event/add-player-to-entry",
         ajax.add_player_to_existing_entry_ajax,
         name="add_player_to_existing_entry_ajax",
+    ),
+    path(
+        "congress/event/delete-player-from-entry",
+        ajax.delete_player_from_entry_ajax,
+        name="delete_player_from_entry_ajax",
     ),
     path(
         "view",

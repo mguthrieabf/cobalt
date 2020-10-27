@@ -15,6 +15,10 @@
     margin: 0px auto;
   }
 </style>
+
+<link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
+<script src="{% static "assets/js/bootstrap4-toggle.min.js" %}"></script>
+
 {% endblock %}
 {% block content %}
 
@@ -24,7 +28,19 @@
   <div class="row text-center">
     <div class="card">
       <div class="card-header card-header-warning">
-        <h1>Edit Entry</h1>
+        <h1></h1>
+
+        <h1>
+          <div class="d-flex justify-content-between">
+            <div>
+            <span id="title">View</span> Entry
+            </div>
+            <div>
+              <i class="material-icons" id="icon" style="font-size:60px; display:none;">edit</i>
+            </div>
+        </h1>
+
+
         <h2>{{ event.event_name }} in {{ congress.name }}</h2>
       </div>
       <div class="card-body text-center mx-auto">
@@ -33,28 +49,37 @@
 
 <!-- Edit checkbox -->
 
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="checkbox" id="enable_edit">Edit Entry
-            <span class="form-check-sign">
-                <span class="check"></span>
-            </span>
-          </label>
-        </div>
+<div class="my-4">
+        <span class="font-weight-bold" style="font-size: 120%">Edit Entry</span>
+        <input type="checkbox" id="enable_edit" data-toggle="toggle" data-size="sm"
+        {% if edit_flag %} checked {% endif %}
+        >
+</div>
+
+ <!-- categories -->
+ {% if categories %}
+ <label for="id_category">Category</label>
+ <select class="selectpicker" data-style="btn btn-info" id="id_category" name="category">
+   {% for category in categories %}
+   <option value="{{ category.id }}">{{ category }}</option>
+   {% endfor %}
+ </select>
+ {% endif %}
+
 
 <!-- table -->
 
-        <div class="container table-responsive">
+        <div class="container">
         <div class="row table-responsive">
-          <table class="table table-responsive table-hover" >
+          <table class="table table-hover">
             <thead>
               <tr>
-                <th></th>
-                <th>Player</th>
+                <th class="px-lg-5"></th>
+                <th class="px-lg-5">Player</th>
                 <th class="editable" style="display:none">Change</th>
-                <th>Payment Method</th>
-                <th>Entry Fee</th>
-                <th>Status</th>
+                <th class="px-lg-5">Payment Method</th>
+                <th class="px-lg-5">Entry Fee</th>
+                <th class="px-lg-5">Status</th>
                 {% if event_entry.entry_status != "Complete" %}
                 <th class="editable" style="display:none">Action</th>
                 {% endif %}
@@ -62,7 +87,7 @@
             </thead>
             <tbody>
 
-          {% for event_entry_player in event_entry.evententryplayer_set.all %}
+          {% for event_entry_player in event_entry_players %}
             {% include "utils/generic_user_search_body.html" with search_id=event_entry_player.id %}
             <tr>
 
@@ -123,8 +148,33 @@
 
 
 <!-- action buttons - hidden by default -->
-                    <td class="td-actions text-right editable" style="display:none">
-                      <div style="white-space: nowrap;">
+                <td class="td-actions text-right editable" style="display:none">
+                                <div style="white-space: nowrap;">
+<!-- only show delete if player isn't already TBA -->
+<!-- Also the delete button is different for players 5 and 6 (actually deletes) -->
+                  {% if event_entry_player.extra_player %}
+                  <!-- delete should actually delete player -->
+                  <button type="button" id="really_delete_team_mate_{{ event_entry_player.id }}"
+                    data-toggle="tooltip"
+                    class="btn btn-danger really_delete_team_mate"
+                    title="Remove {{ event_entry_player.player.first_name }} from team."
+                  >
+                    <i class="material-icons">delete_forever</i>
+                  </button>
+                  {% else %} <!-- player 1 to 4 -->
+                        {% if event_entry_player.player.id != TBA_PLAYER %}
+                        <button type="button" id="delete_team_mate_{{ event_entry_player.id }}"
+                          data-toggle="tooltip"
+                          class="btn btn-danger delete_team_mate"
+                          title="Remove {{ event_entry_player.player.first_name }} from entry and replace with TBA."
+                        >
+                          <i class="material-icons">delete</i>
+                        </button>
+                        {% endif %}
+                  {% endif %}
+
+
+
                         <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
                           data-toggle="modal"
                           data-target="#cobalt_general_member_search{{ event_entry_player.id }}"
@@ -137,16 +187,7 @@
                             </i>
                         </button>
 
-<!-- only show delete if player isn't already TBA -->
-                        {% if event_entry_player.player.id != TBA_PLAYER %}
-                        <button type="button" id="delete_team_mate_{{ event_entry_player.id }}"
-                          data-toggle="tooltip"
-                          class="btn btn-danger delete_team_mate"
-                          title="Remove {{ event_entry_player.player.first_name }} from entry and replace with TBA."
-                        >
-                          <i class="material-icons">delete_forever</i>
-                        </button>
-                        {% endif %}
+
                         </div>
                     </td>
 
@@ -191,8 +232,8 @@
           </div>
 
           <!-- Show add player button if allowed -->
-            {% if event_entry.evententryplayer_set.count == 4  or event_entry.evententryplayer_set.count == 5 %}
-            <div class="row table-responsive text-left">
+            {% if event_entry_players.count == 4  or event_entry_players.count == 5 %}
+            <div class="row table-responsive text-left pb-5">
               <button id="add_player" class="editable btn btn-sm btn-primary text-left" style="display:none"><i class="fas fa-plus-circle display-5"></i>&nbsp;Add Player to Team</button>
             </div>
             {% endif %}
@@ -221,6 +262,17 @@ function cobaltMemberSearchOk(search_id) {
   var name = member_name[search_id];
   var pic = member_pic[search_id];
   editPlayer(member, name, pic, search_id);
+}
+
+// reload page
+function reloadPage(){
+  // reload page, add edit=1 to url so edit opens
+    var url = window.location.href;
+    // add edit if not already present
+    if (url.indexOf("edit=") == -1){
+      url = url + "/edit=1";
+    }
+    window.location.href = url;
 }
 
 function editPlayer(member, name, pic, search_id) {
@@ -252,6 +304,7 @@ function editPlayer(member, name, pic, search_id) {
                   title: 'Player Changed',
                   html: 'Player successfully changed',
                 });
+                reloadPage();
               }
             });
         }
@@ -264,10 +317,12 @@ $(document).ready(function() {
 $('[data-toggle="tooltip"]').tooltip()
 
 // show edit info if selected
-$("#enable_edit").click(function(){
+$("#enable_edit").change(function(){
   $(".editable").each(function() {
     $(this).toggle(100);
   });
+  $("#title").html("Edit");
+  $("#icon").show();
 });
 
 // handle delete button - replace player with TBA
@@ -276,18 +331,36 @@ $(".delete_team_mate").click(function(){
     editPlayer({{ TBA_PLAYER }}, "TBA", "pic_folder/tba.png", search_id);
 });
 
+// handle really delete button - delete player
+$(".really_delete_team_mate").click(function(){
+    var search_id = $(this).attr('id').split("_")[4];
+    $.getJSON("{% url "events:delete_player_from_entry_ajax" %}?event_entry_player_id=" + search_id)
+      .done(response => {
+        if (response['message'] == "Success"){
+          reloadPage();
+        }
+    });
+});
+
 // handle add player
 $("#add_player").click(function(){
 
   $.getJSON("{% url "events:add_player_to_existing_entry_ajax" %}?event_entry_id={{ event_entry.id }}")
     .done(response => {
       if (response['message'] == "Success"){
-          location.reload();
+          reloadPage();
       }
   });
 });
 
-
+// check if edit button should be set
+{% if edit_flag %}
+$(".editable").each(function() {
+  $(this).toggle(100);
+});
+$("#title").html("Edit");
+$("#icon").show();
+{% endif %}
 });
 </script>
 {% endblock %}

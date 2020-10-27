@@ -554,121 +554,6 @@ def enter_event(request, congress_id, event_id):
         return enter_event_form(event, congress, request)
 
 
-# DELETE ME LATER
-@login_required()
-def edit_event_entry_old(request, congress_id, event_id):
-    """ edit an event entry """
-
-    # Load the event
-    event = get_object_or_404(Event, pk=event_id)
-    congress = get_object_or_404(Congress, pk=congress_id)
-
-    # Check if already entered
-    if not event.already_entered(request.user):
-        return redirect(
-            "events:enter_event", event_id=event.id, congress_id=congress_id
-        )
-
-    if request.method == "POST":
-
-        # get event_entry
-        # event_entry_list = event.evententry_set.all().values_list("id")
-        # event_entry = (
-        #     EventEntryPlayer.objects.filter(player=request.user)
-        #     .filter(event_entry__in=event_entry_list)
-        #     .first()
-        #     .event_entry
-        # )
-
-        event_entry = (
-            EventEntry.objects.filter(primary_entrant=request.user)
-            .filter(event=event)
-            .exclude(entry_status="Cancelled")
-            .first()
-        )
-
-        # Get players from form
-        players = {0: request.user}
-        player_payments = {0: request.POST.get("player0_payment")}
-
-        for p_id in range(1, 6):
-            p_string = f"player{p_id}"
-            ppay_string = f"player{p_id}_payment"
-            if p_string in request.POST:
-                players[p_id] = get_object_or_404(
-                    User, pk=int(request.POST.get(p_string))
-                )
-                player_payments[p_id] = request.POST.get(ppay_string)
-
-        # validate
-        if (event.player_format == "Pairs" and len(players) != 2) or (
-            event.player_format == "Teams" and len(players) < 4
-        ):
-            print("invalid number of entries")
-            return
-
-        # get existing player entries
-        event_entry_player_list = EventEntryPlayer.objects.filter(
-            event_entry=event_entry
-        )
-
-        # match them up
-        match_dict = {}
-        for p_id in range(len(players)):
-
-            # try to get player from list
-            event_entry_player = event_entry_player_list.filter(
-                player=players[p_id]
-            ).first()
-            if event_entry_player:
-                match_dict[players[p_id]] = event_entry_player
-
-        # update player entries
-        for p_id in range(len(players)):
-            event_entry_player = event_entry_player_list.filter(
-                player=players[p_id]
-            ).first()
-            if event_entry_player:  # found a match
-                event_entry_player.payment_type = player_payments[p_id]
-                entry_fee, discount, reason, description = event.entry_fee_for(
-                    event_entry_player.player
-                )
-                event_entry_player.entry_fee = entry_fee
-                event_entry_player.save()
-
-            else:  # player name has changed - find an unused one
-
-                print("NFI")
-                return
-
-        if "now" in request.POST:
-            return redirect("events:checkout")
-        else:  # add to cart and keep shopping
-            return redirect("events:view_congress", congress_id=event.congress.id)
-
-    else:  # not a POST so build page
-        existing_choices = {}
-        event_entry = (
-            EventEntry.objects.filter(primary_entrant=request.user)
-            .filter(event=event)
-            .first()
-        )
-        event_entry_players = event_entry.evententryplayer_set.all()
-        count = 0
-        for event_entry_player in event_entry_players:
-            existing_choices["player%s" % count] = {}
-            existing_choices["player%s" % count][
-                "payment"
-            ] = event_entry_player.payment_type
-            existing_choices["player%s" % count]["name"] = event_entry_player.player.id
-            existing_choices["player%s" % count][
-                "entry_fee"
-            ] = event_entry_player.entry_fee
-            count += 1
-
-        return enter_event_form(event, congress, request, existing_choices)
-
-
 @login_required()
 def checkout(request):
     """ Checkout view - make payments, get details """
@@ -816,16 +701,26 @@ def view_events(request):
     events = Event.objects.filter(evententry__in=event_entries_list)
 
     # Only include the ones in the future
-    event_list = []
+    event_dict = {}
     for event in events:
-        if event.start_date() >= datetime.now().date():
+        start_date = event.start_date()
+        if start_date >= datetime.now().date():
             event.entry_status = event.entry_status(request.user)
-            event_list.append(event)
+            event_dict[event] = start_date
+
+    # sort by start date
+    event_list = {
+        key: value
+        for key, value in sorted(event_dict.items(), key=lambda item: item[1])
+    }
 
     # check for pending payments
-    pending_payments = EventEntryPlayer.objects.exclude(payment_status="Paid").filter(
-        player=request.user
+    pending_payments = (
+        EventEntryPlayer.objects.exclude(payment_status="Paid")
+        .filter(player=request.user)
+        .exclude(event_entry__entry_status="Cancelled")
     )
+
     return render(
         request,
         "events/view_events.html",
@@ -934,7 +829,7 @@ def global_admin_congress_masters(request):
 
 
 @login_required()
-def edit_event_entry(request, congress_id, event_id):
+def edit_event_entry(request, congress_id, event_id, edit_flag=None):
     """ edit an event entry """
 
     # Load the event
@@ -949,16 +844,41 @@ def edit_event_entry(request, congress_id, event_id):
     )
     if event_entry_player:
         event_entry = event_entry_player.event_entry
-
     else:
         return redirect(
             "events:enter_event", event_id=event.id, congress_id=congress_id
         )
 
+    # add a flag to the event_players to identify players 5 and 6
+    event_entry_players = EventEntryPlayer.objects.filter(
+        event_entry=event_entry
+    ).order_by("first_created_date")
+
+    count = 1
+    for event_entry_player in event_entry_players:
+        if count > 4:
+            event_entry_player.extra_player = True
+        count += 1
+
+    # Optional bits
+
+    # see if event has categories
+    categories = Category.objects.filter(event=event)
+
+    # if we got a free format question that will already be on the event
+    # We can handle that in the HTML
+
     return render(
         request,
         "events/edit_event_entry.html",
-        {"event": event, "congress": congress, "event_entry": event_entry},
+        {
+            "event": event,
+            "congress": congress,
+            "event_entry": event_entry,
+            "event_entry_players": event_entry_players,
+            "categories": categories,
+            "edit_flag": edit_flag,
+        },
     )
 
 

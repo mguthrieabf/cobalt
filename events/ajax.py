@@ -563,3 +563,41 @@ def add_player_to_existing_entry_ajax(request):
         ).save()
 
         return JsonResponse({"message": "Success"})
+
+
+@login_required()
+def delete_player_from_entry_ajax(request):
+    """ Delete a player (5 or 6 only) from a team from the edit entry screen """
+
+    if request.method == "GET":
+        event_entry_player_id = request.GET["event_entry_player_id"]
+        event_entry_player = get_object_or_404(
+            EventEntryPlayer, pk=event_entry_player_id
+        )
+
+        # check access
+        if not event_entry_player.event_entry.user_can_change(request.user):
+            return JsonResponse({"message": "Access Denied"})
+
+        # check if extra player
+        event_entry_player_count = (
+            EventEntryPlayer.objects.filter(event_entry=event_entry_player.event_entry)
+            .exclude(event_entry__entry_status="Cancelled")
+            .count()
+        )
+
+        if event_entry_player_count < 5:
+            return JsonResponse({"message": "Not an extra player. Cannot delete."})
+
+        # log it
+        EventLog(
+            event=event_entry_player.event_entry.event,
+            actor=request.user,
+            action=f"Deleted {event_entry_player.player} from team",
+            event_entry=event_entry_player.event_entry,
+        ).save()
+
+        # if we got here everything is okay
+        event_entry_player.delete()
+
+        return JsonResponse({"message": "Success"})
