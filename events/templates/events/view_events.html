@@ -76,7 +76,14 @@
 </div>
 
 {% else %}
-<h4>You don't appear to be entered in any congresses. Why not look through the calendar and find something to enter?</h4>
+<div class="card">
+  <div class="card-header card-header-primary">
+    <h2>No Entries Found</h2>
+  </div>
+  <div class="card-body">
+    <h4>You don't appear to be entered in any congresses. Why not look through the <a href="{% url "events:events" %}">Upcoming Events</a> and find something to enter?</h4>    
+  </div>
+</div>
 {% endif %}
 
 {% endblock %}

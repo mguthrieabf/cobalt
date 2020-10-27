@@ -839,15 +839,24 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
     # find matching event entries
     event_entry_player = (
         EventEntryPlayer.objects.filter(player=request.user)
+        .filter(event_entry__event=event)
         .exclude(event_entry__entry_status="Cancelled")
         .first()
     )
     if event_entry_player:
         event_entry = event_entry_player.event_entry
     else:
-        return redirect(
-            "events:enter_event", event_id=event.id, congress_id=congress_id
+        # see if primary_entrant
+        event_entry = (
+            EventEntry.objects.filter(primary_entrant=request.user)
+            .exclude(entry_status="Cancelled")
+            .filter(event=event)
         )
+        if not event_entry:
+            # not entered so redirect
+            return redirect(
+                "events:enter_event", event_id=event.id, congress_id=congress_id
+            )
 
     # add a flag to the event_players to identify players 5 and 6
     event_entry_players = EventEntryPlayer.objects.filter(
@@ -859,6 +868,9 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
         if count > 4:
             event_entry_player.extra_player = True
         count += 1
+
+    # Check if still in basket
+    in_basket = BasketItem.objects.filter(event_entry=event_entry).count()
 
     # Optional bits
 
@@ -878,6 +890,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
             "event_entry_players": event_entry_players,
             "categories": categories,
             "edit_flag": edit_flag,
+            "in_basket": in_basket,
         },
     )
 
@@ -916,6 +929,10 @@ def delete_event_entry(request, event_entry_id):
         title = "You do not have permission"
         return render(request, "events/error.html", {"title": title, "error": error})
 
+    # get total paid
+    amount = event_entry_players.aggregate(Sum("payment_received"))
+    total = amount["payment_received__sum"]
+
     if request.method == "POST":
 
         event_entry.entry_status = "Cancelled"
@@ -927,6 +944,12 @@ def delete_event_entry(request, event_entry_id):
             action=f"Event entry {event_entry.id} cancelled",
             event_entry=event_entry,
         ).save()
+
+        messages.success(
+            request,
+            f"Event entry for {event_entry.event} deleted",
+            extra_tags="cobalt-message-success",
+        )
 
         # dict of people getting money and what they are getting
         refunds = {}
@@ -1070,5 +1093,9 @@ def delete_event_entry(request, event_entry_id):
     return render(
         request,
         "events/delete_event_entry.html",
-        {"event_entry": event_entry, "event_entry_players": event_entry_players},
+        {
+            "event_entry": event_entry,
+            "event_entry_players": event_entry_players,
+            "total": total,
+        },
     )

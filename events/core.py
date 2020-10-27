@@ -317,9 +317,11 @@ def get_events(user):
     """ called by dashboard to get upcoming events """
 
     # get last 50
-    event_entry_players = EventEntryPlayer.objects.filter(player=user).order_by("-id")[
-        :50
-    ]
+    event_entry_players = (
+        EventEntryPlayer.objects.filter(player=user)
+        .exclude(event_entry__entry_status="Cancelled")
+        .order_by("-id")[:50]
+    )
 
     event_entry_players_list = list(event_entry_players)
     event_entry_players_list.reverse()
@@ -328,6 +330,11 @@ def get_events(user):
     upcoming = []
     for event_entry_player in event_entry_players_list:
         if event_entry_player.event_entry.event.start_date() >= datetime.now().date():
+            # Check if still in cart
+            in_cart = BasketItem.objects.filter(
+                event_entry=event_entry_player.event_entry
+            ).count()
+            event_entry_player.in_cart = in_cart
             upcoming.append(event_entry_player)
 
     return upcoming

@@ -51,8 +51,12 @@
                 {% if edit_flag %} checked {% endif %}
                 >
         </div>
+        {% if in_basket %}
+          <h3>This item is still in your basket <a class="btn btn-sm btn-secondary" href="{% url "events:checkout" %}">Checkout</a></h3>
+        {% endif %}
       </div>
       <div class="card-body text-center mx-auto">
+        <div class="text-left"><a href="{% url "events:view_event_entries" congress_id=congress.id event_id=event.id %}">View all entries</a></div>
 
         <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
 
@@ -133,7 +137,7 @@
                                           cancelButtonColor: '#d33',
                                           confirmButtonText: 'Dismiss'
                                         })">
-                  <i class="material-icons">info</i></a>
+                  <i class="material-icons" data-toggle="tooltip" title="Show details">info</i></a>
                 </td>
 
 <!-- name and picture -->
@@ -314,6 +318,12 @@ function editPlayer(member, name, pic, search_id) {
 }
 
 $(document).ready(function() {
+
+  if (window.performance.navigation.type === 2) {
+    // the page was navigated to via the forward or back button
+    // refresh to make sure auto top up status is correct
+    location.reload();
+  }
 
 // initialise tooltips
 $('[data-toggle="tooltip"]').tooltip()
