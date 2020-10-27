@@ -601,3 +601,26 @@ def delete_player_from_entry_ajax(request):
         event_entry_player.delete()
 
         return JsonResponse({"message": "Success"})
+
+
+@login_required()
+def change_category_on_existing_entry_ajax(request, event_entry_id, category_id):
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+    category = get_object_or_404(Category, pk=category_id)
+
+    if not event_entry.user_can_change(request.user):
+        return JsonResponse({"message": "Access Denied"})
+
+    # log it
+    EventLog(
+        event=event_entry.event,
+        actor=request.user,
+        action=f"Changed category to {category} from {event_entry.category}",
+        event_entry=event_entry,
+    ).save()
+
+    event_entry.category = category
+    event_entry.save()
+
+    return JsonResponse({"message": "Success"})

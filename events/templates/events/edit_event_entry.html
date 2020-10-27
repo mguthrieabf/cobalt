@@ -65,9 +65,29 @@
  <label for="id_category">Category</label>
  <select class="selectpicker" data-style="btn btn-info" id="id_category" name="category">
    {% for category in categories %}
-   <option value="{{ category.id }}">{{ category }}</option>
+   <option value="{{ category.id }}"
+
+     {% if category == event_entry.category %}
+      selected
+    {% endif %}
+
+   >{{ category }}
+   </option>
    {% endfor %}
  </select>
+ {% endif %}
+
+ <!-- question -->
+ {% if event.free_format_question %}
+<div class="col-md-6">
+   <div class="form-group">
+     <label class="bmd-label-static">{{ event.free_format_question }}</label>
+     <input type="text" name="question" id="id_question" class="form-control" value="{{ event_entry.free_format_answer|default_if_none:"" }}">
+
+
+   <button class="btn btn-sm btn-info">change</button>
+      </div>
+ </div>
  {% endif %}
 
 
@@ -256,6 +276,7 @@
 
 {% block footer %}
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
 <script>
 
   {% for event_entry_player in event_entry.evententryplayer_set.all %}
@@ -328,6 +349,9 @@ $(document).ready(function() {
 // initialise tooltips
 $('[data-toggle="tooltip"]').tooltip()
 
+// poke the selectpicker
+$('.selectpicker').selectpicker('refresh');
+
 // show edit info if selected
 $("#enable_edit").change(function(){
   $(".editable").each(function() {
@@ -361,6 +385,21 @@ $("#add_player").click(function(){
     .done(response => {
       if (response['message'] == "Success"){
           reloadPage();
+      }
+  });
+});
+
+// handle categories
+$("#id_category").on("change", function(){
+  var category = $("#id_category").val();
+  console.log(category);
+  $.getJSON("{% url "events:change_category_on_existing_entry_ajax" %}/{{ event_entry.id }}/" + category)
+    .done(response => {
+      if (response['message'] == "Success"){
+        Swal.fire({
+          title: 'Category Changed',
+          html: 'Category successfully changed',
+        });
       }
   });
 });

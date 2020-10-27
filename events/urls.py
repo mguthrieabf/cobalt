@@ -41,6 +41,16 @@ urlpatterns = [
         name="edit_event_entry",
     ),
     path(
+        "congress/event/change-category/<int:event_entry_id>/<int:category_id>",
+        ajax.change_category_on_existing_entry_ajax,
+        name="change_category_on_existing_entry_ajax",
+    ),
+    path(
+        "congress/event/change-category",
+        ajax.change_category_on_existing_entry_ajax,
+        name="change_category_on_existing_entry_ajax",
+    ),
+    path(
         "congress/event/delete-entry/<int:event_entry_id>",
         views.delete_event_entry,
         name="delete_event_entry",
