@@ -33,8 +33,8 @@ from payments.core import payment_api, get_balance
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
-from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME
 from .core import notify_conveners
+from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME
 
 
 @login_required()
@@ -621,6 +621,28 @@ def change_category_on_existing_entry_ajax(request, event_entry_id, category_id)
     ).save()
 
     event_entry.category = category
+    event_entry.save()
+
+    return JsonResponse({"message": "Success"})
+
+
+@login_required()
+def change_answer_on_existing_entry_ajax(request, event_entry_id, answer):
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+    if not event_entry.user_can_change(request.user):
+        return JsonResponse({"message": "Access Denied"})
+
+    # log it
+    EventLog(
+        event=event_entry.event,
+        actor=request.user,
+        action=f"Changed answer to {answer} from {event_entry.free_format_answer}",
+        event_entry=event_entry,
+    ).save()
+
+    event_entry.free_format_answer = answer
     event_entry.save()
 
     return JsonResponse({"message": "Success"})

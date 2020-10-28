@@ -41,11 +41,21 @@ urlpatterns = [
         name="edit_event_entry",
     ),
     path(
+        "congress/event/change-answer/<int:event_entry_id>/<str:answer>",
+        ajax.change_answer_on_existing_entry_ajax,
+        name="change_answer_on_existing_entry_ajax",
+    ),
+    path( # dummy entry for no parameters
+        "congress/event/change-answer",
+        ajax.change_answer_on_existing_entry_ajax,
+        name="change_answer_on_existing_entry_ajax",
+    ),
+    path(
         "congress/event/change-category/<int:event_entry_id>/<int:category_id>",
         ajax.change_category_on_existing_entry_ajax,
         name="change_category_on_existing_entry_ajax",
     ),
-    path(
+    path( # dummy entry for no parameters
         "congress/event/change-category",
         ajax.change_category_on_existing_entry_ajax,
         name="change_category_on_existing_entry_ajax",
