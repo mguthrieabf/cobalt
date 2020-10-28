@@ -45,7 +45,7 @@ urlpatterns = [
         ajax.change_answer_on_existing_entry_ajax,
         name="change_answer_on_existing_entry_ajax",
     ),
-    path( # dummy entry for no parameters
+    path(  # dummy entry for no parameters
         "congress/event/change-answer",
         ajax.change_answer_on_existing_entry_ajax,
         name="change_answer_on_existing_entry_ajax",
@@ -55,7 +55,7 @@ urlpatterns = [
         ajax.change_category_on_existing_entry_ajax,
         name="change_category_on_existing_entry_ajax",
     ),
-    path( # dummy entry for no parameters
+    path(  # dummy entry for no parameters
         "congress/event/change-category",
         ajax.change_category_on_existing_entry_ajax,
         name="change_category_on_existing_entry_ajax",
@@ -64,6 +64,16 @@ urlpatterns = [
         "congress/event/delete-entry/<int:event_entry_id>",
         views.delete_event_entry,
         name="delete_event_entry",
+    ),
+    path(
+        "congress/event/third-party-checkout-player/<int:event_entry_player_id>",
+        views.third_party_checkout_player,
+        name="third_party_checkout_player",
+    ),
+    path(  # dummy for entry above
+        "congress/event/third-party-checkout-player",
+        views.third_party_checkout_player,
+        name="third_party_checkout_player",
     ),
     path(
         "congress/checkout",

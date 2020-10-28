@@ -424,7 +424,7 @@ def check_player_entry_ajax(request):
 
 @login_required()
 def change_player_entry_ajax(request):
-    """ Change a player in an event """
+    """ Change a player in an event. Also update entry_fee if required """
 
     if request.method == "GET":
         member_id = request.GET["member_id"]
@@ -487,6 +487,10 @@ def change_player_entry_ajax(request):
             "link": "/events/view",
             "link_text": "View Entry",
         }
+
+        # Check entry fee
+        # non_transferrable_discounts = [""]
+        # current_entry_fee = 1
 
         html_msg = render_to_string("notifications/email_with_button.html", context)
 

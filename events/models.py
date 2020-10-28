@@ -258,7 +258,7 @@ class Event(models.Model):
                 reason = "Early discount"
                 description = f"Early discount {discount:.2f} credits"
 
-        # youth - you get only one discount, whichever is bigger
+        # youth discounts apply after early entry discounts
         if self.congress.allow_youth_payment_discount:
             if user.dob:  # skip if no date of birth set
                 dob = datetime.datetime.combine(user.dob, datetime.time(0, 0))
@@ -267,18 +267,13 @@ class Event(models.Model):
                     year=dob.year + self.congress.youth_payment_discount_age
                 )
                 if self.congress.youth_payment_discount_date <= ref_date.date():
-                    youth_fee = (
-                        float(self.entry_fee / players_per_entry)
-                        * self.entry_youth_payment_discount
-                        / 100.0
+                    youth_fee = entry_fee * self.entry_youth_payment_discount / 100.0
+                    entry_fee = "%.2f" % youth_fee
+                    reason = "Youth discount"
+                    description = (
+                        "Youth discount %s%%" % self.entry_youth_payment_discount
                     )
-                    if youth_fee < entry_fee:
-                        entry_fee = "%.2f" % youth_fee
-                        reason = "Youth discount"
-                        description = (
-                            "Youth discount %s%%" % self.entry_youth_payment_discount
-                        )
-                        discount = float(self.entry_fee) - float(entry_fee)
+                    discount = float(self.entry_fee) - float(entry_fee)
 
         # EventPlayerDiscount
         event_player_discount = (

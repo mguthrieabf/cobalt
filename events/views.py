@@ -1099,3 +1099,57 @@ def delete_event_entry(request, event_entry_id):
             "total": total,
         },
     )
+
+
+@login_required()
+def third_party_checkout_player(request, event_entry_player_id):
+    """ Used by edit entry screen to pay for a single other player in the team """
+
+    event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
+
+    event_entry_players_me = EventEntryPlayer.objects.filter(
+        event_entry=event_entry_player.event_entry
+    ).filter(player=request.user)
+
+    if (
+        not event_entry_players_me
+        or event_entry_player.event_entry.primary_entrant != request.user
+    ):
+        error = """You are not the person who made this entry or one of the players.
+                   You cannot change this entry."""
+
+        title = "You do not have permission"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    # check amount
+    amount = float(event_entry_player.entry_fee - event_entry_player.payment_received)
+
+    if amount > 0:
+
+        unique_id = str(uuid.uuid4())
+
+        # map this user (who is paying) to the batch id
+        PlayerBatchId(player=request.user, batch_id=unique_id).save()
+
+        event_entry_player.batch_id = unique_id
+        event_entry_player.save()
+
+        # make payment
+        return payment_api(
+            request=request,
+            member=request.user,
+            description="Congress Entry",
+            amount=amount,
+            route_code="EVT",
+            route_payload=unique_id,
+            url=reverse(
+                "events:edit_event_entry",
+                kwargs={
+                    "event_id": event_entry_player.event_entry.event.id,
+                    "congress_id": event_entry_player.event_entry.event.congress.id,
+                    "edit_flag": 1,
+                },
+            ),
+            payment_type="Entry to a congress",
+            book_internals=False,
+        )

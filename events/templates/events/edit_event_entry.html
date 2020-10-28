@@ -14,6 +14,7 @@
   .cobalt-table {
     margin: 0px auto;
   }
+
 </style>
 
 <link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
@@ -63,7 +64,7 @@
 <!-- outer wrapper for extra info -->
 {% if categories or event.free_format_question %}
 
-  <div style = "border-radius: 25px; border: 2px solid grey; padding: 20px; display:none" class="editable pb-4">
+  <div style = "border-radius: 25px; border: 2px solid grey; padding: 20px; display:none" class="editable extras">
 
  <!-- categories -->
  {% if categories %}
@@ -253,7 +254,7 @@
 <!-- Action - hidden by default -->
               {% if event_entry_player.payment_status != "Paid" and event_entry_player.payment_status != "Free" %}
               <td class="editable" style="display:none">
-                <button class="btn btn-sm btn-info">Pay Now</button>
+                <button class="btn btn-sm btn-info single_pay" id="single_pay_{{ event_entry_player.id }}">Pay Now</button>
               </td>
               {% else %}
                 {% if event_entry.entry_status != "Complete" %}
@@ -428,6 +429,12 @@ $("#id_change").click(function(){
       }
   });
 
+});
+
+// handle single player payment
+$(".single_pay").click(function(){
+  var pay_id = $(this).attr('id').split("_")[2];
+  window.location.href = "{% url "events:third_party_checkout_player" %}/" + pay_id;  
 });
 
 // check if edit button should be set
