@@ -234,8 +234,13 @@ class Event(models.Model):
 
         return True
 
-    def entry_fee_for(self, user):
-        """ return entry fee for user based on age and date. Also any EventPlayerDiscount applied """
+    def entry_fee_for(self, user, check_date=None):
+        """ return entry fee for user based on age and date. Also any EventPlayerDiscount applied
+            We accept a check_date to work out what the entry fee would be for that date, if not
+            provided then we use today. """
+
+        if not check_date:
+            check_date = timezone.now().date()
 
         # default
         discount = 0.0
@@ -249,8 +254,7 @@ class Event(models.Model):
 
         # date
         if self.congress.allow_early_payment_discount:
-            today = timezone.now().date()
-            if self.congress.early_payment_discount_date >= today:
+            if self.congress.early_payment_discount_date >= check_date:
                 entry_fee = (
                     self.entry_fee - self.entry_early_payment_discount
                 ) / players_per_entry

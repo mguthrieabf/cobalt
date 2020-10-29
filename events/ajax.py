@@ -441,7 +441,7 @@ def change_player_entry_ajax(request):
         congress = get_object_or_404(Congress, pk=event.congress.id)
 
         # check access on the parent event_entry
-        if not event_entry_player.event_entry.user_can_change(request.user):
+        if not event_entry.user_can_change(request.user):
             return JsonResponse({"message": "Access Denied"})
 
         # update
@@ -488,10 +488,6 @@ def change_player_entry_ajax(request):
             "link_text": "View Entry",
         }
 
-        # Check entry fee
-        # non_transferrable_discounts = [""]
-        # current_entry_fee = 1
-
         html_msg = render_to_string("notifications/email_with_button.html", context)
 
         # send
@@ -519,6 +515,96 @@ def change_player_entry_ajax(request):
             msg,
         )
 
+        # Check entry fee - they can keep an early entry discount but nothing else
+        original_entry_fee = event_entry_player.entry_fee
+
+        # get the entry fee based upon when the entry was created
+        entry_fee, discount, reason, description = event.entry_fee_for(event_entry_player.player, event_entry_player.event_entry.first_created_date.date())
+
+        event_entry_player.entry_fee = entry_fee
+        event_entry_player.reason = reason
+        event_entry_player.save()
+
+        # adjust for over or under payment after player change
+
+        difference = event_entry_player.payment_received - event_entry_player.entry_fee
+
+        if difference > 0: # overpaid
+            # create payments in org account
+            payments_core.update_organisation(
+                organisation=event_entry_player.event_entry.event.congress.congress_master.org,
+                amount=-difference,
+                description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.paid_by} partial refund",
+                source="Events",
+                log_msg=event_entry_player.event_entry.event.event_name,
+                sub_source="events_callback",
+                payment_type="Entry to an event",
+                member=event_entry_player.paid_by,
+            )
+
+            # create payment for user
+            payments_core.update_account(
+                member=event_entry_player.player,
+                amount=difference,
+                description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
+                source="Events",
+                sub_source="events_callback",
+                payment_type="Entry to an event",
+                log_msg=event_entry_player.event_entry.event.event_name,
+                organisation=event_entry_player.event_entry.event.congress.congress_master.org,
+            )
+
+            # Log it
+            EventLog(
+                event=event,
+                actor=request.user,
+                event_entry=event_entry,
+                action=f"Triggered refund for {member} - {difference} credits",
+            ).save()
+
+            # notify member of refund
+            context = {
+                "name": event-entry_player.paid_by.first_name,
+                "title": "Refund from - %s" % event,
+                "email_body": f"A refund of {difference} credits has been made to your {BRIDGE_CREDITS} accounts from {event}.<br><br>",
+                "host": COBALT_HOSTNAME,
+                "link": "/events/view",
+                "link_text": "View Entry",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=event_entry_player.paid_by,
+                msg="Refund from - %s" % event,
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="Refund from  %s" % event,
+            )
+
+            # tell the conveners
+            msg = f"""{event_entry_player.paid_by.full_name} has been refunded
+                      {difference} {BRIDGE_CREDITS} for {event.event_name} in {congress}
+                      due to change of player from {old_player} to {event_entry_player.player}.
+                      <br><br>
+                      """
+            notify_conveners(
+                congress,
+                event,
+                f"{event} - {event_entry_player.paid_by} refund",
+                msg,
+            )
+
+
+        # if money is owing then update paid status on event_entry
+        if difference < 0:
+            event_entry_player.payment_status = "Unpaid"
+            event_entry_player.save()
+            event_entry.check_if_paid()
+
+        # the HTML screen reloads so no need to return anything to it
         return JsonResponse({"message": "Success"})
 
 
@@ -632,6 +718,7 @@ def change_category_on_existing_entry_ajax(request, event_entry_id, category_id)
 
 @login_required()
 def change_answer_on_existing_entry_ajax(request, event_entry_id, answer):
+    """ Update the answer to the question on entry """
 
     event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
 
