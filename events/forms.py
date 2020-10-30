@@ -1,7 +1,13 @@
 from django import forms
-from .models import Congress, Event, Session, EventEntryPlayer, EventPlayerDiscount
+from .models import (
+    Congress,
+    Event,
+    Session,
+    EventEntryPlayer,
+    EventPlayerDiscount,
+    CongressMaster,
+)
 from organisations.models import Organisation
-from .models import CongressMaster
 from django_summernote.widgets import SummernoteInplaceWidget
 from cobalt.settings import GLOBAL_ORG, GLOBAL_CURRENCY_NAME, BRIDGE_CREDITS
 
@@ -263,6 +269,15 @@ class SessionForm(forms.ModelForm):
             "session_date",
             "session_start",
             "session_end",
+        )
+
+
+class CongressMasterForm(forms.ModelForm):
+    class Meta:
+        model = CongressMaster
+        fields = (
+            "name",
+            "org",
         )
 
 

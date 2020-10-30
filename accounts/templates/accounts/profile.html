@@ -269,11 +269,12 @@
 
             } else {
 
-              txt_field.html("Team mate - Can use your bridge credits to enter you in an event");
+              txt_field.html("Team Mate<a href='javascript:void(0);' onclick='help();'><i class='material-icons'>add_box</i></a>");
               icon.html("<i class='material-icons'>money_off</i>");
               var title = "Stop " + first_name + " from being able to enter you in an event using your money";
 
             }
+
 
             icon.attr('title', title);
             icon.attr('data-original-title', title);

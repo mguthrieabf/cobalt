@@ -449,6 +449,8 @@ Admin - Creating and Deleting Groups
 
 :func:`rbac.core.rbac_delete_group_by_name`
 
+:func:`rbac.core.rbac_group_id_from_name`
+
 Admin – Adding and Removing Users
 ---------------------------------
 

@@ -32,8 +32,8 @@ from cobalt.settings import GLOBAL_ORG
 
 
 def html_email_reset(request):
-    """ This is necessary so that we can provide an HTML email template
-    for the password reset """
+    """This is necessary so that we can provide an HTML email template
+    for the password reset"""
 
     return PasswordResetView.as_view(
         html_email_template_name="registration/html_password_reset_email.html"
@@ -41,7 +41,7 @@ def html_email_reset(request):
 
 
 def register(request):
-    """ User registration form
+    """User registration form
 
     This form allows a user to register for the system. The form includes
     Ajax code to look up the system number and pre-fill the first and last name.
@@ -87,7 +87,7 @@ def register(request):
 
 
 def activate(request, uidb64, token):
-    """ User activation form
+    """User activation form
 
     This is the link sent to the user over email. If the link is valid, then
     the user is logged in, otherwise they are notified that the link is not
@@ -122,7 +122,7 @@ def loggedout(request):
 
 @login_required()
 def change_password(request):
-    """ Password change form
+    """Password change form
 
     Allows a user to change their password.
 
@@ -172,7 +172,7 @@ def change_password(request):
 
 @login_required()
 def member_detail_m2m_ajax(request):
-    """ Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.
+    """Returns basic public info on a member. ONLY USED BY MEMBER TRANSFER. REPLACE.
 
     Ajax call to get basic info on a member. Will return an empty json array
     if the member number is invalid.
@@ -206,7 +206,7 @@ def member_detail_m2m_ajax(request):
 
 @login_required()
 def member_details_ajax(request):
-    """ Returns basic public info on a member for the generic member search.
+    """Returns basic public info on a member for the generic member search.
 
     Ajax call to get basic info on a member. Will return an empty json array
     if the member number is invalid.
@@ -242,14 +242,18 @@ def member_details_ajax(request):
                         "search_id": search_id,
                     },
                 )
-                data_dict = {"data": html, "member": "%s" % member, "pic": f"{member.pic}"}
+                data_dict = {
+                    "data": html,
+                    "member": "%s" % member,
+                    "pic": f"{member.pic}",
+                }
                 return JsonResponse(data=data_dict, safe=False)
     return JsonResponse(data={"error": "Invalid request"})
 
 
 @login_required()
 def search_ajax(request):
-    """ Ajax member search function. ONLY USED BY MEMBER TRANSFER. REPLACE.
+    """Ajax member search function. ONLY USED BY MEMBER TRANSFER. REPLACE.
 
     Used to search for members by the Member to Member transfer part of Payments.
     Currently very specific to payments. Could be made more generic if other
@@ -315,7 +319,7 @@ def search_ajax(request):
 
 @login_required()
 def member_search_ajax(request):
-    """ Ajax member search function. Used by the generic member search.
+    """Ajax member search function. Used by the generic member search.
 
     Used to search for members by the Member to Member transfer part of Payments.
     Currently very specific to payments. Could be made more generic if other
@@ -388,7 +392,7 @@ def member_search_ajax(request):
 
 @login_required()
 def system_number_search_ajax(request):
-    """ Ajax system_number search function. Used by the generic member search.
+    """Ajax system_number search function. Used by the generic member search.
 
     Args:
         system_number - exact number to search for
@@ -425,7 +429,7 @@ def system_number_search_ajax(request):
 
 @login_required
 def profile(request):
-    """ Profile update form.
+    """Profile update form.
 
     Allows a user to change their profile settings.
 
@@ -464,7 +468,7 @@ def profile(request):
 
 
 def blurb_form_upload(request):
-    """ Profile update sub-form. Handles the picture and about fields.
+    """Profile update sub-form. Handles the picture and about fields.
 
     Allows a user to change their profile settings.
 
@@ -499,7 +503,7 @@ def blurb_form_upload(request):
 
 @login_required
 def public_profile(request, pk):
-    """ Public Profile form.
+    """Public Profile form.
 
     Shows public information about a member.
 
@@ -568,7 +572,7 @@ def public_profile(request, pk):
 
 @login_required
 def user_settings(request):
-    """ User settings form.
+    """User settings form.
 
     Allow user to choose preferences
 
@@ -600,7 +604,7 @@ def user_settings(request):
 
 @login_required()
 def add_team_mate_ajax(request):
-    """ Ajax call to add a team mate
+    """Ajax call to add a team mate
 
     Args:
         request(HTTPRequest): standard request
@@ -612,9 +616,13 @@ def add_team_mate_ajax(request):
     if request.method == "GET":
         member_id = request.GET["member_id"]
         member = User.objects.get(pk=member_id)
-        team_mate = TeamMate(user=request.user, team_mate=member)
-        team_mate.save()
-        msg = "Success"
+        team_mate = TeamMate.objects.filter(user=request.user, team_mate=member)
+        if team_mate:  # already exists
+            msg = f"{member.first_name} is already a team mate"
+        else:
+            team_mate = TeamMate(user=request.user, team_mate=member)
+            team_mate.save()
+            msg = "Success"
 
     else:
         msg = "Invalid request"
@@ -626,7 +634,7 @@ def add_team_mate_ajax(request):
 
 @login_required()
 def delete_team_mate_ajax(request):
-    """ Ajax call to delete a team mate
+    """Ajax call to delete a team mate
 
     Args:
         request(HTTPRequest): standard request
@@ -652,7 +660,7 @@ def delete_team_mate_ajax(request):
 
 @login_required()
 def toggle_team_mate_ajax(request):
-    """ Ajax call to switch the state of a team mate
+    """Ajax call to switch the state of a team mate
 
     Args:
         request(HTTPRequest): standard request

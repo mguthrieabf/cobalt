@@ -94,6 +94,9 @@ class CongressMaster(models.Model):
 
     name = models.CharField("Congress Master Name", max_length=100)
     org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    # status = models.CharField(
+    #         "Status", max_length=14, choices=[("Open", "Open"), ("Disabled", "Disabled")], default="Open"
+    #     )
 
     def __str__(self):
         return self.name

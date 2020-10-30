@@ -22,7 +22,7 @@ from accounts.models import User
 
 
 def rbac_create_group(name_qualifier, name_item, description):
-    """ Create an RBAC group
+    """Create an RBAC group
 
     Args:
         name_qualifier(str): where in the tree the group will go
@@ -45,7 +45,7 @@ def rbac_create_group(name_qualifier, name_item, description):
 
 
 def rbac_delete_group(group):
-    """ Delete an RBAC group
+    """Delete an RBAC group
 
     Args:
         group(RBACGroup): Group to delete
@@ -62,7 +62,7 @@ def rbac_delete_group(group):
 
 
 def rbac_delete_group_by_name(group_name):
-    """ Delete an RBAC group by name
+    """Delete an RBAC group by name
 
     Args:
         group_name(str): group name to delete
@@ -80,7 +80,7 @@ def rbac_delete_group_by_name(group_name):
 
 
 def rbac_add_user_to_group(member, group):
-    """ Adds a user to an RBAC group
+    """Adds a user to an RBAC group
 
     Args:
         member(User): standard user object
@@ -98,7 +98,7 @@ def rbac_add_user_to_group(member, group):
 
 
 def rbac_remove_user_from_group(member, group):
-    """ Removes a user from an RBAC group
+    """Removes a user from an RBAC group
 
     Args:
         member(User): standard user object
@@ -117,7 +117,7 @@ def rbac_remove_user_from_group(member, group):
 
 
 def rbac_remove_admin_user_from_group(member, group):
-    """ Removes a user from an RBAC admin group
+    """Removes a user from an RBAC admin group
 
     Args:
         member(User): standard user object
@@ -137,7 +137,7 @@ def rbac_remove_admin_user_from_group(member, group):
 
 def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
 
-    """ Adds a role to an RBAC group
+    """Adds a role to an RBAC group
 
     Args:
         group(RBACGroup): group
@@ -174,7 +174,7 @@ def rbac_add_role_to_group(group, app, model, action, rule_type, model_id=None):
 
 
 def rbac_user_has_role_exact(member, role):
-    """ check if a user has an exact role
+    """check if a user has an exact role
 
     This is called by rbac_user_has_role to check exact roles. The process
     for checking an exact role is always the same. rbac_user_has_role has
@@ -210,7 +210,7 @@ def rbac_user_has_role_exact(member, role):
 
 
 def rbac_user_has_role_exact_explain(member, role):
-    """ check if a user has an exact role and explain why
+    """check if a user has an exact role and explain why
 
     Args:
         member(User): standard user object
@@ -251,7 +251,7 @@ def rbac_user_has_role_exact_explain(member, role):
 
 
 def rbac_user_has_role(member, role, debug=False):
-    """ check if a user has a specific role
+    """check if a user has a specific role
 
     Args:
         member(User): standard user object
@@ -311,7 +311,7 @@ def rbac_user_has_role(member, role, debug=False):
 
 
 def rbac_user_has_role_explain(member, role):
-    """ check if a user has a specific role and explains why
+    """check if a user has a specific role and explains why
 
     Args:
         member(User): standard user object
@@ -423,7 +423,7 @@ def allow_to_boolean(test_string):
 
 
 def role_to_parts(role):
-    """ take a role string and return it in parts
+    """take a role string and return it in parts
     Args:
         role(str):  string in format e.g. forums.forum.5.view
 
@@ -445,7 +445,7 @@ def role_to_parts(role):
 
 
 def rbac_user_blocked_for_model(user, app, model, action):
-    """ returns a list of model instances which the user cannot view
+    """returns a list of model instances which the user cannot view
 
     Args:
         user(User): standard user object
@@ -490,7 +490,7 @@ def rbac_user_blocked_for_model(user, app, model, action):
 
 
 def rbac_user_allowed_for_model(user, app, model, action):
-    """ returns a tuple.
+    """returns a tuple.
 
     Args:
         user(User): standard user object
@@ -543,7 +543,7 @@ def rbac_user_allowed_for_model(user, app, model, action):
 
 
 def rbac_admin_all_rights(user):
-    """ returns a list of which apps, models and model_ids a user is an admin for
+    """returns a list of which apps, models and model_ids a user is an admin for
 
     Args:
         user(User): standard user object
@@ -567,7 +567,7 @@ def rbac_admin_all_rights(user):
 
 
 def rbac_user_is_group_admin(member, group):
-    """ check if a user has admin rights to a group based upon their rights
+    """check if a user has admin rights to a group based upon their rights
     in the tree. Note - they also need admin rights to the objects if they are
     intending to change the group. This only checks for the ability to change
     group membership or delete the group.
@@ -598,7 +598,7 @@ def rbac_user_is_group_admin(member, group):
 
 
 def rbac_user_is_role_admin(member, role):
-    """ check if a user is an admin for a specific role
+    """check if a user is an admin for a specific role
 
     Args:
         member(User): standard user object
@@ -640,7 +640,7 @@ def rbac_user_is_role_admin(member, role):
 
 
 def rbac_user_is_admin_for_admin_group(member, group):
-    """ check if a user is an admin for an admin group. Any member of an
+    """check if a user is an admin for an admin group. Any member of an
     admin group is automatically an administrator for that group.
 
     Args:
@@ -660,7 +660,7 @@ def rbac_user_is_admin_for_admin_group(member, group):
 
 
 def rbac_access_in_english(user):
-    """ returns what access a user has in plain English
+    """returns what access a user has in plain English
 
     Args:
         user(User): a standard User object
@@ -675,7 +675,7 @@ def rbac_access_in_english(user):
 
 
 def rbac_access_in_english_sub(user, this_name):
-    """ returns what access a user has in plain English
+    """returns what access a user has in plain English
 
     Args:
         user(User): a standard User object
@@ -748,7 +748,7 @@ def rbac_add_role_to_admin_group(group, app, model, model_id=None):
 
 
 def rbac_user_role_list(user, app, model):
-    """ return list of roles a user has for part of the tree.
+    """return list of roles a user has for part of the tree.
 
     This takes in a user and and app/model combination and returns the list of
     model_ids and actions that a user can perform. For example, if you provide::
@@ -777,9 +777,9 @@ def rbac_user_role_list(user, app, model):
 
 
 def rbac_get_groups_for_role(role):
-    """ takes a role and lists the groups that can provide it.
+    """takes a role and lists the groups that can provide it.
 
-    Only works for allow rules with model ids  """
+    Only works for allow rules with model ids"""
 
     (app, model, model_instance, action) = role_to_parts(role)
 
@@ -802,9 +802,9 @@ def rbac_get_users_in_group(groupname):
 
 
 def rbac_get_users_with_role(role):
-    """ returns a list of all users who have a role, either speicifically or
+    """returns a list of all users who have a role, either speicifically or
     from having the equivalent generic role. E.g. forums.forum.5.view would
-    also return users with forums.forum.view or forums.forum.all """
+    also return users with forums.forum.view or forums.forum.all"""
 
     (app, model, model_instance, action) = role_to_parts(role)
 
@@ -835,7 +835,7 @@ def rbac_get_users_with_role(role):
 
 
 def rbac_admin_tree_access(user):
-    """ returns a list of where in the tree a user had admin access.
+    """returns a list of where in the tree a user had admin access.
 
     Args:
         user(User): standard user object
@@ -852,3 +852,26 @@ def rbac_admin_tree_access(user):
     )
     ret = [item for match in matches for item in match]
     return ret
+
+
+def rbac_group_id_from_name(name_qualifier, name_item):
+    """returns the id of a group based upon its name
+
+    Args:
+        name_qualifier(Str): Group qualifier
+        name_item(Str): Group name
+
+    Returns:
+        id:   group id
+    """
+
+    group = (
+        RBACGroup.objects.filter(name_qualifier=name_qualifier)
+        .filter(name_item=name_item)
+        .first()
+    )
+
+    if group:
+        return group.id
+    else:
+        return None

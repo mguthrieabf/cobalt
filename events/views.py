@@ -31,11 +31,13 @@ from .forms import (
     SessionForm,
     EventEntryPlayerForm,
     RefundForm,
+    CongressMasterForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_get_users_with_role,
     rbac_user_has_role,
+    rbac_group_id_from_name,
 )
 from rbac.views import rbac_user_role_or_error
 from .core import events_payments_callback
@@ -822,10 +824,19 @@ def global_admin_congress_masters(request):
 
     congress_masters = CongressMaster.objects.all()
 
+    # Group congress_masters by state
+    grouped_by_state = {}
+    for congress_master in congress_masters:
+
+        if congress_master.org.state in grouped_by_state:
+            grouped_by_state[congress_master.org.state].append(congress_master)
+        else:
+            grouped_by_state[congress_master.org.state] = [congress_master]
+
     return render(
         request,
         "events/global_admin_congress_masters.html",
-        {"congress_masters": congress_masters},
+        {"grouped_by_state": grouped_by_state},
     )
 
 
@@ -1233,3 +1244,63 @@ def third_party_checkout_entry(request, event_entry_id):
             payment_type="Entry to a congress",
             book_internals=False,
         )
+
+
+@login_required()
+def global_admin_edit_congress_master(request, id):
+    """ edit congress masters """
+
+    rbac_user_role_or_error(request, "events.global.edit")
+
+    congress_master = get_object_or_404(CongressMaster, pk=id)
+    org = congress_master.org
+
+    form = CongressMasterForm(request.POST or None, instance=congress_master)
+    # Get list of conveners direct from RBAC
+    conveners = rbac_get_users_with_role("events.org.%s.edit" % org.id)
+
+    # Get default group name if we can
+    qualifier = "rbac.orgs.clubs.%s.%s" % (
+        org.state.lower(),
+        org.name.lower().replace(" ", "_"),
+    )
+    rbac_group_id = rbac_group_id_from_name(qualifier, "congresses")
+
+    if request.method == "POST":
+        if form.is_valid:
+            form.save()
+            messages.success(
+                request, "Congress Master added", extra_tags="cobalt-message-success"
+            )
+            return redirect("events:global_admin_congress_masters")
+
+    return render(
+        request,
+        "events/global_admin_congress_master_edit.html",
+        {
+            "congress_master": congress_master,
+            "form": form,
+            "conveners": conveners,
+            "rbac_group_id": rbac_group_id,
+        },
+    )
+
+
+@login_required()
+def global_admin_create_congress_master(request):
+    """ create congress master """
+
+    rbac_user_role_or_error(request, "events.global.edit")
+
+    form = CongressMasterForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid:
+            form.save()
+            messages.success(
+                request, "Congress Master added", extra_tags="cobalt-message-success"
+            )
+            return redirect("events:global_admin_congress_masters")
+
+    return render(
+        request, "events/global_admin_congress_master_create.html", {"form": form}
+    )

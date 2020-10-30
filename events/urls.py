@@ -291,4 +291,14 @@ urlpatterns = [
         views.global_admin_congress_masters,
         name="global_admin_congress_masters",
     ),
+    path(
+        "system-admin/congress-master-edit/<int:id>",
+        views.global_admin_edit_congress_master,
+        name="global_admin_edit_congress_master",
+    ),
+    path(
+        "system-admin/congress-master-create",
+        views.global_admin_create_congress_master,
+        name="global_admin_create_congress_master",
+    ),
 ]
