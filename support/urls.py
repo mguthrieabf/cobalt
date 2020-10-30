@@ -8,4 +8,6 @@ urlpatterns = [
     path("browser-errors", views.browser_errors, name="browser_errors"),
     path("search", views.search, name="search"),
     path("cookies", views.cookies, name="cookies"),
+    path("guidelines", views.guidelines, name="guidelines"),
+    path("acceptable-use", views.acceptable_use, name="acceptable_use"),
 ]

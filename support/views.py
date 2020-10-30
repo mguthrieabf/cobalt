@@ -22,10 +22,16 @@ def home(request):
     return render(request, "support/home.html")
 
 
-@login_required
 def cookies(request):
-
     return render(request, "support/cookies.html")
+
+
+def guidelines(request):
+    return render(request, "support/guidelines.html")
+
+
+def acceptable_use(request):
+    return render(request, "support/acceptable_use.html")
 
 
 @login_required

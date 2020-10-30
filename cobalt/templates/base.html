@@ -240,12 +240,24 @@
                 </a>
               </li>
               <li>
-                <a href=" {{ GLOBAL_PRIVACY }}">
+                <a href="{% url "support:guidelines" %}">
+                  Guidelines
+                </a>
+              </li>
+              <li>
+              <li>
+                <a href="{% url "support:acceptable_use" %}">
+                  Acceptable Use
+                </a>
+              </li>
+              <li>
+              <li>
+                <a href="{{ GLOBAL_PRIVACY }}">
                   Privacy
                 </a>
               </li>
               <li>
-                <a href=" {{ GLOBAL_COOKIES }}">
+                <a href="{% url "support:cookies" %}">
                   Cookies
                 </a>
               </li>
