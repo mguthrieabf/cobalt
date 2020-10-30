@@ -261,302 +261,6 @@ def view_congress(request, congress_id, fullscreen=False):
     )
 
 
-def enter_event_form(event, congress, request, existing_choices=None):
-    """build the form part of the enter_event view. Its not a Django form,
-    we build our own as the validation won't work with a dynamic form
-    and we are validating on the client side anyway.
-
-    If this is called by the edit entry option then it will pass in
-    existing_choices to pre-fill in the form. If this is a new entry
-    then this will be None.
-
-    """
-
-    our_form = []
-
-    # get payment types for this congress
-    pay_types = []
-    if congress.payment_method_system_dollars:
-        pay_types.append(("my-system-dollars", f"My {BRIDGE_CREDITS}"))
-    if congress.payment_method_bank_transfer:
-        pay_types.append(("bank-transfer", "Bank Transfer"))
-    if congress.payment_method_cash:
-        pay_types.append(("cash", "Cash on the day"))
-    if congress.payment_method_cheques:
-        pay_types.append(("cheque", "Cheque"))
-
-    # Get team mates for this user - exclude anyone entered already
-    all_team_mates = TeamMate.objects.filter(user=request.user)
-    team_mates_list = all_team_mates.values_list("team_mate")
-    entered_team_mates = (
-        EventEntryPlayer.objects.filter(event_entry__event=event)
-        .exclude(event_entry__entry_status="Cancelled")
-        .filter(player__in=team_mates_list)
-        .values_list("player")
-    )
-    team_mates = all_team_mates.exclude(team_mate__in=entered_team_mates)
-
-    name_list = [(0, "Search..."), (TBA_PLAYER, "TBA")]
-    for team_mate in team_mates:
-        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate.full_name)
-        name_list.append(item)
-
-    # set values for player0 (the user)
-    entry_fee, discount, reason, description = event.entry_fee_for(request.user)
-
-    if existing_choices:
-        payment_selected = existing_choices["player0"]["payment"]
-        if (
-            payment_selected == "my-system-dollars"
-        ):  # only ABF dollars go in the you column
-            entry_fee_you = entry_fee
-            entry_fee_pending = ""
-        else:
-            entry_fee_you = ""
-            entry_fee_pending = entry_fee
-    else:
-        payment_selected = pay_types[0]
-        entry_fee_pending = ""
-        entry_fee_you = entry_fee
-
-    player0 = {
-        "id": request.user.id,
-        "payment_choices": pay_types.copy(),
-        "payment_selected": payment_selected,
-        "name": request.user.full_name,
-        "entry_fee_you": "%s" % entry_fee_you,
-        "entry_fee_pending": "%s" % entry_fee_pending,
-    }
-
-    # add another option for everyone except the current user
-    if congress.payment_method_system_dollars:
-        pay_types.append(("other-system-dollars", f"Ask them to pay"))
-
-    # set values for other players
-    team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
-    min_entries = team_size
-    if team_size == 6:
-        min_entries = 4
-    for ref in range(1, team_size):
-
-        # if we are returning then set the passed values
-        if existing_choices and "player%s" % ref in existing_choices.keys():
-            payment_selected = existing_choices["player%s" % ref]["payment"]
-            name_selected = existing_choices["player%s" % ref]["name"]
-            entry_fee = existing_choices["player%s" % ref]["entry_fee"]
-        else:
-            payment_selected = pay_types[0]
-            name_selected = None
-            entry_fee = None
-
-        # only ABF dollars go in the you column
-        if payment_selected == "my-system-dollars":
-            entry_fee_you = entry_fee
-            entry_fee_pending = ""
-        else:
-            entry_fee_you = ""
-            entry_fee_pending = entry_fee
-
-        if payment_selected == "their-system-dollars":
-            augment_payment_types = [
-                ("their-system-dollars", f"Their {BRIDGE_CREDITS}")
-            ]
-        else:
-            augment_payment_types = []
-
-        # set value for whether this is a new entry or an edit
-        if existing_choices:
-            entry_status = "new"
-        else:
-            entry_status = "old"
-
-        item = {
-            "player_no": ref,
-            "payment_choices": pay_types + augment_payment_types,
-            "payment_selected": payment_selected,
-            "name_choices": name_list,
-            "name_selected": name_selected,
-            "entry_fee_you": entry_fee_you,
-            "entry_fee_pending": entry_fee_pending,
-            "entry_status": entry_status,
-        }
-
-        our_form.append(item)
-
-    # Start time of event
-    sessions = Session.objects.filter(event=event).order_by(
-        "session_date", "session_start"
-    )
-    event_start = sessions.first()
-
-    # use reason etc from above to see if discounts apply
-    alert_msg = None
-
-    # don't alert about discounts if editing the entry
-    if not existing_choices:
-        if reason == "Early discount":
-            date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
-            alert_msg = [
-                "Early Entry Discount",
-                "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
-                % (discount, date_field),
-            ]
-
-        if reason == "Youth discount":
-            alert_msg = [
-                "Youth Discount",
-                "You qualify for a youth discount for this event. A saving of $%.2f."
-                % discount,
-            ]
-
-    # categories
-    categories = Category.objects.filter(event=event)
-
-    return render(
-        request,
-        "events/enter_event.html",
-        {
-            "player0": player0,
-            "our_form": our_form,
-            "congress": congress,
-            "event": event,
-            "categories": categories,
-            "sessions": sessions,
-            "event_start": event_start,
-            "alert_msg": alert_msg,
-            "discount": discount,
-            "description": description,
-            "min_entries": min_entries,
-        },
-    )
-
-
-@login_required()
-def enter_event(request, congress_id, event_id):
-    """ enter an event """
-
-    # Load the event
-    event = get_object_or_404(Event, pk=event_id)
-    congress = get_object_or_404(Congress, pk=congress_id)
-
-    # Check if already entered
-    if event.already_entered(request.user):
-        return redirect(
-            "events:edit_event_entry", event_id=event.id, congress_id=event.congress.id
-        )
-
-    # Check if entries are open
-    if not event.is_open():
-        return render(request, "events/event_closed.html", {"event": event})
-
-    # Check if full
-    if event.is_full():
-        return render(request, "events/event_full.html", {"event": event})
-
-    # Check if draft
-    if congress.status != "Published":
-        return render(request, "events/event_closed.html", {"event": event})
-
-    # check if POST.
-    # Note: this works a bit differently to most forms in Cobalt.
-    #       We build our own form and use client side code to validate and
-    #       modify it.
-    #       This will work unless someone has
-    #       deliberately bypassed the client side validation in which case we
-    #       don't mind failing with an error.
-
-    if request.method == "POST":
-
-        # create event_entry
-        event_entry = EventEntry()
-        event_entry.event = event
-        event_entry.primary_entrant = request.user
-
-        # see if we got a category
-        category = request.POST.get("category", None)
-        if category:
-            event_entry.category = get_object_or_404(Category, pk=category)
-
-        # see if we got a free format answer
-        answer = request.POST.get("free_format_answer", None)
-        if answer:
-            event_entry.free_format_answer = answer
-
-        event_entry.save()
-
-        # Log it
-        EventLog(
-            event=event,
-            actor=event_entry.primary_entrant,
-            action=f"Event entry {event_entry.id} created",
-            event_entry=event_entry,
-        ).save()
-
-        # add to basket
-        basket_item = BasketItem()
-        basket_item.player = request.user
-        basket_item.event_entry = event_entry
-        basket_item.save()
-
-        # Get players from form
-        players = {0: request.user}
-        player_payments = {0: request.POST.get("player0_payment")}
-
-        for p_id in range(1, 6):
-            p_string = f"player{p_id}"
-            ppay_string = f"player{p_id}_payment"
-            if p_string in request.POST:
-                p_string_value = request.POST.get(p_string)
-                if p_string_value != "":
-                    players[p_id] = get_object_or_404(User, pk=int(p_string_value))
-                    player_payments[p_id] = request.POST.get(ppay_string)
-
-        # validate
-        if (event.player_format == "Pairs" and len(players) != 2) or (
-            event.player_format == "Teams" and len(players) < 4
-        ):
-            print("invalid number of entries")
-            return
-
-        # create player entries
-        for p_id in range(len(players)):
-
-            event_entry_player = EventEntryPlayer()
-            event_entry_player.event_entry = event_entry
-            event_entry_player.player = players[p_id]
-            event_entry_player.payment_type = player_payments[p_id]
-            entry_fee, discount, reason, description = event.entry_fee_for(
-                event_entry_player.player
-            )
-            if p_id < 4:
-                event_entry_player.entry_fee = entry_fee
-                event_entry_player.reason = reason
-            else:
-                event_entry_player.entry_fee = 0
-                event_entry_player.reason = "Team > 4"
-                event_entry_player.payment_status = "Paid"
-            event_entry_player.save()
-
-            # Log it
-            EventLog(
-                event=event,
-                actor=event_entry.primary_entrant,
-                action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
-                event_entry=event_entry,
-            ).save()
-
-        if "now" in request.POST:
-            return redirect("events:checkout")
-        else:  # add to cart and keep shopping
-            msg = "Added to your cart"
-            return redirect(
-                f"/events/congress/view/{event.congress.id}?msg={msg}#program"
-            )
-
-    else:
-        return enter_event_form(event, congress, request)
-
-
 @login_required()
 def checkout(request):
     """ Checkout view - make payments, get details """
@@ -1304,3 +1008,269 @@ def global_admin_create_congress_master(request):
     return render(
         request, "events/global_admin_congress_master_create.html", {"form": form}
     )
+
+
+def enter_event_form(event, congress, request):
+    """build the form part of the enter_event view. Its not a Django form,
+    we build our own as the validation won't work with a dynamic form
+    and we are validating on the client side anyway.
+
+    """
+
+    our_form = []
+
+    # get payment types for this congress
+    pay_types = []
+    if congress.payment_method_system_dollars:
+        pay_types.append(("my-system-dollars", f"My {BRIDGE_CREDITS}"))
+    if congress.payment_method_bank_transfer:
+        pay_types.append(("bank-transfer", "Bank Transfer"))
+    if congress.payment_method_cash:
+        pay_types.append(("cash", "Cash on the day"))
+    if congress.payment_method_cheques:
+        pay_types.append(("cheque", "Cheque"))
+
+    # Get team mates for this user - exclude anyone entered already
+    all_team_mates = TeamMate.objects.filter(user=request.user)
+    team_mates_list = all_team_mates.values_list("team_mate")
+    entered_team_mates = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .exclude(event_entry__entry_status="Cancelled")
+        .filter(player__in=team_mates_list)
+        .values_list("player")
+    )
+    team_mates = all_team_mates.exclude(team_mate__in=entered_team_mates)
+
+    name_list = [(0, "Search..."), (TBA_PLAYER, "TBA")]
+    for team_mate in team_mates:
+        item = (team_mate.team_mate.id, "%s" % team_mate.team_mate.full_name)
+        name_list.append(item)
+
+    # set values for player0 (the user)
+    entry_fee, discount, reason, description = event.entry_fee_for(request.user)
+
+    payment_selected = pay_types[0]
+    entry_fee_pending = ""
+    entry_fee_you = entry_fee
+
+    player0 = {
+        "id": request.user.id,
+        "payment_choices": pay_types.copy(),
+        "payment_selected": payment_selected,
+        "name": request.user.full_name,
+        "entry_fee_you": "%s" % entry_fee_you,
+        "entry_fee_pending": "%s" % entry_fee_pending,
+    }
+
+    # add another option for everyone except the current user
+    if congress.payment_method_system_dollars:
+        pay_types.append(("other-system-dollars", f"Ask them to pay"))
+
+    # set values for other players
+    team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
+    min_entries = team_size
+    if team_size == 6:
+        min_entries = 4
+    for ref in range(1, team_size):
+
+        payment_selected = pay_types[0]
+        name_selected = None
+        entry_fee = None
+
+        # only ABF dollars go in the you column
+        if payment_selected == "my-system-dollars":
+            entry_fee_you = entry_fee
+            entry_fee_pending = ""
+        else:
+            entry_fee_you = ""
+            entry_fee_pending = entry_fee
+
+        if payment_selected == "their-system-dollars":
+            augment_payment_types = [
+                ("their-system-dollars", f"Their {BRIDGE_CREDITS}")
+            ]
+        else:
+            augment_payment_types = []
+
+        item = {
+            "player_no": ref,
+            "payment_choices": pay_types + augment_payment_types,
+            "payment_selected": payment_selected,
+            "name_choices": name_list,
+            "name_selected": name_selected,
+            "entry_fee_you": entry_fee_you,
+            "entry_fee_pending": entry_fee_pending,
+        }
+
+        our_form.append(item)
+
+    # Start time of event
+    sessions = Session.objects.filter(event=event).order_by(
+        "session_date", "session_start"
+    )
+    event_start = sessions.first()
+
+    # use reason etc from above to see if discounts apply
+    alert_msg = None
+
+    if reason == "Early discount":
+        date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
+        alert_msg = [
+            "Early Entry Discount",
+            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
+            % (discount, date_field),
+        ]
+
+    if reason == "Youth discount":
+        alert_msg = [
+            "Youth Discount",
+            "You qualify for a youth discount for this event. A saving of $%.2f."
+            % discount,
+        ]
+
+    # categories
+    categories = Category.objects.filter(event=event)
+
+    return render(
+        request,
+        "events/enter_event.html",
+        {
+            "player0": player0,
+            "our_form": our_form,
+            "congress": congress,
+            "event": event,
+            "categories": categories,
+            "sessions": sessions,
+            "event_start": event_start,
+            "alert_msg": alert_msg,
+            "discount": discount,
+            "description": description,
+            "min_entries": min_entries,
+        },
+    )
+
+
+@login_required()
+def enter_event(request, congress_id, event_id):
+    """ enter an event """
+
+    # Load the event
+    event = get_object_or_404(Event, pk=event_id)
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # Check if already entered
+    if event.already_entered(request.user):
+        return redirect(
+            "events:edit_event_entry", event_id=event.id, congress_id=event.congress.id
+        )
+
+    # Check if entries are open
+    if not event.is_open():
+        return render(request, "events/event_closed.html", {"event": event})
+
+    # Check if full
+    if event.is_full():
+        return render(request, "events/event_full.html", {"event": event})
+
+    # Check if draft
+    if congress.status != "Published":
+        return render(request, "events/event_closed.html", {"event": event})
+
+    # check if POST.
+    # Note: this works a bit differently to most forms in Cobalt.
+    #       We build our own form and use client side code to validate and
+    #       modify it.
+    #       This will work unless someone has
+    #       deliberately bypassed the client side validation in which case we
+    #       don't mind failing with an error.
+
+    if request.method == "POST":
+
+        # create event_entry
+        event_entry = EventEntry()
+        event_entry.event = event
+        event_entry.primary_entrant = request.user
+
+        # see if we got a category
+        category = request.POST.get("category", None)
+        if category:
+            event_entry.category = get_object_or_404(Category, pk=category)
+
+        # see if we got a free format answer
+        answer = request.POST.get("free_format_answer", None)
+        if answer:
+            event_entry.free_format_answer = answer
+
+        event_entry.save()
+
+        # Log it
+        EventLog(
+            event=event,
+            actor=event_entry.primary_entrant,
+            action=f"Event entry {event_entry.id} created",
+            event_entry=event_entry,
+        ).save()
+
+        # add to basket
+        basket_item = BasketItem()
+        basket_item.player = request.user
+        basket_item.event_entry = event_entry
+        basket_item.save()
+
+        # Get players from form
+        players = {0: request.user}
+        player_payments = {0: request.POST.get("player0_payment")}
+
+        for p_id in range(1, 6):
+            p_string = f"player{p_id}"
+            ppay_string = f"player{p_id}_payment"
+            if p_string in request.POST:
+                p_string_value = request.POST.get(p_string)
+                if p_string_value != "":
+                    players[p_id] = get_object_or_404(User, pk=int(p_string_value))
+                    player_payments[p_id] = request.POST.get(ppay_string)
+
+        # validate
+        if (event.player_format == "Pairs" and len(players) != 2) or (
+            event.player_format == "Teams" and len(players) < 4
+        ):
+            print("invalid number of entries")
+            return
+
+        # create player entries
+        for p_id in range(len(players)):
+
+            event_entry_player = EventEntryPlayer()
+            event_entry_player.event_entry = event_entry
+            event_entry_player.player = players[p_id]
+            event_entry_player.payment_type = player_payments[p_id]
+            entry_fee, discount, reason, description = event.entry_fee_for(
+                event_entry_player.player
+            )
+            if p_id < 4:
+                event_entry_player.entry_fee = entry_fee
+                event_entry_player.reason = reason
+            else:
+                event_entry_player.entry_fee = 0
+                event_entry_player.reason = "Team > 4"
+                event_entry_player.payment_status = "Paid"
+            event_entry_player.save()
+
+            # Log it
+            EventLog(
+                event=event,
+                actor=event_entry.primary_entrant,
+                action=f"Event entry player {event_entry_player.id} created for {event_entry_player.player}",
+                event_entry=event_entry,
+            ).save()
+
+        if "now" in request.POST:
+            return redirect("events:checkout")
+        else:  # add to cart and keep shopping
+            msg = "Added to your cart"
+            return redirect(
+                f"/events/congress/view/{event.congress.id}?msg={msg}#program"
+            )
+
+    else:
+        return enter_event_form(event, congress, request)
