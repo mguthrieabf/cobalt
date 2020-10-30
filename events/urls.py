@@ -76,6 +76,11 @@ urlpatterns = [
         name="third_party_checkout_player",
     ),
     path(
+        "congress/event/third-party-checkout-entry/<int:event_entry_id>",
+        views.third_party_checkout_entry,
+        name="third_party_checkout_entry",
+    ),
+    path(
         "congress/checkout",
         views.checkout,
         name="checkout",

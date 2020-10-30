@@ -4,7 +4,7 @@ from django.utils import timezone
 import payments.core as payments_core  # circular dependency
 from notifications.views import contact_member
 from logs.views import log_event
-from cobalt.settings import COBALT_HOSTNAME
+from cobalt.settings import COBALT_HOSTNAME, BRIDGE_CREDITS
 from django.template.loader import render_to_string
 from datetime import datetime
 from rbac.core import rbac_get_users_with_role
@@ -93,8 +93,8 @@ def update_entries(route_payload, payment_user):
 
         EventLog(
             event=event_entry_player.event_entry.event,
-            actor=event_entry_player.player,
-            action=f"Paid with their system dollars",
+            actor=event_entry_player.paid_by,
+            action=f"Paid for {event_entry_player.player} with {BRIDGE_CREDITS}",
             event_entry=event_entry_player.event_entry,
         ).save()
 
@@ -155,7 +155,7 @@ def update_entries(route_payload, payment_user):
                 EventLog(
                     event=event_entry.event,
                     actor=event_entry_player.player,
-                    action=f"Paid with their bridge credits",
+                    action=f"Paid with {BRIDGE_CREDITS}",
                     event_entry=event_entry,
                 ).save()
 
@@ -323,21 +323,25 @@ def get_events(user):
         .order_by("-id")[:50]
     )
 
-    event_entry_players_list = list(event_entry_players)
-    event_entry_players_list.reverse()
-
     # Only include the ones in the future
-    upcoming = []
-    for event_entry_player in event_entry_players_list:
-        if event_entry_player.event_entry.event.start_date() >= datetime.now().date():
+    upcoming = {}
+    for event_entry_player in event_entry_players:
+
+        # start_date on event is a function, not a field
+        start_date = event_entry_player.event_entry.event.start_date()
+        if start_date >= datetime.now().date():
             # Check if still in cart
             in_cart = BasketItem.objects.filter(
                 event_entry=event_entry_player.event_entry
             ).count()
             event_entry_player.in_cart = in_cart
-            upcoming.append(event_entry_player)
+            upcoming[event_entry_player] = start_date
 
-    return upcoming
+    upcoming_sorted = {
+        key: value for key, value in sorted(upcoming.items(), key=lambda item: item[1])
+    }
+
+    return upcoming_sorted
 
 
 def get_conveners_for_congress(congress):

@@ -60,7 +60,7 @@ from events.core import events_payments_callback, events_payments_secondary_call
 # get_balance_detail  #
 #######################
 def get_balance_detail(member):
-    """ Called by dashboard to show basic information
+    """Called by dashboard to show basic information
 
     Args:
         member: A User object - the member whose balance is required
@@ -86,7 +86,7 @@ def get_balance_detail(member):
 # get_balance  #
 ################
 def get_balance(member):
-    """ Gets member account balance
+    """Gets member account balance
 
     This function returns the current balance of the member's account.
 
@@ -112,7 +112,7 @@ def get_balance(member):
 ################################
 @login_required()
 def stripe_manual_payment_intent(request):
-    """ Called from the checkout webpage.
+    """Called from the checkout webpage.
 
     When a user is going to pay with a credit card we
     tell Stripe and Stripe gets ready for it. By this point in the process
@@ -223,7 +223,7 @@ def stripe_manual_payment_intent(request):
 ####################################
 @login_required()
 def stripe_auto_payment_intent(request):
-    """ Called from the auto top up webpage.
+    """Called from the auto top up webpage.
 
     This is very similar to the one off payment. It lets Stripe
     know to expect a credit card and provides a token to confirm
@@ -284,7 +284,7 @@ def stripe_auto_payment_intent(request):
 # test_callback      #
 ######################
 def test_callback(status, payload, tran):
-    """ Eventually I will be moved to another module. I am only here for testing purposes
+    """Eventually I will be moved to another module. I am only here for testing purposes
 
     I also shouldn't have the 3rd parameter. I only get status and the payload that I provided
     when I made the call to payments to get money from a member. I am responsible for my own
@@ -317,7 +317,7 @@ def payment_api(
     url=None,
     book_internals=True,
 ):
-    """ API for payments from other parts of the application.
+    """API for payments from other parts of the application.
 
     There is a user on the end of this who needs to know what is happening,
     so we return a page that tells them. It could be:
@@ -457,7 +457,30 @@ def payment_api(
             )
 
             # Notify member
-            email_body = f"<b>{member}</b> has transferred {amount:.2f} into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
+            email_body = f"You have transferred {amount:.2f} credits into the {BRIDGE_CREDITS} account of {other_member}.<br><br>The description was: {description}.<br><br>Please contact us immediately if you do not recognise this transaction.<br><br>"
+            context = {
+                "name": member.first_name,
+                "title": "Transfer to %s" % other_member.full_name,
+                "email_body": email_body,
+                "host": COBALT_HOSTNAME,
+                "link": "/payments",
+                "link_text": "View Statement",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=member,
+                msg="Transfer to %s - %s credits" % (other_member.full_name, amount),
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/payments",
+                subject="Transfer to %s" % other_member,
+            )
+
+            # Notify other member
+            email_body = f"<b>{member}</b> has transferred {amount:.2f} credits into your {BRIDGE_CREDITS} account.<br><br>The description was: {description}.<br><br>Please contact {member.first_name} directly if you have any queries.<br><br>"
             context = {
                 "name": other_member.first_name,
                 "title": "Transfer from %s" % member.full_name,
@@ -629,35 +652,29 @@ def payment_api(
 
             if other_member:  # transfer to another member
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for transfer to %s (%s). <br>\
+                    msg = "Partial payment for transfer to %s (%s). <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            other_member,
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        other_member,
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment to %s (%s)" % (other_member, description)
 
             else:
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for %s. <br>\
+                    msg = "Partial payment for %s. <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment for: " + description
@@ -676,7 +693,7 @@ def payment_api(
 # stripe_webhook_manual #
 #########################
 def stripe_webhook_manual(event):
-    """ Handles manual payment events from Stripe webhook
+    """Handles manual payment events from Stripe webhook
 
     Called by stripe_webhook to look after incoming manual payments.
 
@@ -830,7 +847,7 @@ def stripe_webhook_manual(event):
 # stripe_webhook_autosetup   #
 ##############################
 def stripe_webhook_autosetup(event):
-    """ Handles auto top up setup events from Stripe webhook
+    """Handles auto top up setup events from Stripe webhook
 
     Called by stripe_webhook to look after successful incoming auto top up set ups.
 
@@ -901,7 +918,7 @@ def stripe_webhook_autosetup(event):
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):
-    """ Callback from Stripe webhook
+    """Callback from Stripe webhook
 
     In development, Stripe sends us everything. In production we can configure
     the events that we receive. This is the only way for Stripe to communicate
@@ -948,8 +965,7 @@ def stripe_webhook(request):
 
     Returns:
         HTTPStatus Code
-
-"""
+    """
     payload = request.body
     event = None
 
@@ -1012,7 +1028,7 @@ def stripe_webhook(request):
 # callback_router       #
 #########################
 def callback_router(route_code=None, route_payload=None, tran=None, status="Success"):
-    """ Central function to handle callbacks
+    """Central function to handle callbacks
 
     Callbacks are an asynchronous way for us to let the calling application
     know if a payment successed or not.
@@ -1087,22 +1103,22 @@ def update_account(
     other_member=None,
     organisation=None,
 ):
-    """ Function to update a customer account
+    """Function to update a customer account
 
-        args:
-            member - owner of the account
-            amount - value (plus is a deduction, minus is a credit)
-            description - to appear on statement
-            log_msg - to appear on logs
-            source - for logs
-            sub_source - for logs
-            payment_type - type of payment
-            stripe_transaction - linked Stripe transaction (optional)
-            other_member - linked member (optional)
-            organisation - linked organisation (optional)
+    args:
+        member - owner of the account
+        amount - value (plus is a deduction, minus is a credit)
+        description - to appear on statement
+        log_msg - to appear on logs
+        source - for logs
+        sub_source - for logs
+        payment_type - type of payment
+        stripe_transaction - linked Stripe transaction (optional)
+        other_member - linked member (optional)
+        organisation - linked organisation (optional)
 
-        returns:
-            MemberTransaction
+    returns:
+        MemberTransaction
 
     """
     # Get old balance
@@ -1185,7 +1201,7 @@ def update_organisation(
 # auto_topup_member       #
 ###########################
 def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
-    """ process an a member.
+    """process an a member.
 
     Internal function to handle a member needing to process an auto top up.
     This function deals with successful top ups and failed top ups. For
@@ -1223,7 +1239,8 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
     # Get payment method id for this customer from Stripe
     try:
         paylist = stripe.PaymentMethod.list(
-            customer=member.stripe_customer_id, type="card",
+            customer=member.stripe_customer_id,
+            type="card",
         )
         pay_method_id = paylist.data[0].id
     except stripe.error.InvalidRequestError:
@@ -1381,7 +1398,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
 # org_balance                     #
 ###################################
 def org_balance(organisation):
-    """ Returns org balance
+    """Returns org balance
 
     Args:
         organisation (Organisation): Organisation object

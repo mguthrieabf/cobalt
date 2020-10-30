@@ -53,6 +53,7 @@
                     {% endfor %}
                     </span>
                     <a class="cobalt_generic_member btn btn-sm btn-primary text-light" data-toggle="modal" id="unique_id" data-target="#cobalt_general_member_search1">Change</a>
+                    <button class="btn btn-sm btn-info" id="make_tba">Make TBA</button>
                   </div>
                 </td>
               </tr>
@@ -144,8 +145,21 @@ function cobaltMemberSearchOk() {
   $("#player_name").text(member_name[1]);
   $("#id_player").val(member_id[1]);
 
-  return False;
+  return false;
 
 }
+
+$(document).ready(function(){
+
+// handle tba
+  $("#make_tba").click(function(){
+    $("#player_name").text("TBA");
+    $("#id_player").val({{ TBA_PLAYER }});
+
+    return false;
+
+  });
+});
+
 </script>
 {% endblock %}

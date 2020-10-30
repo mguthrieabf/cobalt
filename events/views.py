@@ -288,6 +288,7 @@ def enter_event_form(event, congress, request, existing_choices=None):
     team_mates_list = all_team_mates.values_list("team_mate")
     entered_team_mates = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
+        .exclude(event_entry__entry_status="Cancelled")
         .filter(player__in=team_mates_list)
         .values_list("player")
     )
@@ -851,6 +852,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
             EventEntry.objects.filter(primary_entrant=request.user)
             .exclude(entry_status="Cancelled")
             .filter(event=event)
+            .first()
         )
         if not event_entry:
             # not entered so redirect
@@ -863,11 +865,23 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
         event_entry=event_entry
     ).order_by("first_created_date")
 
+    print(event_entry_players)
+
     count = 1
+    pay_count = 0
     for event_entry_player in event_entry_players:
         if count > 4:
             event_entry_player.extra_player = True
         count += 1
+
+        # check payment outstanding so we can show a Pay All button if mmore than 1
+        if event_entry_player.entry_fee - event_entry_player.payment_received > 0:
+            pay_count += 1
+
+    if pay_count >= 2:
+        pay_all = True
+    else:
+        pay_all = False
 
     # Check if still in basket
     in_basket = BasketItem.objects.filter(event_entry=event_entry).count()
@@ -891,6 +905,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
             "categories": categories,
             "edit_flag": edit_flag,
             "in_basket": in_basket,
+            "pay_all": pay_all,
         },
     )
 
@@ -1113,7 +1128,7 @@ def third_party_checkout_player(request, event_entry_player_id):
 
     if (
         not event_entry_players_me
-        or event_entry_player.event_entry.primary_entrant != request.user
+        and event_entry_player.event_entry.primary_entrant != request.user
     ):
         error = """You are not the person who made this entry or one of the players.
                    You cannot change this entry."""
@@ -1133,6 +1148,71 @@ def third_party_checkout_player(request, event_entry_player_id):
 
         event_entry_player.batch_id = unique_id
         event_entry_player.save()
+
+        # make payment
+        return payment_api(
+            request=request,
+            member=request.user,
+            description="Congress Entry",
+            amount=amount,
+            route_code="EVT",
+            route_payload=unique_id,
+            url=reverse(
+                "events:edit_event_entry",
+                kwargs={
+                    "event_id": event_entry_player.event_entry.event.id,
+                    "congress_id": event_entry_player.event_entry.event.congress.id,
+                    "edit_flag": 1,
+                },
+            ),
+            payment_type="Entry to a congress",
+            book_internals=False,
+        )
+
+
+@login_required()
+def third_party_checkout_entry(request, event_entry_id):
+    """ Used by edit entry screen to pay for all outstanding fees on an entry """
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+    event_entry_players_me = EventEntryPlayer.objects.filter(
+        event_entry=event_entry
+    ).filter(player=request.user)
+
+    # check for association with entry
+    if not event_entry_players_me and event_entry.primary_entrant != request.user:
+        error = """You are not the person who made this entry or one of the players.
+                   You cannot change this entry."""
+
+        title = "You do not have permission"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    # check for cancelled
+    if event_entry.entry_status == "Cancelled":
+        error = "This entry has been cancelled. You cannot change this entry."
+        title = "Cancelled Entry"
+        return render(request, "events/error.html", {"title": title, "error": error})
+
+    # check amount
+    event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
+    amount = 0.0
+    for event_entry_player in event_entry_players:
+        amount += float(
+            event_entry_player.entry_fee - event_entry_player.payment_received
+        )
+
+    if amount > 0:
+
+        unique_id = str(uuid.uuid4())
+
+        # map this user (who is paying) to the batch id
+        PlayerBatchId(player=request.user, batch_id=unique_id).save()
+
+        for event_entry_player in event_entry_players:
+            event_entry_player.batch_id = unique_id
+            event_entry_player.payment_type = "my-system-dollars"
+            event_entry_player.save()
 
         # make payment
         return payment_api(

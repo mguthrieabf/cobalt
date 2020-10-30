@@ -60,6 +60,7 @@
         <div class="text-left"><a href="{% url "events:view_event_entries" congress_id=congress.id event_id=event.id %}">View all entries</a></div>
 
         <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
+        <p>Entry made by: <b>{{ event_entry.primary_entrant.full_name }}</b></p>
 
 <!-- outer wrapper for extra info -->
 {% if categories or event.free_format_question %}
@@ -265,16 +266,29 @@
             </tr>
           {% endfor %}
 
+<!-- bottom fow of table has add player and pay all -->
+          <tr>
+          <td colspan='6'>
+            <!-- Show add player button if allowed -->
+              {% if event_entry_players.count == 4  or event_entry_players.count == 5 %}
+              <div class="row table-responsive text-left pb-5">
+                <button id="add_player" class="editable btn btn-sm btn-primary text-left" style="display:none"><i class="fas fa-plus-circle display-5"></i>&nbsp;Add Player to Team</button>
+              </div>
+              {% endif %}
+          </td>
+
+<!-- Show pay all if valid option -->
+                    {% if pay_all %}
+          <td class="editable" style="display:none">
+            <button class="btn btn-sm btn-info font-weight-bold" style="font-size: 105%;" id="pay_all">Pay All</button>
+          </td>
+          {% endif %}
+          </tr>
+
             </tbody>
           </table>
           </div>
 
-          <!-- Show add player button if allowed -->
-            {% if event_entry_players.count == 4  or event_entry_players.count == 5 %}
-            <div class="row table-responsive text-left pb-5">
-              <button id="add_player" class="editable btn btn-sm btn-primary text-left" style="display:none"><i class="fas fa-plus-circle display-5"></i>&nbsp;Add Player to Team</button>
-            </div>
-            {% endif %}
           </div>
         <div class="text-center">
           <a href="{% url "events:delete_event_entry" event_entry_id=event_entry.id %}" class="btn btn-danger cobalt-save">Withdraw From Event</a>
@@ -434,8 +448,15 @@ $("#id_change").click(function(){
 // handle single player payment
 $(".single_pay").click(function(){
   var pay_id = $(this).attr('id').split("_")[2];
-  window.location.href = "{% url "events:third_party_checkout_player" %}/" + pay_id;  
+  window.location.href = "{% url "events:third_party_checkout_player" %}/" + pay_id;
 });
+
+// handle pay all
+$("#pay_all").click(function(){
+  window.location.href = "{% url "events:third_party_checkout_entry" event_entry_id=event_entry.id %}";
+});
+
+
 
 // check if edit button should be set
 {% if edit_flag %}
