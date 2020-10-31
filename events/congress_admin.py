@@ -118,13 +118,16 @@ def admin_summary(request, congress_id):
             event_entry__in=event_entry_list
         )
 
-        event.due = event_entry_players.aggregate(Sum("entry_fee"))["entry_fee__sum"]
+        # Total entry fee due
+        event.due = event_entry_players.exclude(
+            event_entry__entry_status="Cancelled"
+        ).aggregate(Sum("entry_fee"))["entry_fee__sum"]
         if event.due is None:
             event.due = Decimal(0)
 
-        event.paid = event_entry_players.filter(payment_status="Paid").aggregate(
-            Sum("entry_fee")
-        )["entry_fee__sum"]
+        event.paid = event_entry_players.exclude(
+            event_entry__entry_status="Cancelled"
+        ).aggregate(Sum("payment_received"))["payment_received__sum"]
         if event.paid is None:
             event.paid = Decimal(0)
 
@@ -391,8 +394,10 @@ def admin_event_offsystem(request, event_id):
     rbac_user_role_or_error(request, role)
 
     # get players with manual payment methods
-    players = EventEntryPlayer.objects.filter(event_entry__event=event).exclude(
-        payment_type__in=["my-system-dollars", "their-system-dollars"]
+    players = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .exclude(payment_type__in=["my-system-dollars", "their-system-dollars"])
+        .exclude(event_entry__event_status="Cancelled")
     )
 
     return render(

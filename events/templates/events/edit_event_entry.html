@@ -155,6 +155,10 @@
                                                     <td class=cobalt-left>{{ event_entry_player.get_payment_type_display }}</td>\
                                                   </tr>\
                                                   <tr>\
+                                                    <td class=cobalt-left>Entry Fee Reason: </td>\
+                                                    <td class=cobalt-left>{{ event_entry_player.reason|default_if_none:"" }}</td>\
+                                                  </tr>\
+                                                  <tr>\
                                                     <td class=cobalt-left>Entry Fee: </td>\
                                                     <td class=cobalt-left>{{ event_entry_player.entry_fee|cobalt_credits }}</td>\
                                                   </tr>\
@@ -362,8 +366,10 @@ function editPlayer(member, name, pic, search_id) {
                 Swal.fire({
                   title: 'Player Changed',
                   html: 'Player successfully changed',
-                });
-                reloadPage();
+                }).then((result) => {
+                  reloadPage();
+                })
+
               }
             });
         }

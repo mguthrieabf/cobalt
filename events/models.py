@@ -261,7 +261,6 @@ class Event(models.Model):
                 entry_fee = (
                     self.entry_fee - self.entry_early_payment_discount
                 ) / players_per_entry
-                discount = self.entry_early_payment_discount / players_per_entry
                 reason = "Early discount"
                 description = f"Early discount {discount:.2f} credits"
 
@@ -274,17 +273,15 @@ class Event(models.Model):
                     year=dob.year + self.congress.youth_payment_discount_age
                 )
                 if self.congress.youth_payment_discount_date <= ref_date.date():
-                    youth_fee = (
+                    entry_fee = (
                         float(entry_fee)
                         * float(self.entry_youth_payment_discount)
                         / 100.0
                     )
-                    entry_fee = "%.2f" % youth_fee
                     reason = "Youth discount"
                     description = (
                         "Youth discount %s%%" % self.entry_youth_payment_discount
                     )
-                    discount = float(self.entry_fee) - float(entry_fee)
 
         # EventPlayerDiscount
         event_player_discount = (
@@ -293,13 +290,16 @@ class Event(models.Model):
 
         if event_player_discount:
             discount_fee = event_player_discount.entry_fee
+            print(type(discount_fee))
+            print(type(entry_fee))
             if discount_fee < entry_fee:
-                entry_fee = "%.2f" % discount_fee
+                entry_fee = discount_fee
                 reason = event_player_discount.reason
                 description = f"Manual override {reason}"
-                discount = float(self.entry_fee) - float(entry_fee)
 
-        return entry_fee, discount, reason, description
+        discount = (float(self.entry_fee) / players_per_entry) - float(entry_fee)
+
+        return entry_fee, discount, reason[:20], description
 
     def already_entered(self, user):
         """ check if a user has already entered """
@@ -395,7 +395,11 @@ class Event(models.Model):
         if self.max_entries is None:
             return False
 
-        entries = EventEntry.objects.filter(event=self).count()
+        entries = (
+            EventEntry.objects.filter(event=self)
+            .exclude(entry_status="Cancelled")
+            .count()
+        )
         if entries >= self.max_entries:
             return True
         else:

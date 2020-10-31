@@ -127,7 +127,6 @@
 {% block footer %}
 
 <script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
-<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script src="{% static "assets/js/plugins/jquery.cookie.1.4.1.min.js" %}"></script>
 <!-- <script src="{% static "assets/js/cobalt-unsaved.js" %}"></script> -->
@@ -365,7 +364,7 @@ $(document).ready(function(){
 // see if form is now complete
     var complete = 1;
     $(".cobalt-playerN").each(function(i, obj){
-      if ($(this).val()) {
+      if ($(this).val()>0) {
         complete+=1;
       }
     });

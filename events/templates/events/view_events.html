@@ -27,7 +27,7 @@
         <tr>
           <td>{{ pending_payment.event_entry.event.start_date }}</td>
           <td><a href="{% url "events:view_congress" congress_id=pending_payment.event_entry.event.congress.id %}">{{ pending_payment.event_entry.event.congress }}</a></td>
-          <td>{{ pending_payment.event_entry.event.event_name }}</td>
+          <td><a href="{% url "events:edit_event_entry" congress_id=pending_payment.event_entry.event.congress.id event_id=pending_payment.event_entry.event.id %}">{{ pending_payment.event_entry.event.event_name }}</a></td>
           <td style="text-align: right">{{ pending_payment.payment_status }}</td>
           <td style="text-align: right">{{ pending_payment.get_payment_type_display }}</td>
           <td style="text-align: right">{{ pending_payment.entry_fee }}</td>
@@ -81,7 +81,7 @@
     <h2>No Entries Found</h2>
   </div>
   <div class="card-body">
-    <h4>You don't appear to be entered in any congresses. Why not look through the <a href="{% url "events:events" %}">Upcoming Events</a> and find something to enter?</h4>    
+    <h4>You don't appear to be entered in any congresses. Why not look through the <a href="{% url "events:events" %}">Upcoming Events</a> and find something to enter?</h4>
   </div>
 </div>
 {% endif %}

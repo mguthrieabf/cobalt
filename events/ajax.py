@@ -29,12 +29,18 @@ from rbac.core import (
     rbac_get_users_with_role,
 )
 from rbac.views import rbac_user_role_or_error
-from payments.core import payment_api, get_balance
+from payments.core import (
+    payment_api,
+    org_balance,
+    update_account,
+    update_organisation,
+    get_balance,
+)
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
 from .core import notify_conveners
-from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME
+from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME, BRIDGE_CREDITS
 
 
 @login_required()
@@ -516,10 +522,13 @@ def change_player_entry_ajax(request):
         )
 
         # Check entry fee - they can keep an early entry discount but nothing else
-        original_entry_fee = event_entry_player.entry_fee
+        #    original_entry_fee = event_entry_player.entry_fee
 
         # get the entry fee based upon when the entry was created
-        entry_fee, discount, reason, description = event.entry_fee_for(event_entry_player.player, event_entry_player.event_entry.first_created_date.date())
+        entry_fee, discount, reason, description = event.entry_fee_for(
+            event_entry_player.player,
+            event_entry_player.event_entry.first_created_date.date(),
+        )
 
         event_entry_player.entry_fee = entry_fee
         event_entry_player.reason = reason
@@ -527,11 +536,13 @@ def change_player_entry_ajax(request):
 
         # adjust for over or under payment after player change
 
-        difference = event_entry_player.payment_received - event_entry_player.entry_fee
+        difference = float(event_entry_player.payment_received) - float(
+            event_entry_player.entry_fee
+        )
 
-        if difference > 0: # overpaid
+        if difference > 0:  # overpaid
             # create payments in org account
-            payments_core.update_organisation(
+            update_organisation(
                 organisation=event_entry_player.event_entry.event.congress.congress_master.org,
                 amount=-difference,
                 description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.paid_by} partial refund",
@@ -543,7 +554,7 @@ def change_player_entry_ajax(request):
             )
 
             # create payment for user
-            payments_core.update_account(
+            update_account(
                 member=event_entry_player.player,
                 amount=difference,
                 description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
@@ -564,7 +575,7 @@ def change_player_entry_ajax(request):
 
             # notify member of refund
             context = {
-                "name": event-entry_player.paid_by.first_name,
+                "name": event_entry_player.paid_by.first_name,
                 "title": "Refund from - %s" % event,
                 "email_body": f"A refund of {difference} credits has been made to your {BRIDGE_CREDITS} accounts from {event}.<br><br>",
                 "host": COBALT_HOSTNAME,
@@ -596,7 +607,6 @@ def change_player_entry_ajax(request):
                 f"{event} - {event_entry_player.paid_by} refund",
                 msg,
             )
-
 
         # if money is owing then update paid status on event_entry
         if difference < 0:

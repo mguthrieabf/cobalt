@@ -135,16 +135,32 @@
 {% endblock %}
 
 {% block footer %}
-<script src="{% static "assets/js/cobalt-unsaved.js" %}"></script>
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
 {% include "utils/generic_user_search_footer.html" with search_id=1 %}
 
 function cobaltMemberSearchOk() {
 
-  // Update player details
-  $("#player_name").text(member_name[1]);
-  $("#id_player").val(member_id[1]);
+// Check if player entered already
+  $.getJSON("{% url "events:check_player_entry_ajax" %}" + "?member_id=" + member_id[1] + "&event_id={{ event_entry_player.event_entry.event.id }}")
+    .done(response => {
 
+// already entered
+      if (response['message'] == "Already Entered"){
+        swal.fire({
+            title: "Error",
+            html: member_name[1] + " is already entered in this event",
+            icon: "error",
+            buttonsStyling: false
+          });
+
+      } else {
+
+// Update player details
+        $("#player_name").text(member_name[1]);
+        $("#id_player").val(member_id[1]);
+      }
+    });
   return false;
 
 }

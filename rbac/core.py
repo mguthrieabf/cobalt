@@ -19,6 +19,7 @@ from .models import (
 )
 from cobalt.settings import RBAC_EVERYONE
 from accounts.models import User
+from organisations.models import Organisation
 
 
 def rbac_create_group(name_qualifier, name_item, description):
@@ -708,6 +709,19 @@ def rbac_access_in_english_sub(user, this_name):
         if role.app == "payments":
             if role.model == "global":
                 desc = f"{this_name} {verb} {action_word} in {role.model} {role.app}."
+
+        if role.app == "events":
+            if role.model == "org":
+                if role.model_id:
+                    org = Organisation.objects.get(pk=role.model_id)
+                    if org:
+                        desc = f"{this_name} {verb} create and run congresses for {org} (id={role.model_id})."
+                    else:
+                        desc = f"{this_name} {verb} create and run congresses for org_id={role.model_id} (org not found)."
+                else:
+                    desc = f"{this_name} {verb} create and run congresses for all organisations."
+            if role.model == "global":
+                desc = f"{this_name} {verb} manage global settings for Events such as creating new types of congress."
 
         english.append(desc)
 

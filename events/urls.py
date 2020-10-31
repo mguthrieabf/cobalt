@@ -25,6 +25,11 @@ urlpatterns = [
         name="enter_event_success",
     ),
     path(
+        "congress/event/enter/payment-fail",
+        views.enter_event_payment_fail,
+        name="enter_event_payment_fail",
+    ),
+    path(
         "congress/event/view-event-entries/<int:congress_id>/<int:event_id>",
         views.view_event_entries,
         name="view_event_entries",
@@ -37,6 +42,12 @@ urlpatterns = [
     # as above but accepts edit=1 to open window with edit enabled
     path(
         "congress/event/change-entry/<int:congress_id>/<int:event_id>/edit=<int:edit_flag>",
+        views.edit_event_entry,
+        name="edit_event_entry",
+    ),
+    # as above with extra parameter for messages after pay now pressed
+    path(
+        "congress/event/change-entry/<int:congress_id>/<int:event_id>/edit=<int:edit_flag>/<str:pay_status>",
         views.edit_event_entry,
         name="edit_event_entry",
     ),

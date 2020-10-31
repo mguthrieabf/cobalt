@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load cobalt_tags %}
 
 {% block header %}
 <link href="{% static "assets/css/bootstrap4-toggle.min.css" %}" rel="stylesheet">
@@ -34,16 +35,15 @@
           </div>
       </h1>
 
-
       <h3>{% if summary.IsActive %}{{club}}{% else %}Inactive - Used to play at {{club}}{% endif %}</h3>
-      <h2>Balance: {{ GLOBAL_CURRENCY_SYMBOL }}<span id="balance">{{ balance|intcomma }}</span></h2>
+      <h2>Balance: <span id="balance">{{ balance }}</span></h2>
 
       <div class="float-left">
 
         <b>Auto Top Up</b>
         {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
         <input id="auto-button" class="cobalt-save another" type="checkbox"
-        data-toggle="toggle" data-onstyle="success" data-size="sm" 
+        data-toggle="toggle" data-onstyle="success" data-size="sm"
         {% if auto_button %} checked {% endif %}>
         {% if auto_button %}
         &nbsp;<a class="btn btn-sm btn-secondary" href="{% url "payments:setup_autotopup" %}">Update</a>
@@ -82,11 +82,6 @@
               </button>
             </a>
           </div>
-          <!-- <div class="col-6 col-md-6 col-lg-3 text-center">
-              <a href="{% url 'payments:statement_pdf' %}"<button class="text-center btn btn-info btn-round" style="width: 170px">
-                <i class="material-icons">picture_as_pdf</i>&nbsp;Download as PDF
-                </button>
-            </a> -->
         </div>
       </div>
       {% endif %}
@@ -124,7 +119,7 @@
       };
       let counter = new countUp.CountUp('balance', {{ balance }}, options);
       if (!counter.error) {
-        counter.start();
+        counter.start(() => $("#balance").html("{{ balance|cobalt_credits }}"));
       } else {
         console.error(counter.error);
       }

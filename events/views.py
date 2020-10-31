@@ -166,7 +166,9 @@ def view_congress(request, congress_id, fullscreen=False):
     events_list = {}
     for event in events:
         event.event_start_date = event.start_date()
-        events_list[event] = event.event_start_date
+        if event.event_start_date:
+            events_list[event] = event.event_start_date
+
         events_list_sorted = {
             key: value
             for key, value in sorted(events_list.items(), key=lambda item: item[1])
@@ -315,6 +317,7 @@ def checkout(request):
                 route_code="EVT",
                 route_payload=unique_id,
                 url=reverse("events:enter_event_success"),
+                url_fail=reverse("events:enter_event_payment_fail"),
                 payment_type="Entry to a congress",
                 book_internals=False,
             )
@@ -545,8 +548,13 @@ def global_admin_congress_masters(request):
 
 
 @login_required()
-def edit_event_entry(request, congress_id, event_id, edit_flag=None):
-    """ edit an event entry """
+def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=None):
+    """edit an event entry
+
+    edit_flag is used to enable edit mode on the screen (default off)
+    pay_status is used by the "Pay Now" and "Pay All" buttons as the call
+    to payment_api cannot add a success or failure message.
+    """
 
     # Load the event
     event = get_object_or_404(Event, pk=event_id)
@@ -609,6 +617,21 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None):
     # if we got a free format question that will already be on the event
     # We can handle that in the HTML
 
+    # check if pay_status was set and add a message
+    if pay_status:
+        if pay_status == "success":
+            messages.success(
+                request,
+                f"Payment successful",
+                extra_tags="cobalt-message-success",
+            )
+        elif pay_status == "fail":
+            messages.error(
+                request,
+                f"Payment failed",
+                extra_tags="cobalt-message-error",
+            )
+
     return render(
         request,
         "events/edit_event_entry.html",
@@ -652,7 +675,7 @@ def delete_event_entry(request, event_entry_id):
 
     event_entry_players_me = event_entry_players.filter(player=request.user)
 
-    if not event_entry_players_me or event_entry.primary_entrant != request.user:
+    if not event_entry_players_me and event_entry.primary_entrant != request.user:
         error = """You are not the person who made this entry or one of the players.
                    You cannot change this entry."""
 
@@ -878,6 +901,16 @@ def third_party_checkout_player(request, event_entry_player_id):
                     "event_id": event_entry_player.event_entry.event.id,
                     "congress_id": event_entry_player.event_entry.event.congress.id,
                     "edit_flag": 1,
+                    "pay_status": "success",
+                },
+            ),
+            url_fail=reverse(
+                "events:edit_event_entry",
+                kwargs={
+                    "event_id": event_entry_player.event_entry.event.id,
+                    "congress_id": event_entry_player.event_entry.event.congress.id,
+                    "edit_flag": 1,
+                    "pay_status": "fail",
                 },
             ),
             payment_type="Entry to a congress",
@@ -943,6 +976,16 @@ def third_party_checkout_entry(request, event_entry_id):
                     "event_id": event_entry_player.event_entry.event.id,
                     "congress_id": event_entry_player.event_entry.event.congress.id,
                     "edit_flag": 1,
+                    "pay_status": "success",
+                },
+            ),
+            url_fail=reverse(
+                "events:edit_event_entry",
+                kwargs={
+                    "event_id": event_entry_player.event_entry.event.id,
+                    "congress_id": event_entry_player.event_entry.event.congress.id,
+                    "edit_flag": 1,
+                    "pay_status": "fail",
                 },
             ),
             payment_type="Entry to a congress",
@@ -1010,11 +1053,19 @@ def global_admin_create_congress_master(request):
     )
 
 
+@login_required()
+def enter_event_payment_fail(request):
+    """ payment required auto top up which failed """
+
+    error = "Auto top up failed. We were unable to process your transaction."
+    title = "Payment Failed"
+    return render(request, "events/error.html", {"title": title, "error": error})
+
+
 def enter_event_form(event, congress, request):
     """build the form part of the enter_event view. Its not a Django form,
     we build our own as the validation won't work with a dynamic form
     and we are validating on the client side anyway.
-
     """
 
     our_form = []

@@ -272,13 +272,13 @@ $(document).ready(function() {
   });
 
 // countup settings
-
+const options = {
+  decimalPlaces: 2,
+  duration: 1.5
+};
 // ABF$
 {% if payments.balance_num %}
-  const options = {
-    decimalPlaces: 2,
-    duration: 1.5
-  };
+
   let counter = new countUp.CountUp('balance', {{ payments.balance_num }}, options);
   if (!counter.error) {
     counter.start();

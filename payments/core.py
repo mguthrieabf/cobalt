@@ -315,6 +315,7 @@ def payment_api(
     log_msg=None,
     payment_type=None,
     url=None,
+    url_fail=None,
     book_internals=True,
 ):
     """API for payments from other parts of the application.
@@ -362,6 +363,7 @@ def payment_api(
         log_msg - message for the log
         payment_type - description of payment
         url - next url to go to
+        url_fail - url to go to if payment fails
         book_internals - create internal transactions
 
     returns:
@@ -627,13 +629,45 @@ def payment_api(
                 if request:
                     messages.error(request, msg, extra_tags="cobalt-message-error")
                     return_msg = msg
+
+                # notify user
+                email_body = f"""Auto top up of {GLOBAL_CURRENCY_SYMBOL}{topup_required:.2f}
+                                 into your {BRIDGE_CREDITS} account failed.<br><br>
+                                 If your card has expired please use the link below
+                                 to update your details.<br><br>"""
+                context = {
+                    "name": member.first_name,
+                    "title": "Auto top up failed",
+                    "email_body": email_body,
+                    "host": COBALT_HOSTNAME,
+                    "link": "/payments",
+                    "link_text": "View Statement",
+                }
+
+                html_msg = render_to_string(
+                    "notifications/email_with_button.html", context
+                )
+
+                # send
+                contact_member(
+                    member=member,
+                    msg="Auto top up failed",
+                    contact_type="Email",
+                    html_msg=html_msg,
+                    link="/payments",
+                    subject="Auto top up failed",
+                )
+
                 callback_router(
                     route_code=route_code,
                     route_payload=route_payload,
                     tran=None,
                     status="Failed",
                 )
-                return redirect(url)
+                if url_fail:
+                    return redirect(url_fail)
+                else:
+                    return redirect(url)
 
         else:  # not set up for auto top up - manual payment
 
