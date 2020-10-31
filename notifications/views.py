@@ -8,7 +8,7 @@
 """
 import boto3
 from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID
-from .models import InAppNotification, NotificationMapping
+from .models import InAppNotification, NotificationMapping, Email
 from forums.models import Forum, Post
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
@@ -17,22 +17,58 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from utils.utils import cobalt_paginator
+from threading import Thread
+from django.db import connection
 
 
-def send_cobalt_email(to_address, subject, msg):
-    """ Send single email
+def send_cobalt_email(to_address, subject, message, member=None):
+    """ Send single email. This sets off an async task to actually send the
+        email to avoid delays for the user.
 
     Args:
         to_address (str): who to send to
         subject (str): subject line for email
         msg (str): message to send in HTML or plain format
+        member (User): who this is being sent to (optional)
 
     Returns:
         Nothing
     """
 
-    plain_msg = strip_tags(msg)
-    send_mail(subject, plain_msg, DEFAULT_FROM_EMAIL, [to_address], html_message=msg)
+    # Add to queue
+    email = Email(subject=subject, message=message, recipient=to_address, member=member)
+    email.save()
+
+    # start thread
+    thread = Thread(target=send_cobalt_email_thread, args=[email.id])
+    thread.setDaemon(True)
+    thread.start()
+
+
+def send_cobalt_email_thread(email_id):
+    """ Send single email. Asynchronous thread
+
+    Args:
+        email_id (int): pk for email to send
+
+    Returns:
+        Nothing
+    """
+
+    email = Email.objects.get(pk=email_id)
+    plain_message = strip_tags(email.message)
+    send_mail(
+        email.subject,
+        plain_message,
+        DEFAULT_FROM_EMAIL,
+        [email.recipient],
+        html_message=email.message,
+    )
+    email.status = "Sent"
+    email.save()
+
+    # Django creates a new database connection for this thread so close it
+    connection.close()
 
 
 def send_cobalt_sms(phone_number, msg):
@@ -99,7 +135,7 @@ def get_notifications_for_user(user):
 
 
 def contact_member(member, msg, contact_type, link=None, html_msg=None, subject=None):
-    """ Contact member using their preferred method """
+    """ Contact member using email or SMS """
 
     # Ignore system accounts
     if member.id in (RBAC_EVERYONE, TBA_PLAYER):
@@ -115,7 +151,8 @@ def contact_member(member, msg, contact_type, link=None, html_msg=None, subject=
     add_in_app_notification(member, msg, link)
 
     if contact_type == "Email":
-        send_cobalt_email(member.email, subject, html_msg)
+        send_cobalt_email(member.email, subject, html_msg, member)
+
     if contact_type == "SMS":
         send_cobalt_sms(member.mobile, msg)
 
