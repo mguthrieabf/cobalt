@@ -38,7 +38,8 @@
                 <td class="text-left" data-toggle="tooltip" title="{{ thing.recipient }}">{{ thing.recipient|cobalt_hide_email }}</td>
                 <td class="text-left">{{ thing.member|cobalt_user_link|default_if_none:"-" }}</td>
                 <td class="text-left">{{ thing.subject }}</td>
-                <td><a href="{% url "notifications:admin_view_email" email_id=thing.id %}" class="btn btn-sm btn-info">View</a></td>
+                <td><a onClick='showEmail({{ thing.id }})'
+                  class="btn btn-sm btn-info">View</a></td>
               </tr>
             {% endfor %}
 
@@ -53,6 +54,10 @@
 
 {% block footer %}
 <script>
+
+  function showEmail(id) {
+    var newWin = window.open('{% url "notifications:admin_view_email" %}/' + id, 'email', 'width=1000,height=1500');
+  }
 
   $(document).ready(function() {
     // initialise tooltips

@@ -1,33 +1,18 @@
-{% extends 'base.html' %}
+
 {% load cobalt_tags %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-12 mx-auto">
-
-<i>Emails look very different when displayed in an email client.</i>
-
-  <div class="card bg-primary">
-    <div class="">
-      <div class="display-3">Subject: {{ email.subject }}</div>
-      <div class="display-4">To:
+      <h1>{{ email.subject }}</h1>
+      <h2>To:
         {% if email.member %}
           {{ email.member }}
         {% else %}
           {{ email.recipient }}
         {% endif %}
-      </div>
+      </h2>
       {% if email.status != "Sent" %}
-      <div class="display-2">STATUS: {{ email.status }}</div>
+      <h2>STATUS: {{ email.status }}</h2>
       {% endif %}
-      Date Created: <i>{{ email.created_date|cobalt_nice_datetime }}</i>
-    </div>
-  </div>
-
+      <h3>Date Created: <i>{{ email.created_date|cobalt_nice_datetime }}</i></h3>
 
 {{ email.message|safe}}
-</div>
-</div>
-
-</div>
 {% endblock %}
