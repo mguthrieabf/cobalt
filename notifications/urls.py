@@ -9,4 +9,6 @@ urlpatterns = [
     path("passthrough/<int:id>/", views.passthrough, name="passthrough"),
     path("deleteall", views.deleteall, name="deleteall"),
     path("delete/<int:id>/", views.delete, name="delete"),
+    path("admin/view-all", views.admin_view_all, name="admin_view_all"),
+    path("admin/view-email/<int:email_id>", views.admin_view_email, name="admin_view_email"),
 ]

@@ -47,7 +47,7 @@ def rbac_forbidden(request, role):
 
 @login_required
 def main_admin_screen(request):
-    """ Shows the main admin screen - maybe shouldn't live in in RBAC """
+    """ Shows the main admin screen - maybe shouldn't live in RBAC """
 
     payments_admin = rbac_user_role_list(request.user, "payments", "manage")
     org_list = []
@@ -59,6 +59,7 @@ def main_admin_screen(request):
     payments_site_admin = rbac_user_has_role(request.user, "payments.global.view")
 
     events_site_admin = rbac_user_has_role(request.user, "events.global.edit")
+    email_site_admin = rbac_user_has_role(request.user, "notifications.admin.view")
 
     return render(
         request,
@@ -67,6 +68,7 @@ def main_admin_screen(request):
             "payments_admin": orgs,
             "payments_site_admin": payments_site_admin,
             "events_site_admin": events_site_admin,
+            "email_site_admin": email_site_admin,
         },
     )
 

@@ -91,6 +91,23 @@ def cobalt_credits(credits):
 
     return mark_safe(ret)
 
+# custom filter for email address which hides the address. Used by admin email viewer
+@register.filter(name="cobalt_hide_email", is_safe=True)
+def cobalt_hide_email(email):
+
+    if not email:
+        return None
+
+    loc = email.find("@")
+    last_fullstop = email.rfind(".")
+
+    if loc and last_fullstop:
+        hidden_email = "*" * len(email)
+        hidden_email = hidden_email[:loc] + "@" + hidden_email[loc+1:]
+        hidden_email = hidden_email[:last_fullstop] + email[last_fullstop:]
+        return mark_safe(hidden_email)
+    else:
+        return "*******************"
 
 # return class of object - used by search
 @register.filter(name="get_class")

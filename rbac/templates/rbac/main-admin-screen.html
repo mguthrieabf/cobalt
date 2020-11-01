@@ -12,6 +12,9 @@
       <ul>
         <li><a href="/admin">Django Admin Pages</a>
         <li><a href="/utils/batch">Batch Job Status</a>
+          {% if email_site_admin %}
+        <li><a href="{% url "notifications:admin_view_all" %} ">Emails</a>
+          {% endif %}
         <li><a href="/logs">System Logs</a>
         <li><a href="{% url "utils:user_activity" %}">User Activity</a>
       </ul>

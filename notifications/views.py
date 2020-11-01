@@ -14,11 +14,13 @@ from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE, TBA_PLAYER, RBAC_EVERYONE
 from django.urls import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from utils.utils import cobalt_paginator
 from threading import Thread
 from django.db import connection
+from rbac.views import rbac_forbidden
+from rbac.core import rbac_user_has_role
 
 
 def send_cobalt_email(to_address, subject, message, member=None):
@@ -397,3 +399,30 @@ def notifications_in_english(member):
                 notification.type = "Comments"
 
     return notifications
+
+@login_required()
+def admin_view_all(request):
+    """ Show email notifications for administrators """
+
+    # check access
+    role = "notifications.admin.view"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    emails = Email.objects.all().order_by("-pk")
+    things = cobalt_paginator(request, emails)
+
+    return render(request, "notifications/admin_view_all.html", {"things": things})
+
+@login_required()
+def admin_view_email(request, email_id):
+    """ Show single email for administrators """
+
+    # check access
+    role = "notifications.admin.view"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    email = get_object_or_404(Email, pk=email_id)
+
+    return render(request, "notifications/admin_view_email.html", {"email": email})
