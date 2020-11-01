@@ -53,6 +53,7 @@ from cobalt.settings import (
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )
+from utils.templatetags.cobalt_tags import cobalt_credits
 from datetime import datetime
 import itertools
 from utils.utils import cobalt_paginator
@@ -193,9 +194,10 @@ def view_congress(request, congress_id, fullscreen=False):
         first_row_for_event = True
         for day in days:
             if first_row_for_event:
+                entry_fee = cobalt_credits(event.entry_fee)
                 program[
                     "event"
-                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</td><td rowspan='{rows}'><span class='title'>{event.entry_fee} credits</span></td>"
+                ] = f"<td rowspan='{rows}'><span class='title'>{event.event_name}</td><td rowspan='{rows}'><span class='title'>{entry_fee}</span></td>"
                 if program["entry"]:
                     program[
                         "links"
@@ -621,15 +623,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request,
-                f"Payment successful",
-                extra_tags="cobalt-message-success",
+                request, f"Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request,
-                f"Payment failed",
-                extra_tags="cobalt-message-error",
+                request, f"Payment failed", extra_tags="cobalt-message-error",
             )
 
     return render(

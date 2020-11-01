@@ -2,127 +2,134 @@
 
 {% block content %}
 
-<h1>Administration</h1>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-warning">
-      <h3 class="card-title">General</h3>
-    </div>
-    <div class="card-body">
-      <ul>
-        <li><a href="/admin">Django Admin Pages</a>
-        <li><a href="/utils/batch">Batch Job Status</a>
-          {% if email_site_admin %}
-        <li><a href="{% url "notifications:admin_view_all" %} ">Emails</a>
-          {% endif %}
-        <li><a href="/logs">System Logs</a>
-        <li><a href="{% url "utils:user_activity" %}">User Activity</a>
-      </ul>
-    </div>
+<div class="card">
+  <div class="card-header card-header-danger">
+    <h1>Administration</h1>
   </div>
-</div>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-primary">
-      <h3 class="card-title">Role Based Access Control - User</h3>
+  <div class="card-body">
+    <div class="mx-auto">
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-warning">
+          <h3 class="card-title">General</h3>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="/admin">Django Admin Pages</a>
+            <li><a href="/utils/batch">Batch Job Status</a>
+              {% if email_site_admin %}
+            <li><a href="{% url "notifications:admin_view_all" %} ">Emails</a>
+              {% endif %}
+            <li><a href="/logs">System Logs</a>
+            <li><a href="{% url "utils:user_activity" %}">User Activity</a>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <ul>
-        <li><a href="{% url "rbac:access_screen" %}">View Your Access</a>
-        <li><a href="{% url "rbac:tree_screen" %}">View The Whole Tree</a>
-      </ul>
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-primary">
+          <h3 class="card-title">Role Based Access Control - User</h3>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="{% url "rbac:access_screen" %}">View Your Access</a>
+            <li><a href="{% url "rbac:tree_screen" %}">View The Whole Tree</a>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-primary">
-      <h3 class="card-title">Role Based Access Control - Admin</h3>
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-primary">
+          <h3 class="card-title">Role Based Access Control - Admin</h3>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="{% url "rbac:rbac_admin" %}">View Your Admin Access</a>
+            <li><a href="{% url "rbac:admin_tree_screen" %}">View The Whole Admin Tree</a>
+            <li><a href="{% url "rbac:role_view_screen" %}">View All Models and Roles</a>
+            <li><a href="{% url "rbac:group_create" %}">Create A New Group</a>
+            <li><a href="{% url "rbac:rbac_tests" %}">Tests</a>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <ul>
-        <li><a href="{% url "rbac:rbac_admin" %}">View Your Admin Access</a>
-        <li><a href="{% url "rbac:admin_tree_screen" %}">View The Whole Admin Tree</a>
-        <li><a href="{% url "rbac:role_view_screen" %}">View All Models and Roles</a>
-        <li><a href="{% url "rbac:group_create" %}">Create A New Group</a>
-        <li><a href="{% url "rbac:rbac_tests" %}">Tests</a>
-      </ul>
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-primary">
+          <h3 class="card-title">Role Based Access Control - Admin of Admin</h3>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="{% url "rbac:admin_group_create" %}">Create A New Admin Group</a>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-primary">
-      <h3 class="card-title">Role Based Access Control - Admin of Admin</h3>
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-success">
+          <h3 class="card-title">Forums</h3>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="/forums/forum/create">Add Forum</a>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <ul>
-        <li><a href="{% url "rbac:admin_group_create" %}">Create A New Admin Group</a>
-      </ul>
+    {% if payments_admin %}
+    <div class="card col-lg-9 mx-auto">
+      <div class="card-header card-header-info">
+        <h3 class="card-title">Payments for Organisations</h3>
+      </div>
+      <div class="card-body" style="text-align: left">
+        <div class="container">
+          <div class="row">
+            <ul>
+              {% for org in payments_admin %}
+              <li><a href="{% url "payments:statement_org" org_id=org.id %}">{{org}}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-success">
-      <h3 class="card-title">Forums</h3>
+    {% endif %}
+    {% if payments_site_admin %}
+    <div class="card col-lg-9 mx-auto">
+      <div class="card-header card-header-danger">
+        <h3 class="card-title">Global Payments</h3>
+      </div>
+      <div class="card-body" style="text-align: left">
+        <div class="container">
+          <div class="row">
+            <ul>
+              <li><a href="{% url "payments:statement_admin_summary" %}">{{ GLOBAL_ORG}} Payments</a></li>
+              <li><a href="{% url "payments:stripe_pending" %}">Stripe Transactions</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <ul>
-        <li><a href="/forums/forum/create">Add Forum</a>
-      </ul>
-    </div>
-  </div>
-</div>
-{% if payments_admin %}
-<div class="card col-lg-9">
-  <div class="card-header card-header-info">
-    <h3 class="card-title">Payments for Organisations</h3>
-  </div>
-  <div class="card-body" style="text-align: left">
-    <div class="container">
-      <div class="row">
-        <ul>
-          {% for org in payments_admin %}
-          <li><a href="{% url "payments:statement_org" org_id=org.id %}">{{org}}</a></li>
-          {% endfor %}
-        </ul>
+    {% endif %}
+    {% if events_site_admin %}
+    <div class="card col-lg-9 mx-auto">
+      <div class="card-header card-header-info">
+        <h3 class="card-title">Global Events</h3>
+      </div>
+      <div class="card-body" style="text-align: left">
+        <div class="container">
+          <div class="row">
+            <ul>
+              <li><a href="{% url "events:global_admin_congress_masters" %}">Manage Congress Masters</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-{% endif %}
-{% if payments_site_admin %}
-<div class="card col-lg-9">
-  <div class="card-header card-header-info">
-    <h3 class="card-title">Global Payments</h3>
-  </div>
-  <div class="card-body" style="text-align: left">
-    <div class="container">
-      <div class="row">
-        <ul>
-          <li><a href="{% url "payments:statement_admin_summary" %}">{{ GLOBAL_ORG}} Payments</a></li>
-          <li><a href="{% url "payments:stripe_pending" %}">Stripe Transactions</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-{% if events_site_admin %}
-<div class="card col-lg-9">
-  <div class="card-header card-header-info">
-    <h3 class="card-title">Global Events</h3>
-  </div>
-  <div class="card-body" style="text-align: left">
-    <div class="container">
-      <div class="row">
-        <ul>
-          <li><a href="{% url "events:global_admin_congress_masters" %}">Manage Congress Masters</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+
 {% endif %}
 {% endblock %}

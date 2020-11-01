@@ -60,13 +60,12 @@
         <div class="text-left"><a href="{% url "events:view_event_entries" congress_id=congress.id event_id=event.id %}">View all entries</a></div>
 
         <p class="display-4">Entry status is: <b>{{ event_entry.entry_status }}</b></p>
-        <p>Entry made by: <b>
+
           {% if event_entry.primary_entrant == user %}
-          You
+          <p>You made this entry</p>
           {% else %}
-          {{ event_entry.primary_entrant.full_name }}
+          <p>Entry made by: <b>{{ event_entry.primary_entrant.full_name }}</b></p>
           {% endif %}
-        </b></p>
 
 <!-- outer wrapper for extra info -->
 {% if categories or event.free_format_question %}
