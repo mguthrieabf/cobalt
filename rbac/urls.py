@@ -5,7 +5,7 @@ from . import views, ajax
 app_name = "rbac"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path("", views.view_screen, name="access_screen"),
+    path("", views.view_screen, name="view_screen"),
     path("mainadmin", views.main_admin_screen, name="main_admin_screen"),
     path("tree", views.tree_screen, name="tree_screen"),
     path("role-view", views.role_view_screen, name="role_view_screen"),

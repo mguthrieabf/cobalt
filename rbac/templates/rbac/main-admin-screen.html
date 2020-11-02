@@ -2,15 +2,37 @@
 
 {% block content %}
 
+<!-- Top heading and card -->
+
+
 <div class="card">
   <div class="card-header card-header-danger">
-    <h1>Administration</h1>
+    <h1>
+      <div class="d-flex justify-content-between">
+        <div>
+          Administration
+        </div>
+        <div>
+          <i class="material-icons" style="font-size:60px">power_settings_new</i>
+        </div>
+    </h1>
   </div>
   <div class="card-body">
     <div class="mx-auto">
+
+<!-- General -->
+
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-warning">
-          <h3 class="card-title">General</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  General
+                </div>
+                <div>
+                  <i class="material-icons" style="font-size:45px">list</i>
+                </div>
+          </h2>
         </div>
         <div class="card-body">
           <ul>
@@ -25,10 +47,23 @@
         </div>
       </div>
     </div>
+    <br>
+
+<!-- RBAC - User -->
+
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-primary">
-          <h3 class="card-title">Role Based Access Control - User</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Role Based Access Control - User
+                </div>
+                <div>
+                  <i class="material-icons" style="font-size:45px">lock_open</i>
+                </div>
+          </h2>
+
         </div>
         <div class="card-body">
           <ul>
@@ -38,10 +73,22 @@
         </div>
       </div>
     </div>
+    <br>
+
+<!-- RBAC - Admin -->
+
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-primary">
-          <h3 class="card-title">Role Based Access Control - Admin</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Role Based Access Control - Admin
+                </div>
+                <div>
+                  <i class="material-icons" style="font-size:45px">lock</i>
+                </div>
+          </h2>
         </div>
         <div class="card-body">
           <ul>
@@ -54,10 +101,23 @@
         </div>
       </div>
     </div>
+    <br>
+
+<!-- RBAC Admin of Admin -->
+
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-primary">
-          <h3 class="card-title">Role Based Access Control - Admin of Admin</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  RBAC - Admin of Admin
+                </div>
+                <div>
+                  <i class="material-icons" style="font-size:45px">lock</i>
+                  <i class="material-icons" style="font-size:45px">lock</i>
+                </div>
+          </h2>
         </div>
         <div class="card-body">
           <ul>
@@ -66,10 +126,23 @@
         </div>
       </div>
     </div>
+    <br>
+
+<!-- Forums -->
+
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-success">
-          <h3 class="card-title">Forums</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Global Forums
+                </div>
+                <div>
+                <i class="material-icons" style="font-size:45px">language</i>
+                  <i class="material-icons" style="font-size:45px">chat</i>
+                </div>
+          </h2>
         </div>
         <div class="card-body">
           <ul>
@@ -78,10 +151,22 @@
         </div>
       </div>
     </div>
+    <br>
+
+<!-- Payments  -->
+
     {% if payments_admin %}
     <div class="card col-lg-9 mx-auto">
       <div class="card-header card-header-info">
-        <h3 class="card-title">Payments for Organisations</h3>
+        <h2>
+            <div class="d-flex justify-content-between">
+              <div>
+                Payments for Organisations
+              </div>
+              <div>
+                <i class="material-icons" style="font-size:45px">account_balance</i>
+              </div>
+        </h2>
       </div>
       <div class="card-body" style="text-align: left">
         <div class="container">
@@ -95,11 +180,24 @@
         </div>
       </div>
     </div>
+    <br>
     {% endif %}
+
+<!-- Global Payments -->
+
     {% if payments_site_admin %}
     <div class="card col-lg-9 mx-auto">
       <div class="card-header card-header-danger">
-        <h3 class="card-title">Global Payments</h3>
+        <h2>
+            <div class="d-flex justify-content-between">
+              <div>
+                Global Payments
+              </div>
+              <div>
+                <i class="material-icons" style="font-size:45px">language</i>
+                <i class="material-icons" style="font-size:45px">account_balance</i>
+              </div>
+        </h2>
       </div>
       <div class="card-body" style="text-align: left">
         <div class="container">
@@ -112,11 +210,24 @@
         </div>
       </div>
     </div>
+    <br>
     {% endif %}
+
+<!-- Events -->
+
     {% if events_site_admin %}
     <div class="card col-lg-9 mx-auto">
       <div class="card-header card-header-info">
-        <h3 class="card-title">Global Events</h3>
+        <h2>
+            <div class="d-flex justify-content-between">
+              <div>
+                Global Events
+              </div>
+              <div>
+                <i class="material-icons" style="font-size:45px">language</i>
+                <i class="material-icons" style="font-size:45px">book_online</i>
+              </div>
+        </h2>
       </div>
       <div class="card-body" style="text-align: left">
         <div class="container">

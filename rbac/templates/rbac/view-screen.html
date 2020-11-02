@@ -2,105 +2,175 @@
 
 {% block content %}
 
-<h1>Role Based Access Controls</h1>
-<p>Groups control security within
-  the system. This shows the groups you are a member of.</p>
-
-{% if groups %}
-
-{% for key, value in groups.items %}
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-primary">
-      <h3 class="card-title">Groups in {{ key }}</h3>
-    </div>
-    <div class="card-body" style="text-align: center">
-
-      <div class="container">
-        <div class="row">
-          <table class="table table-responsive table-hover">
-            <thead class="text-info">
-              <tr>
-                <th>Group ID</th>
-                <th>Group Full Name</th>
-                <th>Group Qualifier</th>
-                <th>Group Name</th>
-                <th>Group Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for v in value %}
-              <tr>
-                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
-                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
-                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
-                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
-                <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table><br>
-        </div>
-      </div>
-    </div>
+<div class="card">
+  <div class="card-header card-header-danger">
+    <h1>
+        <div class="d-flex justify-content-between">
+          <div>
+            Role Based Access Controls
+          </div>
+          <div>
+          <i class="material-icons" style="font-size:60px">lock</i>
+          </div>
+    </h1>
+    <h2>Your Access</h2>
   </div>
-</div>
-<br>
-{% endfor %}
+  <div class="card-body">
 
-<p>Groups have roles which allow you to access parts of the system.
-  These are your roles and the groups that they come from</p>
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-warning">
-      <h3 class="card-title">Roles</h3>
+  <div >
+    <div class="card">
+    <div class="card-header card-header-info">
+    <h3>
+        <div class="d-flex justify-content-between">
+          <div>
+            Understanding RBAC
+          </div>
+          <div>
+          <i class="material-icons" style="font-size:35px">help</i>
+          </div>
+    </h3>
     </div>
-    <div class="card-body" style="text-align: center">
-
-      <div class="container">
-        <div class="row">
-          <table class="table table-responsive table-hover">
-            <thead class="text-info">
-              <tr>
-                <th class="text-left">Role ID</th>
-                <th class="text-left">Group Full Name</th>
-                <th class="text-left">Role</th>
-                <th class="text-left">Rule Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for role in roles %}
-              <tr>
-                <td class="text-left">{{ role.id }}</td>
-                <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
-                <td class="text-left">{{ role.role }}</td>
-                <td class="text-left">{{ role.rule_type }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table><br>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-
-<div>
-  <div class="card col-lg-9">
-    <div class="card-header card-header-success">
-      <h3 class="card-title">Explanation</h3>
-    </div>
-    <div class="card-body" style="text-align: left">
-      <p>This explains rules specific to you.</p>
+    <div class="card-body">
+    <p>Role Based Access Control(RBAC) is one of the ways that we keep this
+    system secure. RBAC is about <strong>AUTHORISATION</strong> (<a href="https://en.wikipedia.org/wiki/Authorization">what you can access</a>), not
+    <strong>AUTHENTICATION</strong> (<a href="https://en.wikipedia.org/wiki/Authentication">who you are</a>). That happens before RBAC gets involved.</p>
+    <p>
+      RBAC assigns roles which allow a user of the system to perform a function. Such as:
       <ul>
-        {% for e in english %}
-        <li>{{ e }}
-          {% endfor %}
+        <li>Viewing a forum</li>
+        <li>Managing a congress</li>
+        <li>Making payments for a club</li>
+        <li>Moderating a forum</li>
+        <li>Creating new congresses</li>
+        <li>Making payments to clubs on behalf of the ABF</li>
       </ul>
-    </div>
+
+    <p>
+      Roles are then assigned to groups, and finally users are added to those groups.
+    </p>
+    <p>
+      Most users don't have any specific groups or roles assigned to them, so don't
+      worry if there is nothing listed here. If it does worry you, why not get involved
+      and become a director at your club or volunteer to be a moderator in a forum?
+    </p>
   </div>
-</div>
+  </div>
+  </div>
+
+    {% if groups %}
+
+    <div class="col-lg-9 mx-auto">
+    <blockquote class="blockquote">Groups control security within
+      the system. This shows the groups you are a member of.</<blockquote>
+      </blockquote>
+    </div>
+    <br>
+
+    {% for key, value in groups.items %}
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-primary">
+          <h3 class="card-title">Groups in {{ key }}</h3>
+        </div>
+        <div class="card-body" style="text-align: center">
+
+          <div class="container">
+            <div class="row">
+              <table class="table table-responsive table-hover">
+                <thead class="text-info">
+                  <tr>
+                    <th>Group ID</th>
+                    <th>Group Full Name</th>
+                    <th>Group Qualifier</th>
+                    <th>Group Name</th>
+                    <th>Group Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in value %}
+                  <tr>
+                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
+                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
+                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
+                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
+                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    {% endfor %}
+
+
+
+    <div  class="col-lg-9 mx-auto">
+        <blockquote class="blockquote">Roles are the lowest level of access. Groups have one or more roles.
+        These are your roles and the groups that they come from.</blockquote>
+        <br>
+    </div>
+      <div class="card col-lg-9 mx-auto">
+
+        <div class="card-header card-header-warning">
+          <h3 class="card-title">Roles</h3>
+        </div>
+        <div class="card-body" style="text-align: center">
+
+          <div class="container">
+            <div class="row">
+              <table class="table table-responsive table-hover">
+                <thead class="text-info">
+                  <tr>
+                    <th class="text-left">Role ID</th>
+                    <th class="text-left">Group Full Name</th>
+                    <th class="text-left">Role</th>
+                    <th class="text-left">Rule Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for role in roles %}
+                  <tr>
+                    <td class="text-left">{{ role.id }}</td>
+                    <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
+                    <td class="text-left">{{ role.role }}</td>
+                    <td class="text-left">{{ role.rule_type }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div>
+      <div class="card col-lg-9 mx-auto">
+        <div class="card-header card-header-success">
+          <h3 class="card-title">Explanation</h3>
+        </div>
+        <div class="card-body" style="text-align: left">
+            <blockquote class="blockquote">This explains rules specific to you.</blockquote>
+          <ul>
+            {% for e in english %}
+            <li>{{ e }}
+              {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  </div>
+  </div>
+
+
 
 {% else %}
 <h2>Sorry, you don't appear to be in any groups at this time.</h2>
