@@ -1308,7 +1308,7 @@ def admin_members_with_balance(request):
         .distinct("member")
     )
 
-    things = cobalt_paginator(request, members, 3)
+    things = cobalt_paginator(request, members)
 
     return render(
         request, "payments/admin_members_with_balance.html", {"things": things}
