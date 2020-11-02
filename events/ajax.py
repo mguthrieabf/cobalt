@@ -28,7 +28,8 @@ from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_get_users_with_role,
 )
-from rbac.views import rbac_user_role_or_error
+from rbac.views import rbac_user_has_role, rbac_forbidden
+
 from payments.core import (
     payment_api,
     org_balance,
@@ -104,7 +105,8 @@ def delete_event_ajax(request):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event.delete()
 
@@ -124,7 +126,9 @@ def delete_category_ajax(request):
 
     # check access
     role = "events.org.%s.edit" % category.event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
 
     category.delete()
 
@@ -144,7 +148,8 @@ def delete_session_ajax(request):
 
     # check access
     role = "events.org.%s.edit" % session.event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     session.delete()
 
@@ -264,7 +269,8 @@ def add_category_ajax(request):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     # add category
     category = Category(event=event, description=text)
@@ -289,7 +295,8 @@ def admin_offsystem_pay_ajax(request):
         "events.org.%s.edit"
         % event_entry_player.event_entry.event.congress.congress_master.org.id
     )
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     # Mark as paid
     event_entry_player.payment_status = "Paid"
@@ -326,7 +333,8 @@ def admin_offsystem_unpay_ajax(request):
         "events.org.%s.edit"
         % event_entry_player.event_entry.event.congress.congress_master.org.id
     )
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     # Mark as unpaid
     event_entry_player.payment_status = "Unpaid"
@@ -380,7 +388,9 @@ def admin_player_discount_delete_ajax(request):
             "events.org.%s.edit"
             % event_player_discount.event.congress.congress_master.org.id
         )
-        rbac_user_role_or_error(request, role)
+        if not rbac_user_has_role(request.user, role):
+            return rbac_forbidden(request, role)
+
 
         # Log it
         EventLog(

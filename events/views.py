@@ -39,7 +39,7 @@ from rbac.core import (
     rbac_user_has_role,
     rbac_group_id_from_name,
 )
-from rbac.views import rbac_user_role_or_error
+from rbac.views import rbac_user_has_role, rbac_forbidden
 from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
@@ -529,7 +529,9 @@ def enter_event_success(request):
 def global_admin_congress_masters(request):
     """ administration of congress masters """
 
-    rbac_user_role_or_error(request, "events.global.edit")
+    role = "events.global.edit"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     congress_masters = CongressMaster.objects.all()
 
@@ -995,7 +997,9 @@ def third_party_checkout_entry(request, event_entry_id):
 def global_admin_edit_congress_master(request, id):
     """ edit congress masters """
 
-    rbac_user_role_or_error(request, "events.global.edit")
+    role = "events.global.edit"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     congress_master = get_object_or_404(CongressMaster, pk=id)
     org = congress_master.org
@@ -1035,7 +1039,9 @@ def global_admin_edit_congress_master(request, id):
 def global_admin_create_congress_master(request):
     """ create congress master """
 
-    rbac_user_role_or_error(request, "events.global.edit")
+    role = "events.global.edit"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     form = CongressMasterForm(request.POST or None)
     if request.method == "POST":

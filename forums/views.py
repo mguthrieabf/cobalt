@@ -1,5 +1,5 @@
 """ Views for Forums """
-
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -13,7 +13,10 @@ from rbac.core import (
     rbac_user_has_role,
     rbac_get_users_in_group,
     rbac_add_user_to_group,
+    rbac_get_users_with_role
 )
+from cobalt.settings import COBALT_HOSTNAME
+from notifications.views import contact_member
 from rbac.models import RBACGroup, RBACGroupRole, RBACUserGroup
 from notifications.views import (
     notify_happening,
@@ -22,7 +25,7 @@ from notifications.views import (
     check_listener,
 )
 from utils.utils import cobalt_paginator
-from rbac.views import rbac_user_role_or_error, rbac_forbidden
+from rbac.views import rbac_user_has_role, rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
@@ -36,7 +39,7 @@ from .models import (
     ForumFollow,
 )
 from accounts.models import User
-
+import json
 
 def post_list_single_forum(request, forum_id):
     """ shows posts for a single forum
@@ -89,12 +92,16 @@ def post_detail(request, pk):
 
     # Check access
     post = get_object_or_404(Post, pk=pk)
-    rbac_user_role_or_error(request, "forums.forum.%s.view" % post.forum.id)
+    role = "forums.forum.%s.view" % post.forum.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
 
         # Check user permissions to post
-        rbac_user_role_or_error(request, "forums.forum.%s.create" % post.forum.id)
+        role = "forums.forum.%s.create" % post.forum.id
+        if not rbac_user_has_role(request.user, role):
+            return rbac_forbidden(request, role)
 
         # identify which form submitted this - comments1 or comments2
         if "submit-c1" in request.POST:
@@ -159,7 +166,7 @@ def post_detail(request, pk):
     form2 = Comment2Form()
     post = get_object_or_404(Post, pk=pk)
     post_likes = LikePost.objects.filter(post=post)
-    comments1 = Comment1.objects.filter(post=post)
+    comments1 = Comment1.objects.filter(post=post).order_by('pk')
 
     # TODO: Now that we have counters for comments at the Post and Comment1 level
     # this code could potentially be made more efficient.
@@ -168,7 +175,7 @@ def post_detail(request, pk):
     comments1_new = []  # comments1 is immutable - make a copy
     for c1 in comments1:
         # add related c2 objects to c1
-        c2 = Comment2.objects.filter(comment1=c1)
+        c2 = Comment2.objects.filter(comment1=c1).order_by('pk')
         c2_new = []
         for i in c2:
             i.c2_likes = LikeComment2.objects.filter(comment2=i).count()
@@ -187,10 +194,6 @@ def post_detail(request, pk):
         event_type="forums.post.comment",
         topic=pk,
     )
-
-    # for forums and moderate we can't call rbac_user_has_role as the default for forums is Allow
-    #    is_moderator = user_is_moderator_for_forum(request.user, post.forum.id)
-    # oh yes we can
 
     is_moderator = rbac_user_has_role(
         request.user, "forums.moderate.%s.edit" % post.forum.id
@@ -220,9 +223,10 @@ def post_new(request, forum_id=None):
         form = PostForm(request.POST)
         if form.is_valid():
             # check access
-            rbac_user_role_or_error(
-                request.user, "forums.forum.%s.create" % form.cleaned_data["forum"].id
-            )
+            role = "forums.forum.%s.create" % form.cleaned_data["forum"].id
+            if not rbac_user_has_role(request.user, role):
+                return rbac_forbidden(request, role)
+
             post = form.save(commit=False)
             post.author = request.user
             post.published_date = timezone.now()
@@ -610,7 +614,9 @@ def forum_create(request):
         HttpResponse
     """
 
-    rbac_user_role_or_error(request, "forums.admin.edit")
+    role = "forums.admin.edit"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = ForumForm(request.POST)
@@ -646,7 +652,9 @@ def forum_delete_ajax(request, forum_id):
     """
 
     # check access
-    rbac_user_role_or_error(request, "forums.admin.edit")
+    role = "forums.admin.edit"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     forum = get_object_or_404(Forum, pk=forum_id)
     forum.delete()
@@ -655,7 +663,7 @@ def forum_delete_ajax(request, forum_id):
 
 
 @login_required()
-def comment_edit_common(request, comment):
+def comment_edit_common(request, comment, comment_type):
     """ common code for editing c1 and c2 """
 
     role = "forums.forum.%s.create" % comment.post.forum.id
@@ -689,7 +697,13 @@ def comment_edit_common(request, comment):
                 messages.success(
                     request, "Comment edited", extra_tags="cobalt-message-success"
                 )
-                return redirect("forums:post_detail", pk=comment.post.pk)
+                if comment_type == "c1":
+                    target = f"#target_{comment.id}"
+                elif comment_type == "c2":
+                    target = f"#target_{comment.comment1.id}_{comment.id}"
+
+                url = reverse("forums:post_detail", kwargs={"pk": comment.post.pk}) + target
+                return redirect(url)
 
             else:
                 print(form.errors)
@@ -705,14 +719,14 @@ def comment_edit_common(request, comment):
 def comment1_edit(request, comment_id):
 
     comment = get_object_or_404(Comment1, pk=comment_id)
-    return comment_edit_common(request, comment)
+    return comment_edit_common(request, comment, "c1")
 
 
 @login_required()
 def comment2_edit(request, comment_id):
 
     comment = get_object_or_404(Comment2, pk=comment_id)
-    return comment_edit_common(request, comment)
+    return comment_edit_common(request, comment, "c2")
 
 
 @login_required()
@@ -829,3 +843,87 @@ def unblock_user(request, user_id, forum_id):
         extra_tags="cobalt-message-success",
     )
     return redirect("forums:forum_edit", forum_id=forum.id)
+
+@login_required()
+def report_abuse(request):
+    """ Ajax call to report a post or comment that someone doesn't like """
+
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        text_type = data["text_type"]
+        id = int(data["id"])
+        reason = data["reason"]
+
+        # Handle the different types of objects
+        if text_type == "Post":
+            post = get_object_or_404(Post, pk=id)
+            c1 = None
+            c2 = None
+            author = post.author
+
+        elif text_type == "C1":
+            c1 = get_object_or_404(Comment1, pk=id)
+            post = c1.post
+            c2 = None
+            author = c1.author
+
+        elif text_type == "C2":
+            c2 = get_object_or_404(Comment2, pk=id)
+            c1 = c2.comment1
+            post = c1.post
+            author = c2.author
+
+        notify_moderators_of_abuse(post, c1, c2, request.user, author, reason)
+
+        response_data = {}
+        response_data["message"] = "Success"
+        return JsonResponse({"data": response_data})
+
+
+def notify_moderators_of_abuse(post, c1, c2, user, author, reason):
+    """ Let moderators know about a complaint """
+
+    moderators = rbac_get_users_with_role("forums.moderate.%s.edit" % post.forum.id)
+
+    link = reverse("forums:post_detail", kwargs={"pk": post.id})
+
+    email_body =  f"""<h3>Forum: {post.forum}</h3>
+                      <h3>Reason: {reason}</h3>
+                      <h3>Post: {post.title}</h3>
+                    <br><br>
+
+                   """
+
+    if c2:
+        email_body += c2.text
+        link += f"#target_{c1.id}_{c2.id}"
+    elif c1:
+        email_body += c1.text
+        link += f"#target_{c1.id}"
+    else:
+        email_body += post.text
+
+    email_body += "<br><br>"
+
+    for moderator in moderators:
+
+        context = {
+            "name": moderator.first_name,
+            "title": f"Report on {author.full_name} by {user.full_name}",
+            "email_body": email_body,
+            "host": COBALT_HOSTNAME,
+            "link": link,
+            "link_text": "View Post",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=moderator,
+            msg=f"Report on {author.full_name} by {user.full_name}",
+            contact_type="Email",
+            html_msg=html_msg,
+            link=link,
+            subject=f"Report on {author.full_name} by {user.full_name}",
+        )

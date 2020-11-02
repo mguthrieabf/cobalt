@@ -41,7 +41,7 @@ from rbac.core import (
     rbac_user_allowed_for_model,
     rbac_get_users_with_role,
 )
-from rbac.views import rbac_user_role_or_error
+from rbac.views import rbac_user_has_role, rbac_forbidden
 from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
@@ -74,7 +74,8 @@ def admin_summary(request, congress_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     total = {
         "entries": 0,
@@ -159,7 +160,8 @@ def admin_event_summary(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event_entries = EventEntry.objects.filter(event=event).exclude(
         entry_status="Cancelled"
@@ -215,7 +217,8 @@ def admin_evententry(request, evententry_id):
     congress = event.congress
 
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event_logs = EventLog.objects.filter(event_entry=event_entry)
 
@@ -241,7 +244,8 @@ def admin_evententryplayer(request, evententryplayer_id):
         "events.org.%s.edit"
         % event_entry_player.event_entry.event.congress.congress_master.org.id
     )
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = EventEntryPlayerForm(request.POST, instance=event_entry_player)
@@ -275,7 +279,8 @@ def admin_event_csv(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
 
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     # get details
     entries = event.evententry_set.all()
@@ -391,7 +396,8 @@ def admin_event_offsystem(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     # get players with manual payment methods
     players = (
@@ -415,7 +421,8 @@ def admin_event_log(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     logs = EventLog.objects.filter(event=event).order_by("-action_date")
 
@@ -434,7 +441,8 @@ def admin_evententry_delete(request, evententry_id):
 
     # check access
     role = "events.org.%s.edit" % event_entry.event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)
 
@@ -615,7 +623,8 @@ def admin_event_player_discount(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event_player_discounts = EventPlayerDiscount.objects.filter(event=event)
 
@@ -690,7 +699,8 @@ def admin_event_email(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     form = EmailForm(request.POST or None)
 

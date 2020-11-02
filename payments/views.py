@@ -75,7 +75,7 @@ from accounts.models import User
 from utils.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
-from rbac.views import rbac_user_role_or_error, rbac_forbidden
+from rbac.views import rbac_user_has_role, rbac_forbidden
 from django.utils.timezone import make_aware
 
 TZ = pytz.timezone(TIME_ZONE)
@@ -252,7 +252,9 @@ def statement_admin_view(request, member_id):
     """
 
     # check access
-    rbac_user_role_or_error(request, "payments.global.view")
+    role = "payments.global.view"
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     user = get_object_or_404(User, pk=member_id)
     (summary, club, balance, auto_button, events_list) = statement_common(user)

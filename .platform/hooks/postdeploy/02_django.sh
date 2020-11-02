@@ -15,6 +15,7 @@ chmod 777 /var/app/current/db.sqlite3
 ./manage.py add_rbac_static_payments
 ./manage.py add_rbac_static_orgs
 ./manage.py add_rbac_static_events
+./manage.py add_rbac_static_notifications
 ./manage.py create_states
 #./manage.py add_test_data
 #./manage.py createdummyusers

@@ -40,7 +40,7 @@ from rbac.core import (
     rbac_get_users_with_role,
     rbac_user_has_role,
 )
-from rbac.views import rbac_user_role_or_error
+from rbac.views import rbac_user_has_role, rbac_forbidden
 from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
@@ -80,7 +80,8 @@ def delete_congress(request, congress_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
 
@@ -118,7 +119,8 @@ def create_congress_wizard(request, step=1, congress_id=None):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if step == 2:
         return create_congress_wizard_2(request, step_list, congress)
@@ -150,7 +152,8 @@ def create_congress_wizard_1(request, step_list):
 
                 # check access
                 role = "events.org.%s.edit" % congress_master.org.id
-                rbac_user_role_or_error(request, role)
+                if not rbac_user_has_role(request.user, role):
+                    return rbac_forbidden(request, role)
 
                 congress = Congress()
                 congress.congress_master = congress_master
@@ -561,7 +564,8 @@ def create_event(request, congress_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
 
@@ -599,7 +603,8 @@ def edit_event(request, congress_id, event_id):
 
     # check access
     role = "events.org.%s.edit" % congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     event = get_object_or_404(Event, pk=event_id)
     sessions = Session.objects.filter(event=event).order_by(
@@ -648,7 +653,8 @@ def create_session(request, event_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = SessionForm(request.POST)
@@ -686,7 +692,8 @@ def edit_session(request, event_id, session_id):
 
     # check access
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    rbac_user_role_or_error(request, role)
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
