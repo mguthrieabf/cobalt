@@ -77,25 +77,25 @@ def main_admin_screen(request):
 def view_screen(request):
     """ Shows the user what roles they have in RBAC """
 
-    user_groups = RBACUserGroup.objects.filter(member=request.user)
+    groups = RBACGroup.objects.filter(rbacusergroup__member=request.user)
 
     # split by type
-    data = {}
-    for user_group in user_groups:
-        if user_group.group.name_qualifier in data:
-            data[user_group.group.name_qualifier].append(user_group.group)
-        else:
-            data[user_group.group.name_qualifier] = [user_group.group]
-
-    group_list = user_groups.values_list("group")
-    roles = RBACGroupRole.objects.filter(group__in=group_list)
+    # data = {}
+    # for user_group in user_groups:
+    #     if user_group.group.name_qualifier in data:
+    #         data[user_group.group.name_qualifier].append(user_group.group)
+    #     else:
+    #         data[user_group.group.name_qualifier] = [user_group.group]
+    #
+    # group_list = user_groups.values_list("group")
+    roles = RBACGroupRole.objects.filter(group__in=groups)
 
     english = rbac_access_in_english(request.user)
 
     return render(
         request,
         "rbac/view-screen.html",
-        {"groups": data, "english": english, "roles": roles},
+        {"groups": groups, "english": english, "roles": roles},
     )
 
 

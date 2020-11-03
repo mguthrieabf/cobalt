@@ -20,7 +20,7 @@
   <div >
     <div class="card">
     <div class="card-header card-header-info">
-    <h3>
+    <h2>
         <div class="d-flex justify-content-between">
           <div>
             Understanding RBAC
@@ -28,7 +28,7 @@
           <div>
           <i class="material-icons" style="font-size:35px">help</i>
           </div>
-    </h3>
+    </h2>
     </div>
     <div class="card-body">
     <p>Role Based Access Control(RBAC) is one of the ways that we keep this
@@ -59,41 +59,45 @@
 
     {% if groups %}
 
-    <div class="col-lg-9 mx-auto">
-    <blockquote class="blockquote">Groups control security within
-      the system. This shows the groups you are a member of.</<blockquote>
-      </blockquote>
-    </div>
-    <br>
-
-    {% for key, value in groups.items %}
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-primary">
-          <h3 class="card-title">Groups in {{ key }}</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Your Groups
+                </div>
+                <div>
+                <i class="material-icons" style="font-size:35px">group</i>
+                </div>
+              </div>
+          </h2>
+          <p>Groups control security within
+            the system. This shows the groups you are a member of.</p>
         </div>
         <div class="card-body" style="text-align: center">
 
+
+
+
+
+
           <div class="container">
-            <div class="row">
-              <table class="table table-responsive table-hover">
+            <div class="row table-responsive">
+              <table class="table table-hover">
                 <thead class="text-info">
                   <tr>
-                    <th>Group ID</th>
-                    <th>Group Full Name</th>
-                    <th>Group Qualifier</th>
-                    <th>Group Name</th>
-                    <th>Group Description</th>
+                    <th class="text-left">Group ID</th>
+                    <th class="text-left">Group Name</th>
+                    <th class="text-left">Group Description</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for v in value %}
+                  {% for group in groups %}
                   <tr>
-                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.id }}</a></td>
-                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}.{{ v.name_item }}</a></td>
-                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_qualifier }}</a></td>
-                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.name_item }}</a></td>
-                    <td><a href="{% url "rbac:group_view" group_id=v.id %}">{{ v.description }}</a></td>
+                    <td class="text-left"><a href="{% url "rbac:group_view" group_id=group.id %}">{{ group.id }}</a></td>
+                    <td class="text-left"><a href="{% url "rbac:group_view" group_id=group.id %}">{{ group.name_qualifier }}.{{ group.name_item }}</a></td>
+                    <td class="text-left"><a href="{% url "rbac:group_view" group_id=group.id %}">{{ group.description }}</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -104,40 +108,47 @@
       </div>
     </div>
     <br>
-    {% endfor %}
 
 
-
-    <div  class="col-lg-9 mx-auto">
-        <blockquote class="blockquote">Roles are the lowest level of access. Groups have one or more roles.
-        These are your roles and the groups that they come from.</blockquote>
-        <br>
-    </div>
+<!-- Roles -->
       <div class="card col-lg-9 mx-auto">
 
         <div class="card-header card-header-warning">
-          <h3 class="card-title">Roles</h3>
-        </div>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Your Roles
+                </div>
+                <div>
+                <i class="material-icons" style="font-size:35px">security</i>
+                </div>
+              </div>
+            </h2>
+                  <p>Roles are the lowest level of access. Groups have one or more roles.
+              These are your roles and the groups that they come from.</p>
+              <p>Roles can either Allow or Block you from doing something.</p>
+      </div>
+
         <div class="card-body" style="text-align: center">
 
           <div class="container">
-            <div class="row">
-              <table class="table table-responsive table-hover">
+            <div class="row table-responsive">
+              <table class="table table-hover">
                 <thead class="text-info">
                   <tr>
                     <th class="text-left">Role ID</th>
-                    <th class="text-left">Group Full Name</th>
                     <th class="text-left">Role</th>
                     <th class="text-left">Rule Type</th>
+                    <th class="text-left">Group Full Name</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for role in roles %}
                   <tr>
                     <td class="text-left">{{ role.id }}</td>
-                    <td class="text-left">[{{ role.group.id }}] {{ role.group }}</td>
                     <td class="text-left">{{ role.role }}</td>
                     <td class="text-left">{{ role.rule_type }}</td>
+                    <td class="text-left"><a href="{% url "rbac:group_view" group_id=role.group.id %}">{{ role.group }}</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -152,10 +163,19 @@
     <div>
       <div class="card col-lg-9 mx-auto">
         <div class="card-header card-header-success">
-          <h3 class="card-title">Explanation</h3>
+          <h2>
+              <div class="d-flex justify-content-between">
+                <div>
+                  Explanation
+                </div>
+                <div>
+                <i class="material-icons" style="font-size:35px">format_quote</i>
+                </div>
+              </div>
+            </h2>
+            <p>This explains rules specific to you.</p>
         </div>
         <div class="card-body" style="text-align: left">
-            <blockquote class="blockquote">This explains rules specific to you.</blockquote>
           <ul>
             {% for e in english %}
             <li>{{ e }}
