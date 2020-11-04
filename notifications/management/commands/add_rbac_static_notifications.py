@@ -33,6 +33,7 @@ class Command(BaseCommand):
         # add myself as an admin and create tree and group
         # This lets us create admins who can manage notifications
         user = User.objects.filter(username="Mark").first()
+        julian = User.objects.filter(system_number="518891").first()
 
         group = create_RBAC_admin_group(
             self,
@@ -44,13 +45,13 @@ class Command(BaseCommand):
         rbac_add_user_to_admin_group(group, user)
         rbac_add_role_to_admin_group(group, app="notifications", model="admin")
 
-
         group = rbac_create_group(
             "rbac.orgs.abf.abf_roles",
             "email_view",
             "Ability to see all messages in notifications",
         )
         rbac_add_user_to_group(user, group)
+        rbac_add_user_to_group(julian, group)
         rbac_add_role_to_group(
             group, app="notifications", model="admin", action="view", rule_type="Allow"
         )
