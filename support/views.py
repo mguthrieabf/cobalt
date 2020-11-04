@@ -12,7 +12,9 @@ from forums.filters import PostFilter
 from payments.models import MemberTransaction
 from utils.utils import cobalt_paginator
 from django.db.models import Q
+from django.core.exceptions import SuspiciousOperation
 from itertools import chain
+from django.contrib import messages
 import json
 
 
@@ -32,6 +34,37 @@ def guidelines(request):
 
 def acceptable_use(request):
     return render(request, "support/acceptable_use.html")
+
+
+def non_production_email_changer(request):
+    """ Only for test systems - changes email address of all users """
+
+    if not request.user.is_superuser:
+        raise SuspiciousOperation("This is only avaiable for admin users.")
+
+    if COBALT_HOSTNAME in ["abftech.com.au", "www.abftech.com.au"]:
+        raise SuspiciousOperation(
+            "Not for use in production. This cannot be used in a production system."
+        )
+
+    all_users = User.objects.all()
+
+    if request.method == "POST":
+        new_email = request.POST["new_email"]
+        for user in all_users:
+            user.email = new_email
+            user.save()
+
+        count = all_users.count()
+        messages.success(
+            request,
+            f"{count} users updated.",
+            extra_tags="cobalt-message-success",
+        )
+
+    return render(
+        request, "support/non_production_email_changer.html", {"all_users": all_users}
+    )
 
 
 @login_required

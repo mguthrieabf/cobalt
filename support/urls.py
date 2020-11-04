@@ -10,4 +10,9 @@ urlpatterns = [
     path("cookies", views.cookies, name="cookies"),
     path("guidelines", views.guidelines, name="guidelines"),
     path("acceptable-use", views.acceptable_use, name="acceptable_use"),
+    path(
+        "non-production-email-changer",
+        views.non_production_email_changer,
+        name="non_production_email_changer",
+    ),
 ]
