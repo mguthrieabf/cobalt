@@ -1,6 +1,6 @@
 """ Script to create cobalt test data """
 
-from cobalt.settings import RBAC_EVERYONE, TIME_ZONE, DUMMY_DATA_COUNT
+from cobalt.settings import RBAC_EVERYONE, TIME_ZONE, DUMMY_DATA_COUNT, TBA_PLAYER
 from accounts.models import User
 from events.models import CongressMaster
 from django.core.management.base import BaseCommand
@@ -121,9 +121,9 @@ class Command(BaseCommand):
         return text
 
     def parse_csv(self, file):
-        """ try to sort out the mess Excel makes of CSV files.
-            Requires csv files to have the app and model in the first row and
-            the fieldnames in the second row. """
+        """try to sort out the mess Excel makes of CSV files.
+        Requires csv files to have the app and model in the first row and
+        the fieldnames in the second row."""
 
         f = open(file)
 
@@ -194,6 +194,7 @@ class Command(BaseCommand):
             dic = {}
             this_array = None
             for row in data:
+                print(row)
                 # see if already present
                 exec_cmd = (
                     "module = import_module('%s.models')\ninstance = module.%s.objects"
@@ -303,13 +304,15 @@ class Command(BaseCommand):
                             mt = val_str[4:6]
                             dy = val_str[6:8]
                             this_date = make_aware(
-                                datetime.datetime(int(yr), int(mt), int(dy), 0, 0), TZ,
+                                datetime.datetime(int(yr), int(mt), int(dy), 0, 0),
+                                TZ,
                             )
                             setattr(instance, field, this_date)
                         if key[:2] == "m.":
                             field = key[2:]
                             dt = datetime.datetime.strptime(value, "%H:%M").time()
                             setattr(instance, field, dt)
+
                     instance.save()
                     print("Added: %s" % instance)
                 # add to dic if we have an id field
@@ -335,6 +338,7 @@ class Command(BaseCommand):
                 row["pic"],
             )
             dic[row["id"]] = user
+            dic["TBA"] = User.objects.filter(pk=TBA_PLAYER).first()
             dic["EVERYONE"] = User.objects.filter(pk=RBAC_EVERYONE).first()
             dic["mark"] = User.objects.filter(system_number="620246").first()
             dic["julian"] = User.objects.filter(system_number="518891").first()
