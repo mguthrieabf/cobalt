@@ -1,0 +1,11 @@
+{% extends 'base_logged_out.html' %}
+{% load humanize %}
+{% load static %}
+{% load cobalt_tags %}
+
+{% block content %}
+
+
+    <a href="{% url "events:events" %}" class="btn btn-danger">View Upcoming Congresses</a>
+
+{% endblock %}

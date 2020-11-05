@@ -10,44 +10,58 @@ from events.core import get_events
 from utils.utils import cobalt_paginator
 from forums.models import Post, ForumFollow
 from rbac.core import rbac_user_blocked_for_model
-
+from django.shortcuts import redirect
 import logging
 
 logger = logging.getLogger("django")
 
 
 @login_required()
+def dashboard(request):
+    """ view to force the login prompt to come up """
+    return home(request)
+
+
 def home(request):
     """ Home page """
-    system_number = request.user.system_number
-    masterpoints = get_masterpoints(system_number)
-    payments = get_balance_detail(request.user)
-    posts = get_posts(request)
-    posts2 = get_announcements(request)
-    events = get_events(request.user)
 
-    return render(
-        request,
-        "dashboard/home.html",
-        {
-            "mp": masterpoints,
-            "payments": payments,
-            "posts": posts,
-            "posts2": posts2,
-            "events": events,
-        },
-    )
+    if request.user.is_authenticated:
+        system_number = request.user.system_number
+        masterpoints = get_masterpoints(system_number)
+        payments = get_balance_detail(request.user)
+        posts = get_posts(request)
+        posts2 = get_announcements(request)
+        events = get_events(request.user)
+
+        return render(
+            request,
+            "dashboard/home.html",
+            {
+                "mp": masterpoints,
+                "payments": payments,
+                "posts": posts,
+                "posts2": posts2,
+                "events": events,
+            },
+        )
+
+    else:  # not logged in
+        return redirect("dashboard:logged_out")
+
+
+def logged_out(request):
+    return render(request, "dashboard/logged_out.html")
 
 
 @login_required()
 def scroll1(request):
-    """ Cutdown homepage to be called by infinite scroll.
+    """Cutdown homepage to be called by infinite scroll.
 
     This handles the right column - discussion posts
 
     Infinite scroll will call this when the user scrolls off the bottom
     of the page. We don't need to update anything except the posts so exclude
-    other front page database hits. """
+    other front page database hits."""
 
     posts = get_posts(request)
     return render(request, "dashboard/home.html", {"posts": posts})
@@ -55,13 +69,13 @@ def scroll1(request):
 
 @login_required()
 def scroll2(request):
-    """ Cutdown homepage to be called by infinite scroll.
+    """Cutdown homepage to be called by infinite scroll.
 
     This handles the left column - announcements
 
     Infinite scroll will call this when the user scrolls off the bottom
     of the page. We don't need to update anything except the posts so exclude
-    other front page database hits. """
+    other front page database hits."""
 
     posts2 = get_announcements(request)
     return render(request, "dashboard/home.html", {"posts2": posts2})

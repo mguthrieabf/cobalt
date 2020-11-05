@@ -39,7 +39,7 @@ from rbac.core import (
     rbac_user_has_role,
     rbac_group_id_from_name,
 )
-from rbac.views import rbac_user_has_role, rbac_forbidden
+from rbac.views import rbac_forbidden
 from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
@@ -64,9 +64,11 @@ from decimal import Decimal
 TZ = pytz.timezone(TIME_ZONE)
 
 
-@login_required()
 def home(request):
-    """ main screen to show congresses """
+    """main screen to show congresses
+
+    Can be called without logging in
+    """
 
     congresses = (
         Congress.objects.order_by("start_date")
@@ -74,14 +76,18 @@ def home(request):
         .filter(status="Published")
     )
 
-    # get draft congresses
-    draft_congresses = Congress.objects.filter(status="Draft")
-    draft_congress_flag = False
-    for draft_congress in draft_congresses:
-        role = "events.org.%s.edit" % draft_congress.congress_master.org.id
-        if rbac_user_has_role(request.user, role):
-            draft_congress_flag = True
-            break
+    if request.user.is_authenticated:
+
+        # get draft congresses
+        draft_congresses = Congress.objects.filter(status="Draft")
+        draft_congress_flag = False
+        for draft_congress in draft_congresses:
+            role = "events.org.%s.edit" % draft_congress.congress_master.org.id
+            if rbac_user_has_role(request.user, role):
+                draft_congress_flag = True
+                break
+    else:
+        draft_congress_flag = False
 
     grouped_by_month = {}
     for congress in congresses:
@@ -105,7 +111,8 @@ def home(request):
             congress.msg = "Congress entries are closed"
 
         # check access
-        congress.convener = congress.user_is_convener(request.user)
+        if request.user.is_authenticated:
+            congress.convener = congress.user_is_convener(request.user)
 
         # Group congresses by date
         month = congress.start_date.strftime("%B %Y")
@@ -115,7 +122,10 @@ def home(request):
             grouped_by_month[month] = [congress]
 
     # check if user has any admin rights to show link to create congress
-    admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[1]
+    if request.user.is_authenticated:
+        admin = rbac_user_allowed_for_model(request.user, "events", "org", "edit")[1]
+    else:
+        admin = False
 
     return render(
         request,
@@ -128,9 +138,10 @@ def home(request):
     )
 
 
-@login_required()
 def view_congress(request, congress_id, fullscreen=False):
     """basic view of an event.
+
+    Can be called when not logged in.
 
     Args:
         request(HTTPRequest): standard user request
@@ -141,6 +152,14 @@ def view_congress(request, congress_id, fullscreen=False):
     Returns:
         page(HTTPResponse): page with details about the event
     """
+
+    # Which template to use
+    if fullscreen:
+        master_template = "empty.html"
+    elif request.user.is_authenticated:
+        master_template = "base.html"
+    else:
+        master_template = "base_logged_out.html"
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
@@ -183,7 +202,10 @@ def view_congress(request, congress_id, fullscreen=False):
         program = {}
 
         # see if user has entered already
-        program["entry"] = event.already_entered(request.user)
+        if request.user.is_authenticated:
+            program["entry"] = event.already_entered(request.user)
+        else:
+            program["entry"] = False
 
         # get all sessions for this event plus days and number of rows (# of days)
         sessions = event.session_set.all()
@@ -258,7 +280,7 @@ def view_congress(request, congress_id, fullscreen=False):
         "events/congress.html",
         {
             "congress": congress,
-            "fullscreen": fullscreen,
+            "template": master_template,
             "program_list": program_list,
             "msg": msg,
         },
@@ -625,11 +647,15 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, f"Payment successful", extra_tags="cobalt-message-success",
+                request,
+                f"Payment successful",
+                extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, f"Payment failed", extra_tags="cobalt-message-error",
+                request,
+                f"Payment failed",
+                extra_tags="cobalt-message-error",
             )
 
     return render(
