@@ -10,7 +10,7 @@ admin.site.site_title = f"{settings.GLOBAL_ORG} Administration"
 urlpatterns = [
     path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
-    path("", include("dashboard.urls")),
+    path("", include("dashboard.urls", namespace="home")),
     path("dashboard", include("dashboard.urls")),
     path("results/", include("results.urls", namespace="results")),
     path("accounts/", include("accounts.urls", namespace="accounts")),
