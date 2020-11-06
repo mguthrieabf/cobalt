@@ -77,6 +77,11 @@ def cobalt_user_link_short(user):
 @register.filter(name="cobalt_credits", is_safe=True)
 def cobalt_credits(credits):
 
+    try:
+        credits = float(credits)
+    except ValueError:
+        return mark_safe(None)
+
     if credits == 1.0:
         word = "credit"
     else:
