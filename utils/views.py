@@ -67,7 +67,7 @@ def geo_location(request, location):
 
 
 class CobaltBatch:
-    """ Class to handle batch jobs within Cobalt. We use cron (or whatever you
+    """Class to handle batch jobs within Cobalt. We use cron (or whatever you
     like) to trigger the jobs which are set up using django-extensions.
 
     Args:
@@ -124,3 +124,10 @@ def batch(request):
     things = cobalt_paginator(request, events_list)
 
     return render(request, "utils/batch.html", {"things": things})
+
+
+@login_required()
+def status(request):
+    """ Basic system health """
+
+    return render(request, "utils/status.html")

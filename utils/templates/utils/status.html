@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load cobalt_tags %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="col-md-4 mx-auto my-auto">
+  <div class="card">
+    <div class="card-header card-header-warning text-center">
+      <h2>System Status</h2>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Payments</td>
+            <td><button class="btn btn-sm btn-success">Ok</button></td>
+          </tr>
+          <tr>
+            <td>Events</td>
+            <td><button class="btn btn-sm btn-success">Ok</button></td>
+          </tr>
+          <tr>
+            <td>Forums</td>
+            <td><button class="btn btn-sm btn-success">Ok</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

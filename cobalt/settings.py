@@ -121,6 +121,7 @@ ALLOWED_HOSTS = [
     ".abftech.com.au",
     "127.0.0.1",
     ".eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
+    "192.168.86.138",
 ]
 
 # For AWS we also need to add the local IP address as this is used by the health checks
