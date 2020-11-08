@@ -12,6 +12,7 @@ from .models import InAppNotification, NotificationMapping, Email
 from forums.models import Forum, Post
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
+from django.utils import timezone
 from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE, TBA_PLAYER, RBAC_EVERYONE
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -21,6 +22,7 @@ from threading import Thread
 from django.db import connection
 from rbac.views import rbac_forbidden
 from rbac.core import rbac_user_has_role
+from datetime import datetime, timedelta
 
 
 def send_cobalt_email(to_address, subject, message, member=None):
@@ -400,6 +402,7 @@ def notifications_in_english(member):
 
     return notifications
 
+
 @login_required()
 def admin_view_all(request):
     """ Show email notifications for administrators """
@@ -414,6 +417,7 @@ def admin_view_all(request):
 
     return render(request, "notifications/admin_view_all.html", {"things": things})
 
+
 @login_required()
 def admin_view_email(request, email_id):
     """ Show single email for administrators """
@@ -426,3 +430,16 @@ def admin_view_email(request, email_id):
     email = get_object_or_404(Email, pk=email_id)
 
     return render(request, "notifications/admin_view_email.html", {"email": email})
+
+
+def notifications_status_summary():
+    """ Used by utils status to get a status of notifications """
+
+    latest = Email.objects.all().order_by("-id").first()
+    pending = Email.objects.filter(status="Queued").count()
+
+    last_hour_date_time = datetime.now() - timedelta(hours=1)
+
+    last_hour = Email.objects.filter(created_date__gt=last_hour_date_time).count()
+
+    return {"latest": latest, "pending": pending, "last_hour": last_hour}

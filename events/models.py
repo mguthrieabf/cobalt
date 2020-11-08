@@ -34,10 +34,7 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    (
-        "my-system-dollars",
-        BRIDGE_CREDITS,
-    ),
+    ("my-system-dollars", BRIDGE_CREDITS,),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
@@ -174,6 +171,9 @@ class Congress(models.Model):
         "Congress Status", max_length=10, choices=CONGRESS_STATUSES, default="Draft"
     )
 
+    class Meta:
+        verbose_name_plural = "Congresses"
+
     def __str__(self):
         return self.name
 
@@ -205,9 +205,7 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -412,6 +410,9 @@ class Category(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     description = models.CharField("Event Category", max_length=30)
 
+    class Meta:
+        verbose_name_plural = "Categories"
+
     def __str__(self):
         return self.description
 
@@ -451,6 +452,9 @@ class EventEntry(models.Model):
     free_format_answer = models.CharField(
         "Free Format Answer", max_length=60, null=True, blank=True
     )
+
+    class Meta:
+        verbose_name_plural = "Event entries"
 
     def __str__(self):
         return "%s - %s - %s" % (

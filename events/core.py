@@ -1,4 +1,11 @@
-from .models import BasketItem, EventEntry, EventEntryPlayer, PlayerBatchId, EventLog
+from .models import (
+    BasketItem,
+    EventEntry,
+    EventEntryPlayer,
+    PlayerBatchId,
+    EventLog,
+    Congress,
+)
 from django.db.models import Q
 from django.utils import timezone
 import payments.core as payments_core  # circular dependency
@@ -6,7 +13,7 @@ from notifications.views import contact_member
 from logs.views import log_event
 from cobalt.settings import COBALT_HOSTNAME, BRIDGE_CREDITS
 from django.template.loader import render_to_string
-from datetime import datetime
+from datetime import datetime, timedelta
 from rbac.core import rbac_get_users_with_role
 from django.urls import reverse
 
@@ -382,3 +389,38 @@ def notify_conveners(congress, event, subject, msg):
             link=link,
             subject=subject,
         )
+
+
+def events_status_summary():
+    """ Used by utils status to get the status of events """
+
+    now = datetime.now().date()
+    last_day_date_time = datetime.now() - timedelta(hours=24)
+    last_hour_date_time = datetime.now() - timedelta(hours=1)
+
+    active_congresses = (
+        Congress.objects.filter(status="Published")
+        .filter(start_date__lte=now)
+        .filter(end_date__gte=now)
+        .count()
+    )
+    upcoming_congresses = (
+        Congress.objects.filter(status="Published").filter(start_date__gt=now).count()
+    )
+    upcoming_entries = EventEntryPlayer.objects.filter(
+        event_entry__event__congress__start_date__gt=now
+    ).count()
+    entries_last_24_hours = EventEntry.objects.filter(
+        first_created_date__gt=last_day_date_time
+    ).count()
+    entries_last_hour = EventEntry.objects.filter(
+        first_created_date__gt=last_hour_date_time
+    ).count()
+
+    return {
+        "active": active_congresses,
+        "upcoming": upcoming_congresses,
+        "upcoming_entries": upcoming_entries,
+        "entries_last_24_hours": entries_last_24_hours,
+        "entries_last_hour": entries_last_hour,
+    }

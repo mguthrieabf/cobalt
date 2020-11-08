@@ -27,6 +27,9 @@ class Batch(models.Model):
         "Job Status", choices=JOB_STATUSES, max_length=10, default="Started"
     )
 
+    class Meta:
+        verbose_name_plural = "Batches"
+
     def __str__(self):
         if self.instance:
             return f"{self.name}[{self.instance}] - {self.run_date} - {self.job_status}"

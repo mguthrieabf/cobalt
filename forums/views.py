@@ -13,7 +13,7 @@ from rbac.core import (
     rbac_user_has_role,
     rbac_get_users_in_group,
     rbac_add_user_to_group,
-    rbac_get_users_with_role
+    rbac_get_users_with_role,
 )
 from cobalt.settings import COBALT_HOSTNAME
 from notifications.views import contact_member
@@ -25,7 +25,7 @@ from notifications.views import (
     check_listener,
 )
 from utils.utils import cobalt_paginator
-from rbac.views import rbac_user_has_role, rbac_forbidden
+from rbac.views import rbac_forbidden
 from .forms import PostForm, CommentForm, Comment2Form, ForumForm
 from .filters import PostFilter
 from .models import (
@@ -40,6 +40,7 @@ from .models import (
 )
 from accounts.models import User
 import json
+
 
 def post_list_single_forum(request, forum_id):
     """ shows posts for a single forum
@@ -166,7 +167,7 @@ def post_detail(request, pk):
     form2 = Comment2Form()
     post = get_object_or_404(Post, pk=pk)
     post_likes = LikePost.objects.filter(post=post)
-    comments1 = Comment1.objects.filter(post=post).order_by('pk')
+    comments1 = Comment1.objects.filter(post=post).order_by("pk")
 
     # TODO: Now that we have counters for comments at the Post and Comment1 level
     # this code could potentially be made more efficient.
@@ -175,7 +176,7 @@ def post_detail(request, pk):
     comments1_new = []  # comments1 is immutable - make a copy
     for c1 in comments1:
         # add related c2 objects to c1
-        c2 = Comment2.objects.filter(comment1=c1).order_by('pk')
+        c2 = Comment2.objects.filter(comment1=c1).order_by("pk")
         c2_new = []
         for i in c2:
             i.c2_likes = LikeComment2.objects.filter(comment2=i).count()
@@ -702,7 +703,10 @@ def comment_edit_common(request, comment, comment_type):
                 elif comment_type == "c2":
                     target = f"#target_{comment.comment1.id}_{comment.id}"
 
-                url = reverse("forums:post_detail", kwargs={"pk": comment.post.pk}) + target
+                url = (
+                    reverse("forums:post_detail", kwargs={"pk": comment.post.pk})
+                    + target
+                )
                 return redirect(url)
 
             else:
@@ -844,6 +848,7 @@ def unblock_user(request, user_id, forum_id):
     )
     return redirect("forums:forum_edit", forum_id=forum.id)
 
+
 @login_required()
 def report_abuse(request):
     """ Ajax call to report a post or comment that someone doesn't like """
@@ -887,7 +892,7 @@ def notify_moderators_of_abuse(post, c1, c2, user, author, reason):
 
     link = reverse("forums:post_detail", kwargs={"pk": post.id})
 
-    email_body =  f"""<h3>Forum: {post.forum}</h3>
+    email_body = f"""<h3>Forum: {post.forum}</h3>
                       <h3>Reason: {reason}</h3>
                       <h3>Post: {post.title}</h3>
                     <br><br>
@@ -927,3 +932,13 @@ def notify_moderators_of_abuse(post, c1, c2, user, author, reason):
             link=link,
             subject=f"Report on {author.full_name} by {user.full_name}",
         )
+
+
+def forums_status_summary():
+    """ Used by utils status to check on the health of forums """
+
+    latest_post = Post.objects.all().order_by("-created_date").first()
+    latest_c1 = Comment1.objects.all().order_by("-created_date").first()
+    latest_c2 = Comment2.objects.all().order_by("-created_date").first()
+
+    return {"latest_post": latest_post, "latest_c1": latest_c1, "latest_c2": latest_c2}

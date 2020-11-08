@@ -686,29 +686,35 @@ def payment_api(
 
             if other_member:  # transfer to another member
                 if balance > 0.0:
-                    msg = "Partial payment for transfer to %s (%s). <br>\
+                    msg = (
+                        "Partial payment for transfer to %s (%s). <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f." % (
-                        other_member,
-                        description,
-                        GLOBAL_CURRENCY_SYMBOL,
-                        balance,
-                        GLOBAL_CURRENCY_SYMBOL,
-                        amount,
+                           of %s%.2f to make total payment of %s%.2f."
+                        % (
+                            other_member,
+                            description,
+                            GLOBAL_CURRENCY_SYMBOL,
+                            balance,
+                            GLOBAL_CURRENCY_SYMBOL,
+                            amount,
+                        )
                     )
                 else:
                     msg = "Payment to %s (%s)" % (other_member, description)
 
             else:
                 if balance > 0.0:
-                    msg = "Partial payment for %s. <br>\
+                    msg = (
+                        "Partial payment for %s. <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f." % (
-                        description,
-                        GLOBAL_CURRENCY_SYMBOL,
-                        balance,
-                        GLOBAL_CURRENCY_SYMBOL,
-                        amount,
+                           of %s%.2f to make total payment of %s%.2f."
+                        % (
+                            description,
+                            GLOBAL_CURRENCY_SYMBOL,
+                            balance,
+                            GLOBAL_CURRENCY_SYMBOL,
+                            amount,
+                        )
                     )
                 else:
                     msg = "Payment for: " + description
@@ -1273,8 +1279,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
     # Get payment method id for this customer from Stripe
     try:
         paylist = stripe.PaymentMethod.list(
-            customer=member.stripe_customer_id,
-            type="card",
+            customer=member.stripe_customer_id, type="card",
         )
         pay_method_id = paylist.data[0].id
     except stripe.error.InvalidRequestError:
@@ -1449,3 +1454,41 @@ def org_balance(organisation):
         balance = 0.0
 
     return float(balance)
+
+
+###################################
+# payments_status_summary         #
+###################################
+def payments_status_summary():
+    """Called by utils to show a management summary of how payments is working.
+
+    Args:
+        None
+
+    Returns:
+        dict: various indicators in a dictionary
+    """
+
+    try:
+        stripe_latest = StripeTransaction.objects.filter(status="Complete").latest(
+            "created_date"
+        )
+        stripe_manual_pending = StripeTransaction.objects.filter(status="Pending")
+        stripe_auto_pending = User.objects.filter(stripe_auto_confirmed="Pending")
+
+        if stripe_manual_pending or stripe_auto_pending:  # errors
+            status = "Bad"
+        else:
+            status = "Good"
+
+        payments_indicators = {
+            "latest": stripe_latest,
+            "manual_pending": stripe_manual_pending,
+            "auto_pending": stripe_auto_pending,
+            "status": status,
+        }
+
+    except StripeTransaction.DoesNotExist:
+        payments_indicators = {"status": "Unknown"}
+
+    return payments_indicators

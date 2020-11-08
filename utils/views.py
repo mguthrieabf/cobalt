@@ -13,6 +13,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from notifications.views import send_cobalt_email
 from cobalt.settings import COBALT_HOSTNAME
 from accounts.models import User
+from payments.core import payments_status_summary
+from notifications.views import notifications_status_summary
+from events.core import events_status_summary
+from forums.views import forums_status_summary
 import datetime
 
 
@@ -130,4 +134,49 @@ def batch(request):
 def status(request):
     """ Basic system health """
 
-    return render(request, "utils/status.html")
+    # if not rbac_user_has_role(request.user, "support.support.view"):
+    #     return rbac_forbidden(request, "support.support.view")
+
+    # Activity
+    one_hour_ago = timezone.now() - datetime.timedelta(hours=1)
+
+    users = (
+        User.objects.order_by("-last_activity")
+        .exclude(last_activity=None)
+        .exclude(id=request.user.id)
+        .filter(last_activity__gte=one_hour_ago)
+        .count()
+    )
+
+    # Payments
+    payments = payments_status_summary()
+
+    # Emails
+    notifications = notifications_status_summary()
+
+    # Events
+    events = events_status_summary()
+
+    # Forums
+    forums = forums_status_summary()
+
+    return render(
+        request,
+        "utils/status.html",
+        {
+            "users": users,
+            "payments": payments,
+            "notifications": notifications,
+            "events": events,
+            "forums": forums,
+        },
+    )
+
+
+# @login_required()
+# def payment_status(request):
+#     """ Basic payment health """
+#
+#     payments = None
+#
+#     return render(request, "utils/payment_status.html", {"payments": payments})
