@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone, dateformat
+from utils.templatetags.cobalt_tags import cobalt_credits
 from django.db.models import Sum, Q
 from notifications.views import contact_member
 from logs.views import log_event
@@ -22,6 +23,7 @@ from .models import (
     BasketItem,
     PlayerBatchId,
     EventLog,
+    Bulletin,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -53,7 +55,6 @@ from cobalt.settings import (
     COBALT_HOSTNAME,
     TBA_PLAYER,
 )
-from utils.templatetags.cobalt_tags import cobalt_credits
 from datetime import datetime
 import itertools
 from utils.utils import cobalt_paginator
@@ -275,6 +276,9 @@ def view_congress(request, congress_id, fullscreen=False):
             program_list.append(program)
             program = {}
 
+    # Get bulletins
+    bulletins = Bulletin.objects.filter(congress=congress).order_by("-pk")
+
     return render(
         request,
         "events/congress.html",
@@ -282,6 +286,7 @@ def view_congress(request, congress_id, fullscreen=False):
             "congress": congress,
             "template": master_template,
             "program_list": program_list,
+            "bulletins": bulletins,
             "msg": msg,
         },
     )
@@ -1139,6 +1144,7 @@ def enter_event_form(event, congress, request):
         "payment_choices": pay_types.copy(),
         "payment_selected": payment_selected,
         "name": request.user.full_name,
+        "name_choices": name_list,
         "entry_fee_you": "%s" % entry_fee_you,
         "entry_fee_pending": "%s" % entry_fee_pending,
     }
@@ -1198,15 +1204,22 @@ def enter_event_form(event, congress, request):
         date_field = event.congress.early_payment_discount_date.strftime("%d/%m/%Y")
         alert_msg = [
             "Early Entry Discount",
-            "You qualify for an early discount if you enter now. You will save $%.2f on this event. Discount valid until %s."
-            % (discount, date_field),
+            "You qualify for an early discount if you enter now. You will save %s on this event. Discount valid until %s."
+            % (cobalt_credits(discount), date_field),
         ]
 
     if reason == "Youth discount":
         alert_msg = [
             "Youth Discount",
-            "You qualify for a youth discount for this event. A saving of $%.2f."
-            % discount,
+            "You qualify for a youth discount for this event. A saving of %s."
+            % cobalt_credits(discount),
+        ]
+
+    if reason == "Youth+Early discount":
+        alert_msg = [
+            "Youth and Early Discount",
+            "You qualify for a youth discount as well as an early entry discount for this event. A saving of %s."
+            % cobalt_credits(discount),
         ]
 
     # categories
@@ -1299,10 +1312,12 @@ def enter_event(request, congress_id, event_id):
         basket_item.save()
 
         # Get players from form
-        players = {0: request.user}
-        player_payments = {0: request.POST.get("player0_payment")}
+        #    players = {0: request.user}
+        #    player_payments = {0: request.POST.get("player0_payment")}
+        players = {}
+        player_payments = {}
 
-        for p_id in range(1, 6):
+        for p_id in range(0, 6):
             p_string = f"player{p_id}"
             ppay_string = f"player{p_id}_payment"
             if p_string in request.POST:

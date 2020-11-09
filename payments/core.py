@@ -408,7 +408,7 @@ def payment_api(
         payment_type = "Miscellaneous"
 
     if not url:  # where to next
-        url = "dashboard"
+        url = "dashboard:dashboard"
 
     if amount <= balance:  # sufficient funds
 
@@ -686,35 +686,29 @@ def payment_api(
 
             if other_member:  # transfer to another member
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for transfer to %s (%s). <br>\
+                    msg = "Partial payment for transfer to %s (%s). <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            other_member,
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        other_member,
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment to %s (%s)" % (other_member, description)
 
             else:
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for %s. <br>\
+                    msg = "Partial payment for %s. <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment for: " + description
@@ -1279,7 +1273,8 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
     # Get payment method id for this customer from Stripe
     try:
         paylist = stripe.PaymentMethod.list(
-            customer=member.stripe_customer_id, type="card",
+            customer=member.stripe_customer_id,
+            type="card",
         )
         pay_method_id = paylist.data[0].id
     except stripe.error.InvalidRequestError:

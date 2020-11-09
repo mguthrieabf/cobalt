@@ -13,9 +13,11 @@ from .models import (
     PlayerBatchId,
     EventLog,
     EventPlayerDiscount,
+    Bulletin,
 )
 
 admin.site.register(CongressMaster)
+admin.site.register(Bulletin)
 admin.site.register(Congress)
 admin.site.register(PlayerBatchId)
 admin.site.register(Category)

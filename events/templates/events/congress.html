@@ -56,6 +56,22 @@
         </div>
       </div>
 
+      {% if bulletins %}
+      <div class="col-lg-10 mx-auto">
+        <div class="card">
+          <div class="card-header card-header-info">
+            <h4 class="card-title">Bulletins</h4>
+          </div>
+          <div class="card-body table-responsive">
+            <ul>
+            {% for bulletin in bulletins %}
+              <li><a href="{{ bulletin.document.url }}">{{ bulletin.description }}</a>
+            {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <div class="col-lg-10 mx-auto">
         <div class="card">

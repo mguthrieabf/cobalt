@@ -294,6 +294,16 @@ urlpatterns = [
         ajax.admin_player_discount_delete_ajax,
         name="admin_player_discount_delete_ajax",
     ),
+    path(
+        "congress-admin/bulletins/<int:congress_id>",
+        congress_admin.admin_bulletins,
+        name="admin_bulletins",
+    ),
+    path(
+        "congress-admin/bulletin/delete",
+        ajax.admin_delete_bulletin_ajax,
+        name="admin_delete_bulletin_ajax",
+    ),
     #######################################################
     # higher level admin functions                        #
     #######################################################

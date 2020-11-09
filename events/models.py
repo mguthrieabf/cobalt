@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.humanize.templatetags.humanize import ordinal
+from utils.templatetags.cobalt_tags import cobalt_credits
 from organisations.models import Organisation
 from accounts.models import User
 from payments.models import MemberTransaction
@@ -34,7 +35,10 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    ("my-system-dollars", BRIDGE_CREDITS,),
+    (
+        "my-system-dollars",
+        BRIDGE_CREDITS,
+    ),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
@@ -205,7 +209,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -260,7 +266,8 @@ class Event(models.Model):
                     self.entry_fee - self.entry_early_payment_discount
                 ) / players_per_entry
                 reason = "Early discount"
-                description = f"Early discount {discount:.2f} credits"
+                discount = float(self.entry_fee) / players_per_entry - float(entry_fee)
+                description = "Early discount " + cobalt_credits(discount)
 
         # youth discounts apply after early entry discounts
         if self.congress.allow_youth_payment_discount:
@@ -276,10 +283,15 @@ class Event(models.Model):
                         * float(self.entry_youth_payment_discount)
                         / 100.0
                     )
-                    reason = "Youth discount"
-                    description = (
-                        "Youth discount %s%%" % self.entry_youth_payment_discount
-                    )
+                    discount = float(self.entry_fee) / players_per_entry - entry_fee
+                    if reason == "Early discount":
+                        reason = "Youth+Early discount"
+                        description = "Youth+Early discount " + cobalt_credits(discount)
+                    else:
+                        reason = "Youth discount"
+                        description = (
+                            "Youth discount %s%%" % self.entry_youth_payment_discount
+                        )
 
         # EventPlayerDiscount
         event_player_discount = (
@@ -288,16 +300,14 @@ class Event(models.Model):
 
         if event_player_discount:
             discount_fee = event_player_discount.entry_fee
-            print(type(discount_fee))
-            print(type(entry_fee))
             if discount_fee < entry_fee:
                 entry_fee = discount_fee
                 reason = event_player_discount.reason
                 description = f"Manual override {reason}"
 
-        discount = (float(self.entry_fee) / players_per_entry) - float(entry_fee)
+        # discount = (float(self.entry_fee) / players_per_entry) - float(entry_fee)
 
-        return entry_fee, discount, reason[:20], description
+        return entry_fee, discount, reason[:40], description
 
     def already_entered(self, user):
         """ check if a user has already entered """
@@ -518,7 +528,7 @@ class EventEntryPlayer(models.Model):
     batch_id = models.CharField(
         "Payment Batch ID", max_length=40, null=True, blank=True
     )
-    reason = models.CharField("Entry Fee Reason", max_length=20, null=True, blank=True)
+    reason = models.CharField("Entry Fee Reason", max_length=40, null=True, blank=True)
     entry_fee = models.DecimalField(
         "Entry Fee", decimal_places=2, max_digits=10, null=True, blank=True
     )
@@ -609,3 +619,15 @@ class EventPlayerDiscount(models.Model):
 
     def __str__(self):
         return f"{self.event} - {self.player}"
+
+
+class Bulletin(models.Model):
+    """ Regular PDF bulletins for congresses """
+
+    document = models.FileField(upload_to="bulletins/%Y/%m/%d/")
+    create_date = models.DateTimeField(default=timezone.now)
+    congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
+    description = models.CharField("Description", max_length=200)
+
+    def __str__(self):
+        return f"{self.congress} - {self.description}"

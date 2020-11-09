@@ -25,6 +25,7 @@ from .models import (
     PlayerBatchId,
     EventLog,
     EventPlayerDiscount,
+    Bulletin,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -36,6 +37,7 @@ from .forms import (
     RefundForm,
     EventPlayerDiscountForm,
     EmailForm,
+    BulletinForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -755,4 +757,40 @@ def admin_event_email(request, event_id):
         request,
         "events/admin_email.html",
         {"form": form, "event": event, "count": recipients_qs.count()},
+    )
+
+
+@login_required()
+def admin_bulletins(request, congress_id):
+    """ Manage bulletins """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+        form = BulletinForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request, "Bulletin uploaded", extra_tags="cobalt-message-success"
+            )
+
+            return redirect("events:view_congress", congress_id=congress.id)
+
+    else:
+        form = BulletinForm()
+
+    # Get bulletins
+    bulletins = Bulletin.objects.filter(congress=congress).order_by("-pk")
+
+    return render(
+        request,
+        "events/admin_bulletins.html",
+        {"form": form, "congress": congress, "bulletins": bulletins},
     )

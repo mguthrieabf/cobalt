@@ -18,6 +18,7 @@ from .models import (
     EventLog,
     EventPlayerDiscount,
     EVENT_PLAYER_FORMAT_SIZE,
+    Bulletin,
 )
 from accounts.models import User, TeamMate
 from notifications.views import contact_member
@@ -129,7 +130,6 @@ def delete_category_ajax(request):
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
 
-
     category.delete()
 
     response_data = {}
@@ -176,6 +176,7 @@ def fee_for_user_ajax(request):
         "description": description,
         "discount": discount,
     }
+
     response_data["message"] = "Success"
     return JsonResponse({"data": response_data})
 
@@ -390,7 +391,6 @@ def admin_player_discount_delete_ajax(request):
         )
         if not rbac_user_has_role(request.user, role):
             return rbac_forbidden(request, role)
-
 
         # Log it
         EventLog(
@@ -757,3 +757,24 @@ def change_answer_on_existing_entry_ajax(request, event_entry_id, answer):
     event_entry.save()
 
     return JsonResponse({"message": "Success"})
+
+
+@login_required()
+def admin_delete_bulletin_ajax(request):
+    """ Ajax call to delete a bulletin from a congress """
+
+    if request.method == "GET":
+        bulletin_id = request.GET["bulletin_id"]
+
+    bulletin = get_object_or_404(Bulletin, pk=bulletin_id)
+
+    # check access
+    role = "events.org.%s.edit" % bulletin.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    bulletin.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
