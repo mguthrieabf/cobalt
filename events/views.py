@@ -697,9 +697,12 @@ def delete_event_entry(request, event_entry_id):
         title = "This Event has already started"
         return render(request, "events/error.html", {"title": title, "error": error})
 
-    if event_entry.event.start_date() == datetime.now().date():
-        error = "You need to contact the convener directly to make any changes on the same day."
-        title = "This Event starts today"
+    # check if passed the automatic refund date
+    print(event_entry.event.congress.automatic_refund_cutoff)
+    print(datetime.now().date())
+    if event_entry.event.congress.automatic_refund_cutoff <= datetime.now().date():
+        error = "You need to contact the convener directly to make any changes to this entry."
+        title = "This Event is too soon"
         return render(request, "events/error.html", {"title": title, "error": error})
 
     event_entry_players = EventEntryPlayer.objects.filter(event_entry=event_entry)

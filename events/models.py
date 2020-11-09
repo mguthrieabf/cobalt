@@ -158,6 +158,7 @@ class Congress(models.Model):
     # Open and close dates can be overriden at the event level
     entry_open_date = models.DateField(null=True, blank=True)
     entry_close_date = models.DateField(null=True, blank=True)
+    automatic_refund_cutoff = models.DateField(null=True, blank=True)
     allow_partnership_desk = models.BooleanField(default=False)
     author = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="author", null=True, blank=True

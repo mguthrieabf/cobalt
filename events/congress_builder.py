@@ -40,7 +40,7 @@ from rbac.core import (
     rbac_get_users_with_role,
     rbac_user_has_role,
 )
-from rbac.views import rbac_user_has_role, rbac_forbidden
+from rbac.views import rbac_forbidden
 from .core import events_payments_callback
 from payments.core import payment_api, org_balance, update_account, update_organisation
 from organisations.models import Organisation
@@ -331,6 +331,9 @@ def create_congress_wizard_5(request, step_list, congress):
             ]
             congress.entry_open_date = form.cleaned_data["entry_open_date"]
             congress.entry_close_date = form.cleaned_data["entry_close_date"]
+            congress.automatic_refund_cutoff = form.cleaned_data[
+                "automatic_refund_cutoff"
+            ]
             congress.allow_partnership_desk = form.cleaned_data[
                 "allow_partnership_desk"
             ]
@@ -363,6 +366,10 @@ def create_congress_wizard_5(request, step_list, congress):
         initial = {}
         if congress.entry_open_date:
             initial["entry_open_date"] = congress.entry_open_date.strftime("%d/%m/%Y")
+        if congress.automatic_refund_cutoff:
+            initial[
+                "automatic_refund_cutoff"
+            ] = congress.automatic_refund_cutoff.strftime("%d/%m/%Y")
         if congress.entry_close_date:
             initial["entry_close_date"] = congress.entry_close_date.strftime("%d/%m/%Y")
         if congress.early_payment_discount_date:
@@ -383,6 +390,7 @@ def create_congress_wizard_5(request, step_list, congress):
     form.fields["payment_method_cheques"].required = True
     form.fields["entry_open_date"].required = True
     form.fields["entry_close_date"].required = True
+    form.fields["automatic_refund_cutoff"].required = True
     form.fields["allow_partnership_desk"].required = True
     form.fields["allow_early_payment_discount"].required = True
     form.fields["bank_transfer_details"].required = True
@@ -440,7 +448,9 @@ def create_congress_wizard_7(request, step_list, congress):
             congress.status = "Published"
             congress.save()
             messages.success(
-                request, "Congress published", extra_tags="cobalt-message-success",
+                request,
+                "Congress published",
+                extra_tags="cobalt-message-success",
             )
             return redirect("events:view_congress", congress_id=congress.id)
 
@@ -679,7 +689,9 @@ def create_session(request, event_id):
         form = SessionForm()
 
     return render(
-        request, "events/create_session.html", {"form": form, "event": event},
+        request,
+        "events/create_session.html",
+        {"form": form, "event": event},
     )
 
 
