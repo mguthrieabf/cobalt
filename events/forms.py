@@ -7,6 +7,7 @@ from .models import (
     EventPlayerDiscount,
     CongressMaster,
     Bulletin,
+    PartnershipDesk,
 )
 from organisations.models import Organisation
 from django_summernote.widgets import SummernoteInplaceWidget
@@ -358,3 +359,9 @@ class BulletinForm(forms.ModelForm):
     class Meta:
         model = Bulletin
         fields = ("document", "congress", "description")
+
+
+class PartnershipForm(forms.ModelForm):
+    class Meta:
+        model = PartnershipDesk
+        fields = ("event", "private", "comment", "player")

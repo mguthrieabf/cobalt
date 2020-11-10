@@ -47,7 +47,9 @@
               </td>
               <td>{{ looking.comment }}</td>
               <td>
+              {% if looking.player != request.user %}
                 <button class="btn btn-sm btn-success contact_button" id="contact_{{ looking.id }}">Contact</button>
+              {% endif %}
               {% if looking.player == request.user %}
               <button class="btn btn-sm btn-danger delete_button">Delete</button>
               {% endif %}
@@ -60,7 +62,7 @@
 
         <div class="row">
           <div class="col text-center">
-            <a href="" class="btn btn-info">Signup to Partnership Desk</a>
+            <a href="{% url "events:partnership_desk_signup" event_id=event.id congress_id=event.congress.id %}" class="btn btn-info">Signup to Partnership Desk</a>
           </div>
         </div>
       {% endif %}
@@ -113,13 +115,13 @@
 
       Swal.fire({
         title: 'Contact This Member',
-        text: "Your email address and phone number will be shared with this person.",
+        html: "Your email address and phone number (if we have it) will be shared with this person. They may or may not choose to contact you. Please don't take it personally if you do not hear back from them.<br><br>Enter an optional message to send:",
         input: 'text',
 
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Contact Them'
+        confirmButtonText: 'Send Contact Request'
       }).then((result) => {
         if (result.value) {
           $.get("{% url "events:contact_partnership_desk_person_ajax" %}?partnership_desk_id=" + $(this).attr('id').split('_')[1] +"&message=" + result.value)

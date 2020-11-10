@@ -167,6 +167,11 @@ urlpatterns = [
         views.view_events,
         name="view_events",
     ),
+    path(
+        "congress/event/partnership-desk-signup/<int:congress_id>/<int:event_id>",
+        views.partnership_desk_signup,
+        name="partnership_desk_signup",
+    ),
     ########################################################################
     # Congress Builder screens for conveners to create and edit congresses #
     ########################################################################

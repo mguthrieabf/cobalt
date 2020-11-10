@@ -35,6 +35,7 @@ from .forms import (
     EventEntryPlayerForm,
     RefundForm,
     CongressMasterForm,
+    PartnershipForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -663,11 +664,15 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, f"Payment successful", extra_tags="cobalt-message-success",
+                request,
+                f"Payment successful",
+                extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, f"Payment failed", extra_tags="cobalt-message-error",
+                request,
+                f"Payment failed",
+                extra_tags="cobalt-message-error",
             )
 
     return render(
@@ -1419,4 +1424,38 @@ def view_event_partnership_desk(request, congress_id, event_id):
             "admin": admin,
             "already": already,
         },
+    )
+
+
+@login_required()
+def partnership_desk_signup(request, congress_id, event_id):
+    """ sign up for the partnership desk """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    if request.method == "POST":
+
+        form = PartnershipForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Partnership request accepted. Look out for emails from potential partners.",
+                extra_tags="cobalt-message-success",
+            )
+            return redirect(
+                "events:view_event_partnership_desk",
+                event_id=event.id,
+                congress_id=event.congress.id,
+            )
+        else:
+            print(form.errors)
+    else:
+
+        form = PartnershipForm()
+
+    return render(
+        request, "events/partnership_desk_signup.html", {"form": form, "event": event}
     )
