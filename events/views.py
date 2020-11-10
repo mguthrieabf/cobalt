@@ -234,7 +234,12 @@ def view_congress(request, congress_id, fullscreen=False):
                 else:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/enter/{congress.id}/{event.id}'>Enter</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a>"
+                    if congress.allow_partnership_desk:
+                        program[
+                            "links"
+                        ] += f"<br><a href='/events/congress/event/view-event-partnership-desk/{congress.id}/{event.id}'>Partnership Desk</a>"
+                    program["links"] += "</td>"
                 first_row_for_event = False
             program["day"] = "<td>%s</td>" % day.session_date.strftime("%A")
 
@@ -658,15 +663,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request,
-                f"Payment successful",
-                extra_tags="cobalt-message-success",
+                request, f"Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request,
-                f"Payment failed",
-                extra_tags="cobalt-message-error",
+                request, f"Payment failed", extra_tags="cobalt-message-error",
             )
 
     return render(
