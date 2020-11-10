@@ -664,15 +664,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request,
-                f"Payment successful",
-                extra_tags="cobalt-message-success",
+                request, f"Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request,
-                f"Payment failed",
-                extra_tags="cobalt-message-error",
+                request, f"Payment failed", extra_tags="cobalt-message-error",
             )
 
     return render(
@@ -712,7 +708,10 @@ def delete_event_entry(request, event_entry_id):
     # check if passed the automatic refund date
     print(event_entry.event.congress.automatic_refund_cutoff)
     print(datetime.now().date())
-    if event_entry.event.congress.automatic_refund_cutoff <= datetime.now().date():
+    if (
+        event_entry.event.congress.automatic_refund_cutoff
+        and event_entry.event.congress.automatic_refund_cutoff <= datetime.now().date()
+    ):
         error = "You need to contact the convener directly to make any changes to this entry."
         title = "This Event is too soon"
         return render(request, "events/error.html", {"title": title, "error": error})
