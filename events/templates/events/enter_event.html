@@ -214,9 +214,11 @@ function cobaltMemberSearchOk(search_id) {
               user_entry_fee(member_id[search_id], search_id);
               user_payment_method(member_id[search_id], search_id);
             }
+            is_form_complete();
           }
       });
     }
+    is_form_complete();
 }
 
 // if generic search is cancelled reset the player field
@@ -336,7 +338,22 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
   });
 }
 
-// lets get ready to rumble!!!
+function is_form_complete(){
+// see if form is now complete
+    var complete = 0;
+    $(".cobalt-playerN").each(function(i, obj){
+      if ($(this).val()>0) {
+        complete+=1;
+      }
+    });
+    if (complete=={{ min_entries }}){
+      $("#id_checkout").prop("disabled", false);
+      $("#id_cart").prop("disabled", false);
+      $("#plus_4").show();
+    }
+}
+
+// Doc Ready
 $(document).ready(function(){
 
 // calculate totals
@@ -420,19 +437,7 @@ $(document).ready(function(){
       previous[this_id] = this.value;
       previous_name[this_id] = $('#' + this_id).find('option:selected').text();
 
-
-// see if form is now complete
-    var complete = 0;
-    $(".cobalt-playerN").each(function(i, obj){
-      if ($(this).val()>0) {
-        complete+=1;
-      }
-    });
-    if (complete=={{ min_entries }}){
-      $("#id_checkout").prop("disabled", false);
-      $("#id_cart").prop("disabled", false);
-      $("#plus_4").show();
-    }
+      is_form_complete();
   });
 
 // when player payment method changes update totals

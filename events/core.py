@@ -147,7 +147,10 @@ def update_entries(route_payload, payment_user):
     # easier to understand as 2 separate bits of code
     for event_entry in event_entries:
         for event_entry_player in event_entry.evententryplayer_set.all():
-            if event_entry_player.payment_type == "their-system-dollars":
+            if (
+                event_entry_player.payment_type == "their-system-dollars"
+                and event_entry_player.payment_status != "Paid"
+            ):
                 payments_core.payment_api(
                     request=None,
                     member=event_entry_player.player,

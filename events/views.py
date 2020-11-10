@@ -487,7 +487,7 @@ def pay_outstanding(request):
     event_entry_players = (
         EventEntryPlayer.objects.exclude(payment_status="Paid")
         .filter(player=request.user)
-        .filter(evententry__entry_status="Cancelled")
+        .exclude(event_entry__entry_status="Cancelled")
     )
 
     # redirect if nothing owing
@@ -1307,7 +1307,7 @@ def enter_event(request, congress_id, event_id):
         # see if we got a free format answer
         answer = request.POST.get("free_format_answer", None)
         if answer:
-            event_entry.free_format_answer = answer
+            event_entry.free_format_answer = answer[:60]
 
         event_entry.save()
 
