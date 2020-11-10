@@ -24,6 +24,7 @@ from .models import (
     PlayerBatchId,
     EventLog,
     Bulletin,
+    PartnershipDesk,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -224,7 +225,12 @@ def view_congress(request, congress_id, fullscreen=False):
                 if program["entry"]:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>View Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a></td>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>View Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a>"
+                    if congress.allow_partnership_desk:
+                        program[
+                            "links"
+                        ] += f"<br><a href='/events/congress/event/view-event-partnership-desk/{congress.id}/{event.id}'>Partnership Desk</a>"
+                    program["links"] += "</td>"
                 else:
                     program[
                         "links"
@@ -1353,6 +1359,14 @@ def enter_event(request, congress_id, event_id):
                 event_entry_player.entry_fee = 0
                 event_entry_player.reason = "Team > 4"
                 event_entry_player.payment_status = "Paid"
+
+            # set payment status depending on payment type
+            if (
+                event_entry_player.payment_status != "Paid"
+                and event_entry_player.payment_type
+                in ["bank-transfer", "cash", "cheque"]
+            ):
+                event_entry_player.payment_status = "Pending Manual"
             event_entry_player.save()
 
             # Log it
@@ -1373,3 +1387,35 @@ def enter_event(request, congress_id, event_id):
 
     else:
         return enter_event_form(event, congress, request)
+
+
+@login_required()
+def view_event_partnership_desk(request, congress_id, event_id):
+    """ Show the partnership desk for an event """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    partnerships = PartnershipDesk.objects.filter(event=event)
+
+    # admins can see private entries
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if rbac_user_has_role(request.user, role):
+        admin = True
+    else:
+        admin = False
+
+    if partnerships.filter(player=request.user):
+        already = True
+    else:
+        already = False
+
+    return render(
+        request,
+        "events/view_event_partnership_desk.html",
+        {
+            "partnerships": partnerships,
+            "event": event,
+            "admin": admin,
+            "already": already,
+        },
+    )

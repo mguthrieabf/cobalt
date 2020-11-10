@@ -335,6 +335,25 @@ class EmailForm(forms.Form):
     )
 
 
+class LatestNewsForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(LatestNewsForm, self).__init__(*args, **kwargs)
+
+        # Hide the crispy labels
+        self.fields["latest_news"].label = False
+
+    latest_news = forms.CharField(
+        widget=SummernoteInplaceWidget(
+            attrs={
+                "summernote": {
+                    "height": "250",
+                    "placeholder": "<br><br>Enter the latest news for the top of your homepage. If this is blank it will be skipped. If you overwrite what is in here it will be lost.",
+                }
+            }
+        )
+    )
+
+
 class BulletinForm(forms.ModelForm):
     class Meta:
         model = Bulletin

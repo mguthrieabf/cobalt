@@ -19,6 +19,7 @@ from .models import (
     EventPlayerDiscount,
     EVENT_PLAYER_FORMAT_SIZE,
     Bulletin,
+    PartnershipDesk,
 )
 from accounts.models import User, TeamMate
 from notifications.views import contact_member
@@ -774,6 +775,81 @@ def admin_delete_bulletin_ajax(request):
         return rbac_forbidden(request, role)
 
     bulletin.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def delete_me_from_partnership_desk(request, event_id):
+    """ delete this user from the partnership desk """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    partnership = (
+        PartnershipDesk.objects.filter(player=request.user).filter(event=event).first()
+    )
+
+    if partnership:
+        # Log it
+        EventLog(
+            event=event,
+            actor=request.user,
+            action="Deleted partnership desk listing",
+        ).save()
+        partnership.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def contact_partnership_desk_person_ajax(request):
+    """ get in touch with someone who you want to play with from the partnership desk """
+
+    if request.method == "GET":
+        partnership_desk_id = request.GET["partnership_desk_id"]
+        partnership_desk = get_object_or_404(PartnershipDesk, pk=partnership_desk_id)
+        message = request.GET["message"]
+
+        # Log it
+        EventLog(
+            event=partnership_desk.event,
+            actor=request.user,
+            action=f"Shared partnership desk details with {partnership_desk.player}",
+        ).save()
+
+        email_body = f"""{request.user} has responded to your partnership desk search.<br><br>
+                        <h3>Message</h3>
+                        {message}<br><br>
+                        <h3>Details</h3>
+                        Event: {partnership_desk.event}<br>
+                        Email: <a href="mailto:{request.user.email}">{request.user.email}</a><br>
+                        Phone: {request.user.mobile}<br><br>
+        """
+
+        context = {
+            "name": partnership_desk.player.first_name,
+            "title": "Partner Request",
+            "email_body": email_body,
+            "host": COBALT_HOSTNAME,
+            "link": "/events/view",
+            "link_text": "View Event",
+        }
+
+        html_msg = render_to_string("notifications/email_with_button.html", context)
+
+        # send
+        contact_member(
+            member=partnership_desk.player,
+            msg="Partnership Message from %s" % request.user.full_name,
+            contact_type="Email",
+            html_msg=html_msg,
+            link="/events/view",
+            subject="Partnership Message",
+        )
 
     response_data = {}
     response_data["message"] = "Success"

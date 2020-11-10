@@ -28,6 +28,19 @@
       </div>
       {% endif %}
 
+      {% if congress.latest_news %}
+      <div class="row">
+        <div class="card col-lg-10 mx-auto">
+          <div class="card-header card-header-success">
+            <h4 class="card-title">Latest News</h4>
+          </div>
+          <div class="card-body">
+            {{ congress.latest_news|safe }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="row">
         <div class="col-lg-10 mx-auto">
           <div class="row">

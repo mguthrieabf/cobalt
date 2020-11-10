@@ -38,6 +38,7 @@ from .forms import (
     EventPlayerDiscountForm,
     EmailForm,
     BulletinForm,
+    LatestNewsForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -405,7 +406,7 @@ def admin_event_offsystem(request, event_id):
     players = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
         .exclude(payment_type__in=["my-system-dollars", "their-system-dollars"])
-        .exclude(event_entry__event_status="Cancelled")
+        .exclude(event_entry__entry_status="Cancelled")
     )
 
     return render(
@@ -793,4 +794,37 @@ def admin_bulletins(request, congress_id):
         request,
         "events/admin_bulletins.html",
         {"form": form, "congress": congress, "bulletins": bulletins},
+    )
+
+
+@login_required()
+def admin_latest_news(request, congress_id):
+    """ Manage latest news section """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+        form = LatestNewsForm(request.POST)
+
+        if form.is_valid():
+            congress.latest_news = form.cleaned_data["latest_news"]
+            congress.save()
+            messages.success(
+                request, "Latest News Updated", extra_tags="cobalt-message-success"
+            )
+
+            return redirect("events:view_congress", congress_id=congress.id)
+
+    else:
+        form = LatestNewsForm()
+
+    return render(
+        request,
+        "events/admin_latest_news.html",
+        {"form": form, "congress": congress},
     )

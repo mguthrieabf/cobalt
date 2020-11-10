@@ -35,6 +35,11 @@ urlpatterns = [
         name="view_event_entries",
     ),
     path(
+        "congress/event/view-event-partnership-desk/<int:congress_id>/<int:event_id>",
+        views.view_event_partnership_desk,
+        name="view_event_partnership_desk",
+    ),
+    path(
         "congress/event/change-entry/<int:congress_id>/<int:event_id>",
         views.edit_event_entry,
         name="edit_event_entry",
@@ -141,6 +146,21 @@ urlpatterns = [
         "congress/event/delete-player-from-entry",
         ajax.delete_player_from_entry_ajax,
         name="delete_player_from_entry_ajax",
+    ),
+    path(
+        "congress/event/contact_partnership_desk_person",
+        ajax.contact_partnership_desk_person_ajax,
+        name="contact_partnership_desk_person_ajax",
+    ),
+    path(
+        "congress/event/delete-me-from-partnership-desk/<int:event_id>",
+        ajax.delete_me_from_partnership_desk,
+        name="delete_me_from_partnership_desk",
+    ),
+    path(  # dummy for entry above
+        "congress/event/delete-me-from-partnership-desk",
+        ajax.delete_me_from_partnership_desk,
+        name="delete_me_from_partnership_desk",
     ),
     path(
         "view",
@@ -298,6 +318,11 @@ urlpatterns = [
         "congress-admin/bulletins/<int:congress_id>",
         congress_admin.admin_bulletins,
         name="admin_bulletins",
+    ),
+    path(
+        "congress-admin/latest-news/<int:congress_id>",
+        congress_admin.admin_latest_news,
+        name="admin_latest_news",
     ),
     path(
         "congress-admin/bulletin/delete",

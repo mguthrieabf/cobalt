@@ -31,7 +31,7 @@ def home(request):
         payments = get_balance_detail(request.user)
         posts = get_posts(request)
         posts2 = get_announcements(request)
-        events = get_events(request.user)
+        events, unpaid = get_events(request.user)
 
         return render(
             request,
@@ -42,6 +42,7 @@ def home(request):
                 "posts": posts,
                 "posts2": posts2,
                 "events": events,
+                "unpaid": unpaid,
             },
         )
 

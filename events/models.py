@@ -136,6 +136,7 @@ class Congress(models.Model):
 
     general_info = models.TextField("General Information", null=True, blank=True)
     links = models.TextField("Links", null=True, blank=True)
+    latest_news = models.TextField("Latest News", null=True, blank=True)
     payment_method_system_dollars = models.BooleanField(default=True)
     payment_method_bank_transfer = models.BooleanField(default=False)
     bank_transfer_details = models.TextField(
@@ -632,3 +633,16 @@ class Bulletin(models.Model):
 
     def __str__(self):
         return f"{self.congress} - {self.description}"
+
+
+class PartnershipDesk(models.Model):
+    """ Partnership Desk players looking for partners """
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    private = models.BooleanField(default=False)
+    comment = models.TextField("Comment", null=True, blank=True)
+    create_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.event} - {self.player}"

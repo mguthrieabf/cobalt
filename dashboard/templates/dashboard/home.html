@@ -101,6 +101,9 @@
 
 
         <div class="card-body table-responsive">
+          {% if unpaid == True %}
+          You have unpaid entries <a class="btn btn-sm btn-danger" href='{% url "events:view_events" %}'>Pay Now</a><br>
+          {% endif %}
           {% for event in events %}
             {{ event.event_entry.event.start_date }}:
             <a class="card-link" href="{% url "events:view_congress" congress_id=event.event_entry.event.congress.id %}">
@@ -109,7 +112,14 @@
              {{ event.event_entry.event.event_name }}</a>
              {% if event.in_cart %}
               (in shopping basket)
-              {% endif %}
+             {% endif %}
+              {% if event.payment_status == "Pending Manual" and event.payment_type == "bank-transfer" %}
+                (transfer pending)
+             {% endif %}
+              {% if event.payment_status == "Pending Manual" and event.payment_type == "cheque" %}
+                (cheque pending)  
+             {% endif %}
+
              <br>
           {% empty %}
             <span class="card-link">Nothing booked</span>

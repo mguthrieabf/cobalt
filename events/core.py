@@ -335,6 +335,7 @@ def get_events(user):
 
     # Only include the ones in the future
     upcoming = {}
+    unpaid = False
     for event_entry_player in event_entry_players:
 
         # start_date on event is a function, not a field
@@ -346,12 +347,15 @@ def get_events(user):
             ).count()
             event_entry_player.in_cart = in_cart
             upcoming[event_entry_player] = start_date
+            # check if unpaid
+            if event_entry_player.payment_status == "Unpaid":
+                unpaid = True
 
     upcoming_sorted = {
         key: value for key, value in sorted(upcoming.items(), key=lambda item: item[1])
     }
 
-    return upcoming_sorted
+    return upcoming_sorted, unpaid
 
 
 def get_conveners_for_congress(congress):
