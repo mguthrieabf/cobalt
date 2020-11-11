@@ -70,8 +70,8 @@ Player0 is the logged in player - not handled here
     <nobr>
     <span id="player{{ our_form_row.player_no }}_discount_alert">&nbsp;</span>
     <td class="text-right">
-    <input class="pay_now" id="fee_{{ our_form_row.player_no }}_now" type="text" size="10" readonly style="border: none;" value="" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
+    <input class="pay_now" id="fee_{{ our_form_row.player_no }}_now" type="text" size="12" readonly style="border: none;" value="" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
     </nobr>
   <td class="col">
-    <input class="pay_later" id="fee_{{ our_form_row.player_no }}_later" type="text" size="10" readonly style="border: none;" value="" }}" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
+    <input class="pay_later" id="fee_{{ our_form_row.player_no }}_later" type="text" size="12" readonly style="border: none;" value="" }}" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
 </tr>

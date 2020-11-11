@@ -104,10 +104,10 @@
                             &nbsp;
                             {% endif %}
                             <td class="text-right">
-                            <input id="fee_0_now" class="pay_now" type="text" size="10" readonly style="border: none;" value="{{ player0.entry_fee_you|cobalt_credits }}">
+                            <input id="fee_0_now" class="pay_now" type="text" size="12" readonly style="border: none;" value="{{ player0.entry_fee_you|cobalt_credits }}">
                           </nobr>
                         <td class="col">
-                          <input id="fee_0_later" class="pay_later" type="text" size="10" readonly style="border: none;" value="">
+                          <input id="fee_0_later" class="pay_later" type="text" size="12" readonly style="border: none;" value="">
                       </tr>
 
 {% for our_form_row in our_form %}
@@ -118,9 +118,9 @@
                       <td>
                       <td class="col" style="text-align: right; padding-right:18px;"><b>Total</b>
                       <td class="col" align="right">
-                        <input id="total_now" type="text" size="10" readonly style="border: none;" value="">
+                        <input id="total_now" type="text" size="12" readonly style="border: none;" value="">
                       <td class="col">
-                        <input id="total_later" type="text" size="10" style="border: none;" readonly value="">
+                        <input id="total_later" type="text" size="12" style="border: none;" readonly value="">
                     </tr>
 
                 </tbody>
@@ -392,7 +392,8 @@ $(document).ready(function(){
   // when player N identity changes get their entry fee and update table
   $('.cobalt-playerN').change(function(event) {
 
-      var user_id = this.value;
+    //  var user_id = this.value;
+      var user_id = $(this).val();
       var search_id = event.target.id.slice(-1);
       var this_id = event.target.id;
 
@@ -434,7 +435,8 @@ $(document).ready(function(){
         });
       };
       $('.selectpicker').selectpicker('refresh');
-      previous[this_id] = this.value;
+      previous[this_id] = $(this).val();
+    //  previous[this_id] = this.value;
       previous_name[this_id] = $('#' + this_id).find('option:selected').text();
 
       is_form_complete();
