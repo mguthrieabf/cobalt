@@ -3,8 +3,14 @@
 {% load static %}
 {% load cobalt_tags %}
 
+
+
 {% block content %}
 
-    <a href="{% url "events:events" %}" class="btn btn-danger">View Upcoming Congresses</a>
+
+    <a href="{% url "events:events" %}" class="btn btn-danger" style="width:240px">View Upcoming Congresses</a><br>
+    <a href="{% url "events:events" %}" class="btn btn-dark" style="width:240px">Visit Our Main Site</a><br>
+    <a href="{% url "events:events" %}" class="btn btn-primary" style="width:240px">Learn To Play</a>
+
 
 {% endblock %}

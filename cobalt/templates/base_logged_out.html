@@ -38,34 +38,44 @@ body {
 }
 </style>
 
-
   {% block header %}
+  <style>
+    .bg {
+      height: 100%;
+      background-image: url("{% static "assets/img/backgrounds/cards.jpg" %}");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+
+    }
+
+
+
+
+
+
+
+
+  </style>
   {% endblock %}
+
 </head>
 
 <body>
-  <div class="content">
-    <div class="card">
-      <div class="card-header card-header-warning">
-        <h2>
-            <div class="d-flex justify-content-between">
-              <div>
-                {{ GLOBAL_ORG }} Tech
-              </div>
-              <div>
-              <a href="{% url "accounts:register" %}" class="btn btn-primary">Sign Up</a>
-              <a href="{% url "dashboard:dashboard" %}" class="btn btn-success">Sign In</a>
+  <div class="bg" id="bg">
+    <div class="px-5">
+    <div class="text-right">
+      <a href="{% url "accounts:register" %}" class="btn btn-info btn-sm" >Sign Up</a>
+      <a href="{% url "dashboard:dashboard" %}" class="btn btn primary btn-sm">Sign In</a>
+    </div>
+<!-- <img src="{% static "assets/img/abftechlogo.png" %}" style="width:200px; border:2px"> -->
+  <div class="display-1">{{ GLOBAL_ORG }} Tech</div>
 
-              </div>
-        </h2>
-      </div>
-      <div class="card-body">
-            <h1>I am an ugly screen, but we can fix that later</h1>
         {% block content %}
         {% endblock %}
-      </div>
-    </div>
-  </div>
+</div>
+</div>
+</body>
   <footer class="footer">
         <div class="container-fluid">
           <nav class="float-left">
