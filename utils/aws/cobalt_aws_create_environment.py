@@ -149,9 +149,8 @@ def main():
         choices=ENVS,
         help="Environment. Options are: " + ", ".join(ENVS),
         required=True,
-        metavar="",
     )
-    parser.add_argument("-d", "--dns_name", help="DNS sub-domain. Defaults to env_name")
+    parser.add_argument("-d", "--dns_name", help="DNS sub-domain. Defaults to env_nam")
 
     args = parser.parse_args()
 
