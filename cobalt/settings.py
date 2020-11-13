@@ -256,7 +256,7 @@ if "FILE_SYSTEM_ID" in os.environ:  # AWS EFS for media
 MEDIA_URL = "/media/"
 
 LOGIN_REDIRECT_URL = "/dashboard"
-LOGOUT_REDIRECT_URL = "/accounts/login"
+LOGOUT_REDIRECT_URL = "/"
 
 MESSAGE_TAGS = {
     messages.DEBUG: "alert-info",
