@@ -1,6 +1,7 @@
 {% extends template %}
 {% load static %}
-
+{% block animate %}
+{% endblock %}
 {% block content %}
 {% if congress.raw_html %}
 {{ congress.raw_html|safe }}

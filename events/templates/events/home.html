@@ -1,6 +1,8 @@
 {% extends request.user.is_authenticated|yesno:"base.html,base_logged_out.html" %}
 {% load static %}
 
+{% block animate %}
+{% endblock %}
 {% block content %}
 
 <div class="card">

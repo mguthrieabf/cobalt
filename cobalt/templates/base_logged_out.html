@@ -16,74 +16,61 @@
   <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
   <link href="{% static "assets/css/cobalt.css" %}" rel="stylesheet" />
   <link href="{% static "assets/css/font-awesome.5.14/css/all.min.css" %}" rel="stylesheet" />
-  <link href="{% static "assets/css/animate.4.0.0/animate.min.css" %}" rel="stylesheet" />
 
   <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
   <script src="{% static "assets/js/core/popper.min.js" %}"></script>
   <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
   <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@900&display=swap" rel="stylesheet">
+
+{% block animate %}
+<!-- Override this to prevent animation -->
+  <link href="{% static "assets/css/animate.4.0.0/animate.min.css" %}" rel="stylesheet" />
+{% endblock %}
+
+{% block header %}
 <style>
-html, body {
-  height: 100%;
-}
-body {
-  display: flex;
-  flex-direction: column;
-}
-.content {
-  flex: 1 0 auto;
-}
-.footer {
-  flex-shrink: 0;
+
+ .local-font {
+    font-family: 'Roboto Slab', serif;
 }
 </style>
-
-  {% block header %}
-  <style>
-    .bg {
-      height: 100%;
-      background-image: url("{% static "assets/img/backgrounds/cards.jpg" %}");
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-
-  #bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  /* Preserve aspet ratio */
-  min-width: 100%;
-  min-height: 100%;
-}
-  </style>
-  {% endblock %}
+{% endblock %}
 
 </head>
 
-<body class="bg-white" style="padding-bottom: 70px;">
+<body class="bg-white" style="padding-bottom: 70px;>
   <div class="container-fluid px-5 py-3 bg-white">
     <div class="d-flex justify-content-between">
-      <div>
-        <img src="{% static "assets/img/abftechlogo.png" %}" style="width:150px; border:2px">
+      <div class="text-center animate__animated animate__fadeInDown animate__delay-1s">
+        <a href="/"><img src="{% static "assets/img/abftechlogo.png" %}" style="width:150px; border:2px"></a>
+        <br>ABF Tech
       </div>
       <div>
-        <span class="text-left"><h1 class="animate__animated animate__lightSpeedInLeft">{{ GLOBAL_ORG }} Tech</h1></span>
+        <span class="text-left"><h1 class="text-center display-2 local-font animate__animated animate__lightSpeedInLeft animate__delay-1s animate__slow">Australian Bridge Federation</h1></span>
+        <span class="text-center"><h3 class=" local-font animate__animated animate__fadeInUpBig animate__delay-3s">New Technology Site</h3></span>
         </div>
-        <div class="text-right">
+        <div class="text-right px-3 py-2 animate__animated animate__fadeInDown animate__delay-1s">
           <a href="{% url "accounts:register" %}" class="btn btn-info btn-sm" >Sign Up</a>
           <a href="{% url "dashboard:dashboard" %}" class="btn btn primary btn-sm">Sign In</a>
         </div>
      </div>
-    <div class="text-center">
-        {% block content %}
-        {% endblock %}
+     <div class="container">
+
+       <div class="d-flex justify-content-center align-items-center">
+         <div class="container">
+            <div class="my-auto">
+              {% block content %}
+              {% endblock %}
+             </div>
+          </div>
+       </div>
     </div>
   </div>
 </body>
-  <footer class="footer navbar fixed-bottom">
+  <footer class="footer {% block fixed_bottom %}{% endblock %}">
         <div class="container-fluid">
           <nav class="float-left">
             <ul>
@@ -122,8 +109,6 @@ body {
           </div>
         </div>
       </footer>
-    </div>
-  </div>
 
   {% block footer %}
   {% endblock %}
