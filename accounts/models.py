@@ -78,7 +78,7 @@ class User(AbstractUser):
         if self.id in (TBA_PLAYER, RBAC_EVERYONE):
             return self.first_name
         else:
-            return "%s(%s: %s)" % (self.full_name, GLOBAL_ORG, self.system_number)
+            return "%s (%s: %s)" % (self.full_name, GLOBAL_ORG, self.system_number)
 
     @property
     def full_name(self):

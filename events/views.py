@@ -1,15 +1,33 @@
-import csv
+""" This module has the views that are used by normal players """
+
+from datetime import datetime
+from decimal import Decimal
+import uuid
+import pytz
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.forms import formset_factory
-from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone, dateformat
+from django.contrib import messages
+from django.db.models import Sum
 from utils.templatetags.cobalt_tags import cobalt_credits
-from django.db.models import Sum, Q
+
 from notifications.views import contact_member
-from logs.views import log_event
+from accounts.models import User, TeamMate
+from rbac.core import (
+    rbac_user_allowed_for_model,
+    rbac_get_users_with_role,
+    rbac_user_has_role,
+    rbac_group_id_from_name,
+)
+from rbac.views import rbac_forbidden
+from payments.core import payment_api, update_account, update_organisation
+from cobalt.settings import (
+    BRIDGE_CREDITS,
+    TIME_ZONE,
+    COBALT_HOSTNAME,
+    TBA_PLAYER,
+)
 from .models import (
     Congress,
     Category,
@@ -18,7 +36,6 @@ from .models import (
     Session,
     EventEntry,
     EventEntryPlayer,
-    PAYMENT_TYPES,
     EVENT_PLAYER_FORMAT_SIZE,
     BasketItem,
     PlayerBatchId,
@@ -26,43 +43,12 @@ from .models import (
     Bulletin,
     PartnershipDesk,
 )
-from accounts.models import User, TeamMate
 from .forms import (
-    CongressForm,
-    NewCongressForm,
-    EventForm,
-    SessionForm,
-    EventEntryPlayerForm,
-    RefundForm,
     CongressMasterForm,
     PartnershipForm,
 )
-from rbac.core import (
-    rbac_user_allowed_for_model,
-    rbac_get_users_with_role,
-    rbac_user_has_role,
-    rbac_group_id_from_name,
-)
-from rbac.views import rbac_forbidden
 from .core import events_payments_callback
-from payments.core import payment_api, org_balance, update_account, update_organisation
-from organisations.models import Organisation
-from django.contrib import messages
-import uuid
-from cobalt.settings import (
-    GLOBAL_ORG,
-    GLOBAL_CURRENCY_NAME,
-    BRIDGE_CREDITS,
-    TIME_ZONE,
-    COBALT_HOSTNAME,
-    TBA_PLAYER,
-)
-from datetime import datetime
-import itertools
-from utils.utils import cobalt_paginator
-from django.utils.timezone import make_aware, now, utc
-import pytz
-from decimal import Decimal
+
 
 TZ = pytz.timezone(TIME_ZONE)
 
@@ -359,7 +345,7 @@ def checkout(request):
                 route_payload=unique_id,
                 url=reverse("events:enter_event_success"),
                 url_fail=reverse("events:enter_event_payment_fail"),
-                payment_type="Entry to a congress",
+                payment_type="Entry to an event",
                 book_internals=False,
             )
 
@@ -528,7 +514,7 @@ def pay_outstanding(request):
         route_code="EV2",
         route_payload=unique_id,
         url=reverse("events:enter_event_success"),
-        payment_type="Entry to a congress",
+        payment_type="Entry to an event",
     )
 
 
@@ -644,10 +630,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
         if event_entry_player.entry_fee - event_entry_player.payment_received > 0:
             pay_count += 1
 
-    if pay_count >= 2:
-        pay_all = True
-    else:
-        pay_all = False
+    pay_all = bool(pay_count >= 2)
 
     # Check if still in basket
     in_basket = BasketItem.objects.filter(event_entry=event_entry).count()
@@ -664,11 +647,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, f"Payment successful", extra_tags="cobalt-message-success",
+                request, "Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, f"Payment failed", extra_tags="cobalt-message-error",
+                request, "Payment failed", extra_tags="cobalt-message-error",
             )
 
     return render(
@@ -958,7 +941,7 @@ def third_party_checkout_player(request, event_entry_player_id):
                     "pay_status": "fail",
                 },
             ),
-            payment_type="Entry to a congress",
+            payment_type="Entry to an event",
             book_internals=False,
         )
 
@@ -1033,7 +1016,7 @@ def third_party_checkout_entry(request, event_entry_id):
                     "pay_status": "fail",
                 },
             ),
-            payment_type="Entry to a congress",
+            payment_type="Entry to an event",
             book_internals=False,
         )
 
@@ -1165,7 +1148,7 @@ def enter_event_form(event, congress, request):
 
     # add another option for everyone except the current user
     if congress.payment_method_system_dollars:
-        pay_types.append(("other-system-dollars", f"Ask them to pay"))
+        pay_types.append(("other-system-dollars", "Ask them to pay"))
 
     # set values for other players
     team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
@@ -1404,10 +1387,7 @@ def view_event_partnership_desk(request, congress_id, event_id):
 
     # admins can see private entries
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
-    if rbac_user_has_role(request.user, role):
-        admin = True
-    else:
-        admin = False
+    admin = rbac_user_has_role(request.user, role)
 
     if partnerships.filter(player=request.user):
         already = True

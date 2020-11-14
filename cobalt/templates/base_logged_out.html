@@ -33,9 +33,10 @@
 {% block header %}
 <style>
 
- .local-font {
+.local-font {
     font-family: 'Roboto Slab', serif;
 }
+
 </style>
 {% endblock %}
 
@@ -45,12 +46,23 @@
   <div class="container-fluid px-5 py-3 bg-white">
     <div class="d-flex justify-content-between">
       <div class="text-center animate__animated animate__fadeInDown animate__delay-1s">
-        <a href="/"><img src="{% static "assets/img/abftechlogo.png" %}" style="width:150px; border:2px"></a>
-        <br>ABF Tech
+        <a href="/"><img src="{% static "assets/img/abftechlogo.png" %}" class="p-2" style="width:140px; border:2px"></a>
+        <!-- <br>ABF Tech -->
       </div>
       <div>
-        <span class="text-left"><h1 class="text-center display-2 local-font animate__animated animate__lightSpeedInLeft animate__delay-1s animate__slow">Australian Bridge Federation</h1></span>
-        <span class="text-center"><h3 class=" local-font animate__animated animate__fadeInUpBig animate__delay-3s">New Technology Site</h3></span>
+        <span class="text-left"><h1 class="text-center display-2 local-font animate__animated animate__lightSpeedInLeft animate__delay-1s animate__slow">
+<!-- Change text based upon screen size -->
+          <div class="d-lg-none display-2">ABF</div>
+          <div class="d-none d-lg-block">Australian Bridge Federation</div>
+
+        </h1></span>
+        <span class="text-center"><h3 class=" local-font animate__animated animate__fadeInUpBig animate__delay-3s">
+          <!-- <span class="d-md-none"><span style="font-size: 14px"></span></span>
+          <span class="d-none d-md-block"><span style="font-size: 20px">Free for members</span></span> -->
+
+
+
+        </h3></span>
         </div>
         <div class="text-right px-3 py-2 animate__animated animate__fadeInDown animate__delay-1s">
           <a href="{% url "accounts:register" %}" class="btn btn-info btn-sm" >Sign Up</a>
@@ -70,7 +82,7 @@
     </div>
   </div>
 </body>
-  <footer class="footer {% block fixed_bottom %}{% endblock %}">
+  <!-- <footer class="footer {% block fixed_bottom %}{% endblock %}">
         <div class="container-fluid">
           <nav class="float-left">
             <ul>
@@ -108,7 +120,7 @@
             {% now "Y" %}
           </div>
         </div>
-      </footer>
+      </footer> -->
 
   {% block footer %}
   {% endblock %}
