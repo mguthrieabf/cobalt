@@ -160,6 +160,11 @@
     {% include 'utils/generic_user_search_footer.html' with search_id=our_form_row.player_no %}
   {% endfor %}
 
+// Global var - When we change the players in Firefox this triggers the onchange
+// In Chrome it doesn't. This var is used to say that we
+
+player_not_changed = true;
+
 // callback from generic search if user is chosen
 function cobaltMemberSearchOk(search_id) {
 
@@ -395,6 +400,12 @@ $(document).ready(function(){
   $('.cobalt-playerN').change(function(event) {
 
       console.log("Event is " + event.type);
+      console.log("Player_not_changed: " + player_not_changed)
+
+// see if we changed this ourselves
+      if (player_not_changed == true){
+        return;
+      }
 
     //  var user_id = this.value;
       var user_id = $(this).val();
