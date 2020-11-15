@@ -346,11 +346,13 @@ function is_form_complete(){
         complete+=1;
       }
     });
+    console.log("complete is "+ complete);
     if (complete=={{ min_entries }}){
       $("#id_checkout").prop("disabled", false);
       $("#id_cart").prop("disabled", false);
       $("#plus_4").show();
     }
+    console.log("End of is_form_complete");
 }
 
 // Doc Ready
@@ -392,10 +394,15 @@ $(document).ready(function(){
   // when player N identity changes get their entry fee and update table
   $('.cobalt-playerN').change(function(event) {
 
+      console.log("Event is " + event.type);
+
     //  var user_id = this.value;
       var user_id = $(this).val();
       var search_id = event.target.id.slice(-1);
       var this_id = event.target.id;
+
+      console.log("Player Changed - " + user_id);
+      console.log("Search id = " + search_id);
 
   // check for search id=0
       if (user_id == 0){
@@ -410,13 +417,17 @@ $(document).ready(function(){
           console.log(user_id);
           console.log(search_id);
           user_entry_fee(user_id, search_id);
+          console.log("playerN after user_entry_fee");
           user_payment_method(user_id, search_id);
+          console.log("playerN after user_payment_method");
         }
 // remove from other lists
         if (user_id != {{ TBA_PLAYER }}) {
           $(".cobalt-playerN option[value='" + user_id + "']").each(function() {
             if ($(this).parent().attr('id') != this_id) {
+              console.log("Removing "+ $(this).attr('id'));
               $(this).remove();
+              console.log("after remove");
             }
           });
         }
@@ -438,7 +449,7 @@ $(document).ready(function(){
       previous[this_id] = $(this).val();
     //  previous[this_id] = this.value;
       previous_name[this_id] = $('#' + this_id).find('option:selected').text();
-
+      console.log("calling is_form_complete");
       is_form_complete();
   });
 

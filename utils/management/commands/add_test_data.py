@@ -125,7 +125,7 @@ class Command(BaseCommand):
         Requires csv files to have the app and model in the first row and
         the fieldnames in the second row."""
 
-        f = open(file)
+        f = open(file, encoding="ISO-8859-1")
 
         lines = f.readlines()
 
@@ -356,7 +356,7 @@ class Command(BaseCommand):
         print("\nCreating dummy forum posts")
         print("Running", end="", flush=True)
         count = 0
-        for post_counter in range(DUMMY_DATA_COUNT * 5):
+        for post_counter in range(DUMMY_DATA_COUNT * 10):
 
             user_list = list(self.id_array["accounts.User"].values())
             user_list.remove(self.id_array["accounts.User"]["EVERYONE"])
