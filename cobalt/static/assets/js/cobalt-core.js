@@ -1,4 +1,5 @@
 // send client side errors to the server to log
+
 window.onerror =
 function (message, source, lineno, colno, error) {
     console.log(message);
