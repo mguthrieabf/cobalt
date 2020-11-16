@@ -64,9 +64,9 @@ EVENT_TYPES = [
     ("Intermediate", "Intermediate"),
 ]
 EVENT_PLAYER_FORMAT = [
-    ("Individual", "Individual"),
+    #    ("Individual", "Individual"),
     ("Pairs", "Pairs"),
-    ("Teams of 3", "Teams of Three"),
+    #    ("Teams of 3", "Teams of Three"),
     ("Teams", "Teams"),
 ]
 EVENT_PLAYER_FORMAT_SIZE = {
@@ -189,6 +189,23 @@ class Congress(models.Model):
         role = "events.org.%s.edit" % self.congress_master.org.id
         return rbac_user_has_role(user, role)
 
+    def get_payment_methods(self):
+        """get a list of payment types for this congress. Excludes other-system-dollars
+        as this isn't applicable for the logged in user and is easier to add to the
+        list than remove"""
+
+        pay_methods = []
+        if self.payment_method_system_dollars:
+            pay_methods.append(("my-system-dollars", f"My {BRIDGE_CREDITS}"))
+        if self.payment_method_bank_transfer:
+            pay_methods.append(("bank-transfer", "Bank Transfer"))
+        if self.payment_method_cash:
+            pay_methods.append(("cash", "Cash on the day"))
+        if self.payment_method_cheques:
+            pay_methods.append(("cheque", "Cheque"))
+
+        return pay_methods
+
 
 class Event(models.Model):
     """ An event within a congress """
@@ -239,6 +256,25 @@ class Event(models.Model):
             close_date = self.congress.entry_close_date
         if close_date:
             if today > close_date:
+                return False
+
+        # check start date of event
+        start_date = self.start_date()
+        print("Start date:")
+        print(start_date)
+        print("Today:")
+        print(today)
+        if start_date and start_date < today:  # event started
+            return False
+        elif start_date == today:
+            start_time = self.start_time()
+            print("Start time:")
+            print(start_time)
+
+            print("Now:")
+            print(timezone.now().time())
+
+            if start_time and start_time < timezone.now().time():
                 return False
 
         return True
@@ -329,7 +365,7 @@ class Event(models.Model):
             return None
 
     def start_time(self):
-        """ return the start date of this event """
+        """ return the start time of this event """
         session = Session.objects.filter(event=self)
         if session:
             return session.earliest("session_date").session_start

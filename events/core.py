@@ -378,7 +378,7 @@ def notify_conveners(congress, event, subject, msg):
 
         context = {
             "name": convener.first_name,
-            "title": subject,
+            "title": "Convener Msg: " + subject,
             "email_body": f"{msg}<br><br>",
             "host": COBALT_HOSTNAME,
             "link": link,

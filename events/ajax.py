@@ -535,6 +535,9 @@ def change_player_entry_ajax(request):
         # Check entry fee - they can keep an early entry discount but nothing else
         #    original_entry_fee = event_entry_player.entry_fee
 
+        # default value
+        return_html = "Player successfully changed."
+
         # get the entry fee based upon when the entry was created
         entry_fee, discount, reason, description = event.entry_fee_for(
             event_entry_player.player,
@@ -560,21 +563,27 @@ def change_player_entry_ajax(request):
                 source="Events",
                 log_msg=event_entry_player.event_entry.event.event_name,
                 sub_source="events_callback",
-                payment_type="Entry to an event",
+                payment_type="Refund",
                 member=event_entry_player.paid_by,
             )
 
             # create payment for user
             update_account(
-                member=event_entry_player.player,
+                member=event_entry_player.paid_by,
                 amount=difference,
-                description=f"{event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
+                description=f"Refund for {event_entry_player.event_entry.event.event_name} - {event_entry_player.player}",
                 source="Events",
                 sub_source="events_callback",
-                payment_type="Entry to an event",
+                payment_type="Refund",
                 log_msg=event_entry_player.event_entry.event.event_name,
                 organisation=event_entry_player.event_entry.event.congress.congress_master.org,
             )
+
+            # update entry payment amount
+            event_entry_player.payment_received = event_entry_player.entry_fee
+            event_entry_player.save()
+
+            return_html = f"Player successfully changed. A refund of {difference} credits was paid to {event_entry_player.paid_by}"
 
             # Log it
             EventLog(
@@ -624,9 +633,10 @@ def change_player_entry_ajax(request):
             event_entry_player.payment_status = "Unpaid"
             event_entry_player.save()
             event_entry.check_if_paid()
+            return_html = f"Player succesfully changed. There are {difference} credits required for this player entry."
 
-        # the HTML screen reloads so no need to return anything to it
-        return JsonResponse({"message": "Success"})
+        # the HTML screen reloads but we need to tell the user what happened first
+        return JsonResponse({"message": "Success", "html": return_html})
 
 
 @login_required()
@@ -854,3 +864,29 @@ def contact_partnership_desk_person_ajax(request):
     response_data = {}
     response_data["message"] = "Success"
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def change_payment_method_on_existing_entry_ajax(request):
+    """ Ajax call from edit event entry screen to change payment method """
+
+    if request.method == "GET":
+        player_entry_id = request.GET["player_entry_id"]
+        payment_method = request.GET["payment_method"]
+
+        player_entry = get_object_or_404(EventEntryPlayer, pk=player_entry_id)
+
+        print(player_entry_id)
+        print(player_entry)
+        print(payment_method)
+
+        # Check access
+        if not player_entry.event_entry.user_can_change(request.user):
+            return JsonResponse({"message": "Access Denied"})
+
+        player_entry.payment_type = payment_method
+        player_entry.save()
+
+        return JsonResponse({"message": "Success"})
+
+    return JsonResponse({"message": "Invalid call"})

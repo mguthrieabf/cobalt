@@ -26,6 +26,9 @@
         <div class="card">
           <div class="card-header card-header-info">
             <h2>{{ event.event_name }} - Entry</h2>
+            {% if event_entry.category %}
+              <h3>Category - {{ event_entry.category }}</h3>
+            {% endif %}
             <h3>Entry by: {{ event_entry.primary_entrant }}</h3>
           </div>
 
@@ -63,6 +66,10 @@
               </tbody>
             </table>
           </div>
+          {% if event.free_format_question %}
+            <h3>{{ event.free_format_question }}</h3>
+            <p>{{ event_entry.free_format_answer }}</p>
+          {% endif %}
         </div>
       </div>
     </div>

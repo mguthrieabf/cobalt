@@ -172,6 +172,11 @@ urlpatterns = [
         views.partnership_desk_signup,
         name="partnership_desk_signup",
     ),
+    path(
+        "congress/event/change-payment-method-on-existing-entry-ajax",
+        ajax.change_payment_method_on_existing_entry_ajax,
+        name="change_payment_method_on_existing_entry_ajax",
+    ),
     ########################################################################
     # Congress Builder screens for conveners to create and edit congresses #
     ########################################################################

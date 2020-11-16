@@ -70,6 +70,13 @@
 <!-- outer wrapper for extra info -->
 {% if categories or event.free_format_question %}
 
+<!-- category and question display only if not in edit mode -->
+{% if categories %}
+<div class="category editable"><b>Category:</b> {{ event_entry.category }}</div>
+{% endif %}
+{% if event.free_format_question %}
+<div class="category editable"><b>{{ event.free_format_question }}:</b> {{ event_entry.free_format_answer }}</div>
+{% endif %}
   <div style = "border-radius: 25px; border: 2px solid grey; padding: 20px; display:none" class="editable extras">
 
  <!-- categories -->
@@ -101,7 +108,7 @@
 
 
       </div>
-      <button id="id_change" class="btn btn-sm btn-success">change answer</button>
+      <button id="id_change" class="btn btn-sm btn-success" disabled>change answer</button>
    </div>
 
  {% endif %}
@@ -240,8 +247,20 @@
                     </td>
 
   <!-- Payment method -->
-              <td style="white-space: nowrap;">{{ event_entry_player.get_payment_type_display }}</td>
-              <td>{{ event_entry_player.entry_fee|cobalt_credits }}</td>
+              <td style="white-space: nowrap;">
+              {{ event_entry_player.get_payment_type_display }}
+      <!-- check if payment method is editable -->
+                {% if event_entry_player.payment_status != "Paid" and event_entry_player.payment_status != "Free" %}
+                <a class="change_payment_method editable" href="javascript:void(0)" style="display: none">
+                  <i class="material-icons" id="change_payment_{{ event_entry_player.id }}">edit</i>
+                </a>
+                {% endif %}
+                </td>
+
+        <!-- Entry fee -->
+                <td>
+                {{ event_entry_player.entry_fee|cobalt_credits }}
+              </td>
               <td>
                 <div>
 
@@ -275,7 +294,7 @@
             </tr>
           {% endfor %}
 
-<!-- bottom fow of table has add player and pay all -->
+<!-- bottom row of table has add player and pay all -->
           <tr>
           <td colspan='6'>
             <!-- Show add player button if allowed -->
@@ -364,15 +383,62 @@ function editPlayer(member, name, pic, search_id) {
                 $("#popup-name-" + search_id).html(name);
                 Swal.fire({
                   title: 'Player Changed',
-                  html: 'Player successfully changed',
+                  html: response['html'],
                 }).then((result) => {
                   reloadPage();
                 })
-
               }
             });
         }
       })
+}
+
+// change payment type
+function change_payment_method(event){
+
+  var player_entry_id = event.target.id.split("_")[2];
+
+  var input_options = {
+
+{% for payment_method in payment_methods %}
+'{{ payment_method.0 }}': '{{ payment_method.1 }}',
+{% endfor %}
+
+  }
+
+// TODO: Add in their-bridge-credits and ask them as options if not the logged in user
+
+// This seems to needed to force Django's late/lazy eval stuff to actually work
+// Doesn't make any sense but fails without it
+  console.log(input_options);
+
+  (async () => {
+
+  const {value: payment_method} = await swal.fire({
+      title: 'Change Payment Method',
+      input: 'select',
+      inputOptions: input_options,
+      inputPlaceholder: 'Select method',
+      showCancelButton: true,
+  })
+
+  if (payment_method) {
+      $.getJSON("{% url "events:change_payment_method_on_existing_entry_ajax" %}?player_entry_id=" + player_entry_id + "&payment_method=" + payment_method)
+        .done(response => {
+          console.log("hello");
+          console.log(response);
+          if (response['message'] == "Success"){
+            Swal.fire({
+              title: 'Payment Method Changed',
+              html: 'Payment method successfully changed',
+            }).then((result) => {
+              reloadPage();
+            });            
+          }
+      });
+    }
+  })()
+
 }
 
 $(document).ready(function() {
@@ -443,7 +509,6 @@ $("#id_category").on("change", function(){
 // handle change question
 $("#id_change").click(function(){
   var answer = $("#id_question").val();
-  console.log(answer);
   $.getJSON("{% url "events:change_answer_on_existing_entry_ajax" %}/{{ event_entry.id }}/" + encodeURIComponent(answer))
     .done(response => {
       if (response['message'] == "Success"){
@@ -467,7 +532,13 @@ $("#pay_all").click(function(){
   window.location.href = "{% url "events:third_party_checkout_entry" event_entry_id=event_entry.id %}";
 });
 
+// handle question changing
+$("#id_question").on("keyup", function(){
+  $("#id_change").prop("disabled", false);
+})
 
+// handle edit payment type
+$(".change_payment_method").on('click', change_payment_method)
 
 // check if edit button should be set
 {% if edit_flag %}
@@ -478,5 +549,6 @@ $("#title").html("Edit");
 $("#icon").show();
 {% endif %}
 });
+
 </script>
 {% endblock %}

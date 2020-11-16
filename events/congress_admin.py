@@ -198,6 +198,9 @@ def admin_event_summary(request, event_id):
             total_outstanding += event_entry_player.entry_fee - received
             total_entry_fee += event_entry_player.entry_fee
 
+    # check on categories
+    categories = Category.objects.filter(event=event).exists()
+
     return render(
         request,
         "events/admin_event_summary.html",
@@ -207,6 +210,7 @@ def admin_event_summary(request, event_id):
             "total_received": total_received,
             "total_outstanding": total_outstanding,
             "total_entry_fee": total_entry_fee,
+            "categories": categories,
         },
     )
 
@@ -310,8 +314,13 @@ def admin_event_csv(request, event_id):
         "Entry Complete Date",
     ]
 
+    categories = Category.objects.filter(event=event).exists()
+
+    if categories:
+        header.append("Category")
+
     if event.free_format_question:
-        header.append(f"'{event.free_format_question}'")
+        header.append(f"{event.free_format_question}")
 
     writer.writerow(header)
 
@@ -342,6 +351,9 @@ def admin_event_csv(request, event_id):
             dateformat.format(local_dt, "Y-m-d H:i:s"),
             dateformat.format(local_dt2, "Y-m-d H:i:s"),
         ]
+
+        if categories:
+            this_row.append(row.category)
 
         if event.free_format_question:
             this_row.append(row.free_format_answer)

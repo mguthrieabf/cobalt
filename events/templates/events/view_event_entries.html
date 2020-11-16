@@ -22,6 +22,9 @@
           <tr>
             <th>Entry</th>
             <th>Status</th>
+            {% if categories %}
+            <th>Category</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
@@ -37,6 +40,13 @@
         <td class="py-1">
         {{ entry.entry_status }}
         </td>
+
+        {% if categories %}
+        <td>
+          {{ entry.category }}
+        </td>
+        {% endif %}
+
         </tr>
       {% empty %}
       <h3>No entries yet</h3>

@@ -55,6 +55,15 @@
                 <th class="text-right">Due</th>
                 <th class="text-right">Paid</th>
                 <th class="text-right">Pending</th>
+
+                {% if categories %}
+                <th>Category</th>
+                {% endif %}
+
+                {% if event.free_format_question %}
+                <th>Answer</th>
+                {% endif %}
+
                 <th class="text-right">Status</th>
                 <th class="text-right">Action</th>
               </thead>
@@ -70,6 +79,18 @@
                     <td class="text-right">{{ event_entry.entry_fee|floatformat:2 }}</td>
                     <td class="text-right">{{ event_entry.received|floatformat:2 }}</td>
                     <td class="text-right">{{ event_entry.outstanding|floatformat:2 }}</td>
+                    {% if categories %}
+                    <td>{{ event_entry.category }}</td>
+                    {% endif %}
+                    {% if event.free_format_question %}
+                    <td class="text-center">
+                      {% if event_entry.free_format_answer %}
+                      <a href="javascript:void(0)" onclick='help("{{ event.free_format_question }}", "{{ event_entry.free_format_answer }}");'>
+                        <i class="material-icons">question_answer</i></a>
+                      {% endif %}
+                    </td>
+                    {% endif %}
+
                     <td class="text-right">{{ event_entry.entry_status }}</td>
                     <td class="text-right"><a href="{% url "events:admin_evententry" evententry_id=event_entry.id %}" class="btn btn-sm btn-info">Details</a>
                     <a href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}" class="btn btn-sm btn-danger">Withdraw</a></td>
@@ -84,6 +105,12 @@
                   <td class="text-right font-weight-bold">{{ total_received|floatformat:2 }}</td>
                   <td class="text-right font-weight-bold">{{ total_outstanding|floatformat:2 }}</td>
                   <td></td>
+                  {% if categories %}
+                  <td></td>
+                  {% endif %}
+                  {% if event.free_format_question %}
+                  <td></td>
+                  {% endif %}
                   <td></td>
                 </tr>
 
@@ -95,4 +122,14 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script>
+  function help(title, html){
+    swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+    return false;
+  }
+</script>
 {% endblock %}

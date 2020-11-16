@@ -96,7 +96,10 @@ def home(request):
             congress.msg = "Entries close on " + congress.entry_close_date.strftime(
                 "%d %b %Y"
             )
-        else:
+        elif (
+            congress.entry_close_date
+            and congress.entry_close_date <= datetime.now().date()
+        ):
             congress.msg = "Congress entries are closed"
 
         # check access
@@ -212,7 +215,7 @@ def view_congress(request, congress_id, fullscreen=False):
                 if program["entry"]:
                     program[
                         "links"
-                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>View Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a>"
+                    ] = f"<td rowspan='{rows}'><a href='/events/congress/event/change-entry/{congress.id}/{event.id}'>View Your Entry</a><br><a href='/events/congress/event/view-event-entries/{congress.id}/{event.id}'>View Entries</a>"
                     if congress.allow_partnership_desk:
                         program[
                             "links"
@@ -525,6 +528,7 @@ def view_event_entries(request, congress_id, event_id):
     congress = get_object_or_404(Congress, pk=congress_id)
     event = get_object_or_404(Event, pk=event_id)
     entries = EventEntry.objects.filter(event=event).exclude(entry_status="Cancelled")
+    categories = Category.objects.filter(event=event).exists()
     date_string = event.print_dates()
 
     return render(
@@ -534,6 +538,7 @@ def view_event_entries(request, congress_id, event_id):
             "congress": congress,
             "event": event,
             "entries": entries,
+            "categories": categories,
             "date_string": date_string,
         },
     )
@@ -647,12 +652,19 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, "Payment successful", extra_tags="cobalt-message-success",
+                request,
+                "Payment successful",
+                extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, "Payment failed", extra_tags="cobalt-message-error",
+                request,
+                "Payment failed",
+                extra_tags="cobalt-message-error",
             )
+
+    # valid payment methods
+    payment_methods = congress.get_payment_methods()
 
     return render(
         request,
@@ -666,6 +678,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
             "edit_flag": edit_flag,
             "in_basket": in_basket,
             "pay_all": pay_all,
+            "payment_methods": payment_methods,
         },
     )
 
@@ -1103,15 +1116,7 @@ def enter_event_form(event, congress, request):
     our_form = []
 
     # get payment types for this congress
-    pay_types = []
-    if congress.payment_method_system_dollars:
-        pay_types.append(("my-system-dollars", f"My {BRIDGE_CREDITS}"))
-    if congress.payment_method_bank_transfer:
-        pay_types.append(("bank-transfer", "Bank Transfer"))
-    if congress.payment_method_cash:
-        pay_types.append(("cash", "Cash on the day"))
-    if congress.payment_method_cheques:
-        pay_types.append(("cheque", "Cheque"))
+    pay_methods = congress.get_payment_methods()
 
     # Get team mates for this user - exclude anyone entered already
     all_team_mates = TeamMate.objects.filter(user=request.user)
@@ -1132,13 +1137,13 @@ def enter_event_form(event, congress, request):
     # set values for player0 (the user)
     entry_fee, discount, reason, description = event.entry_fee_for(request.user)
 
-    payment_selected = pay_types[0]
+    payment_selected = pay_methods[0]
     entry_fee_pending = ""
     entry_fee_you = entry_fee
 
     player0 = {
         "id": request.user.id,
-        "payment_choices": pay_types.copy(),
+        "payment_choices": pay_methods.copy(),
         "payment_selected": payment_selected,
         "name": request.user.full_name,
         "name_choices": name_list,
@@ -1148,7 +1153,7 @@ def enter_event_form(event, congress, request):
 
     # add another option for everyone except the current user
     if congress.payment_method_system_dollars:
-        pay_types.append(("other-system-dollars", "Ask them to pay"))
+        pay_methods.append(("other-system-dollars", "Ask them to pay"))
 
     # set values for other players
     team_size = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
@@ -1157,7 +1162,7 @@ def enter_event_form(event, congress, request):
         min_entries = 4
     for ref in range(1, team_size):
 
-        payment_selected = pay_types[0]
+        payment_selected = pay_methods[0]
         name_selected = None
         entry_fee = None
 
@@ -1178,7 +1183,7 @@ def enter_event_form(event, congress, request):
 
         item = {
             "player_no": ref,
-            "payment_choices": pay_types + augment_payment_types,
+            "payment_choices": pay_methods + augment_payment_types,
             "payment_selected": payment_selected,
             "name_choices": name_list,
             "name_selected": name_selected,
