@@ -66,7 +66,20 @@
           <h2>Security</h2>
         </div>
         <div class="card-body">
+          <button class="accordion">Why do I need to be logged in?</button>
+            <div class="panel">
+      <p>When you login we know who you are and can provide a customised experience for you.</p>
+      <ul>
+        <li>We can show menu options that you want and hide those that you don't</li>
+        <li>We can customise your dashboard to show information that is relevant to you</li>
+        <li>We can show your results without you having to search for them</li>
+        <li>Entering an event is a lot simpler because there is no need for you to input any identifying detail – the system already knows it is you</li>
 
+      </ul>
+      <p>In addition, security means that only members can view information which is important for privacy.</p>
+
+
+          </div>
           <button class="accordion">How do I logout?</button>
           <div class="panel">
             <p>You can logout by clicking on the person icon
@@ -111,118 +124,226 @@
             </p>
           </div>
 
-          <button class="accordion"></button>
-          <div class="panel">
-            <p>
-            </p>
-          </div>
-
-          <button class="accordion"></button>
-          <div class="panel">
-            <p>
-            </p>
-          </div>
-
-          <button class="accordion"></button>
-          <div class="panel">
-            <p>
-            </p>
-          </div>
-
-          <button class="accordion"></button>
-          <div class="panel">
-            <p>
-            </p>
-          </div>
         </div>
       </div>
       <br>
 
-      <!-- ABF Dollars -->
+      <!-- Dashboard -->
 
       <div class="card col-md-8 mx-auto">
         <div class="card-header card-header-success">
-          <h2>{{ BRIDGE_CREDITS}}</h2>
+          <h2>Dashboard</h2>
         </div>
         <div class="card-body">
 
-          <button class="accordion">What are {{ BRIDGE_CREDITS}}?</button>
+          <button class="accordion">What are the different parts of the dashboard?</button>
           <div class="panel">
-            <p>You can logout by clicking on the person icon
-              at the top right hand corner of every screen. <i class="material-icons">person</i>.
-            </p>
-            <p>
-              Then choose Logout.
-            </p>
-            <p><b>Always</b> logout after using a shared computer.</p>
-          </div>
-          <button class="accordion">What Credit Cards are supported?</button>
-          <div class="panel">
-            <p>You can change your password through your <a href="{% url "accounts:user_profile" %}">Profile</a>
-              which you can get to by clicking on the person icon
-              at the top right hand corner of every screen. <i class="material-icons">person</i>.
-            </p>
-            <p>
-              You can also go
-              to the <a href="{% url "accounts:change_password" %}">Password Change Screen here</a>.
+            <p>On a large screen, the main menu is down the left and appears on every screen when you are logged in. On a smaller screen it appears on the top
+              right of the screen as three horizonal lines.</p>
+            <p>At the top right is the search window, as well as indications that you have notifications or unpaid items in your shopping basket.
+              The people icon to the far right provides access to your Profile, Settings or to logout.</p>
+            <p>At the top are three shortcuts – to your bridge credits account, your entries and your masterpoints.</p>
+            <p>The central part of the page will contain your personal results in future (not yet active) and a summary of your upcoming event bookings.</p>
+            <p>The remainder of the page contains Announcements and Discussions forums.
             </p>
           </div>
 
-          <button class="accordion">Where are my card details kept?</button>
+          <button class="accordion">Where is the main menu?</button>
           <div class="panel">
-            <p>Yes.
-            </p>
+            <p>On a large screen, the main menu is down the left and appears on every screen when you are logged in. On a smaller screen it appears on the top
+              right of the screen as three horizonal lines.</p>
             <p>
-              Here are some of the security features:
-            </p>
-            <ul>
-              <li>Data is encrypted at rest.
-              <li>Data is encypted in transit using TLS1.2.
-              <li>Production data is not used in any other environment e.g. Test.
-              <li>The system is built in Django, one of the most secure web frameworks available.
-            </ul>
-          </div>
-
-          <button class="accordion">What is Auto Top Up?</button>
-          <div class="panel">
-            <p>There is a password reset option on the login screen. You will be sent
-              a link in email to reset your password.
-            </p>
-          </div>
-          <button class="accordion">How can I set up Auto Top Up?</button>
-          <div class="panel">
-            <p>There is a password reset option on the login screen. You will be sent
-              a link in email to reset your password.
+              The main menu contains links to different parts of the application and is the primary means of navigating around the system.
+                      </p><p>
+              The items in the menu are not the same for everyone – some players who have administrative access to certain areas will see additional items.
             </p>
           </div>
 
-          <button class="accordion"></button>
+          <button class="accordion">What are the shortcuts at the top?</button>
           <div class="panel">
             <p>
+              There are 3 shortcuts.  These show a quick headline view of your bridge credit balance, your booked events and your masterpoints.
+              Clicking on Bridge Credits takes you to the Payments page.  Clicking on Masterpoints takes you to the Masterpoints page.
+              Clicking on Booked events opens a separate list of all events you are currently entered in.
             </p>
           </div>
 
-          <button class="accordion"></button>
+          <button class="accordion">How do I search?</button>
           <div class="panel">
             <p>
+              At the top right of the screen, key in your search term and click the search icon. <i class="material-icons">search</i>
+              This brings up a list of results which can be filtered by areas of the system.
             </p>
           </div>
 
-          <button class="accordion"></button>
+          <button class="accordion">Where do I find my notifications?</button>
           <div class="panel">
             <p>
+              If you have any notifications there will be a bell icon <i class="material-icons">notifications</i>
+               visible at the top right of the screen.
+              The number in the red box is the number of notifications you have.  Click to bring up a listing of the most recent notifications.
+              At the bottom you can click “Show all notifications” to bring up full list – from which you can view them or delete them.
             </p>
+            <p>Notifications are temporary and will may be deleted after a few weeks.</p>
           </div>
 
-          <button class="accordion"></button>
+          <button class="accordion">Where do I find the shopping cart?</button>
           <div class="panel">
             <p>
+              If you have any unpaid entries, there will be  a shopping cart icon <i class="material-icons">shopping_cart</i> visible at the top right of the screen.
+              The number in the red box is the number of items you have in the cart.
+              Click to bring up the Congress checkout page from where you can complete payment or delete the entry.
             </p>
           </div>
-
 
         </div>
       </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Profile</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion">Where is my profile page?</button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
+      <!--  -->
+
+      <div class="card col-md-8 mx-auto">
+        <div class="card-header card-header-success">
+          <h2>Dashboard</h2>
+        </div>
+        <div class="card-body">
+
+          <button class="accordion"></button>
+          <div class="panel">
+            <p>
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <br>
+
     </div>
   </div>
 </div>
