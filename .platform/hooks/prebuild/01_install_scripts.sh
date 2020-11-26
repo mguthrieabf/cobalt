@@ -58,9 +58,9 @@ echo Logs live in /var/log
 echo
 PS3='Select a log file: '
 options=("eb-engine.log (install file)" "eb-hooks.log (install file details)" "web.stdout.log (boring)" "nginx/access.log (web access log)" "nginx/access.log (web access log filtered)" "nginx/error.log (web error log)" "Quit")
-select opt in "${options[@]}"
+select opt in "\${options[@]}"
 do
-    case $opt in
+    case \$opt in
         "eb-engine.log (install file)")
             tail -100f /var/log/eb-engine.log
             break

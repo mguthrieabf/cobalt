@@ -47,6 +47,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
     print(
         "If ssh is required to complete installation you will need to type 'yes' in about 5 minutes.\n"
     )
+    print("DONT FORGET TO UNSET AWS_ VARS")
     input("Press Enter to continue...")
 
     # create environment variable string
@@ -58,7 +59,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
     if env_type == "standalone":
         envs += ",USE_SQLITE=True"
 
-    print("Creating environment. This will take several minutes.")
+    print("Creating environment. This will take ages.")
     #    result = subprocess.run(["eb", "create", "--keyname", "cobalt", "--envvars", envs], stdout=subprocess.PIPE)
     process = subprocess.Popen(
         ["eb", "create", env_name, "--keyname", "cobalt", "--envvars", envs]
@@ -108,30 +109,30 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
             stdout=subprocess.PIPE,
         )
     # Run commands for non-prod environments
-    if env_type in ["test", "uat"]:
-        print("Follow up tasks for non-production environments.")
-        print("Setting up test data.")
-        subprocess.run(
-            [
-                "eb",
-                "ssh",
-                env_name,
-                "--command",
-                "-f sudo /var/app/current/utils/aws/rebuild_test_database_postgres.sh",
-            ],
-            stdout=subprocess.PIPE,
-        )
-        print("Installing crontab.")
-        subprocess.run(
-            [
-                "eb",
-                "ssh",
-                env_name,
-                "--command",
-                "-f sudo crontab /var/app/current/utils/aws/rebuild_test_database_postgres_crontab.txt",
-            ],
-            stdout=subprocess.PIPE,
-        )
+    # if env_type in ["test", "uat"]:
+    #     print("Follow up tasks for non-production environments.")
+    #     print("Setting up test data.")
+    #     subprocess.run(
+    #         [
+    #             "eb",
+    #             "ssh",
+    #             env_name,
+    #             "--command",
+    #             "-f sudo /var/app/current/utils/aws/rebuild_test_database_postgres.sh",
+    #         ],
+    #         stdout=subprocess.PIPE,
+    #     )
+    #     print("Installing crontab.")
+    #     subprocess.run(
+    #         [
+    #             "eb",
+    #             "ssh",
+    #             env_name,
+    #             "--command",
+    #             "-f sudo crontab /var/app/current/utils/aws/rebuild_test_database_postgres_crontab.txt",
+    #         ],
+    #         stdout=subprocess.PIPE,
+    #     )
 
 
 def main():
