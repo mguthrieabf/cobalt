@@ -87,7 +87,7 @@
         document.getElementById("time").innerHTML = time + " seconds";
         time--;
         if (time == 0) {
-          window.location.href = "{% url "accounts: user_profile" %}";
+          window.location.href = "{% url "accounts:user_profile" %}";
         }
       }, 1000);
 
