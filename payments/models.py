@@ -33,7 +33,7 @@ TRANSACTION_TYPE = [
 
 
 class StripeTransaction(models.Model):
-    """ Our record of Stripe transactions.
+    """Our record of Stripe transactions.
 
     Only stores basic information, for the full details use the
     stripe_reference to look up the transaction in Stripe.
@@ -226,13 +226,13 @@ class MemberTransaction(AbstractTransaction):
             )
         super(MemberTransaction, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return "%s - %s %s %s" % (
-            self.member.system_number,
-            self.member.first_name,
-            self.member.last_name,
-            self.id,
-        )
+    # def __str__(self):
+    #     return "%s - %s %s %s" % (
+    #         self.member.system_number,
+    #         self.member.first_name,
+    #         self.member.last_name,
+    #         self.id,
+    #     )
 
 
 class OrganisationTransaction(AbstractTransaction):

@@ -8,12 +8,21 @@
     <div class="card col-lg-9">
       <div class="card-header card-header-danger">
         <h2>{{ event_entry.event }}</h2>
+        {% if basket_item %}
+        <h3>Delete from Basket</h3>
+        {% else %}
         <h3>Withdraw Entry</h3>
+        {% endif %}
       </div>
       <div class="card-body">
         <form method="post">
           {% csrf_token %}
+          {% if basket_item %}
+          <p>This will delete your entry from your shopping basket.</p>
+          {% else %}
           <p>This will delete your entry from this event.</p>
+          {% endif %}
+
 
 <!-- only show table if there is an amount to refund -->
           {% if total > 0 %}

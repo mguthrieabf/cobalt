@@ -702,8 +702,8 @@ def delete_event_entry(request, event_entry_id):
         return render(request, "events/error.html", {"title": title, "error": error})
 
     # check if passed the automatic refund date
-    print(event_entry.event.congress.automatic_refund_cutoff)
-    print(datetime.now().date())
+    #    print(event_entry.event.congress.automatic_refund_cutoff)
+    #    print(datetime.now().date())
     if (
         event_entry.event.congress.automatic_refund_cutoff
         and event_entry.event.congress.automatic_refund_cutoff <= datetime.now().date()
@@ -727,7 +727,26 @@ def delete_event_entry(request, event_entry_id):
     amount = event_entry_players.aggregate(Sum("payment_received"))
     total = amount["payment_received__sum"]
 
+    # check if still in basket
+    basket_item = BasketItem.objects.filter(event_entry=event_entry).first()
+
     if request.method == "POST":
+
+        # This was never a real entry - delete everything
+        if basket_item:
+            EventLog(
+                event=event_entry.event,
+                actor=request.user,
+                action="Deleted event from basket",
+            ).save()
+            messages.success(
+                request,
+                f"Event deleted from basket",
+                extra_tags="cobalt-message-success",
+            )
+            basket_item.delete()
+            event_entry.delete()
+            return redirect("events:view_events")
 
         event_entry.entry_status = "Cancelled"
         event_entry.save()
@@ -891,6 +910,7 @@ def delete_event_entry(request, event_entry_id):
             "event_entry": event_entry,
             "event_entry_players": event_entry_players,
             "total": total,
+            "basket_item": basket_item,
         },
     )
 

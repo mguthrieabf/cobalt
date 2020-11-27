@@ -460,9 +460,14 @@ def profile(request):
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
 
+    team_mates = TeamMate.objects.filter(user=request.user).order_by(
+        "team_mate__first_name"
+    )
+
     context = {
         "form": form,
         "blurbform": blurbform,
+        "team_mates": team_mates,
     }
     return render(request, "accounts/profile.html", context)
 
@@ -646,7 +651,7 @@ def delete_team_mate_ajax(request):
     if request.method == "GET":
         member_id = request.GET["member_id"]
         member = User.objects.get(pk=member_id)
-        team_mate = TeamMate.objects.filter(team_mate=member)
+        team_mate = TeamMate.objects.filter(team_mate=member, user=request.user)
         team_mate.delete()
         msg = "Success"
 

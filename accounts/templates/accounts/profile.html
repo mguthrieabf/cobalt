@@ -83,7 +83,7 @@
               </thead>
               <tbody>
 
-                {% for team_mate in request.user.team_mate_user.all %}
+                {% for team_mate in team_mates %}
                   <tr id="div_for_{{ team_mate.team_mate.id }}">
                       <td>
                         <a href="{% url "accounts:public_profile" pk=team_mate.team_mate.id %}">
