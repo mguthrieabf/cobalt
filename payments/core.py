@@ -79,7 +79,7 @@ def get_balance_detail(member):
             "last_top_up": last_tran.created_date,
         }
     else:
-        return {"balance": "$0.00", "balance_num": None, "last_top_up": None}
+        return {"balance": "0", "balance_num": None, "last_top_up": None}
 
 
 ################
