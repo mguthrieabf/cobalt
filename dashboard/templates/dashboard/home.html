@@ -29,7 +29,7 @@
             {% if payments.last_top_up %}
             Last event:
             {% endif %}
-            {{ payments.last_top_up|default_if_none:"No History" }}
+            {{ payments.last_top_up|cobalt_nice_datetime|default_if_none:"No History" }}
           </div>
         </div>
         </a>
@@ -117,7 +117,7 @@
                 (transfer pending)
              {% endif %}
               {% if event.payment_status == "Pending Manual" and event.payment_type == "cheque" %}
-                (cheque pending)  
+                (cheque pending)
              {% endif %}
 
              <br>
