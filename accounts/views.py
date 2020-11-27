@@ -666,13 +666,15 @@ def toggle_team_mate_ajax(request):
         request(HTTPRequest): standard request
 
     Returns:
-        HTTPResponse: success, failure or error
+        JsonResponse: message and first name
     """
 
     if request.method == "GET":
         member_id = request.GET["member_id"]
         member = User.objects.get(pk=member_id)
-        team_mate = TeamMate.objects.filter(team_mate=member).first()
+        team_mate = (
+            TeamMate.objects.filter(user=request.user).filter(team_mate=member).first()
+        )
         team_mate.make_payments = not team_mate.make_payments
         team_mate.save()
         msg = team_mate.make_payments
