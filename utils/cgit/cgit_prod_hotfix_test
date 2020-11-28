@@ -5,7 +5,7 @@
 
 BRANCH=`git branch --show-current`
 
-if [[ $BRANCH != *"=hotfix="* ]]; then
+if [[ $BRANCH != *"=HOTFIX="* ]]; then
   echo ""
   echo ""
   echo "You are not on a hotfix branch. Your branch is $BRANCH."
