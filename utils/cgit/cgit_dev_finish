@@ -2,6 +2,7 @@
 
 BRANCH=`git branch --show-current`
 
+
 echo ""
 echo ""
 echo "Congratulations on finishing a feature."
@@ -82,12 +83,7 @@ else
   exit
 fi
 
-<<<<<<< HEAD
 echo "Deleting branch $BRANCH..."
-=======
-echo ""
-echo "Deleting $BRANCH..."
->>>>>>> 0db290a93c0fd8510c66e2bb9741e2b9c7d5e99f
 echo ""
 
 git branch -d $BRANCH

@@ -3,16 +3,52 @@
 BRANCH=`git branch --show-current`
 
 echo ""
-echo "This one is a bit tough, so do it yourself for now."
-echo "If the pre-commits reject the code they may change it and you need to add the files again."
 echo ""
-echo "Run this until it works:"
+echo "Adding changes to $BRANCH..."
+
+git add -A
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
 echo ""
-echo "git add -A"
-echo "git commit -m \"$BRANCH\""
+echo "Trying to commit changes to $BRANCH..."
 echo ""
-echo "Then run this:"
+
+git commit -m "$BRANCH"
+if [ $? -ne 0 ];then
+
+  echo ""
+  echo "Commit failed, possible due to black. Re-trying..."
+  echo ""
+
+  git add -A
+  if [ $? -ne 0 ];then
+   exit 1
+  fi
+
+  echo ""
+  echo "Trying to commit changes to $BRANCH for a second time..."
+  echo ""
+
+  git commit -m "$BRANCH"
+  if [ $? -ne 0 ];then
+    echo "Failed to save changes, do this manually."
+    echo ""
+    echo "git add -A"
+    echo "git commit -m \"$BRANCH\""
+    echo ""
+    echo "Then run this:"
+    echo ""
+    echo "git push origin $BRANCH"
+    echo ""
+    echo ""
+    exit 1
+  fi
+fi
+
 echo ""
-echo "git push origin $BRANCH"
+echo "Pushing changes to github..."
 echo ""
-echo ""
+
+git push origin $BRANCH
