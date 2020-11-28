@@ -5,7 +5,6 @@ BRANCH=`git branch --show-current`
 echo ""
 echo ""
 echo "Adding changes to $BRANCH..."
-echo ""
 
 git add -A
 if [ $? -ne 0 ];then
