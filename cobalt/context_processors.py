@@ -3,6 +3,7 @@
 from django.conf import settings
 from notifications.views import get_notifications_for_user
 from events.core import get_basket_for_user
+from .version import COBALT_VERSION
 
 
 def global_settings(request):
@@ -19,8 +20,8 @@ def global_settings(request):
         "notification_count": notification_count,
         "notifications": notifications,
         "basket_items": basket_items,
+        "COBALT_VERSION": COBALT_VERSION,
         "COBALT_HOSTNAME": settings.COBALT_HOSTNAME,
-        "COBALT_VERSION": settings.COBALT_VERSION,
         "BRIDGE_CREDITS": settings.BRIDGE_CREDITS,
         "GLOBAL_ORG": settings.GLOBAL_ORG,
         "GLOBAL_TITLE": settings.GLOBAL_TITLE,

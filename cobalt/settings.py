@@ -22,8 +22,6 @@ import os
 import ast
 from django.contrib.messages import constants as messages
 
-COBALT_VERSION = "0.8.0"
-
 ###########################################
 # function to set values from environment #
 # variables.                              #
