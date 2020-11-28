@@ -13,8 +13,7 @@ echo "Congratulations on finishing a bug."
 echo ""
 echo "I will check your branch is clean and then merge your changes into"
 echo "the release branch. I will then deploy to the UAT system."
-echo ""
-echo "I won't delete the branch '$BRANCH'. You need to do that yourself."
+echo "I will then delete the branch '$BRANCH'."
 echo ""
 echo "The release I will be updating is $RELEASE"
 echo ""
@@ -90,3 +89,7 @@ else
   exit
 fi
 
+echo "Deleting branch $BRANCH..."
+echo ""
+
+git branch -d $BRANCH

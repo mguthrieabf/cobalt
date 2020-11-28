@@ -64,3 +64,57 @@ else
   exit
 fi
 
+echo ""
+echo "Pulling latest develop branch..."
+echo ""
+
+git pull origin develop
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
+echo ""
+echo "Checking out develop branch..."
+echo ""
+
+git checkout develop
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
+echo ""
+echo "Merging $BRANCH..."
+echo ""
+
+git merge $BRANCH
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
+echo ""
+echo "Pulling latest master branch..."
+echo ""
+
+git pull origin master
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
+echo ""      
+echo "Checking out master branch..."
+echo ""
+
+git checkout master
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
+echo ""   
+echo "Merging $BRANCH..."
+echo ""
+
+git merge $BRANCH
+if [ $? -ne 0 ];then
+ exit 1
+fi
+
