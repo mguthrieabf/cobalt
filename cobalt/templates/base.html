@@ -262,8 +262,8 @@
             </ul>
           </nav>
           <div class="copyright float-right">
-            {{ request.HTTP_HOST }}
-            {% if request.HTTP_HOST != "test,aftech.com.au" %}
+            HTTP_HOST: {{ request.meta.HTTP_HOST }}
+            {% if request.meta.HTTP_HOST != "test.aftech.com.au" %}
                   <small>Cobalt {{ COBALT_VERSION }}</small>
             {% endif %}
             {{ GLOBAL_ORG }} &copy;
