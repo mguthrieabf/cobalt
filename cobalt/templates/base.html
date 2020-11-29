@@ -262,8 +262,9 @@
             </ul>
           </nav>
           <div class="copyright float-right">
-            HTTP_HOST: {{ request.META.HTTP_HOST }}
-            {% if request.META.HTTP_HOST != "test.aftech.com.au" %}
+            {% if request.META.HTTP_HOST == GLOBAL_TEST %}
+                  <small>Cobalt Test System</small>
+            {% else %}
                   <small>Cobalt {{ COBALT_VERSION }}</small>
             {% endif %}
             {{ GLOBAL_ORG }} &copy;

@@ -30,6 +30,7 @@ def global_settings(request):
         "GLOBAL_COOKIES": settings.GLOBAL_COOKIES,
         "GLOBAL_MPSERVER": settings.GLOBAL_MPSERVER,
         "GLOBAL_PRODUCTION": settings.GLOBAL_PRODUCTION,
+        "GLOBAL_TEST": settings.GLOBAL_TEST,
         "GLOBAL_PRIVACY": settings.GLOBAL_PRIVACY,
         "GLOBAL_CURRENCY_SYMBOL": settings.GLOBAL_CURRENCY_SYMBOL,
         "GLOBAL_CURRENCY_NAME": settings.GLOBAL_CURRENCY_NAME,

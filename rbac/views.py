@@ -30,9 +30,14 @@ from .core import (
     rbac_get_users_with_role,
     rbac_admin_tree_access,
 )
+from cobalt.settings import TIME_ZONE
 from .forms import AddGroup
 from django.contrib import messages
+from django.utils import timezone
 from organisations.models import Organisation
+import os
+import datetime
+import pytz
 
 
 @login_required
@@ -61,6 +66,14 @@ def main_admin_screen(request):
     events_site_admin = rbac_user_has_role(request.user, "events.global.edit")
     email_site_admin = rbac_user_has_role(request.user, "notifications.admin.view")
 
+    # Get build time of this release
+    TZ = pytz.timezone(TIME_ZONE)
+
+    stat_time = os.stat("__init__.py").st_mtime
+    utc_build_date = datetime.datetime.fromtimestamp(stat_time)
+    # build_date = timezone.localtime(utc_build_date, TZ)
+    build_date = TZ.localize(utc_build_date)
+
     return render(
         request,
         "rbac/main-admin-screen.html",
@@ -69,6 +82,7 @@ def main_admin_screen(request):
             "payments_site_admin": payments_site_admin,
             "events_site_admin": events_site_admin,
             "email_site_admin": email_site_admin,
+            "build_date": build_date,
         },
     )
 
