@@ -262,7 +262,9 @@
             </ul>
           </nav>
           <div class="copyright float-right">
+            {% if request.HTTP_HOST != "TEST.ABFTECH.COM.AU" %}
                   <small>Cobalt {{ COBALT_VERSION }}</small>
+            {% endif %}
             {{ GLOBAL_ORG }} &copy;
             {% now "Y" %}
           </div>
@@ -270,7 +272,7 @@
       </footer>
     </div>
   </div>
- 
+
   {% block footer %}
   {% endblock %}
 
