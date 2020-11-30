@@ -79,7 +79,7 @@
                       <tr>
                         <td class="col text-center">
                           <div id="div_id_player0" class="form-group">
-                            <select class="selectpicker cobalt-playerN" data-style="btn btn-info" title="Select" id="id_player0" name="player0">
+                            <select class="cobalt-playerN form-control input-sm bg-primary" title="Select" id="id_player0" name="player0">
                               <option value="{{ player0.id }}" selected>{{ player0.name }}</option>
                               {% for val,item in player0.name_choices %}
 
@@ -89,12 +89,14 @@
                             </select>
                           </div>
                         </td>
-                        <td class="col">
-                          <select id="id_player0_payment" name="player0_payment" data-container="body" class="selectpicker payment-method" data-style="btn btn-danger">
+                        <td>
+                          <div class="form-group">
+                          <select id="id_player0_payment" name="player0_payment" class="form-control input-sm bg-primary payment-method">
                             {% for val,item in player0.payment_choices %}
                             <option value="{{ val }}">{{ item }}</option>
                             {% endfor %}
                           </select>
+                          </div>
                         <td class="col">
                           <nobr>
                             {% if discount %}
