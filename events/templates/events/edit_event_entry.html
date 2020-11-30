@@ -24,7 +24,7 @@
 {% endblock %}
 {% block content %}
 
-<div class="ignore_cobalt_save"></div>
+<!-- <div id="ignore_cobalt_save"></div> -->
 
 <div class="container">
   <div class="row text-center">
@@ -75,7 +75,7 @@
 <div class="category editable"><b>Category:</b> {{ event_entry.category }}</div>
 {% endif %}
 {% if event.free_format_question %}
-<div class="category editable"><b>{{ event.free_format_question }}:</b> {{ event_entry.free_format_answer }}</div>
+<div class="category editable"><b>{{ event.free_format_question }}:</b> {{ event_entry.free_format_answer|default_if_none:"" }}</div>
 {% endif %}
   <div style = "border-radius: 25px; border: 2px solid grey; padding: 20px; display:none" class="editable extras">
 
@@ -283,7 +283,11 @@
 <!-- Action - hidden by default -->
               {% if event_entry_player.payment_status != "Paid" and event_entry_player.payment_status != "Free" %}
               <td class="editable" style="display:none">
-                <button class="btn btn-sm btn-info single_pay" id="single_pay_{{ event_entry_player.id }}">Pay Now</button>
+                <button class="btn btn-sm btn-info single_pay"
+                        id="single_pay_{{ event_entry_player.id }}"
+                        data-toggle="tooltip"
+                        title="Pay now using your bridge credits"
+                        >Pay Now</button>
               </td>
               {% else %}
                 {% if event_entry.entry_status != "Complete" %}
@@ -308,7 +312,12 @@
 <!-- Show pay all if valid option -->
                     {% if pay_all %}
           <td class="editable" style="display:none">
-            <button class="btn btn-sm btn-info font-weight-bold" style="font-size: 105%;" id="pay_all">Pay All</button>
+            <button class="btn btn-sm btn-info font-weight-bold"
+                    style="font-size: 105%;"
+                    id="pay_all"
+                    data-toggle="tooltip"
+                    title="Pay all outstanding now using your bridge credits"
+                    >Pay All</button>
           </td>
           {% endif %}
           </tr>
@@ -433,7 +442,7 @@ function change_payment_method(event){
               html: 'Payment method successfully changed',
             }).then((result) => {
               reloadPage();
-            });            
+            });
           }
       });
     }

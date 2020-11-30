@@ -876,15 +876,16 @@ def change_payment_method_on_existing_entry_ajax(request):
 
         player_entry = get_object_or_404(EventEntryPlayer, pk=player_entry_id)
 
-        print(player_entry_id)
-        print(player_entry)
-        print(payment_method)
-
         # Check access
         if not player_entry.event_entry.user_can_change(request.user):
             return JsonResponse({"message": "Access Denied"})
 
         player_entry.payment_type = payment_method
+        if payment_method in ["bank-transfer", "cash", "cheque"]:
+            player_entry.payment_status = "Pending Manual"
+        else:
+            player_entry.payment_status = "Unpaid"
+
         player_entry.save()
 
         return JsonResponse({"message": "Success"})

@@ -272,7 +272,7 @@ def send_notifications(route_payload, payment_user):
                 # Outstanding payments due. Check for bank and cheque
                 if event_entry_players.filter(payment_type="bank-transfer").exists():
                     player_email[player] += (
-                        "<h3>Bank Details</h3> %s<br><br>"
+                        "<p>We are expecting payment by bank transfer.</p><h3>Bank Details</h3> %s<br><br>"
                         % event_entry_players[
                             0
                         ].event_entry.event.congress.bank_transfer_details
@@ -280,7 +280,7 @@ def send_notifications(route_payload, payment_user):
 
                 if event_entry_players.filter(payment_type="cheque").exists():
                     player_email[player] += (
-                        "<h3>Cheques</h3> %s<br><br>"
+                        "<p>We are expecting payment by cheque.</p><h3>Cheques</h3> %s<br><br>"
                         % event_entry_players[
                             0
                         ].event_entry.event.congress.cheque_details
@@ -301,7 +301,7 @@ def send_notifications(route_payload, payment_user):
                 "email_body": player_email[player],
                 "host": COBALT_HOSTNAME,
                 "link": "/events/view",
-                "link_text": "Edit Entry",
+                "link_text": "View Entry",
             }
 
             html_msg = render_to_string("notifications/email_with_button.html", context)

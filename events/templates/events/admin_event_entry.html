@@ -46,7 +46,7 @@
                 <th class="text-right">Action</th>
               </thead>
               <tbody>
-                {% for event_entry_player in event_entry.evententryplayer_set.all %}
+                {% for event_entry_player in event_entry_players %}
 
                   <tr>
                     <td>
@@ -57,7 +57,7 @@
                     <td class="text-right">{{ event_entry_player.payment_status }}</td>
                     <td class="text-right">{{ event_entry_player.get_payment_type_display }}</td>
                     <td class="text-right">{{ event_entry_player.paid_by.full_name }}</td>
-                    <td class="text-right">{{ event_entry_player.reason }}</td>
+                    <td class="text-right">{{ event_entry_player.reason|default_if_none:"" }}</td>
                     <td class="text-right">{{ event_entry_player.entry_complete_date|cobalt_nice_datetime|default_if_none:"-" }}</td>
                     <td class="text-right"><a href="{% url "events:admin_evententryplayer" evententryplayer_id=event_entry_player.id %}" class="btn btn-sm btn-info">Edit</a></td>
                   </tr>

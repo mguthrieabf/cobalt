@@ -227,6 +227,10 @@ def admin_evententry(request, evententry_id):
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
 
+    event_entry_players = EventEntryPlayer.objects.filter(
+        event_entry=event_entry
+    ).order_by("id")
+
     event_logs = EventLog.objects.filter(event_entry=event_entry)
 
     return render(
@@ -236,6 +240,7 @@ def admin_evententry(request, evententry_id):
             "event_entry": event_entry,
             "event": event,
             "congress": congress,
+            "event_entry_players": event_entry_players,
             "event_logs": event_logs,
         },
     )

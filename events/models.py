@@ -11,6 +11,7 @@ from cobalt.settings import (
     TIME_ZONE,
     BRIDGE_CREDITS,
 )
+from utils.utils import cobalt_round
 import datetime
 import pytz
 from rbac.core import rbac_user_has_role
@@ -66,7 +67,7 @@ EVENT_TYPES = [
 EVENT_PLAYER_FORMAT = [
     #    ("Individual", "Individual"),
     ("Pairs", "Pairs"),
-    #    ("Teams of 3", "Teams of Three"),
+    ("Teams of 3", "Teams of Three"),
     ("Teams", "Teams"),
 ]
 EVENT_PLAYER_FORMAT_SIZE = {
@@ -295,7 +296,7 @@ class Event(models.Model):
         # Need a better approach for teams
         if self.player_format == "Teams":
             players_per_entry = 4
-        entry_fee = self.entry_fee / players_per_entry
+        entry_fee = cobalt_round(self.entry_fee / players_per_entry)
 
         # date
         if self.congress.allow_early_payment_discount:
@@ -303,6 +304,7 @@ class Event(models.Model):
                 entry_fee = (
                     self.entry_fee - self.entry_early_payment_discount
                 ) / players_per_entry
+                entry_fee = cobalt_round(entry_fee)
                 reason = "Early discount"
                 discount = float(self.entry_fee) / players_per_entry - float(entry_fee)
                 description = "Early discount " + cobalt_credits(discount)
@@ -321,6 +323,7 @@ class Event(models.Model):
                         * float(self.entry_youth_payment_discount)
                         / 100.0
                     )
+                    entry_fee = cobalt_round(entry_fee)
                     discount = float(self.entry_fee) / players_per_entry - entry_fee
                     if reason == "Early discount":
                         reason = "Youth+Early discount"
@@ -337,13 +340,15 @@ class Event(models.Model):
         )
 
         if event_player_discount:
-            discount_fee = event_player_discount.entry_fee
+            discount_fee = cobalt_round(event_player_discount.entry_fee)
             if discount_fee < entry_fee:
                 entry_fee = discount_fee
                 reason = event_player_discount.reason
                 description = f"Manual override {reason}"
 
         # discount = (float(self.entry_fee) / players_per_entry) - float(entry_fee)
+
+        # round up
 
         return entry_fee, discount, reason[:40], description
 

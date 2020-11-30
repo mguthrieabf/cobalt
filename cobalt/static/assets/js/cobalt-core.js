@@ -50,13 +50,9 @@ $(document).ready(function () {
       // if no form then we don't need to disable the buttons
       console.error(error);
     }
-
-
-
   });
 
   // prompt for unsaved changes unless button is cobalt-save
-
   var unsaved = false;
 
   $(":input").change(function(){
@@ -79,7 +75,7 @@ $(document).ready(function () {
 // check if this page wants to be ignored
 // if any object is called ignore_cobalt_save then do nothing
     var ignore=$("#ignore_cobalt_save");
-    if (ignore == null){
+    if (ignore.attr('id') == null){
       if(unsaved){
           return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
       }
@@ -87,6 +83,5 @@ $(document).ready(function () {
   }
 
   window.onbeforeunload = unloadPage;
-
 
 });

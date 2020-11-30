@@ -37,6 +37,11 @@
               <a href="{% url 'events:admin_event_player_discount' event_id=event.id %}" class="text-center btn btn-default btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">person_remove</i>&nbsp;Player Discounts
               </a>
+              {% if event.congress.allow_partnership_desk %}
+              <a href="{% url 'events:view_event_partnership_desk' congress_id=event.congress.id event_id=event.id %}" class="text-center btn btn-warning btn-sm btn-round" style="width: 170px">
+                <i class="material-icons">emoji_people</i>&nbsp;Partnership Desk
+              </a>
+              {% endif %}
               <a href="{% url 'events:admin_event_email' event_id=event.id %}" class="text-center btn btn-danger btn-sm btn-round" style="width: 170px">
                 <i class="material-icons">email</i>&nbsp;Email
               </a>
