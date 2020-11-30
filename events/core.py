@@ -11,7 +11,7 @@ from django.utils import timezone
 import payments.core as payments_core  # circular dependency
 from notifications.views import contact_member
 from logs.views import log_event
-from cobalt.settings import COBALT_HOSTNAME, BRIDGE_CREDITS
+from cobalt.settings import COBALT_HOSTNAME, BRIDGE_CREDITS, GLOBAL_ORG
 from django.template.loader import render_to_string
 from datetime import datetime, timedelta
 from rbac.core import rbac_get_users_with_role
@@ -314,6 +314,18 @@ def send_notifications(route_payload, payment_user):
                 html_msg=html_msg,
                 link="/events/view",
                 subject="Event Entry - %s" % congress,
+            )
+
+    # Notify conveners
+    for congress in email_dic.keys():
+        for event in email_dic[congress].keys():
+            player_string = f"<table><tr><td><b>Name</b><td><b>{GLOBAL_ORG} No.</b><td><b>Payment Method</b><td><b>Status</b></tr>"
+            for player in email_dic[congress][event]:
+                player_string += f"<tr><td>{player.player.full_name}<td>{player.player.system_number}<td>{player.payment_type}<td>{player.payment_status}</tr>"
+            player_string += "</table>"
+            message = "New entry received.<br><br> %s" % player_string
+            notify_conveners(
+                congress, event, f"New Entry to {event.event_name}", message
             )
 
     # empty basket - if user added things after they went to the
