@@ -738,11 +738,11 @@ def delete_event_entry(request, event_entry_id):
             EventLog(
                 event=event_entry.event,
                 actor=request.user,
-                action="Deleted event from basket",
+                action="Deleted event from cart",
             ).save()
             messages.success(
                 request,
-                f"Event deleted from basket",
+                f"Event deleted from shopping cart",
                 extra_tags="cobalt-message-success",
             )
             basket_item.delete()

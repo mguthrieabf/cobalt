@@ -303,6 +303,8 @@ def admin_offsystem_pay_ajax(request):
     # Mark as paid
     event_entry_player.payment_status = "Paid"
     event_entry_player.payment_received = event_entry_player.entry_fee
+    # TODO: client side screen to capture who actually paid this so don't need to assume it was the player
+    event_entry_player.paid_by = event_entry_player.player
     event_entry_player.save()
 
     # Log it
