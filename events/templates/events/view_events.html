@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cobalt_tags %}
 
 {% block content %}
 
@@ -30,12 +31,18 @@
           <td><a href="{% url "events:edit_event_entry" congress_id=pending_payment.event_entry.event.congress.id event_id=pending_payment.event_entry.event.id %}">{{ pending_payment.event_entry.event.event_name }}</a></td>
           <td style="text-align: right">{{ pending_payment.payment_status }}</td>
           <td style="text-align: right">{{ pending_payment.get_payment_type_display }}</td>
-          <td style="text-align: right">{{ pending_payment.entry_fee }}</td>
+          <td style="text-align: right">{{ pending_payment.entry_fee|cobalt_credits }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    <!-- check if things are in the basket, if so send the user to checkout not pay now -->
+    <!-- basket items are loaded already for us by base.html -->
+    {% if basket_items %}
+    <a href="{% url "events:checkout" %}" class="btn btn-success">Checkout</a>
+    {% else %}
     <a href="{% url "events:pay_outstanding" %}" class="btn btn-success">Pay Now With Bridge Credits</a>
+    {% endif %}
   </div>
 </div>
 <br>

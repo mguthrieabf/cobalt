@@ -176,6 +176,12 @@ def update_entries(route_payload, payment_user):
     for event_entry in event_entries:
         event_entry.check_if_paid()
 
+    # Check if the basket needs emptied
+    event_entries_list = event_entries.values_list("id")
+    BasketItem.objects.filter(player=payment_user).filter(
+        event_entry__in=event_entries_list
+    ).delete()
+
 
 def send_notifications(route_payload, payment_user):
     """ Send the notification emails """
@@ -264,6 +270,7 @@ def send_notifications(route_payload, payment_user):
                 EventEntryPlayer.objects.exclude(payment_status="Paid")
                 .filter(player=player)
                 .filter(event_entry__event__congress=congress)
+                .exclude(event_entry__entry_status="Cancelled")
             )
 
             # Check status
@@ -292,7 +299,7 @@ def send_notifications(route_payload, payment_user):
             else:
                 player_email[
                     player
-                ] += "Your entries are all paid for. You have nothing more to do. If you need to change anything you can use the link below.<br><br>"
+                ] += "Your entries are all paid for however other players in the entry may still need to pay. You can see overall entry status above. You have nothing more to do. If you need to view the entry or change anything you can use the link below.<br><br>"
 
             # build email
             context = {

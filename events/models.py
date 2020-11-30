@@ -346,10 +346,6 @@ class Event(models.Model):
                 reason = event_player_discount.reason
                 description = f"Manual override {reason}"
 
-        # discount = (float(self.entry_fee) / players_per_entry) - float(entry_fee)
-
-        # round up
-
         return entry_fee, discount, reason[:40], description
 
     def already_entered(self, user):

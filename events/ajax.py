@@ -538,6 +538,10 @@ def change_player_entry_ajax(request):
         # default value
         return_html = "Player successfully changed."
 
+        # Check if this is a free entry - player 5 or 6
+        if event_entry_player.payment_type == "Free":
+            return JsonResponse({"message": "Success", "html": return_html})
+
         # get the entry fee based upon when the entry was created
         entry_fee, discount, reason, description = event.entry_fee_for(
             event_entry_player.player,
@@ -630,6 +634,7 @@ def change_player_entry_ajax(request):
 
         # if money is owing then update paid status on event_entry
         if difference < 0:
+            difference = -difference
             event_entry_player.payment_status = "Unpaid"
             event_entry_player.save()
             event_entry.check_if_paid()
@@ -720,6 +725,45 @@ def delete_player_from_entry_ajax(request):
 
         # if we got here everything is okay
         event_entry_player.delete()
+
+        if event_entry_player.player.id != TBA_PLAYER:
+
+            event = event_entry_player.event_entry.event
+            congress = event_entry_player.event_entry.event.congress
+
+            # notify member
+            context = {
+                "name": event_entry_player.player.first_name,
+                "title": "Removal from Team in %s" % event,
+                "email_body": f"{request.user.full_name} has removed you from their team in {event}.<br><br>",
+                "host": COBALT_HOSTNAME,
+            }
+
+            html_msg = render_to_string("notifications/email.html", context)
+
+            # send
+            contact_member(
+                member=event_entry_player.player,
+                msg="Removal from %s" % event,
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="Removal from %s" % event,
+            )
+
+            # tell the conveners
+            msg = f"""{event_entry_player.player.full_name} has been removed from the team
+                      by {request.user.full_name} for {event.event_name} in {congress}.
+                      <br><br>
+                      The team is still complete.
+                      <br><br>
+                      """
+            notify_conveners(
+                congress,
+                event,
+                f"{event} - Extra player {event_entry_player.player} removed",
+                msg,
+            )
 
         return JsonResponse({"message": "Success"})
 

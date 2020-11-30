@@ -27,6 +27,7 @@ from cobalt.settings import (
     TIME_ZONE,
     COBALT_HOSTNAME,
     TBA_PLAYER,
+    GLOBAL_ORG,
 )
 from .models import (
     Congress,
@@ -47,7 +48,7 @@ from .forms import (
     CongressMasterForm,
     PartnershipForm,
 )
-from .core import events_payments_callback
+from .core import events_payments_callback, notify_conveners
 
 
 TZ = pytz.timezone(TIME_ZONE)
@@ -514,7 +515,7 @@ def pay_outstanding(request):
         member=request.user,
         description="Congress Entry",
         amount=amount["entry_fee__sum"],
-        route_code="EV2",
+        route_code="EVT",
         route_payload=unique_id,
         url=reverse("events:enter_event_success"),
         payment_type="Entry to an event",
@@ -764,6 +765,19 @@ def delete_event_entry(request, event_entry_id):
             extra_tags="cobalt-message-success",
         )
 
+        # Notify conveners
+        player_string = f"<table><tr><td><b>Name</b><td><b>{GLOBAL_ORG} No.</b><td><b>Payment Method</b><td><b>Status</b></tr>"
+        for event_entry_player in event_entry_players:
+            player_string += f"<tr><td>{event_entry_player.player.full_name}<td>{event_entry_player.player.system_number}<td>{event_entry_player.payment_type}<td>{event_entry_player.payment_status}</tr>"
+        player_string += "</table>"
+        message = "Entry cancelled.<br><br> %s" % player_string
+        notify_conveners(
+            event_entry.event.congress,
+            event_entry.event,
+            f"Entry cancelled to {event_entry.event.event_name}",
+            message,
+        )
+
         # dict of people getting money and what they are getting
         refunds = {}
 
@@ -824,9 +838,9 @@ def delete_event_entry(request, event_entry_id):
                 else:
                     refunds[event_entry_player.paid_by] = amount
 
-                # also record players getting cancelled
-                if event_entry_player.player not in cancelled:
-                    cancelled.append(event_entry_player.player)
+            # also record players getting cancelled
+            if event_entry_player.player not in cancelled:
+                cancelled.append(event_entry_player.player)
 
         # new loop, refunds have been made so notify people
         for member in refunds.keys():
@@ -860,7 +874,7 @@ def delete_event_entry(request, event_entry_id):
                 "link_text": "View Entry",
             }
 
-            html_msg = render_to_string("notifications/email_with_button.html", context)
+            html_msg = render_to_string("notifications/email.html", context)
 
             # send
             contact_member(
@@ -871,7 +885,7 @@ def delete_event_entry(request, event_entry_id):
                 link="/events/view",
                 subject="Entry Cancelled - %s" % event_entry.event,
             )
-
+        print(cancelled)
         # There can be people left on cancelled who didn't pay for their entry - let them know
         for member in cancelled:
 
@@ -889,7 +903,7 @@ def delete_event_entry(request, event_entry_id):
                 "link_text": "View Entry",
             }
 
-            html_msg = render_to_string("notifications/email_with_button.html", context)
+            html_msg = render_to_string("notifications/email.html", context)
 
             # send
             contact_member(
