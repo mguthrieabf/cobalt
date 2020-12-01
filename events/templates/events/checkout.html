@@ -105,15 +105,10 @@
 </div>
 
 
-
-
-
-
-
 {% if grouped_by_congress|length > 0 %}
 <div class="card">
 <div class="total mx-auto my-2 card-header card-header-primary">
-  <b class="display-3">Total to pay now: {{ total_today }} credits</b>
+  <b class="display-3">Total to pay now: {{ total_today|cobalt_credits }}</b>
 </div>
 
 <h3>Details:</h3>
@@ -124,9 +119,9 @@
 
     {% for congress, rows in grouped_by_congress.items %}
 
-      <button class="accordion card-header card-header-info mx-auto my-2 ">{{ congress }}: {{ rows.0.today }} credits now.
+      <button class="accordion card-header card-header-info mx-auto my-2 ">{{ congress }}: {{ rows.0.today|cobalt_credits }} now.
         {% if rows.0.later > 0 %}
-          To pay later: {{ rows.0.later }} credits.
+          To pay later: {{ rows.0.later|cobalt_credits }}.
         {% endif %}
       </button>
       <div class="panel mx-auto">

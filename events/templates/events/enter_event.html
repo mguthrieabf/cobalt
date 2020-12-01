@@ -61,12 +61,12 @@
                 </select>
                 {% endif %}
 
-                <div class="row table-responsive">
+                <div class="container row table-responsive">
                   <table class="table borderless">
                     <thead>
                       <tr>
 
-                        <th class="px-lg-5">Player</th>
+                        <th class="px-lg-5 text-left text-primary">Player</th>
                         <th class="px-lg-5">Payment Method</th>
                         <th></th>
                         <th class="px-lg-5">Pay Now</th>
@@ -79,7 +79,7 @@
                       <tr>
                         <td class="col text-center">
                           <div id="div_id_player0" class="form-group">
-                            <select class="cobalt-playerN form-control input-sm bg-primary" title="Select" id="id_player0" name="player0">
+                            <select class="cobalt-playerN form-control input-sm" title="Select" id="id_player0" name="player0">
                               <option value="{{ player0.id }}" selected>{{ player0.name }}</option>
                               {% for val,item in player0.name_choices %}
 
@@ -91,7 +91,7 @@
                         </td>
                         <td>
                           <div class="form-group">
-                          <select id="id_player0_payment" name="player0_payment" class="form-control input-sm bg-primary payment-method">
+                          <select id="id_player0_payment" name="player0_payment" class="form-control input-sm payment-method">
                             {% for val,item in player0.payment_choices %}
                             <option value="{{ val }}">{{ item }}</option>
                             {% endfor %}
@@ -320,6 +320,7 @@ function user_entry_fee(user_id, search_id){
 }
 // update payment method if team mates
 function user_payment_method(user_id, search_id){
+
 $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&entering_user_id={{ request.user.id }}&other_user_id=" + user_id)
   .done(response => {
     var msg = response['data']['message'];
@@ -327,6 +328,13 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
     var now_payment = $("#fee_" + search_id + "_now");
     var later_payment = $("#fee_" + search_id + "_later");
     var pay_amt = now_payment.val() || later_payment.val();
+
+    // if search_id=0 then they have changed themselves. Need to add ask them to pay to options
+    if (search_id==0){
+       $("#id_player" + search_id + "_payment option[value='other-system-dollars']").remove();
+       $("#id_player" + search_id + "_payment").append('<option value="other-system-dollars" selected="">Ask them to pay</option>');
+       $("#id_player" + search_id + "_payment").val('my-system-dollars');
+    }
 
     if (msg == 'Allowed') {
       $("#id_player" + search_id + "_payment").prepend('<option value="their-system-dollars" selected="">Their {{ BRIDGE_CREDITS }}</option>');

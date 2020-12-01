@@ -422,7 +422,7 @@ def admin_event_offsystem(request, event_id):
     # get players with manual payment methods
     players = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
-        .exclude(payment_type__in=["my-system-dollars", "their-system-dollars"])
+        .exclude(payment_type__in=["my-system-dollars", "their-system-dollars", "other-system-dollars"])
         .exclude(event_entry__entry_status="Cancelled")
     )
 

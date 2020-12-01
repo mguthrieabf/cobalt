@@ -23,7 +23,8 @@ Player0 is the logged in player - not handled here
 
     <div id="div_id_player{{ our_form_row.player_no }}" class="form-group" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
       <div class="player-selectpicker class="form-group" id="div_id_player_sub_{{ our_form_row.player_no }}">
-        <select class="form-control input-sm bg-primary cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
+        <select class="form-control input-sm cobalt-playerN" data-container="body" data-style="btn btn-info"  title="Team Mate" name="player{{ our_form_row.player_no }}" id="id_player{{ our_form_row.player_no }}">
+            <option selected disabled>Select...</option>
           {% for val,item in our_form_row.name_choices %}
 
           <option value="{{ val }}" {% if our_form_row.name_selected == val %} selected {% endif %}>{{ item }}</option>
@@ -38,7 +39,7 @@ Player0 is the logged in player - not handled here
   </td>
   <td class="col">
     <div class="form-group" id="id_player{{ our_form_row.player_no }}_paydiv" {% if our_form_row.player_no > 3 %}style="display: none;"{% endif %}>
-    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="payment-method form-control input-sm bg-success" disabled>
+    <select id="id_player{{ our_form_row.player_no }}_payment" name="player{{ our_form_row.player_no }}_payment" class="payment-method form-control input-sm" disabled>
 
 <!-- player 5 and 6 set to free -->
       {% if our_form_row.player_no > 3 %}
@@ -46,7 +47,7 @@ Player0 is the logged in player - not handled here
         <option value="free" selected>No Charge</option>
 
       {% else %}
-
+        <option selected disabled>Select...</option>
         {% for val,item in our_form_row.payment_choices %}
 
         <option value="{{ val }}" {% if our_form_row.payment_selected == val %} selected {% endif %}>
