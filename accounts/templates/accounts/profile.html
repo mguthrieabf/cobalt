@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
 
+<div id="ignore_cobalt_save"></div>
 <div class="container-fluid">
   <p>You can edit your profile here. You can also change less personal things in <a href="{% url "accounts:user_settings" %}" class="btn btn-sm btn-danger">settings</a></p>
   <h2>{{ form.errors }}</h2>
