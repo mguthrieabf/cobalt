@@ -4,6 +4,7 @@
 # Install utility scripts #
 ###########################
 
+
 cp /root/.bashrc /root/.bashrc.old
 
 # ec2-user bash login script
