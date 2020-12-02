@@ -29,6 +29,7 @@ TRANSACTION_TYPE = [
     ("Miscellaneous", "Miscellaneous payment"),
     ("Settlement", "Settlement payment"),
     ("Manual Adjustment", "Manual adjustment"),
+    ("Refund", "Refund"),
 ]
 
 

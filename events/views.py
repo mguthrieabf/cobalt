@@ -885,7 +885,7 @@ def delete_event_entry(request, event_entry_id):
                 link="/events/view",
                 subject="Entry Cancelled - %s" % event_entry.event,
             )
-        print(cancelled)
+
         # There can be people left on cancelled who didn't pay for their entry - let them know
         for member in cancelled:
 

@@ -666,6 +666,15 @@ def admin_event_player_discount(request, event_id):
                     extra_tags="cobalt-message-error",
                 )
 
+            entered = EventEntryPlayer.objects.filter(event_entry__event=event, player=player).exists()
+
+            if entered:
+                messages.error(
+                    request,
+                    f"{player} has already entered this event. Update the entry to change the entry fee.",
+                    extra_tags="cobalt-message-error",
+                )
+
             else:
 
                 entry_fee = form.cleaned_data["entry_fee"]
