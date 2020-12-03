@@ -73,6 +73,11 @@ def masterpoints_detail(request, system_number=None):
     red = float(summary["TotalRed"])
     green = float(summary["TotalGreen"])
 
+    print("counter: %s" % counter)
+    print("gold: %s" % gold)
+    print("red: %s" % red)
+    print("green: %s" % green)
+
     # build list for the fancy chart at the top while we loop through.
     labels_key = []
     labels = []
@@ -94,6 +99,8 @@ def masterpoints_detail(request, system_number=None):
         chart_red["%s-%s" % (year, month)] = 0.0
         chart_green["%s-%s" % (year, month)] = 0.0
 
+    print(chart_gold)
+
     last_line_green = 0
     last_line_red = 0
     last_line_gold = 0
@@ -110,7 +117,7 @@ def masterpoints_detail(request, system_number=None):
         last_line_gold = 0
 
         d["running_total"] = counter
-        d["PostingDate"] = "%s-%s" % (d["PostingYear"], d["PostingMonth"])
+        d["PostingDate"] = "%s-%02d" % (d["PostingYear"], d["PostingMonth"])
         d["PostingDateDisplay"] = "%s-%s" % (
             calendar.month_abbr[d["PostingMonth"]],
             d["PostingYear"],

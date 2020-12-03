@@ -33,26 +33,9 @@ fetch("/payments/create-payment-intent", {
     var form = document.getElementById("payment-form");
     form.addEventListener("submit", function(event) {
 
-//      var card_number = $("[name='cardnumber']");
-
-      $("input[name='cardnumber']").each(function() {
-          console.log( this );
-          console.log( this.value );
-      });
-
-
-  //    console.log(card_number);
-  //    console.log(card_number.val());
       event.preventDefault();
       // Initiate payment when the submit button is clicked
-      var amex = ["34", "37"]
-    //  var first2 = card.substring(0, 2);
-      console.log(card);
-      if (in_array(first2, amex)){
-        alert("Amex not accepted");
-      } else {
       pay(stripe, card, clientSecret);
-    }
     });
   });
 
