@@ -43,6 +43,7 @@ from cobalt.settings import (
     STRIPE_SECRET_KEY,
     GLOBAL_MPSERVER,
     AUTO_TOP_UP_LOW_LIMIT,
+    AUTO_TOP_UP_MAX_AMT,
     AUTO_TOP_UP_DEFAULT_AMT,
     GLOBAL_ORG,
     GLOBAL_ORG_ID,
@@ -71,11 +72,11 @@ from .core import (
 )
 from organisations.views import org_balance
 from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
-from accounts.models import User
+from accounts.models import User, TeamMate
 from utils.utils import cobalt_paginator
 from organisations.models import Organisation
 from rbac.core import rbac_user_has_role
-from rbac.views import rbac_user_has_role, rbac_forbidden
+from rbac.views import rbac_forbidden
 from django.utils.timezone import make_aware
 
 TZ = pytz.timezone(TIME_ZONE)
@@ -87,8 +88,7 @@ TZ = pytz.timezone(TIME_ZONE)
 #################################
 def test_payment(request):
     """This is a temporary view that can be used to test making a payment against
-       a members account. This simulates them entering an event or paying a subscription.
-"""
+    a members account. This simulates them entering an event or paying a subscription."""
 
     if request.method == "POST":
         form = TestTransaction(request.POST)
@@ -138,7 +138,7 @@ def test_payment(request):
 # statement_common #
 ####################
 def statement_common(user):
-    """ Member statement view - common part across online, pdf and csv
+    """Member statement view - common part across online, pdf and csv
 
     Handles the non-formatting parts of statements.
 
@@ -204,7 +204,7 @@ def statement_common(user):
 #####################
 @login_required()
 def statement(request):
-    """ Member statement view.
+    """Member statement view.
 
     Basic view of statement showing transactions in a web page.
 
@@ -238,7 +238,7 @@ def statement(request):
 ################################
 @login_required()
 def statement_admin_view(request, member_id):
-    """ Member statement view for administrators.
+    """Member statement view for administrators.
 
     Basic view of statement showing transactions in a web page. Used by an
     administrator to view a members statement
@@ -281,7 +281,7 @@ def statement_admin_view(request, member_id):
 #####################
 @login_required()
 def statement_org(request, org_id):
-    """ Organisation statement view.
+    """Organisation statement view.
 
     Basic view of statement showing transactions in a web page.
 
@@ -354,7 +354,7 @@ def statement_org(request, org_id):
 #########################
 @login_required()
 def statement_csv_org(request, org_id):
-    """ Organisation statement CSV.
+    """Organisation statement CSV.
 
     Args:
         request: standard request object
@@ -422,7 +422,7 @@ def statement_csv_org(request, org_id):
 
 
 def statement_org_summary_ajax(request, org_id, range):
-    """ Called by the org statement when the summary date range changes
+    """Called by the org statement when the summary date range changes
 
     Args:
         request (HTTPRequest): standard request object
@@ -477,7 +477,7 @@ def statement_org_summary_ajax(request, org_id, range):
 #####################
 @login_required()
 def statement_csv(request, member_id=None):
-    """ Member statement view - csv download
+    """Member statement view - csv download
 
     Generates a CSV of the statement.
 
@@ -546,7 +546,7 @@ def statement_csv(request, member_id=None):
 #####################
 @login_required()
 def statement_pdf(request):
-    """ Member statement view - csv download
+    """Member statement view - csv download
 
     Generates a PDF of the statement.
 
@@ -585,7 +585,7 @@ def statement_pdf(request):
 ############################
 @login_required()
 def stripe_create_customer(request):
-    """ calls Stripe to register a customer.
+    """calls Stripe to register a customer.
 
     Creates a new customer entry with Stripe and sets this member's
     stripe_customer_id to match the customer created. Also sets the
@@ -610,7 +610,7 @@ def stripe_create_customer(request):
 #######################
 @login_required()
 def setup_autotopup(request):
-    """ view to sign up to auto top up.
+    """view to sign up to auto top up.
 
     Creates Stripe customer if not already defined.
     Hands over to Stripe to process card.
@@ -629,7 +629,8 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id, type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -705,7 +706,7 @@ def setup_autotopup(request):
 #######################
 @login_required()
 def member_transfer(request):
-    """ view to transfer $ to another member
+    """view to transfer $ to another member
 
     This view allows a member to transfer money to another member.
 
@@ -750,6 +751,12 @@ def member_transfer(request):
     for r in recents:
         member = User.objects.get(pk=r["other_member"])
         recent_transfer_to.append(member)
+
+    team_mates = TeamMate.objects.filter(user=request.user)
+    for team_mate in team_mates:
+        if team_mate not in recent_transfer_to:
+            recent_transfer_to.append(team_mate.team_mate)
+
     return render(
         request,
         "payments/member_transfer.html",
@@ -762,7 +769,7 @@ def member_transfer(request):
 ########################
 @login_required()
 def update_auto_amount(request):
-    """ Called by the auto top up page when a user changes the amount of the auto top up.
+    """Called by the auto top up page when a user changes the amount of the auto top up.
 
     The auto top up page has Stripe code on it so a standard form won't work
     for this. Instead we use a little Ajax code on the page to handle this.
@@ -787,7 +794,7 @@ def update_auto_amount(request):
 ###################
 @login_required()
 def manual_topup(request):
-    """ Page to allow credit card top up regardless of auto status.
+    """Page to allow credit card top up regardless of auto status.
 
     This page allows a member to add to their account using a credit card,
     they can do this even if they have already set up for auto top up.
@@ -833,7 +840,13 @@ def manual_topup(request):
     balance = get_balance(request.user)
 
     return render(
-        request, "payments/manual_topup.html", {"form": form, "balance": balance}
+        request,
+        "payments/manual_topup.html",
+        {
+            "form": form,
+            "balance": balance,
+            "remaining_balance": AUTO_TOP_UP_MAX_AMT - balance,
+        },
     )
 
 
@@ -842,7 +855,7 @@ def manual_topup(request):
 ######################
 @login_required()
 def cancel_auto_top_up(request):
-    """ Cancel auto top up.
+    """Cancel auto top up.
 
     Args:
         request (HTTPRequest): standard request object
@@ -874,7 +887,7 @@ def cancel_auto_top_up(request):
 ###########################
 @login_required()
 def statement_admin_summary(request):
-    """ Main statement page for system administrators
+    """Main statement page for system administrators
 
     Args:
         request (HTTPRequest): standard request object
@@ -946,7 +959,7 @@ def statement_admin_summary(request):
 ##############
 @login_required()
 def settlement(request):
-    """ process payments to organisations. This is expected to be a monthly
+    """process payments to organisations. This is expected to be a monthly
         activity.
 
     At certain points in time an administrator will clear out the balances of
@@ -1073,7 +1086,7 @@ def settlement(request):
 ########################
 @login_required()
 def manual_adjust_member(request):
-    """ make a manual adjustment on a member account
+    """make a manual adjustment on a member account
 
     Args:
         request (HTTPRequest): standard request object
@@ -1120,7 +1133,7 @@ def manual_adjust_member(request):
 ########################
 @login_required()
 def manual_adjust_org(request):
-    """ make a manual adjustment on an organisation account
+    """make a manual adjustment on an organisation account
 
     Args:
         request (HTTPRequest): standard request object
@@ -1166,7 +1179,7 @@ def manual_adjust_org(request):
 ##########################
 @login_required()
 def stripe_webpage_confirm(request, stripe_id):
-    """ User has been told by Stripe that transaction went through.
+    """User has been told by Stripe that transaction went through.
 
     This is called by the web page after Stripe confirms the transaction is approved.
     Because this originates from the client we do not trust it, but we do move
@@ -1194,7 +1207,7 @@ def stripe_webpage_confirm(request, stripe_id):
 ############################
 @login_required()
 def stripe_autotopup_confirm(request):
-    """ User has been told by Stripe that auto top up went through.
+    """User has been told by Stripe that auto top up went through.
 
     This is called by the web page after Stripe confirms that auto top up is approved.
     Because this originates from the client we do not trust it, but we do move
@@ -1222,7 +1235,7 @@ def stripe_autotopup_confirm(request):
 ############################
 @login_required()
 def stripe_autotopup_off(request):
-    """ Switch off auto top up
+    """Switch off auto top up
 
     This is called by the web page when a user submits new card details to
     Stripe. This is the latest point that we can turn it off in case the
@@ -1246,7 +1259,7 @@ def stripe_autotopup_off(request):
 ######################
 @login_required()
 def stripe_pending(request):
-    """ Shows any pending stripe transactions.
+    """Shows any pending stripe transactions.
 
     Stripe transactions should never really be in a pending state unless
     there is a problem. They go from intent to success usually. The only time
@@ -1291,7 +1304,7 @@ def stripe_pending(request):
 #################################
 @login_required()
 def admin_members_with_balance(request):
-    """ Shows any open balances held by members
+    """Shows any open balances held by members
 
     Args:
         request (HTTPRequest): standard request object
@@ -1320,7 +1333,7 @@ def admin_members_with_balance(request):
 #################################
 @login_required()
 def admin_orgs_with_balance(request):
-    """ Shows any open balances held by orgs
+    """Shows any open balances held by orgs
 
     Args:
         request (HTTPRequest): standard request object
@@ -1347,7 +1360,7 @@ def admin_orgs_with_balance(request):
 #####################################
 @login_required()
 def admin_members_with_balance_csv(request):
-    """ Shows any open balances held by members - as CSV
+    """Shows any open balances held by members - as CSV
 
     Args:
         request (HTTPRequest): standard request object
@@ -1396,7 +1409,7 @@ def admin_members_with_balance_csv(request):
 #####################################
 @login_required()
 def admin_orgs_with_balance_csv(request):
-    """ Shows any open balances held by orgs - as CSV
+    """Shows any open balances held by orgs - as CSV
 
     Args:
         request (HTTPRequest): standard request object
@@ -1436,7 +1449,7 @@ def admin_orgs_with_balance_csv(request):
 ###################################
 @login_required()
 def admin_view_manual_adjustments(request):
-    """ Shows any open balances held by orgs - as CSV
+    """Shows any open balances held by orgs - as CSV
 
     Args:
         request (HTTPRequest): standard request object
@@ -1575,7 +1588,7 @@ def admin_view_manual_adjustments(request):
 ###################################
 @login_required()
 def admin_view_stripe_transactions(request):
-    """ Shows stripe transactions for an admin
+    """Shows stripe transactions for an admin
 
     Args:
         request (HTTPRequest): standard request object
@@ -1691,7 +1704,7 @@ def admin_view_stripe_transactions(request):
 
 @login_required()
 def member_transfer_org(request, org_id):
-    """ Allows an organisation to transfer money to a member
+    """Allows an organisation to transfer money to a member
 
     Args:
         request (HTTPRequest): standard request object
@@ -1763,7 +1776,11 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            msg = "Transferred %s%s to %s" % (
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+                member,
+            )
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:

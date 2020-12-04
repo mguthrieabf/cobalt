@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 
 
 def send_cobalt_email(to_address, subject, message, member=None):
-    """ Send single email. This sets off an async task to actually send the
+    """Send single email. This sets off an async task to actually send the
         email to avoid delays for the user.
 
     Args:
@@ -50,7 +50,7 @@ def send_cobalt_email(to_address, subject, message, member=None):
 
 
 def send_cobalt_email_thread(email_id):
-    """ Send single email. Asynchronous thread
+    """Send single email. Asynchronous thread
 
     Args:
         email_id (int): pk for email to send
@@ -76,7 +76,7 @@ def send_cobalt_email_thread(email_id):
 
 
 def send_cobalt_sms(phone_number, msg):
-    """ Send single SMS
+    """Send single SMS
 
     Args:
         phone_number (str): who to send to
@@ -103,7 +103,7 @@ def send_cobalt_sms(phone_number, msg):
 
 
 def get_notifications_for_user(user):
-    """ Get a list of all unacklowledged notifications for a user
+    """Get a list of all unacklowledged notifications for a user
 
     Returns a list of notifications for the user where the status is
     unacknowledged.
@@ -169,7 +169,7 @@ def create_user_notification(
     subtopic=None,
     notification_type="Email",
 ):
-    """ create a notification record for a user
+    """create a notification record for a user
 
     Used to programatically create a notification record. For example Forums
     will call this to register a notification for comments on a users post.
@@ -207,8 +207,8 @@ def notify_happening_forums(
     email_subject=None,
     user=None,
 ):
-    """ sub function for notify_happening() - handles Forum events
-        Might be able to make this generic
+    """sub function for notify_happening() - handles Forum events
+    Might be able to make this generic
     """
     listeners = NotificationMapping.objects.filter(
         application=application_name,
@@ -219,6 +219,8 @@ def notify_happening_forums(
 
     for listener in listeners:
         if user != listener.member:
+            # Add first name
+            html_msg = html_msg.replace("[NAME]", listener.member.first_name)
             contact_member(
                 listener.member,
                 msg,
@@ -240,7 +242,7 @@ def notify_happening(
     email_subject=None,
     user=None,
 ):
-    """ Called by Cobalt applications to tell notify they have done something.
+    """Called by Cobalt applications to tell notify they have done something.
 
     Main entry point for general notifications of events within the system.
     Applications publish an event through this call and Notifications tells
@@ -382,9 +384,9 @@ def check_listener(member, application, event_type, topic=None, subtopic=None):
 
 
 def notifications_in_english(member):
-    """ returns a list of notifications in a simple English format.
+    """returns a list of notifications in a simple English format.
     This is hand coded and needs to be updated when new notifications are
-    defined. Used by Accounts:Settings but can be used more generally. """
+    defined. Used by Accounts:Settings but can be used more generally."""
 
     notifications = NotificationMapping.objects.filter(member=member)
     for notification in notifications:

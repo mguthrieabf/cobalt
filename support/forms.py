@@ -1,9 +1,8 @@
 from django import forms
 
-from .models import Photo
 
+class ContactForm(forms.Form):
+    """ Contact Support """
 
-class PhotoForm(forms.ModelForm):
-    class Meta:
-        model = Photo
-        fields = ('file', )
+    title = forms.CharField(label="Title", max_length=80)
+    message = forms.CharField(label="Message")

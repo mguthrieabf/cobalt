@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from cobalt.settings import ADMINS, COBALT_HOSTNAME
 from accounts.models import User
-from notifications.views import send_cobalt_email
+from notifications.views import send_cobalt_email, contact_member
 from django.template.loader import render_to_string
 from forums.models import Post, Forum
 from events.models import Congress
@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.core.exceptions import SuspiciousOperation
 from itertools import chain
 from django.contrib import messages
+from .forms import ContactForm
 import json
 
 
@@ -67,6 +68,48 @@ def non_production_email_changer(request):
     )
 
 
+def contact(request):
+    """ Contact form """
+
+    form = ContactForm(request.POST or None)
+
+    if request.method == "POST":
+        title = request.POST["title"]
+        message = request.POST["message"].replace("\n", "<br>")
+
+        msg = f"""
+                  {request.user} - {request.user.email}<br><br>
+                  <b>{title}</b>
+                  <br><br>
+                  {message}
+        """
+
+        for admin in ADMINS:
+
+            context = {
+                "name": admin[0].split()[0],
+                "title": f"Support Request: {title}",
+                "email_body": msg,
+                "host": COBALT_HOSTNAME,
+            }
+
+            html_msg = render_to_string(
+                "notifications/email-notification-no-button-error.html", context
+            )
+
+            send_cobalt_email(admin[1], f"Support Request: {title}", html_msg)
+
+        messages.success(
+            request,
+            "Message sent successfully",
+            extra_tags="cobalt-message-success",
+        )
+
+        return redirect("support:support")
+
+    return render(request, "support/contact.html", {"form": form})
+
+
 @login_required
 @csrf_exempt
 def browser_errors(request):
@@ -76,7 +119,6 @@ def browser_errors(request):
         data = request.POST.get("data", None)
         if data:
             errors = json.loads(data)
-            print(errors)
             msg = f"""
                   <table>
                       <tr><td>Error<td>{errors['message']}</tr>

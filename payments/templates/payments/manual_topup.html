@@ -40,10 +40,10 @@
 
         <div class="d-flex">
           <div>
-            <input type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success center-text">
+            <input type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success cobalt-save center-text">
           </div>
           <div class="ml-auto">
-            <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+            <a class="btn btn-info center-text cobalt-save" href="{% url "payments:payments" %}">Cancel</a>
           </div>
         </div>
 
@@ -68,8 +68,8 @@
       amount.focus();
       return false;
     }
-    if (amount.val() > {{ AUTO_TOP_UP_MAX_AMT }}) {
-      amount_err.html("Too large. Maximum is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }}.");
+    if (amount.val() > {{ remaining_balance }}) {
+      amount_err.html("Too large. Maximum balance is {{ GLOBAL_CURRENCY_SYMBOL }}{{ AUTO_TOP_UP_MAX_AMT }}.");
       amount.focus();
       return false;
     }

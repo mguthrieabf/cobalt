@@ -177,6 +177,8 @@ def update_entries(route_payload, payment_user):
         event_entry.check_if_paid()
 
     # Check if the basket needs emptied
+
+
 #    event_entries_list = event_entries.values_list("id")
 #    BasketItem.objects.filter(player=payment_user).filter(
 #        event_entry__in=event_entries_list
@@ -317,7 +319,6 @@ def send_notifications(route_payload, payment_user):
             html_msg = render_to_string("notifications/email_with_button.html", context)
 
             # send
-            print("sending...")
             contact_member(
                 member=player,
                 msg="Entry to %s" % congress,

@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 
 {% load widget_tweaks %}
+{% load cobalt_tags %}
 {% load humanize %}
 
 {% block content %}
+<div id="ignore_cobalt_save"></div>
 <div class="container">
   <div class="row justify-content-center">
     <div class="card col-11 col-md-6">
       <div class="card-header card-header-primary">
         <h3 class="card-title">{{ BRIDGE_CREDITS }}</h3>
         <h5>Transfer funds online to another member</h5>
-        <h5>Balance: {{ balance|floatformat:2|intcomma }}</h5>
+        <h5>Balance: {{ balance|cobalt_credits }}</h5>
       </div>
       <div class="card-body">
         <div class="container">
@@ -105,7 +107,7 @@
                     <input type="submit" value="Transfer" id="cobalt-button" onclick="this.disabled=true,this.form.submit();" class="btn btn-success center-text cobalt-save" disabled>
                   </div>
                   <div class="ml-auto">
-                    <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+                    <a class="btn btn-info center-text" href="{% url "payments:payments" %}">Cancel</a>
                   </div>
                 </div>
               </div>
@@ -157,6 +159,11 @@
       if (amount.val() < 0) {
         amount_err.html("Must be a positive amount");
         amount.focus();
+        e.preventDefault();
+      }
+      if (amount.val() > {{ AUTO_TOP_UP_MAX_AMT }}) {
+          amount_err.html("Too large. Maximum transfer amount is {{ AUTO_TOP_UP_MAX_AMT|cobalt_credits }}.");
+          amount.focus();
         e.preventDefault();
       }
     });

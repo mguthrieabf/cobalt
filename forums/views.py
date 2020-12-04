@@ -43,7 +43,7 @@ import json
 
 
 def post_list_single_forum(request, forum_id):
-    """ shows posts for a single forum
+    """shows posts for a single forum
 
     Args:
         request(HTTPRequest): standard user request
@@ -78,7 +78,7 @@ def post_list_single_forum(request, forum_id):
 
 @login_required()
 def post_detail(request, pk):
-    """ Main view for existing post.
+    """Main view for existing post.
 
     Shows post and existing comments and allows the user to coment at either
     level (Comment1 or Comment2).
@@ -126,19 +126,20 @@ def post_detail(request, pk):
             host = request.get_host()
             absolute_link = "http://%s%s" % (host, link)
 
-            email_body = "%s commented on %s in Forum: '%s.'" % (
+            email_body = "%s commented on %s in Forum: '%s.'<br><br>%s" % (
                 request.user,
                 post.post.title,
                 post.post.forum,
+                post.post.text,
             )
 
             context = {
-                "name": request.user.first_name,
+                "name": "[NAME]",
                 "title": "New Comment on: %s" % post.post.title,
                 "email_body": email_body,
                 "absolute_link": absolute_link,
                 "host": host,
-                "link_text": "See Comment",
+                "link_text": "Go To Post",
             }
 
             html_msg = render_to_string(
@@ -302,9 +303,9 @@ def post_new(request, forum_id=None):
 
 @login_required()
 def post_edit(request, post_id):
-    """ Edit a post in a forum.
+    """Edit a post in a forum.
 
-    This can be done by the user who created it or a moderator """
+    This can be done by the user who created it or a moderator"""
 
     post = get_object_or_404(Post, pk=post_id)
     role = "forums.forum.%s.create" % post.forum.id
@@ -358,7 +359,7 @@ def post_edit(request, post_id):
 
 @login_required()
 def like_post(request, pk):
-    """ Function to like a post over ajax
+    """Function to like a post over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -383,7 +384,7 @@ def like_post(request, pk):
 
 @login_required()
 def like_comment1(request, pk):
-    """ Function to like a comment1 over ajax
+    """Function to like a comment1 over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -407,7 +408,7 @@ def like_comment1(request, pk):
 
 @login_required()
 def like_comment2(request, pk):
-    """ Function to like a comment2 over ajax
+    """Function to like a comment2 over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -432,7 +433,7 @@ def like_comment2(request, pk):
 
 @login_required
 def forum_list(request):
-    """ View to show a list of all forums
+    """View to show a list of all forums
 
     Args:
         request(HTTPRequest): standard request object
@@ -525,7 +526,7 @@ def post_search(request):
 
 @login_required()
 def follow_forum_ajax(request, forum_id):
-    """ Function to follow a forum over ajax
+    """Function to follow a forum over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -547,7 +548,7 @@ def follow_forum_ajax(request, forum_id):
 
 @login_required()
 def unfollow_forum_ajax(request, forum_id):
-    """ Function to unfollow a forum over ajax
+    """Function to unfollow a forum over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -565,7 +566,7 @@ def unfollow_forum_ajax(request, forum_id):
 
 @login_required()
 def follow_post_ajax(request, post_id):
-    """ Function to follow a post over ajax
+    """Function to follow a post over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -586,7 +587,7 @@ def follow_post_ajax(request, post_id):
 
 @login_required()
 def unfollow_post_ajax(request, post_id):
-    """ Function to unfollow a post over ajax
+    """Function to unfollow a post over ajax
 
     Args:
         request(HTTPRequest): standard request object
@@ -607,7 +608,7 @@ def unfollow_post_ajax(request, post_id):
 
 @login_required()
 def forum_create(request):
-    """ view to create a new forum
+    """view to create a new forum
 
     Args: request(HTTPRequest): standard request object
 
@@ -642,7 +643,7 @@ def forum_create(request):
 
 @login_required()
 def forum_delete_ajax(request, forum_id):
-    """ Function to delete a forum
+    """Function to delete a forum
 
     Args:
         request(HTTPRequest): standard request object
@@ -715,7 +716,9 @@ def comment_edit_common(request, comment, comment_type):
         form = CommentForm(instance=comment)
 
     return render(
-        request, "forums/comment_edit.html", {"form": form, "post": comment.post.id},
+        request,
+        "forums/comment_edit.html",
+        {"form": form, "post": comment.post.id},
     )
 
 
