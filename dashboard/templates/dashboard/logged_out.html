@@ -3,17 +3,71 @@
 
 {% block content %}
 
-<div class="text-center">
+<div class="container">
 
-  <a href="{% url "events:events" %}" class="btn btn-danger py-4 animate__animated animate__fadeIn animate__slow animate__delay-5s btn-block"><span class="display-4 cobalt-text-transform-off">Congresses</span></a><br>
-  <a href="{{ GLOBAL_ABOUT }}" class="btn btn-dark py-4 animate__animated animate__fadeIn animate__slow animate__delay-5s btn-block"><span class="display-4 cobalt-text-transform-off">Main ABF Site</span></a><br>
-  <a href="https://www.abf.com.au/youth-bridge/" class="btn btn-success py-4 animate__animated animate__fadeIn animate__slow animate__delay-5s btn-block"><span class="display-4 cobalt-text-transform-off">Youth Bridge</span></a><br>
-  <a href="https://www.abf.com.au/education/getting-started/" class="btn btn-primary py-4 animate__animated animate__fadeIn animate__slow animate__delay-5s btn-block"><span class="display-4 cobalt-text-transform-off">Learn To Play</span></a>
+
+<div class="parallax">
+</div>
+
+<button> <a href="{% url "events:events" %}">VIEW CONGRESSES</a> </button>
 
 </div>
 
+<div class="buttoncluster">
+
+<button><a href="{{ GLOBAL_ABOUT }}"> MAIN ABF SITE</a> </button>
+
+<button style="float:right"><a href="https://www.abf.com.au/youth-bridge/"> YOUTH BRIDGE </a></button>
+
+</div>
+
+<div class="arrow-down">
+</div>
+
+<div class="boldfeature">
+
+<button><a href="https://www.abf.com.au/education/getting-started/"> LEARN TO PLAY </a></button>
+
+</div>
+
+<br>
+
+<h2> LATEST NEWS </h2>
+
+<div class="newsitem">
+
+<h2> 2020 ABF Online Teams Qualifying </h2>
+
+<p>
+    sectetur adipiscing elit.
+    Sed sit amet nunc et quam molestie finibus convallis et ante
+</p>
+
+<button> READ MORE </button>
+
+</div>
+
+<div class="newsitem">
+
+<h2> 2020 Golden West Swiss Pairs </h2>
+
+<p>
+  Mandurah, November 13-15, 2020
+</p>
+
+<button> READ MORE </button>
+
+</div>
+
+<div class="newsitem">
+
+<h2> Sydney Spring Nationals Online Pairs 2020 </h2>
+
+<p>
+  Entries are now open for the Sydney Spring National Online Pairs
+</p>
+
+  <button> READ MORE </button>
+</div>
 
 {% endblock %}
-
-<!-- Fix the footer for the main page only  -->
-{% block fixed_bottom %}fixed-bottom{% endblock %}

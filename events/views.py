@@ -68,6 +68,8 @@ def home(request):
 
     if request.user.is_authenticated:
 
+        template = "events/home.html"
+
         # get draft congresses
         draft_congresses = Congress.objects.filter(status="Draft")
         draft_congress_flag = False
@@ -77,6 +79,9 @@ def home(request):
                 draft_congress_flag = True
                 break
     else:
+
+        template = "events/home_logged_out.html"
+
         draft_congress_flag = False
 
     grouped_by_month = {}
@@ -122,7 +127,7 @@ def home(request):
 
     return render(
         request,
-        "events/home.html",
+        template,
         {
             "grouped_by_month": grouped_by_month,
             "admin": admin,
@@ -149,10 +154,13 @@ def view_congress(request, congress_id, fullscreen=False):
     # Which template to use
     if fullscreen:
         master_template = "empty.html"
+        template = "events/congress.html"
     elif request.user.is_authenticated:
         master_template = "base.html"
+        template = "events/congress.html"
     else:
-        master_template = "base_logged_out.html"
+        master_template = None
+        template = "events/congress_logged_out.html"
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
@@ -283,7 +291,7 @@ def view_congress(request, congress_id, fullscreen=False):
 
     return render(
         request,
-        "events/congress.html",
+        template,
         {
             "congress": congress,
             "template": master_template,

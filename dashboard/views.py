@@ -47,7 +47,7 @@ def home(request):
         )
 
     else:  # not logged in
-        return redirect("dashboard:logged_out")
+        return redirect("logged_out")
 
 
 def logged_out(request):

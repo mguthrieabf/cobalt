@@ -1,7 +1,5 @@
-{% extends template %}
+{% extends "base_logged_out.html" %}
 {% load static %}
-{% block animate %}
-{% endblock %}
 {% block content %}
 {% if congress.raw_html %}
 {{ congress.raw_html|safe }}
@@ -214,15 +212,6 @@
 
     marker.setMap(map);
 
-    {% if msg %}
-    $('html,body').animate({scrollTop: $("#program").offset().top},'slow');
-    swal.fire({
-      title: "Entry Added",
-      html: "Remember to checkout to complete entry. You can click on the cart at the top right whenever you are ready.",
-      icon: "success",
-      buttonsStyling: false,
-    });
-    {% endif %}
 
   });
 </script>

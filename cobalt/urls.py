@@ -2,12 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from dashboard.views import logged_out
 
 # Overwrite admin panel defaults
 admin.site.site_header = f"{settings.GLOBAL_ORG}Tech Administration"
 admin.site.site_title = f"{settings.GLOBAL_ORG} Administration"
 
 urlpatterns = [
+    path("logged-out", logged_out, name="logged_out"),
     path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path("", include("dashboard.urls", namespace="home")),

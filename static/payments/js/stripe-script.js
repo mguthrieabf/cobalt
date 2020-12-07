@@ -32,6 +32,7 @@ fetch("/payments/create-payment-intent", {
     // Handle form submission.
     var form = document.getElementById("payment-form");
     form.addEventListener("submit", function(event) {
+
       event.preventDefault();
       // Initiate payment when the submit button is clicked
       pay(stripe, card, clientSecret);
