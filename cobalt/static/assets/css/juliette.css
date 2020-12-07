@@ -113,6 +113,8 @@ position:relative;
   color: black;
 
 }
+
+/* MG */
 .parallax {
   background-image: url("/static/assets/img/cards.jpg");
   height: 350px;
@@ -121,6 +123,19 @@ position:relative;
   background-repeat: no-repeat;
   background-size: cover;
   display: block
+
+}
+
+/* MG */
+.congressbox {
+
+  background-color: #E5E5E5;
+  width: 100%;
+  display: inline-block;
+  margin: 100px;
+  text-align: center;
+  vertical-align: top;
+
 
 }
 
