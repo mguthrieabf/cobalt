@@ -1,5 +1,6 @@
 {% extends 'base_logged_out.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -34,40 +35,17 @@
 
 <h2> LATEST NEWS </h2>
 
-<div class="newsitem">
-
-<h2> 2020 ABF Online Teams Qualifying </h2>
-
-<p>
-    sectetur adipiscing elit.
-    Sed sit amet nunc et quam molestie finibus convallis et ante
-</p>
-
-<button> READ MORE </button>
-
-</div>
+{% for post in posts %}
 
 <div class="newsitem">
 
-<h2> 2020 Golden West Swiss Pairs </h2>
+<h2> {{ post.title }} </h2>
 
-<p>
-  Mandurah, November 13-15, 2020
-</p>
+{{ post.text|truncatewords_html:25|safe }}
 
-<button> READ MORE </button>
+<button><a href="{% url 'forums:post_detail' pk=post.pk %}"> READ MORE </a></button>
 
 </div>
-
-<div class="newsitem">
-
-<h2> Sydney Spring Nationals Online Pairs 2020 </h2>
-
-<p>
-  Entries are now open for the Sydney Spring National Online Pairs
-</p>
-
-  <button> READ MORE </button>
-</div>
+{% endfor %}
 
 {% endblock %}

@@ -51,7 +51,10 @@ def home(request):
 
 
 def logged_out(request):
-    return render(request, "dashboard/logged_out.html")
+    """ Home screen for logged out users """
+
+    posts = get_announcements_logged_out()
+    return render(request, "dashboard/logged_out.html", {"posts": posts})
 
 
 @login_required()
@@ -126,4 +129,14 @@ def get_posts(request):
 
     posts = cobalt_paginator(request, posts_list, 20)
 
+    return posts
+
+
+def get_announcements_logged_out():
+    """ internal function to get Posts for logged out users
+        For now just return the latest 3 posts in Forum id=1
+    """
+
+    posts = Post.objects.all().order_by("-created_date")
+    print(posts)
     return posts

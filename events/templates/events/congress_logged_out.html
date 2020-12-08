@@ -1,5 +1,40 @@
 {% extends "base_logged_out.html" %}
 {% load static %}
+
+{% block header %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY&callback=initMap&libraries=&v=weekly" defer></script>
+    <style type="text/css">
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 400px;
+        /* The height is 400 pixels */
+        width: 100%;
+        /* The width is the width of the web page */
+      }
+    </style>
+    <script>
+      // Initialize and add the map
+      function initMap() {
+        var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
+
+        var mapOptions = {
+          zoom: 14,
+          center: myLatlng,
+          scrollwheel: false, //we disable de scroll over the map, it is a really annoing when you scroll through page
+        }
+
+        var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+        var marker = new google.maps.Marker({
+          position: myLatlng,
+          title: "Regular Map!"
+        });
+
+        marker.setMap(map);
+      }
+    </script>
+{% endblock %}
+
 {% block content %}
 {% if congress.raw_html %}
 {{ congress.raw_html|safe }}
@@ -10,7 +45,7 @@
 
 <button>
     <h3>{{ congress.congress_master.org }}</h3>
-    <h3>{{ congress.date_string }}</h3>
+    <h4>{{ congress.date_string }}</h4>
 </button>
 
 </div>
@@ -26,191 +61,135 @@
           <br>
           <br>
         </div>
+        <br>
       {% endif %}
 
       {% if congress.latest_news %}
-            <h4 class="card-title">Latest News</h4>
-          </div>
-          <div class="card-body">
+          <div class="congressbox">
+            <h3>Latest News</h3>
             {{ congress.latest_news|safe }}
+            <br>
+            <br>
           </div>
-        </div>
-      </div>
+          <br>
       {% endif %}
 
-      <div class="row">
-        <div class="col-lg-10 mx-auto">
-          <div class="row">
-            <div class="col-6">
-              <div class="card">
-                <div class="card-header card-header-warning">
-                  <h4 class="card-title">People</h4>
-                </div>
-                <div class="card-body table-responsive">
-                  {{ congress.people|safe }}
-                </div>
-              </div>
-            </div>
-
-            <div class="col-6">
-              <div class="card">
-                <div class="card-header card-header-primary">
-                  <h4 class="card-title">Links</h4>
-                </div>
-                <div class="card-body table-responsive">
-                  {{ congress.links|safe }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="congressbox">
+        <h3>People</h3>
+        {{ congress.people|safe }}
+        <br>
+        <br>
       </div>
+      <br>
+
+      <div class="congressbox">
+        <h3>Links</h3>
+        {{ congress.links|safe }}
+        <br>
+        <br>
+      </div>
+      <br>
 
       {% if bulletins %}
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-info">
-            <h4 class="card-title">Bulletins</h4>
-          </div>
-          <div class="card-body table-responsive">
-            <ul>
-            {% for bulletin in bulletins %}
-              <li><a href="{{ bulletin.document.url }}">{{ bulletin.description }}</a>
-            {% endfor %}
-            </ul>
-          </div>
-        </div>
+      <div class="congressbox">
+        <h3>Bulletins</h3>
+        <ul>
+        {% for bulletin in bulletins %}
+          <li><a href="{{ bulletin.document.url }}">{{ bulletin.description }}</a>
+        {% endfor %}
+        </ul>
+        <br>
+        <br>
       </div>
+      <br>
       {% endif %}
 
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-danger">
-            <h4 class="card-title">General Information</h4>
-          </div>
-          <div class="card-body table-responsive">
-            {{ congress.general_info|safe }}
-          </div>
+      <div class="congressbox">
+        <h3>General Information</h3>
+        <div class="boxbody">
+          {{ congress.general_info|safe }}
         </div>
+        <br>
+        <br>
       </div>
+      <br>
 
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-success">
-            <h4 class="card-title">Location - {{ congress.venue_name }}</h4>
-          </div>
-          <div class="card-body table-responsive">
-            <div id="regularMap" class="map"></div>
-          </div>
-        </div>
+      <div class="congressbox">
+        <h3>Location - {{ congress.venue_name }}</h3>
+        <div id="map"></div>
+        <br>
+        <br>
       </div>
+      <br>
 
       {% if congress.venue_transport %}
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-info">
-            <h4 class="card-title">Transport</h4>
+        <div class="congressbox">
+          <h3>Transport</h3>
+          <div class="boxbody">
+          {{ congress.venue_transport|safe }}
           </div>
-          <div class="card-body table-responsive">
-            {{ congress.venue_transport|safe }}
-          </div>
+          <br>
+          <br>
         </div>
-      </div>
+        <br>
       {% endif %}
 
       {% if congress.venue_catering %}
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-primary">
-            <h4 class="card-title">Catering</h4>
+        <div class="congressbox">
+          <h3>Catering</h3>
+          <div class="boxbody">
+          {{ congress.venue_catering|safe }}
           </div>
-          <div class="card-body table-responsive">
-            {{ congress.venue_catering|safe }}
-          </div>
+          <br>
+          <br>
         </div>
-      </div>
+        <br>
       {% endif %}
 
       {% if congress.venue_additional_info %}
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-warning">
-            <h4 class="card-title">Venue Additional Information</h4>
+        <div class="congressbox">
+          <h3>Venue Additional Information</h3>
+          <div class="boxbody">
+          {{ congress.venue_additional_info|safe }}
           </div>
-          <div class="card-body table-responsive">
-            {{ congress.venue_additional_info|safe }}
-          </div>
+          <br>
+          <br>
         </div>
-      </div>
+        <br>
       {% endif %}
 
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
-          <div class="card-header card-header-success">
-            <h4 class="card-title">Program</h4>
-          </div>
-          <div class="card-body table-responsive">
-            <div class="table-responsive">
-              <table border class="table">
-                <thead class="text-primary">
-                  <th id="program">Event</th>
-                  <th>Entry Fee</th>
-                  <th>Day</th>
-                  <th>Time</th>
-                  <th>Action</th>
-                </thead>
-                <tbody>
-                  {% for program in program_list %}
-                  <tr>
-                    {{ program.event|safe }}
-                    {{ program.day|safe }}
-                    {{ program.time|safe }}
-                    {{ program.links|safe }}
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            {{ congress.additional_info|safe }}
-          </div>
-        </div>
+      <div class="congressbox">
+        <h3>Program</h3>
+        <table border class="table">
+          <thead>
+            <th id="program">Event</th>
+            <th>Entry Fee</th>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            {% for program in program_list %}
+            <tr>
+              {{ program.event|safe }}
+              {{ program.day|safe }}
+              {{ program.time|safe }}
+              {{ program.links|safe }}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <br>
+        <br>
       </div>
-    </div>
-  </div>
-</div>
+      <br>
+
+
+
+      {{ congress.additional_info|safe }}
 
 
 
 <!-- end raw HTML if/else -->
 {% endif %}
-{% endblock %}
-
-{% block footer %}
-<script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
-
-<!--  Google Maps Plugin    -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDt0qnOZKvnJzLO83eg1KB0k8l5SH-NGzY"></script>
-
-<script>
-  $(document).ready(function() {
-    var myLatlng = new google.maps.LatLng({{ congress.venue_location }});
-
-    var mapOptions = {
-      zoom: 14,
-      center: myLatlng,
-      scrollwheel: false, //we disable de scroll over the map, it is a really annoing when you scroll through page
-    }
-
-    var map = new google.maps.Map(document.getElementById("regularMap"), mapOptions);
-
-    var marker = new google.maps.Marker({
-      position: myLatlng,
-      title: "Regular Map!"
-    });
-
-    marker.setMap(map);
-
-
-  });
-</script>
 {% endblock %}

@@ -160,9 +160,9 @@ def view_congress(request, congress_id, fullscreen=False):
         template = "events/congress.html"
     else:
 #        master_template = None
-#        template = "events/congress_logged_out.html"
+        template = "events/congress_logged_out.html"
         master_template = "empty.html"
-        template = "events/congress.html"
+#        template = "events/congress.html"
 
     congress = get_object_or_404(Congress, pk=congress_id)
 

@@ -17,8 +17,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 
-
-
+{% block header %}
+{% endblock %}
 
 </head>
 
@@ -29,8 +29,7 @@
   <div class="header-left">
   <a href="/" class="title"> AUSTRALIAN BRIDGE FEDERATION </a>
 
-{% block header %}
-{% endblock %}
+
   </div>
 
   <div class="header-right">
@@ -52,5 +51,9 @@
 
 <div id="footer"> AUSTRALIAN BRIDGE FEDERATION </div>
 </body>
+
+
+  {% block footer %}
+  {% endblock %}
 
 </html>

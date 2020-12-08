@@ -130,13 +130,16 @@ position:relative;
 .congressbox {
 
   background-color: #E5E5E5;
-  width: 100%;
-  display: inline-block;
-  margin: 100px;
+  width: 70%;
+  margin: auto;
   text-align: center;
-  vertical-align: top;
+  padding: 10px;
 
+}
 
+/* MG */
+.boxbody {
+  text-align: left;
 }
 
 .messagebar {
