@@ -41,7 +41,7 @@
 
 <h2> {{ post.title }} </h2>
 
-{{ post.text|truncatewords_html:25|safe }}
+{{ post.text|truncatewords_html:15|safe }}
 
 <button><a href="{% url 'forums:post_detail' pk=post.pk %}"> READ MORE </a></button>
 

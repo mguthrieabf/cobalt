@@ -137,5 +137,5 @@ def get_announcements_logged_out():
         For now just return the latest 3 posts in Forum id=1
     """
 
-    posts = Post.objects.all().order_by("-created_date")[:2]
+    posts = Post.objects.all().order_by("-created_date")[:3]
     return posts
