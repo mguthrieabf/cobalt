@@ -34,6 +34,7 @@ fetch("/payments/create-payment-intent", {
     form.addEventListener("submit", function(event) {
 
       event.preventDefault();
+
       // Initiate payment when the submit button is clicked
       pay(stripe, card, clientSecret);
     });
@@ -42,7 +43,7 @@ fetch("/payments/create-payment-intent", {
 // Set up Stripe.js and Elements to use in checkout form
 var setupElements = function(data) {
   stripe = Stripe(data.publishableKey);
-  var elements = stripe.elements();
+  elements = stripe.elements();
   var style = {
     base: {
       color: "#32325d",
@@ -61,6 +62,20 @@ var setupElements = function(data) {
 
   var card = elements.create("card", { hidePostalCode: true, style: style });
   card.mount("#card-element");
+
+// disable Amex
+  card.on('change', function(event) {
+    if (event.brand == "amex"){
+      swal.fire({
+        title: "American Express Not Accepted",
+        html: "Sorry, due to the high fees involved we do not accept American Express credit cards.",
+        icon: "info",
+        buttonsStyling: false
+      });
+
+      card.clear();
+    }
+  });
 
   return {
     stripe: stripe,

@@ -56,6 +56,20 @@ var setupElements = function(data) {
   var card = elements.create("card", { hidePostalCode: true, style: style });
   card.mount("#card-element");
 
+// disable Amex
+  card.on('change', function(event) {
+    if (event.brand == "amex"){
+      swal.fire({
+        title: "American Express Not Accepted",
+        html: "Sorry, due to the high fees involved we do not accept American Express credit cards.",
+        icon: "info",
+        buttonsStyling: false
+      });
+
+      card.clear();
+    }
+  });
+
   return {
     stripe: stripe,
     card: card,
