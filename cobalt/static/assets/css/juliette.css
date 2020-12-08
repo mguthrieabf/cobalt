@@ -279,8 +279,11 @@ h2 {
 }
 
 
-
-
+/* MG */
+.table {
+  border-collapse: collapse;
+  	width: 100%;
+}
 
 #footer {
 	background-color: #404040;
