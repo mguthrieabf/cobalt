@@ -6,7 +6,7 @@ accounts, resetting passwords, searches. profiles etc.
 
 """
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.sites.shortcuts import get_current_site
@@ -499,11 +499,13 @@ def blurb_form_upload(request):
 
     form = UserUpdateForm(instance=request.user)
 
-    context = {
-        "form": form,
-        "blurbform": blurbform,
-    }
-    return render(request, "accounts/profile.html", context)
+    return redirect("accounts:user_profile")
+
+    # context = {
+    #     "form": form,
+    #     "blurbform": blurbform,
+    # }
+    # return render(request, "accounts/profile.html", context)
 
 
 @login_required

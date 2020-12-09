@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 
-<div id="ignore_cobalt_save"></div>
+<div id="ignore_cobalt_savex"></div>
 <div class="container-fluid">
   <p>You can edit your profile here. You can also change less personal things in <a href="{% url "accounts:user_settings" %}" class="btn btn-sm btn-danger">settings</a></p>
   <h2>{{ form.errors }}</h2>
@@ -61,7 +61,7 @@
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn btn-success pull-right">Update Profile</button>
+            <button type="submit" class="btn btn-success pull-right cobalt-save">Update Profile</button>
             <div class="clearfix"></div>
           </form>
         </div>
@@ -71,6 +71,7 @@
         <div class="card-header card-header-warning">
           <h4>Team Mates</h4>
           <p class="card-category">Add people you play with regularly to make it easier to enter events together</p>
+          <h4 class="text-dark">You can only add team mates who have registered on the system</h4>
         </div>
         <div class="card-body">
 
@@ -163,7 +164,7 @@
               <label class="bmd-label-floating">About You</label>
               <textarea rows=8 name="about" id="id_about" class="form-control" placeholder="Tell people about yourself in a few words.">{{ blurbform.about.value|default_if_none:"" }}</textarea>
             </p>
-            <button type="submit" class="btn btn-success">Update</button>
+            <button type="submit" class="btn btn-success cobalt-save">Update</button>
       </form>
     </div>
   </div>
@@ -239,6 +240,8 @@
           if (msg == 'Success'){
             swal.fire({ title:"Team Mate Added", html: "Success. Added a new team mate", icon: "success", buttonsStyling: false})
             .then((result) => {
+              alert(cobalt_form_data_changed);
+              cobalt_form_data_changed = false;
               location.reload();
             });
           } else {
