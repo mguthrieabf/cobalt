@@ -54,7 +54,6 @@ class UserUpdateForm(forms.ModelForm):
             "system_number",
             "dob",
             "mobile",
-            "about",
             "pic",
             "bbo_name",
         ]

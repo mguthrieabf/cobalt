@@ -217,7 +217,7 @@
 
       search_results.html("");
 
-      if (ln.length + fn.length > 3) {
+      if (ln.length + fn.length > 1) {
         $.getJSON(member_search + "?lastname=" + ln + "&firstname=" + fn)
           .done(response => {
             // update screen with results

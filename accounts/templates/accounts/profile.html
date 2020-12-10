@@ -71,69 +71,74 @@
         <div class="card-header card-header-warning">
           <h4>Team Mates</h4>
           <p class="card-category">Add people you play with regularly to make it easier to enter events together</p>
-          <h4 class="text-dark">You can only add team mates who have registered on the system</h4>
-        </div>
-        <div class="card-body">
+      </div>
+      <div class="card-body">
 
-          <table class="table" id="team_mate_table">
-              <thead>
-                  <tr>
-                      <th>Name</th>
-                      <th>Status</th>
-                      <th class="text-right">Actions</th>
-                  </tr>
-              </thead>
-              <tbody>
+      {% if team_mates %}
 
-                {% for team_mate in team_mates %}
-                  <tr id="div_for_{{ team_mate.team_mate.id }}">
-                      <td>
-                        <a href="{% url "accounts:public_profile" pk=team_mate.team_mate.id %}">
-                          {{ team_mate.team_mate.full_name }}
+        <table class="table" id="team_mate_table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+              {% for team_mate in team_mates %}
+                <tr id="div_for_{{ team_mate.team_mate.id }}">
+                    <td>
+                      <a href="{% url "accounts:public_profile" pk=team_mate.team_mate.id %}">
+                        {{ team_mate.team_mate.full_name }}
+                      </a>
+                    </td>
+                    <td id="status_{{ team_mate.team_mate.id }}">
+                      {% if team_mate.make_payments %}
+                        Team Mate<a href="javascript:void(0)" onclick='help("Team Mate Plus", "This person can use your bridge credits to enter you in an event");'>
+                          <i class="material-icons">add_box</i>
                         </a>
-                      </td>
-                      <td id="status_{{ team_mate.team_mate.id }}">
-                        {% if team_mate.make_payments %}
-                          Team Mate<a href="javascript:void(0)" onclick='help("Team Mate Plus", "This person can use your bridge credits to enter you in an event");'>
-                            <i class="material-icons">add_box</i>
-                          </a>
-                        {% else %}
-                          Team mate - basic
-                        {% endif %}
-                      </td>
-                      <td class="td-actions text-right">
-                          <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
-                            data-toggle="tooltip"
-                            title="{% if team_mate.make_payments %}Stop {{ team_mate.team_mate.first_name }} from being able to use your money to enter you in an event{% else %}Allow {{ team_mate.team_mate.first_name }} to enter you in an event using your money{% endif %}"
-                            class="make_payments btn btn-info">
-                              <i class="material-icons">
-                                {% if team_mate.make_payments %}
-                                  money_off
-                                {% else %}
-                                  attach_money
-                                {% endif %}
-                              </i>
-                          </button>
-                          <button type="button" id="delete_team_mate_{{ team_mate.team_mate.id }}"
-                            data-toggle="tooltip"
-                            class="btn btn-danger delete_team_mate"
-                            title="Remove {{ team_mate.team_mate.first_name }} as a team mate. Nobody likes {{ team_mate.team_mate.first_name }}, hit the button."
-                          >
-                            <i class="material-icons">delete</i>
-                          </button>
-                      </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-          </table>
+                      {% else %}
+                        Team mate - basic
+                      {% endif %}
+                    </td>
+                    <td class="td-actions text-right">
+                        <button type="button" id="toggle_team_mate_{{ team_mate.team_mate.id }}"
+                          data-toggle="tooltip"
+                          title="{% if team_mate.make_payments %}Stop {{ team_mate.team_mate.first_name }} from being able to use your money to enter you in an event{% else %}Allow {{ team_mate.team_mate.first_name }} to enter you in an event using your money{% endif %}"
+                          class="make_payments btn btn-info">
+                            <i class="material-icons">
+                              {% if team_mate.make_payments %}
+                                money_off
+                              {% else %}
+                                attach_money
+                              {% endif %}
+                            </i>
+                        </button>
+                        <button type="button" id="delete_team_mate_{{ team_mate.team_mate.id }}"
+                          data-toggle="tooltip"
+                          class="btn btn-danger delete_team_mate"
+                          title="Remove {{ team_mate.team_mate.first_name }} as a team mate. Nobody likes {{ team_mate.team_mate.first_name }}, hit the button."
+                        >
+                          <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h4 class="text-dark">Note: You can only add team mates who have already signed up to the system. Encourage your friends to sign up.</h4>
+        {% endif %}
 
-          {% include "utils/generic_user_search_body.html" with search_id=1 %}
+        {% include "utils/generic_user_search_body.html" with search_id=1 %}
 
-          <div class="d-flex">
-            <div>
-              <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search1">Add Team Mate</a>
-            </div>
+        <div class="d-flex">
+          <div>
+            <a href="" class="btn btn-success cobalt_generic_member" data-toggle="modal" id="cobalt_user" data-target="#cobalt_general_member_search1">Add Team Mate</a>
           </div>
+        </div>
+
         </div>
       </div>
     </div>

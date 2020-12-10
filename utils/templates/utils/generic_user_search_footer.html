@@ -123,7 +123,7 @@ jQuery(document).ready(function() {
 
     search_results{{ search_id }}.html("");
 
-    if (ln.length + fn.length > 3) {
+    if (ln.length + fn.length > 1) {
       $.getJSON(member_search{{ search_id }} + "?lastname=" + ln + "&firstname=" + fn + "&search_id={{ search_id }}")
         .done(response => {
 
