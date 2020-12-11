@@ -19,14 +19,12 @@ logger = logging.getLogger("django")
 @login_required()
 def dashboard(request):
     """ view to force the login prompt to come up """
-    print("dashboard")
     return home(request)
 
 
 def home(request):
     """ Home page """
 
-    print("home")
     if request.user.is_authenticated:
         system_number = request.user.system_number
         masterpoints = get_masterpoints(system_number)

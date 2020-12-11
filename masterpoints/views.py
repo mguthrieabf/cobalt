@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from accounts.models import User
 import requests
 import calendar
@@ -21,7 +22,7 @@ from cobalt.settings import GLOBAL_MPSERVER
 
 
 @login_required()
-def masterpoints_detail(request, system_number=None):
+def masterpoints_detail(request, system_number=None, retry=False):
 
     if system_number is None:
         system_number = request.user.system_number
@@ -37,10 +38,28 @@ def masterpoints_detail(request, system_number=None):
         ConnectionError,
     ):
         r = []
+
     if len(r) == 0:
-        error_msg = "No entry found for %s" % system_number
-        error = {"cobalt_error_msg": error_msg}
-        raise Http404(error)
+
+        if retry:  # This isn't the first time we've been here
+            messages.error(
+                request,
+                f"Masterpoints module unable to find entry for id: {system_number}",
+                extra_tags="cobalt-message-error",
+            )
+            return redirect("dashboard:dashboard")
+
+        # not found - set error and call this again
+        messages.warning(
+            request,
+            f"No Masterpoints entry found for id: {system_number}",
+            extra_tags="cobalt-message-warning",
+        )
+        return masterpoints_detail(request, retry=True)
+        # error_msg = "No entry found for %s" % system_number
+        # error = {"cobalt_error_msg": error_msg}
+        # raise Http404(error)
+
     summary = r[0]
 
     # Set active to a boolean
