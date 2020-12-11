@@ -240,6 +240,8 @@
       // toggle visibility
       var id = event.target.id.replace("cobalt-click", "cobalt-thread");
       $('#' + id).toggleClass('d-block d-none');
+// set focus
+      $('#' + id).find('.cobalt-textarea').focus();
     });
 
     function likePost() {
@@ -258,7 +260,7 @@
             likecount.text(newcount);
             swal.fire({
               title: "Post Liked",
-              html: "Success. Thank you for liking this.",
+              html: "Thank you for liking this.",
               icon: "success",
             });
           } else {
@@ -293,7 +295,7 @@
             likecount.text(newcount);
             swal.fire({
               title: "Post Liked",
-              html: "Success. Thank you for liking this.",
+              html: "Thank you for liking this.",
               icon: "success",
             });
           } else {
@@ -327,7 +329,7 @@
             likecount.text(newcount);
             swal.fire({
               title: "Post Liked",
-              html: "Success. Thank you for liking this.",
+              html: "Thank you for liking this.",
               icon: "success",
             });
           } else {

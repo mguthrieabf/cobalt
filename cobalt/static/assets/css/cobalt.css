@@ -76,3 +76,9 @@ img.cobalt-rounded {
 .pagination-next {
     color: #3354AA;
 }
+
+/* Properly disable buttons */
+.btn[disabled]{
+  pointer-events:none;
+  opacity:0.5
+}

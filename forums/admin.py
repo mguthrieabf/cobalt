@@ -12,11 +12,12 @@ from .models import (
 )
 
 
-class PostAdmin(SummernoteModelAdmin):
-    summernote_fields = ("text",)
+# class PostAdmin(SummernoteModelAdmin):
+#     summernote_fields = ("text",)
 
 
-admin.site.register(Post, PostAdmin)
+# admin.site.register(Post, PostAdmin)
+admin.site.register(Post)
 admin.site.register(Forum)
 admin.site.register(Comment1)
 admin.site.register(Comment2)
