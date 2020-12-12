@@ -50,6 +50,7 @@ from payments.core import payment_api, org_balance, update_account, update_organ
 from organisations.models import Organisation
 from django.contrib import messages
 import uuid
+import copy
 from cobalt.settings import (
     GLOBAL_ORG,
     GLOBAL_CURRENCY_NAME,
@@ -251,17 +252,18 @@ def admin_evententryplayer(request, evententryplayer_id):
     """ Admin Event Entry Player View """
 
     event_entry_player = get_object_or_404(EventEntryPlayer, pk=evententryplayer_id)
+    old_user = copy.copy(event_entry_player.player)
 
-    role = (
-        "events.org.%s.edit"
-        % event_entry_player.event_entry.event.congress.congress_master.org.id
-    )
+    event = event_entry_player.event_entry.event
+
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
 
     if request.method == "POST":
         form = EventEntryPlayerForm(request.POST, instance=event_entry_player)
         if form.is_valid():
+            new_user = form.cleaned_data["player"]
             form.save()
 
             # check if event entry payment status has changed
@@ -270,6 +272,63 @@ def admin_evententryplayer(request, evententryplayer_id):
             messages.success(
                 request, "Entry updated", extra_tags="cobalt-message-success"
             )
+
+            # Log it
+            EventLog(
+                event=event,
+                event_entry=event_entry_player.event_entry,
+                actor=request.user,
+                action=f"Removed {old_user}. Added {new_user}.",
+            ).save()
+
+            if new_user != old_user:
+
+                # notify deleted member
+                if old_user.id != TBA_PLAYER:
+                    context = {
+                        "name": old_user.first_name,
+                        "title": "Removed from event - %s" % event,
+                        "email_body": f"The convener, {request.user.full_name}, has removed you from this event.<br><br>",
+                        "host": COBALT_HOSTNAME,
+                    }
+
+                    html_msg = render_to_string("notifications/email.html", context)
+
+                    # send
+                    contact_member(
+                        member=old_user,
+                        msg="Removed from - %s" % event,
+                        contact_type="Email",
+                        html_msg=html_msg,
+                        link="/events/view",
+                        subject="Removed from - %s" % event,
+                    )
+
+                # notify added member
+                if new_user.id != TBA_PLAYER:
+                    context = {
+                        "name": new_user.first_name,
+                        "title": "Added to event - %s" % event,
+                        "email_body": f"The convener, {request.user.full_name}, has added you to this event.<br><br>",
+                        "host": COBALT_HOSTNAME,
+                        "link": "/events/view",
+                        "link_text": "View Entry",
+                    }
+
+                    html_msg = render_to_string(
+                        "notifications/email_with_button.html", context
+                    )
+
+                    # send
+                    contact_member(
+                        member=new_user,
+                        msg="Added to - %s" % event,
+                        contact_type="Email",
+                        html_msg=html_msg,
+                        link="/events/view",
+                        subject="Added to - %s" % event,
+                    )
+
             return redirect(
                 "events:admin_evententry",
                 evententry_id=event_entry_player.event_entry.id,
@@ -422,7 +481,13 @@ def admin_event_offsystem(request, event_id):
     # get players with manual payment methods
     players = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
-        .exclude(payment_type__in=["my-system-dollars", "their-system-dollars", "other-system-dollars"])
+        .exclude(
+            payment_type__in=[
+                "my-system-dollars",
+                "their-system-dollars",
+                "other-system-dollars",
+            ]
+        )
         .exclude(event_entry__entry_status="Cancelled")
     )
 
@@ -666,7 +731,9 @@ def admin_event_player_discount(request, event_id):
                     extra_tags="cobalt-message-error",
                 )
 
-            entered = EventEntryPlayer.objects.filter(event_entry__event=event, player=player).exists()
+            entered = EventEntryPlayer.objects.filter(
+                event_entry__event=event, player=player
+            ).exists()
 
             if entered:
                 messages.error(

@@ -503,11 +503,9 @@ def change_player_entry_ajax(request):
             "title": "Event Entry - %s" % congress,
             "email_body": f"{request.user.full_name} has removed you from {event}.<br><br>",
             "host": COBALT_HOSTNAME,
-            "link": "/events/view",
-            "link_text": "View Entry",
         }
 
-        html_msg = render_to_string("notifications/email_with_button.html", context)
+        html_msg = render_to_string("notifications/email.html", context)
 
         # send
         contact_member(

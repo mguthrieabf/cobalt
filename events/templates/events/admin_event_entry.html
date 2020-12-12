@@ -68,7 +68,7 @@
           </div>
           {% if event.free_format_question %}
             <h3>{{ event.free_format_question }}</h3>
-            <p>{{ event_entry.free_format_answer }}</p>
+            <p>{{ event_entry.free_format_answer|default_if_none:" " }}</p>
           {% endif %}
         </div>
       </div>
