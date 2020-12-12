@@ -20,7 +20,11 @@
         <tbody>
           {% for thing in things %}
           <tr>
-            <td><a href=" {% url "accounts:public_profile" pk=thing.member.id %}">{{ thing.member }}</a></td>
+            {% if thing.member.id %}
+              <td><a href=" {% url "accounts:public_profile" pk=thing.member.id %}">{{ thing.member }}</a></td>
+            {% else %}
+              <td>{{ thing.member }}</td>
+            {% endif %}
             <td class="text-right">{{ thing.balance }}</td>
             <td><a href="{% url "payments:statement_admin_view" member_id=thing.member.id %}" class="btn btn-sm btn-info">View Statement</a></td>
           </tr>
