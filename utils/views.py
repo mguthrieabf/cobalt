@@ -11,13 +11,15 @@ from django.contrib.auth.decorators import user_passes_test
 from utils.utils import cobalt_paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from notifications.views import send_cobalt_email
-from cobalt.settings import COBALT_HOSTNAME
+from cobalt.settings import COBALT_HOSTNAME, TIME_ZONE, DEFAULT_FROM_EMAIL2
 from accounts.models import User
 from payments.core import payments_status_summary
 from notifications.views import notifications_status_summary
 from events.core import events_status_summary
 from forums.views import forums_status_summary
 import datetime
+import os
+import pytz
 
 
 @login_required
@@ -160,6 +162,14 @@ def status(request):
     # Forums
     forums = forums_status_summary()
 
+    # Get build time of this release
+    TZ = pytz.timezone(TIME_ZONE)
+
+    stat_time = os.stat("__init__.py").st_mtime
+    utc_build_date = datetime.datetime.fromtimestamp(stat_time)
+    # build_date = timezone.localtime(utc_build_date, TZ)
+    build_date = TZ.localize(utc_build_date)
+
     return render(
         request,
         "utils/status.html",
@@ -169,6 +179,8 @@ def status(request):
             "notifications": notifications,
             "events": events,
             "forums": forums,
+            "build_date": build_date,
+            "DEFAULT_FROM_EMAIL2": DEFAULT_FROM_EMAIL2,
         },
     )
 

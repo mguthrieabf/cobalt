@@ -189,7 +189,7 @@ class MemberTransaction(AbstractTransaction):
     # This is the primary member whose account is being interacted with
     member = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True,
+        #        null=True,
         on_delete=models.PROTECT,
         related_name="primary_member",
     )

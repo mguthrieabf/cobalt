@@ -12,7 +12,7 @@ For development you also need to set environment variables or it
 won't work.
 
 readthedocs somehow runs the code as well in order to generate the
-documentation and this requires variables to defined so as well as importing
+documentation and this requires variables to be defined, so as well as importing
 the variables from the environment, we also have to define them (with dummy
 values) within this file.
 
@@ -65,6 +65,7 @@ EMAIL_HOST = set_value("EMAIL_HOST")
 EMAIL_HOST_USER = set_value("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = set_value("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = set_value("DEFAULT_FROM_EMAIL", "notset@fake.com")
+DEFAULT_FROM_EMAIL2 = set_value("DEFAULT_FROM_EMAIL2", "notset@fake.com")
 SUPPORT_EMAIL = set_value("SUPPORT_EMAIL", ["m@rkguthrie.com"])
 
 # stripe

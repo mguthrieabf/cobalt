@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
 from utils.templatetags.cobalt_tags import cobalt_credits
-
 from notifications.views import contact_member
 from accounts.models import User, TeamMate
 from rbac.core import (
@@ -159,10 +158,10 @@ def view_congress(request, congress_id, fullscreen=False):
         master_template = "base.html"
         template = "events/congress.html"
     else:
-#        master_template = None
+        #        master_template = None
         template = "events/congress_logged_out.html"
         master_template = "empty.html"
-#        template = "events/congress.html"
+    #        template = "events/congress.html"
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
@@ -663,15 +662,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request,
-                "Payment successful",
-                extra_tags="cobalt-message-success",
+                request, "Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request,
-                "Payment failed",
-                extra_tags="cobalt-message-error",
+                request, "Payment failed", extra_tags="cobalt-message-error",
             )
 
     # valid payment methods
@@ -821,7 +816,7 @@ def delete_event_entry(request, event_entry_id):
                 update_account(
                     organisation=event_entry.event.congress.congress_master.org,
                     amount=amount,
-                    description=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
+                    description=f"Refund for {event_entry.event}",
                     source="Events",
                     log_msg=f"Refund from {event_entry.event.congress.congress_master.org} for {event_entry.event.event_name}",
                     sub_source="refund",
