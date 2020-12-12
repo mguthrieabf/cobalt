@@ -227,13 +227,8 @@ class MemberTransaction(AbstractTransaction):
             )
         super(MemberTransaction, self).save(*args, **kwargs)
 
-    # def __str__(self):
-    #     return "%s - %s %s %s" % (
-    #         self.member.system_number,
-    #         self.member.first_name,
-    #         self.member.last_name,
-    #         self.id,
-    #     )
+    def __str__(self):
+        return f"{self.member} - {self.type}"
 
 
 class OrganisationTransaction(AbstractTransaction):
