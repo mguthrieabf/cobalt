@@ -26,7 +26,11 @@
               <td>{{ thing.member }}</td>
             {% endif %}
             <td class="text-right">{{ thing.balance }}</td>
-            <td><a href="{% url "payments:statement_admin_view" member_id=thing.member.id %}" class="btn btn-sm btn-info">View Statement</a></td>
+            {% if thing.member.id %}
+              <td><a href="{% url "payments:statement_admin_view" member_id=thing.member.id %}" class="btn btn-sm btn-info">View Statement</a></td>
+            {% else %}
+              <td><a href="#" class="btn btn-sm btn-info">View Statement</a></td>
+            {% endif %}
           </tr>
           {% endfor %}
 
