@@ -232,6 +232,26 @@ def post_new(request, forum_id=None):
             post = form.save(commit=False)
             post.author = request.user
             post.published_date = timezone.now()
+
+            # Summernote allows images to overflow their divs - we don't want that
+            text = post.text
+
+            # We are looking to turn ....<img..>... into
+            # ...<div style="overflow:hidden;"><img...></div>
+
+            loc = text.find("<img")
+            while loc >= 0:
+                beginning = text[:loc]
+                ending = text[loc:]
+                endloc = ending.find(">") + 1
+                new_ending = "%s</div>%s" % (ending[:endloc], ending[endloc:])
+                text = "%s<div style='overflow:hidden;'>%s" % (beginning, new_ending)
+
+                # find next, string is now longer
+                loc = text.find("<img", loc + 36)
+
+            post.text = text
+
             post.save()
 
             messages.success(
@@ -765,8 +785,6 @@ def forum_edit(request, forum_id):
         form = ForumForm(instance=forum)
 
     blocked_users = rbac_get_users_in_group(f"forums.forum.{forum_id}.blocked_users")
-
-    print(blocked_users)
 
     return render(
         request,

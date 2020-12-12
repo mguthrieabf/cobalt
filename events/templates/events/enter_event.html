@@ -204,10 +204,13 @@ function cobaltMemberSearchOk(search_id) {
             // add option if not already there
             if ($('#id_player' + search_id + ' option[value=' + member_id[search_id] + ']').length==0) {
               // not found so add
-              $("#id_player" + search_id).append('<option value="'+member_id[search_id]+'" selected="">'+member_name[search_id]+'</option>');
+              // if we get Alan Admin (100) change to Alan Admin
+              var name = member_name[search_id].split("(")[0]
+              $("#id_player" + search_id).append('<option value="'+member_id[search_id]+'" selected="">'+name+'</option>');
             } else {
               // already present - set as selected
-              $("#id_player" + search_id).val(member_id[search_id]).selectpicker('refresh');
+            //  $("#id_player" + search_id).val(member_id[search_id]).selectpicker('refresh');
+              $("#id_player" + search_id).val(member_id[search_id]);
             }
 
         // check on fees and payment methods
@@ -227,12 +230,17 @@ function cobaltMemberSearchOk(search_id) {
 // if generic search is cancelled reset the player field and disable the
 // payment method
 function cobaltMemberSearchCancel(search_id) {
-  $("#fee_" + search_id + "_now").val('');
-  $("#fee_" + search_id + "_later").val('');
-  $("#id_player" + search_id).val('').selectpicker('refresh');
-  $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
-  $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
-  $("#id_player" + search_id + "_payment").prop("disabled", false);
+  if (previous[search_id]){  // if we have a previous then reset it
+    $("#id_player" + search_id).val(previous[search_id]);
+  } else {
+    $("#fee_" + search_id + "_now").val('');
+    $("#fee_" + search_id + "_later").val('');
+    // $("#id_player" + search_id).val('').selectpicker('refresh');
+    // $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
+    // $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
+    $("#id_player" + search_id + "_payment").val('');
+    $("#id_player" + search_id + "_payment").prop("disabled", false);
+  }
   if (search_id<4){
     $("#id_checkout").prop("disabled", true);
     $("#id_cart").prop("disabled", true);

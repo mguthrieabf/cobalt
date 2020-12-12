@@ -274,3 +274,15 @@ class OrganisationTransaction(AbstractTransaction):
 
     def __str__(self):
         return f"{self.organisation.name} - {self.id}"
+
+
+class StripeLog(models.Model):
+    """ Log messages received from Stripe on the webhook in case we need them in full """
+
+    created_date = models.DateTimeField("Create Date", default=timezone.now)
+    event = models.TextField("Event", blank=True, null=True)
+    event_type = models.TextField("Event Type", blank=True, null=True)
+    cobalt_tran_type = models.TextField("Cobalt Tran Type", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.event_type} - {self.created_date}"

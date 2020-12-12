@@ -46,7 +46,7 @@
             <p>It may take several minutes for this to reach your statement.</p>
             <p>Click <b>Payments</b> in the menu to view your statement.</p>
             {% if next_url %}
-              <h3>Taking you <a href="{{ next_url }}" style="color: blue;">back to events</a> in <span id="time"></span></h3>
+              <h3>Taking you <a href="{{ next_url }}" style="color: blue;">back to {{ next_url_name }}</a> in <span id="time"></span></h3>
             {% endif %}
           </div>
         </div>
@@ -61,4 +61,20 @@
 
 {% block footer %}
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+
+<!-- <script>
+  $('document').ready(function() {
+    var time = 20;
+    setInterval(function() {
+      document.getElementById("time").innerHTML = time + " seconds";
+      time--;
+      if (time == 0) {
+        window.location.href = "{{ next_url }}";
+      }
+    }, 1000);
+
+  });
+</script> -->
+
+
 {% endblock %}

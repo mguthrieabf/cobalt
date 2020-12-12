@@ -28,7 +28,7 @@ from .tokens import account_activation_token
 from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
 from forums.models import Post, Comment1, Comment2
 from utils.utils import cobalt_paginator
-from cobalt.settings import GLOBAL_ORG
+from cobalt.settings import GLOBAL_ORG, RBAC_EVERYONE, TBA_PLAYER, COBALT_HOSTNAME
 
 
 def html_email_reset(request):
@@ -63,6 +63,39 @@ def register(request):
             user.is_active = False  # not active until email confirmed
             user.system_number = user.username
             user.save()
+
+            # Check for duplicate emails
+            others_same_email = (
+                User.objects.filter(email=user.email).exclude(id=user.id).order_by("id")
+            )
+            for other_same_email in others_same_email:
+                msg = f"""A new user - {user} - has registered using the same email address as you.
+                This is supported to allow couples to share the same email address. Only the first
+                registered user can login using the email address. All users can login with their
+                {GLOBAL_ORG} number.<br><br>
+                All messages for any of the users will be sent to the same email address but will
+                usually have the first name present to allow you to determine who the message was
+                intended for.<br><br>
+                We recommend that every user has a unique email address, but understand that some
+                people wish to share an email.<br><br><br>
+                The {GLOBAL_ORG} Technology Team
+                """
+                context = {
+                    "name": other_same_email.first_name,
+                    "title": "Someone Using Your Email Address",
+                    "email_body": msg,
+                    "host": COBALT_HOSTNAME,
+                }
+
+                html_msg = render_to_string("notifications/email.html", context)
+
+                # send
+                send_cobalt_email(
+                    other_same_email.email,
+                    f"{user} is using your email address",
+                    html_msg,
+                )
+
             current_site = get_current_site(request)
             mail_subject = "Activate your account."
             message = render_to_string(
@@ -110,7 +143,15 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return render(request, "accounts/activate_complete.html", {"user": user})
+        # Check for multiple email addresses
+        others_same_email = (
+            User.objects.filter(email=user.email).exclude(id=user.id).order_by("id")
+        )
+        return render(
+            request,
+            "accounts/activate_complete.html",
+            {"user": user, "others_same_email": others_same_email},
+        )
     else:
         return HttpResponse("Activation link is invalid or already used!")
 
@@ -354,19 +395,21 @@ def member_search_ajax(request):
         else:
             search_first_name = None
 
+        exclude_list = [request.user.id, RBAC_EVERYONE, TBA_PLAYER]
+
         if search_first_name and search_last_name:
             members = User.objects.filter(
                 first_name__istartswith=search_first_name,
                 last_name__istartswith=search_last_name,
-            ).exclude(pk=request.user.id)
+            ).exclude(pk__in=exclude_list)
         elif search_last_name:
             members = User.objects.filter(
                 last_name__istartswith=search_last_name
-            ).exclude(pk=request.user.id)
+            ).exclude(pk__in=exclude_list)
         else:
             members = User.objects.filter(
                 first_name__istartswith=search_first_name
-            ).exclude(pk=request.user.id)
+            ).exclude(pk__in=exclude_list)
 
         if request.is_ajax:
             if members.count() > 30:
@@ -402,6 +445,7 @@ def system_number_search_ajax(request):
     """
 
     if request.method == "GET":
+        exclude_list = [request.user.system_number, RBAC_EVERYONE, TBA_PLAYER]
 
         if "system_number" in request.GET:
             system_number = request.GET.get("system_number")
@@ -410,7 +454,7 @@ def system_number_search_ajax(request):
             system_number = None
             member = None
 
-        if member:
+        if member and member.system_number not in exclude_list:
             status = "Success"
             msg = "Found member"
             member_id = member.id
@@ -497,7 +541,7 @@ def blurb_form_upload(request):
     if request.user.dob:
         request.user.dob = request.user.dob.strftime("%d/%m/%Y")
 
-    form = UserUpdateForm(instance=request.user)
+    # form = UserUpdateForm(instance=request.user)
 
     return redirect("accounts:user_profile")
 

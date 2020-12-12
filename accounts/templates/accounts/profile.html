@@ -70,7 +70,7 @@
       <div class="card">
         <div class="card-header card-header-warning">
           <h4>Team Mates</h4>
-          <p class="card-category">Add people you play with regularly to make it easier to enter events together</p>
+          <p class="card-category">Add people you play with regularly to make it easier to enter events together. They need to be signed up to this system first.</p>
       </div>
       <div class="card-body">
 
@@ -118,7 +118,7 @@
                         <button type="button" id="delete_team_mate_{{ team_mate.team_mate.id }}"
                           data-toggle="tooltip"
                           class="btn btn-danger delete_team_mate"
-                          title="Remove {{ team_mate.team_mate.first_name }} as a team mate. Nobody likes {{ team_mate.team_mate.first_name }}, hit the button."
+                          title="Remove {{ team_mate.team_mate.first_name }} as a team mate."
                         >
                           <i class="material-icons">delete</i>
                         </button>
@@ -245,7 +245,6 @@
           if (msg == 'Success'){
             swal.fire({ title:"Team Mate Added", html: "Success. Added a new team mate", icon: "success", buttonsStyling: false})
             .then((result) => {
-              alert(cobalt_form_data_changed);
               cobalt_form_data_changed = false;
               location.reload();
             });

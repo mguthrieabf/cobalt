@@ -51,7 +51,12 @@ from cobalt.settings import (
     BRIDGE_CREDITS,
     GLOBAL_CURRENCY_SYMBOL,
 )
-from .models import StripeTransaction, MemberTransaction, OrganisationTransaction
+from .models import (
+    StripeTransaction,
+    MemberTransaction,
+    OrganisationTransaction,
+    StripeLog,
+)
 from notifications.views import contact_member
 from events.core import events_payments_callback, events_payments_secondary_callback
 
@@ -408,7 +413,7 @@ def payment_api(
         payment_type = "Miscellaneous"
 
     if not url:  # where to next
-        url = "dashboard:dashboard"
+        url = reverse("dashboard:dashboard")
 
     if amount <= balance:  # sufficient funds
 
@@ -714,10 +719,27 @@ def payment_api(
                     msg = "Payment for: " + description
 
             if request:
+                next_url_name = ""
+                if url:
+                    print(url)
+                    if url.find("events") >= 0:
+                        next_url_name = "Events"
+                    elif url.find("dashboard") >= 0:
+                        next_url_name = "Dashboard"
+                    elif url.find("payments") >= 0:
+                        next_url_name = "your statement"
+
+                print(next_url_name)
+
                 return render(
                     request,
                     "payments/checkout.html",
-                    {"trans": trans, "msg": msg, "next_url": url},
+                    {
+                        "trans": trans,
+                        "msg": msg,
+                        "next_url": url,
+                        "next_url_name": next_url_name,
+                    },
                 )
             else:
                 return return_msg
@@ -795,7 +817,6 @@ def stripe_webhook_manual(event):
     # Set the payment type - this could be for a linked transaction or a manual
     # payment.
 
-    print(tran.linked_transaction_type)
     if tran.linked_transaction_type:  # payment for a linked transaction
         paytype = "CC Payment"
     else:  # manual top up
@@ -1017,10 +1038,13 @@ def stripe_webhook(request):
 
         return HttpResponse(status=400)
 
+    # Log message
+    stripe_log = StripeLog(event=event)
+    stripe_log.save()
+
     try:
         tran_type = event.data.object.metadata.cobalt_tran_type
     except AttributeError:
-        print(event)
         log_event(
             user="Stripe API",
             severity="CRITICAL",
@@ -1030,6 +1054,10 @@ def stripe_webhook(request):
         )
         # TODO: change to 400
         return HttpResponse(status=200)
+
+    stripe_log.cobalt_tran_type = tran_type
+    stripe_log.event_type = event.type
+    stripe_log.save()
 
     # We only process change succeeded for Manual charges - for auto topup
     # we get this synchronously through the API call, this is additional info.

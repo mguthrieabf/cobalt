@@ -36,7 +36,12 @@
             <div class="card-body">
               <h1>Congratulations!</h1>
               <h2>Hi {{ user.first_name }}, your account is active.</h2>
+              {% if others_same_email %}
+              <h4>You can login using your {{ GLOBAL_ORG }} number({{ user.username }}).</h4>
+              <h4><b>You cannot login using your email address as this is already linked to {{ others_same_email.0.full_name }}.</b></h4>
+              {% else %}
               <h4>You can login using your email address or {{ GLOBAL_ORG }} number({{ user.username }}).</h4>
+              {% endif %}
               <h3> We will take you to complete your profile in <span id="time">20 seconds</span>.
                 <h3><a href="{% url "accounts:user_profile" %}">Click here to go there now</a></h3>
             </div>

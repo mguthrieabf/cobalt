@@ -21,7 +21,7 @@ class CobaltBackend(ModelBackend):
 
         con_type = None  # default is we don't know how they are connecting
 
-        user = user_model.objects.filter(email=username).last()
+        user = user_model.objects.filter(email=username).first()
         if user:
             con_type = "email"  # matched on email address
         else:
