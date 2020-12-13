@@ -22,7 +22,7 @@ from cobalt.settings import GLOBAL_MPSERVER
 
 
 @login_required()
-def masterpoints_detail(request, system_number=None, retry=False):
+def masterpoints_detail(request, system_number=None, years=1, retry=False):
 
     if system_number is None:
         system_number = request.user.system_number
@@ -56,9 +56,6 @@ def masterpoints_detail(request, system_number=None, retry=False):
             extra_tags="cobalt-message-warning",
         )
         return masterpoints_detail(request, retry=True)
-        # error_msg = "No entry found for %s" % system_number
-        # error = {"cobalt_error_msg": error_msg}
-        # raise Http404(error)
 
     summary = r[0]
 
@@ -74,7 +71,7 @@ def masterpoints_detail(request, system_number=None, retry=False):
 
     # Get last year in YYYY-MM format
     dt = date.today()
-    dt = dt.replace(year=dt.year - 1)
+    dt = dt.replace(year=dt.year - years)
     year = dt.strftime("%Y")
     month = dt.strftime("%m")
 
@@ -92,11 +89,6 @@ def masterpoints_detail(request, system_number=None, retry=False):
     red = float(summary["TotalRed"])
     green = float(summary["TotalGreen"])
 
-    print("counter: %s" % counter)
-    print("gold: %s" % gold)
-    print("red: %s" % red)
-    print("green: %s" % green)
-
     # build list for the fancy chart at the top while we loop through.
     labels_key = []
     labels = []
@@ -106,19 +98,20 @@ def masterpoints_detail(request, system_number=None, retry=False):
 
     # build chart labels
     # go back a year then move forward
-    rolling_date = datetime.today() + relativedelta(years=-1)
+    rolling_date = datetime.today() + relativedelta(years=-years)
 
-    for i in range(13):
+    for i in range(12 * years + 1):
         year = rolling_date.strftime("%Y")
         month = rolling_date.strftime("%m")
         labels_key.append("%s-%s" % (year, month))
-        labels.append(rolling_date.strftime("%b"))
+        if years == 1:
+            labels.append(rolling_date.strftime("%b"))
+        else:
+            labels.append(rolling_date.strftime("%b %Y"))
         rolling_date = rolling_date + relativedelta(months=+1)
         chart_gold["%s-%s" % (year, month)] = 0.0
         chart_red["%s-%s" % (year, month)] = 0.0
         chart_green["%s-%s" % (year, month)] = 0.0
-
-    print(chart_gold)
 
     last_line_green = 0
     last_line_red = 0
@@ -202,6 +195,24 @@ def masterpoints_detail(request, system_number=None, retry=False):
 
     bottom = {"gold": gold, "red": red, "green": green, "total": total}
 
+    # Show bullets on lines or not
+    if years > 2:
+        show_point = "false"
+    else:
+        show_point = "true"
+
+    # Show title every X points
+    points_dict = {1: 1, 2: 3, 3: 5, 4: 12, 5: 12}
+    try:
+        points_every = points_dict[years]
+    except KeyError:
+        points_every = len(labels) - 1  # start and end only
+
+    timescale = f"Last {years} years"
+
+    if years == 1:
+        timescale = "Last 12 Months"
+
     return render(
         request,
         "masterpoints/details.html",
@@ -211,6 +222,10 @@ def masterpoints_detail(request, system_number=None, retry=False):
             "club": club,
             "chart": chart,
             "bottom": bottom,
+            "show_point": show_point,
+            "points_every": points_every,
+            "system_number": system_number,
+            "timescale": timescale,
         },
     )
 
@@ -321,3 +336,38 @@ def get_masterpoints(system_number):
         points = "Not found"
         rank = "Not found"
     return {"points": points, "rank": rank}
+
+
+def user_summary(system_number):
+    """ This is only here until we move masterpoints into Cobalt.
+        It gets basic things such as home club and masterpoints.
+    """
+
+    # Get summary data
+    qry = "%s/mps/%s" % (GLOBAL_MPSERVER, system_number)
+    try:
+        r = requests.get(qry).json()
+    except (
+        IndexError,
+        requests.exceptions.InvalidSchema,
+        requests.exceptions.MissingSchema,
+        ConnectionError,
+    ):
+        r = []
+
+    if len(r) == 0:
+        return None
+
+    summary = r[0]
+
+    # Set active to a boolean
+    if summary["IsActive"] == "Y":
+        summary["IsActive"] = True
+    else:
+        summary["IsActive"] = False
+
+    # Get home club name
+    qry = "%s/club/%s" % (GLOBAL_MPSERVER, summary["HomeClubID"])
+    summary["home_club"] = requests.get(qry).json()[0]["ClubName"]
+
+    return summary

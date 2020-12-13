@@ -629,8 +629,7 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id,
-                type="card",
+                customer=request.user.stripe_customer_id, type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -754,8 +753,11 @@ def member_transfer(request):
 
     team_mates = TeamMate.objects.filter(user=request.user)
     for team_mate in team_mates:
-        if team_mate not in recent_transfer_to:
-            recent_transfer_to.append(team_mate.team_mate)
+        recent_transfer_to.append(team_mate.team_mate)
+
+    # make unique - convert to set to be unique, then back to list to sort
+    recent_transfer_to = list(set(recent_transfer_to))
+    recent_transfer_to.sort(key=lambda x: x.first_name)
 
     return render(
         request,
@@ -1776,11 +1778,7 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (
-                GLOBAL_CURRENCY_SYMBOL,
-                amount,
-                member,
-            )
+            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:

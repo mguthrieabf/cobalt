@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
+from django.db import transaction
 from utils.templatetags.cobalt_tags import cobalt_credits
 from notifications.views import contact_member
 from accounts.models import User, TeamMate
@@ -479,6 +480,7 @@ def view_events(request):
 
 
 @login_required()
+@transaction.atomic
 def pay_outstanding(request):
     """ Pay anything that is not in a status of paid """
 
@@ -592,6 +594,7 @@ def global_admin_congress_masters(request):
 
 
 @login_required()
+@transaction.atomic
 def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=None):
     """edit an event entry
 
@@ -631,8 +634,6 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     event_entry_players = EventEntryPlayer.objects.filter(
         event_entry=event_entry
     ).order_by("first_created_date")
-
-    print(event_entry_players)
 
     count = 1
     pay_count = 0
@@ -690,6 +691,7 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
 
 
 @login_required()
+@transaction.atomic
 def delete_event_entry(request, event_entry_id):
     """ Delete an entry to an event """
 

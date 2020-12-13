@@ -29,8 +29,8 @@
             </div>
 
             <div class="form-group row">
-              <button type="submit" class="save btn btn-primary btn-sm" name="publish">Change</button>
-              <button type="cancel" class="save btn btn-info btn-sm" onclick="history.back();" name="cancel">Cancel</button>
+              <button type="submit" class="save btn btn-primary btn-sm cobalt-save" name="publish">Change</button>
+              <a href="{% url "forums:post_detail" pk=post %}" class="save btn btn-info btn-sm" name="cancel">Cancel</a>
             </div>
           </form>
         </div>

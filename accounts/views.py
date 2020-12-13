@@ -29,6 +29,7 @@ from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettin
 from forums.models import Post, Comment1, Comment2
 from utils.utils import cobalt_paginator
 from cobalt.settings import GLOBAL_ORG, RBAC_EVERYONE, TBA_PLAYER, COBALT_HOSTNAME
+from masterpoints.views import user_summary
 
 
 def html_email_reset(request):
@@ -606,6 +607,10 @@ def public_profile(request, pk):
         comment1s = cobalt_paginator(request, comment1_list, PAGE_SIZE, 1)
         comment2s = cobalt_paginator(request, comment2_list, PAGE_SIZE)
 
+    summary = user_summary(pub_profile.system_number)
+
+    print(summary)
+
     return render(
         request,
         "accounts/public_profile.html",
@@ -617,6 +622,7 @@ def public_profile(request, pk):
             "posts_active": posts_active,
             "comment1s_active": comment1s_active,
             "comment2s_active": comment2s_active,
+            "summary": summary,
         },
     )
 
