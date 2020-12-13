@@ -167,5 +167,11 @@ jQuery(document).ready(function() {
     cancelSearch{{search_id}}();
   });
 
+//
+// Fix for bootstrap on ios not showing the modal window
+//
+  $(document).on('show.bs.modal', '.modal', function () {
+    $(this).appendTo('body');
+  });
 
 }); // end document ready

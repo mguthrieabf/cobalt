@@ -216,7 +216,7 @@
 <form method="POST" class="post-form">{% csrf_token %}
   <input type="hidden" id="id_post" name="post" value="{{ post.id }}">
   {{ form.text|as_crispy_field }}
-  <button type="submit" name="submit-c1" class="save btn btn-success btn-sm">Reply to Post</button>
+  <button type="submit" name="submit-c1" class="save btn btn-success btn-sm cobalt-save">Reply to Post</button>
 </form>
 
 <script>
