@@ -25,6 +25,12 @@ def home(request):
     return render(request, "support/home.html")
 
 
+@login_required
+def admin(request):
+
+    return render(request, "support/home-admin.html")
+
+
 def cookies(request):
     return render(request, "support/cookies.html")
 
@@ -58,9 +64,7 @@ def non_production_email_changer(request):
 
         count = all_users.count()
         messages.success(
-            request,
-            f"{count} users updated.",
-            extra_tags="cobalt-message-success",
+            request, f"{count} users updated.", extra_tags="cobalt-message-success",
         )
 
     return render(
@@ -100,9 +104,7 @@ def contact(request):
             send_cobalt_email(admin[1], f"Support Request: {title}", html_msg)
 
         messages.success(
-            request,
-            "Message sent successfully",
-            extra_tags="cobalt-message-success",
+            request, "Message sent successfully", extra_tags="cobalt-message-success",
         )
 
         return redirect("support:support")
