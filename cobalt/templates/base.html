@@ -91,7 +91,7 @@
           <li class="nav-item {% if request.path|slice:":9" == "/payments" %}active{% endif %} ">
             <a class="nav-link" href="/payments">
               <i class="material-icons">account_balance</i>
-              <p>Payments</p>
+              <p>Bridge Credits</p>
             </a>
           </li>
           <hr>
@@ -197,7 +197,7 @@
                   <span class="notification">{{ basket_items }}</span>
 
                   <p class="d-lg-none d-md-block">
-                    Basket Item{{ basket_items|pluralize }}
+                    Cart Item{{ basket_items|pluralize }}
                   </p>
                 </a>
               </li>

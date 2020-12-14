@@ -201,6 +201,12 @@
 <script>
   $(document).ready(function() {
 
+    if (window.performance.navigation.type === 2) {
+      // the page was navigated to via the forward or back button
+      // refresh to clean up
+      location.reload();
+    }
+
     $('.selectpicker').selectpicker('refresh');
 
     chartData = {

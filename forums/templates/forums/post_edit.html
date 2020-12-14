@@ -3,14 +3,14 @@
 {% load crispy_forms_tags %}
 {% block headerjs %}
 
-<!-- The js libraries are a problem for Summernote so we override thwm here -->
+<!-- The js libraries are a problem for Summernote so we override them here -->
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
 <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
 <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
-
+<script src="{% static "assets/js/cobalt-core.js" %}"></script>
 <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
 
 
@@ -79,13 +79,6 @@
           <form method="POST" class="post-form">
             {% csrf_token %}
 
-            <!-- <div class="form-group row">
-                <label for="id_forum" class="col-sm-2">Forum</label>
-                <div class="col-sm-10">
-                  {{ form.forum|as_crispy_field }}
-                </div>
-              </div> -->
-
             <input type="hidden" name="forum" id="id_forum" value="{{ forum.id }}">
 
             <div class="form-group row">
@@ -100,7 +93,7 @@
             <div class="form-group row">
               <button type="submit" class="save btn btn-primary btn-sm cobalt-save" name="publish">Publish</button>
               {% if edit %}
-              <button type="delete" class="save btn btn-danger btn-sm" name="delete">Delete</button>
+              <button type="delete" class="save btn btn-danger btn-sm cobalt-save" name="delete">Delete</button>
               {% endif %}
               <a href="{% url "forums:forums" %}" class="save btn btn-info btn-sm" name="cancel">Cancel</a>
             </div>
@@ -116,31 +109,5 @@
 <script src="{% static "forums/assets/js/summernote-plugin-diamonds.js" %}"></script>
 <script src="{% static "forums/assets/js/summernote-plugin-clubs.js" %}"></script>
 <!-- <script src="{% static "forums/assets/js/summernote-plugin-hand.js" %}"></script> -->
-
-{% endblock %}
-
-
-<!-- This should be deleted if I can't get it to work -->
-{% block footer %}
-<script>
-  $(document).ready(function() {
-    $("#id_forum").change(function() {
-      var forum = $('#id_forum').val();
-      var strURL = "/forums/forum-colours/" + forum;
-
-      $.ajax({
-        url: strURL,
-        context: document.body,
-        success: function(txt) {
-          console.log(txt);
-          //            $(".card-header").css("backgroundColor", "yellow");
-          //            $(".note-editable").css({"backgroundColor": "black !important", "color": "white !important"});
-          //            $(".note-editable").css("line-height", "5.0");
-          //            $(".note-editable").css("color", "white");
-        }
-      });
-    });
-  });
-</script>
 
 {% endblock %}

@@ -111,7 +111,7 @@
             <a href="{% url "events:edit_event_entry" congress_id=event.event_entry.event.congress.id event_id=event.event_entry.event.id %}">
              {{ event.event_entry.event.event_name }}</a>
              {% if event.in_cart %}
-              (in shopping basket)
+              (in cart)
              {% endif %}
               {% if event.payment_status == "Pending Manual" and event.payment_type == "bank-transfer" %}
                 (transfer pending)

@@ -197,9 +197,17 @@ function cobaltMemberSearchOk(search_id) {
                 icon: "error",
                 buttonsStyling: false
             })
-            $("#id_player" + search_id).val('').selectpicker('refresh');
+        //    $("#id_player" + search_id).val('').selectpicker('refresh');
+            if (previous[search_id]){  // if we have a previous then reset it
+              $("#id_player" + search_id).val(previous[search_id]);
+            } else {
+              $("#id_player" + search_id).prop('selectedIndex', 0);
+              $("#fee_" + search_id + "_now").val('');
+              $("#fee_" + search_id + "_later").val('');
+              $("#id_player" + search_id + "_payment").val('');
+              $("#id_player" + search_id + "_payment").prop("disabled", false);
+            }
           } else {
-
 
             // add option if not already there
             if ($('#id_player' + search_id + ' option[value=' + member_id[search_id] + ']').length==0) {
@@ -233,18 +241,9 @@ function cobaltMemberSearchCancel(search_id) {
   if (previous[search_id]){  // if we have a previous then reset it
     $("#id_player" + search_id).val(previous[search_id]);
   } else {
-    $("#fee_" + search_id + "_now").val('');
-    $("#fee_" + search_id + "_later").val('');
-    // $("#id_player" + search_id).val('').selectpicker('refresh');
-    // $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
-    // $("#id_player" + search_id + "_payment").val('').selectpicker('refresh');
-    $("#id_player" + search_id + "_payment").val('');
-    $("#id_player" + search_id + "_payment").prop("disabled", false);
+    $("#id_player" + search_id).prop('selectedIndex', 0);
   }
-  if (search_id<4){
-    $("#id_checkout").prop("disabled", true);
-    $("#id_cart").prop("disabled", true);
-  }
+  is_form_complete();
   totals();
 }
 
@@ -440,16 +439,22 @@ function player_has_changed(event) {
 
               // ignore this one
               if ($(this).attr("id") != this_id) {
-                var realthis = $(this)[0];
-                if (realthis.tagName == "SELECT"){
-                  $(this).append('<option value="' + previous[search_id] + '">' + previous_name[search_id] + '</option>');
-                }
+                // var realthis = $(this)[0];
+                // if (realthis.tagName == "SELECT"){
+                  // $(this).append('<option value="' + previous[search_id] + '">' + previous_name[search_id] + '</option>');
+                  var my_id = $(this).attr("id");
+                  console.log(my_id);
+                  console.log($("#" + my_id + " option[value='" + previous[search_id] + "']").length);
+                  if ($("#" + my_id + " option[value='" + previous[search_id] + "']").length == 0){
+                    $(this).append('<option value="' + previous[search_id] + '">' + previous_name[search_id] + '</option>');
+                  }
               }
+
           });
         };
 
         // refresh select pickers after changes
-        $('.selectpicker').selectpicker('refresh');
+  //      $('.selectpicker').selectpicker('refresh');
 
         // save current values as previous for next time unless this was a search
         if (user_id != 0){
@@ -547,6 +552,7 @@ $(document).ready(function(){
     $('#id_player4_paydiv').show();
     $('#plus_5').show();
     $('#plus_4').hide();
+    $('#plus_sign_4').hide();
     return false;
   });
 

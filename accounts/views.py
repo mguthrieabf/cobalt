@@ -192,7 +192,7 @@ def change_password(request):
                 sub_source="change_password",
                 message="Password change successful",
             )
-            return render(request, "accounts/change_password.html", {"form": form})
+            return redirect("accounts:user_profile")
         else:
             log_event(
                 request=request,
