@@ -58,7 +58,7 @@ echo
 echo Logs live in /var/log
 echo
 PS3='Select a log file: '
-options=("eb-engine.log (install file)" "eb-hooks.log (install file details)" "web.stdout.log (boring)" "nginx/access.log (web access log)" "nginx/access.log (web access log filtered)" "nginx/error.log (web error log)" "Quit")
+options=("eb-engine.log (install file)" "eb-hooks.log (install file details)" "web.stdout.log (stdout/stderr)" "nginx/access.log (web access log)" "nginx/access.log (web access log filtered)" "nginx/error.log (web error log)" "Quit")
 select opt in "\${options[@]}"
 do
     case \$opt in
@@ -70,8 +70,8 @@ do
             tail -100f /var/log/eb-hooks.log
             break
           ;;
-        "web.stdout.log (boring)")
-            tail -100f /var/log/web.stdout.log | grep -v "Invalid HTTP_HOST"
+        "web.stdout.log (stdout/stderr)")
+            tail -1000f /var/log/web.stdout.log | grep -v "Invalid HTTP_HOST"
             break
             ;;
         "nginx/access.log (web access log)")

@@ -23,6 +23,7 @@ from django.db import connection
 from rbac.views import rbac_forbidden
 from rbac.core import rbac_user_has_role
 from datetime import datetime, timedelta
+import time
 
 
 def send_cobalt_email(to_address, subject, message, member=None):
@@ -58,6 +59,10 @@ def send_cobalt_email_thread(email_id):
     Returns:
         Nothing
     """
+
+    # It is possible for this thread to start before the email has been
+    # saved to the database. Not ideal, but a pause solves this
+    time.sleep(2)
 
     email = Email.objects.get(pk=email_id)
     plain_message = strip_tags(email.message)
