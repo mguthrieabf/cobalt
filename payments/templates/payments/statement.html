@@ -41,7 +41,7 @@
       <div class="float-left">
 
         <b>Auto Top Up</b>
-        {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ request.user.auto_amount }}) {% endif %}
+        {% if auto_button %} ({{GLOBAL_CURRENCY_SYMBOL}}{{ auto_amount }}) {% endif %}
         <input id="auto-button" class="cobalt-save another" type="checkbox"
         data-toggle="toggle" data-onstyle="success" data-size="sm"
         {% if auto_button %} checked {% endif %}>

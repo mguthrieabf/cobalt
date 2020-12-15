@@ -98,24 +98,24 @@
                     <div class="col-md-12">
                       <div class="form-group">
                         <label class="bmd-label-floating">{{ GLOBAL_ORG }} Number</label>
-                        <input name="system_number" id="id_system_number" type="number" min="0" step="1" class="form-control" value="">
+                        <input name="system_number" id="id_system_number" type="number" min="0" step="1" class="form-control search-item" value="">
                       </div>
                     </div>
                     <div class="col-md-12">
                       <div class="form-group">
                         <label class="bmd-label-floating">Last Name</label>
-                        <input name="last_name" id="id_last_name" type="text" class="form-control" value="">
+                        <input name="last_name" id="id_last_name" type="text" class="form-control search-item" value="">
                       </div>
                     </div>
                     <div class="col-md-12">
                       <div class="form-group">
                         <label class="bmd-label-floating">First Name</label>
-                        <input name="first_name" id="id_first_name" type="text" class="form-control" value="">
+                        <input name="first_name" id="id_first_name" type="text" class="form-control search-item" value="">
                       </div>
                     </div>
                   </div>
                   <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary center-text cobalt-save">Search</button>
+                    <button id="button-submit" type="submit" class="btn btn-primary center-text cobalt-save" disabled>Search</button>
                   </div>
                   <div class="clearfix"></div>
                 </form>
@@ -247,5 +247,23 @@
     });
 
   });
+
+// disable search until data entered
+
+  $('.search-item').keyup(function() {
+      var empty = true;
+      $('.search-item').each(function() {
+          if ($(this).val() != '') {
+              empty = false;
+          }
+      });
+
+      if (empty) {
+          $('#button-submit').attr('disabled', 'disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+      } else {
+          $('#button-submit').removeAttr('disabled'); // updated according to http://stackoverflow.com/questions/7637790/how-to-remove-disabled-attribute-with-jquery-ie
+      }
+  });
+
 </script>
 {% endblock %}

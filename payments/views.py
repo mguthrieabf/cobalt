@@ -229,6 +229,7 @@ def statement(request):
             "club": club,
             "balance": balance,
             "auto_button": auto_button,
+            "auto_amount": request.user.auto_amount,
         },
     )
 
@@ -271,6 +272,7 @@ def statement_admin_view(request, member_id):
             "club": club,
             "balance": balance,
             "auto_button": auto_button,
+            "auto_amount": user.auto_amount,
             "admin_view": True,
         },
     )
