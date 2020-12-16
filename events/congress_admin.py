@@ -232,7 +232,7 @@ def admin_evententry(request, evententry_id):
         event_entry=event_entry
     ).order_by("id")
 
-    event_logs = EventLog.objects.filter(event_entry=event_entry)
+    event_logs = EventLog.objects.filter(event_entry=event_entry).order_by('-id')
 
     return render(
         request,
@@ -253,7 +253,8 @@ def admin_evententryplayer(request, evententryplayer_id):
 
     event_entry_player = get_object_or_404(EventEntryPlayer, pk=evententryplayer_id)
     old_user = copy.copy(event_entry_player.player)
-
+    old_entry = copy.copy(event_entry_player)
+    print(old_user)
     event = event_entry_player.event_entry.event
 
     role = "events.org.%s.edit" % event.congress.congress_master.org.id
@@ -274,12 +275,21 @@ def admin_evententryplayer(request, evententryplayer_id):
             )
 
             # Log it
-            EventLog(
-                event=event,
-                event_entry=event_entry_player.event_entry,
-                actor=request.user,
-                action=f"Removed {old_user}. Added {new_user}.",
-            ).save()
+            for changed in form.changed_data:
+                old_value = getattr(old_entry, changed)
+                new_value = getattr(event_entry_player, changed)
+                action = f"Convener Action: Changed {changed} from {old_value} to {new_value} on Entry:{old_entry.id} - {event_entry_player.event_entry}"
+
+                # Don't understand this so hardcoding - other fields work but player doesnt
+                if changed == "player":
+                    action = f"Convener Action: Changed {changed} from {old_user} to {new_user} on Entry:{old_entry.id} - {event_entry_player.event_entry}"
+
+                EventLog(
+                    event=event,
+                    event_entry=event_entry_player.event_entry,
+                    actor=request.user,
+                    action=action,
+                ).save()
 
             if new_user != old_user:
 

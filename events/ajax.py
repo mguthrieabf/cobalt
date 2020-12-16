@@ -204,7 +204,7 @@ def payment_options_for_user_ajax(request):
         other_user_id = request.GET["other_user_id"]
         event_id = request.GET["event_id"]
 
-    # default to no
+    # default to no 
     reply = False
     response_data = {}
 

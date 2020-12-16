@@ -635,7 +635,7 @@ class EventLog(models.Model):
         EventEntry, on_delete=models.SET_NULL, null=True, blank=True
     )
     action_date = models.DateTimeField(default=timezone.now)
-    action = models.CharField("Action", max_length=200)
+    action = models.TextField("Action")
 
     def __str__(self):
         return "%s - %s" % (self.event, self.actor)

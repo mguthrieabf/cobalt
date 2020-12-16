@@ -802,6 +802,10 @@ def delete_event_entry(request, event_entry_id):
 
                 amount_str = "%.2f credits" % amount
 
+                # Check for blank paid_by - can happen if manually edited
+                if not event_entry_player.paid_by:
+                    event_entry_player.paid_by = event_entry_player.player
+
                 # create payments in org account
                 update_organisation(
                     organisation=event_entry.event.congress.congress_master.org,

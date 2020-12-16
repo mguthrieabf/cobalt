@@ -8,6 +8,7 @@
 
 {% block content %}
 
+<div id="ignore_cobalt_save"></div>
 <div class="jumbotron">
 
   <h1>Role Based Access Controls</h1>
@@ -190,7 +191,8 @@
   // Generic member search popup ok button pressed
 
   function cobaltMemberSearchOk() {
-    clearModal();
+
+    console.log("in");
 
     $.get("{% url "rbac:rbac_add_user_to_admin_group_ajax" %}?member_id=" + member_id[1] + "&group_id=" + {{ group.id }})
       .done(response => {

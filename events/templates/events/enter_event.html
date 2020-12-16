@@ -294,6 +294,7 @@ function user_entry_fee(user_id, search_id){
   $.get("{% url "events:fee_for_user_ajax" %}?event_id={{ event.id }}&user_id=" + user_id)
     .done(response => {
       msg = response['data']['message'];
+      console.log(response);
       if (msg == 'Success') {
         if (response['data']['discount']>0) {
           $("#player" + search_id + "_discount_alert").html('<span class="myHover" data-toggle="tooltip" title="'
@@ -316,7 +317,7 @@ function user_entry_fee(user_id, search_id){
 
     // enable payment type - must refresh selectpickers
         $("#id_player" + search_id + "_payment").prop("disabled", false);
-        $('.selectpicker').selectpicker('refresh');
+    //    $('.selectpicker').selectpicker('refresh');
 
    // set up event handler
         $("#id_player" + search_id + "_payment").on('change', payment_has_changed);
@@ -344,11 +345,26 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
     }
 
     if (msg == 'Allowed') {
-      $("#id_player" + search_id + "_payment").prepend('<option value="their-system-dollars" selected="">Their {{ BRIDGE_CREDITS }}</option>');
+      if ($("#id_player" + search_id + "_payment option[value='their-system-dollars']").length == 0){
+        $("#id_player" + search_id + "_payment").append('<option value="their-system-dollars" selected="">Their {{ BRIDGE_CREDITS }}</option>');
+      }
       $("#id_player" + search_id + "_payment").prop("disabled", false);
       $("#id_player" + search_id + "_payment").val('their-system-dollars');
+      console.log("--------------------------------------msg=Allowed");
+      console.log("msg:" + msg);
+      console.log("now_payment = " + now_payment);
+      console.log("later_payment = " + later_payment);
+      console.log("now_payment amt = " + now_payment.val());
+      console.log("later_payment amt = " + later_payment.val());
+      console.log("pay_amt = " + pay_amt);
+      console.log("### CHANGE ##");
       later_payment.val(pay_amt);
+      console.log("later_payment amt = " + later_payment.val());
+
       now_payment.val("");
+      console.log("now_payment amt = " + now_payment.val());
+      console.log($("#fee_1_now").val());
+      console.log($("#fee_1_later").val());
 
     } else {
 
@@ -360,7 +376,7 @@ $.get("{% url "events:payment_options_for_user_ajax" %}?event_id={{ event.id }}&
     }
 
     // refresh the fussy selectpickers
-    $('.selectpicker').selectpicker('refresh');
+//    $('.selectpicker').selectpicker('refresh');
 
     // update totals
     totals();
@@ -413,6 +429,7 @@ function player_has_changed(event) {
     // get entry fee and payment methods
           if (search_id<4){
             user_entry_fee(user_id, search_id);
+            console.log("Calling ajax");
             user_payment_method(user_id, search_id);
           }
   // remove from other lists
@@ -467,6 +484,7 @@ function player_has_changed(event) {
 
 // player has changed
 function payment_has_changed(event) {
+  console.log("payment has changed");
   var me = event.target.id;
   var parts = me.split("_");
   var player_no = parts[1].slice(-1);  // last char of word 2
