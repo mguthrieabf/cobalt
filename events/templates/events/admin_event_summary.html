@@ -28,30 +28,40 @@
           <div class="card-header card-header-info">
             <h2>{{ event.event_name }}</h2>
             <div class="float-left">
-              <a href="{% url 'events:admin_event_offsystem' event_id=event.id %}" class="text-center btn btn-primary btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">attach_money</i>&nbsp;Off-system payments
-              </a>
-              <a href="{% url 'events:admin_event_log' event_id=event.id %}" class="text-center btn btn-success btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">text_snippet</i>&nbsp;Logs
-              </a>
-              <a href="{% url 'events:admin_event_player_discount' event_id=event.id %}" class="text-center btn btn-default btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">person_remove</i>&nbsp;Player Discounts
-              </a>
-              {% if event.congress.allow_partnership_desk %}
-              <a href="{% url 'events:view_event_partnership_desk' congress_id=event.congress.id event_id=event.id %}" class="text-center btn btn-warning btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">emoji_people</i>&nbsp;Partnership Desk
-              </a>
-              {% endif %}
-              <a href="{% url 'events:admin_event_email' event_id=event.id %}" class="text-center btn btn-danger btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">email</i>&nbsp;Email
-              </a>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle btn-round" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Actions
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'events:admin_event_offsystem' event_id=event.id %}">Off System Payments</a>
+                  <a class="dropdown-item" href="{% url 'events:admin_event_log' event_id=event.id %}">View Logs</a>
+                  <a class="dropdown-item" href="{% url 'events:admin_event_player_discount' event_id=event.id %}">Manage Player Discounts</a>
+                  <a class="dropdown-item" href="{% url 'events:admin_event_email' event_id=event.id %}">Email Event Entrants</a>
+                  {% if event.congress.allow_partnership_desk %}
+                  <a class="dropdown-item" href="{% url 'events:view_event_partnership_desk' congress_id=event.congress.id event_id=event.id %}">Partnership Desk</a>
+                  {% endif %}
+                </div>
+              </div>
+
+
             </div>
             <div class="float-right">
-              <a href="{% url 'events:admin_event_csv' event_id=event.id %}" class="text-center btn btn-secondary btn-sm btn-round" style="width: 170px">
-                <i class="material-icons">arrow_downward</i>&nbsp;Download as CSV
-              </a>
+              <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle btn-round" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  CSV Downloads
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'events:admin_event_csv' event_id=event.id %}">Entrants</a>
+                  <a class="dropdown-item" href="{% url 'events:admin_event_csv_scoring' event_id=event.id %}">Import to Scoring Program</a>
+                </div>
+              </div>
             </div>
           </div>
+
+
+
+
+
 
           <div class="card-body table-responsive">
             <table class="table table-hover">

@@ -481,6 +481,59 @@ def admin_event_csv(request, event_id):
 
 
 @login_required()
+def admin_event_csv_scoring(request, event_id):
+    """ Download a CSV file with info to import to a scoring program """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    local_dt = timezone.localtime(timezone.now(), TZ)
+    today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+    # get details
+    entries = event.evententry_set.exclude(entry_status="Cancelled")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f"attachment; filename={event} - Scoring.csv"
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [event.event_name, "Downloaded by %s" % request.user.full_name, today]
+    )
+
+    # Event Entry details
+    header = [
+        "Team/Pair No",
+        "Name",
+        "ABF Number",
+        "Team Name",
+    ]
+
+    writer.writerow(header)
+
+    for entry in entries:
+        for row in entry.evententryplayer_set.all():
+            writer.writerow(
+                [
+                    entry.id,
+                    row.player.full_name.upper(),
+                    row.player.system_number,
+                    row.event_entry.primary_entrant.last_name.upper(),
+                ]
+            )
+
+    # Log it
+    EventLog(
+        event=event, actor=request.user, action=f"CSV Download of scoring for {event}"
+    ).save()
+
+    return response
+
+
+@login_required()
 def admin_event_offsystem(request, event_id):
     """ Handle off system payments such as cheques and bank transfers """
 

@@ -96,11 +96,7 @@ urlpatterns = [
         views.third_party_checkout_entry,
         name="third_party_checkout_entry",
     ),
-    path(
-        "congress/checkout",
-        views.checkout,
-        name="checkout",
-    ),
+    path("congress/checkout", views.checkout, name="checkout",),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",
         congress_builder.edit_session,
@@ -162,11 +158,7 @@ urlpatterns = [
         ajax.delete_me_from_partnership_desk,
         name="delete_me_from_partnership_desk",
     ),
-    path(
-        "view",
-        views.view_events,
-        name="view_events",
-    ),
+    path("view", views.view_events, name="view_events",),
     path(
         "congress/event/partnership-desk-signup/<int:congress_id>/<int:event_id>",
         views.partnership_desk_signup,
@@ -298,6 +290,11 @@ urlpatterns = [
         "congress-admin/event-csv/<int:event_id>",
         congress_admin.admin_event_csv,
         name="admin_event_csv",
+    ),
+    path(
+        "congress-admin/event-csv-scoring/<int:event_id>",
+        congress_admin.admin_event_csv_scoring,
+        name="admin_event_csv_scoring",
     ),
     path(
         "congress-admin/event-log/<int:event_id>",
