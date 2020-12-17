@@ -64,6 +64,7 @@ function clearModal{{ search_id }}(){
   })
   $('#search-results{{ search_id }}').html("");
   $('#cobalt-member{{ search_id }}').html("");
+  $('#id_system_number{{ search_id }}').val("");
 
   // show search boxes
   $("#id-cobalt-search-top{{ search_id }}").show();
@@ -77,7 +78,7 @@ function clearModal{{ search_id }}(){
 function enterKeyListener{{ search_id }}(e) {
   if (e.keyCode == 13) {
     e.preventDefault();
-    document.removeEventListener('keyup', enterKeyListener{{ search_id }}, true);
+    document.removeEventListener('keyup', enterKeyListener{{ search_id }});
     okSearch{{ search_id }}({{ search_id }});
   }
 }
@@ -117,6 +118,16 @@ function showSingleMember{{search_id}}(id) {
       document.addEventListener('keyup', enterKeyListener{{ search_id }});
 
     })
+ }
+
+ //
+ // handle escape key
+ //
+ function escapeSearch{{ search_id }}(e) {
+   if (e.keyCode == 27) {
+//     document.removeEventListener('keyup', escapeSearch{{ search_id }});
+     cancelSearch{{search_id}}();
+   }
  }
 
 jQuery(document).ready(function() {
@@ -185,11 +196,7 @@ jQuery(document).ready(function() {
 // listen for escape and close dialog
 //
 
-  document.addEventListener('keyup', function(e) {
-    if (e.keyCode == 27) {
-      cancelSearch{{search_id}}();
-    }
-  });
+  document.addEventListener('keyup', escapeSearch{{ search_id }});
 
 //
 // Fix for bootstrap on ios not showing the modal window

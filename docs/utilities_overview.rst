@@ -95,6 +95,12 @@ changes). Do this using the class cobalt-save::
 
     <button type="submit" name="Save" class="cobalt-save btn btn-success">Save</button>
 
+As this is loaded by default you need a way to tell it to ignore your page.
+
+You can do this by adding any element with the id ignore-cobalt-save. e.g.::
+
+    <div id="ignore-cobalt-save"></div>
+
 Template Filters
 ----------------
 
@@ -118,6 +124,21 @@ You can use the following template filters::
 
       prints user with a link to their public profile. e.g.
           <a href='/accounts/public_profile/45'>Peter Parker(45654)</a>
+
+Size Based Text
+===============
+
+If you want to have different text based upon the size of the screen
+(or anything else based on the size of the screen), you can use this::
+
+    <!-- Show on large screens, not small -->
+    <span class="d-none d-md-block d-lg-block">
+      Administration
+    </span>
+    <!-- Show on small screens, not large -->
+    <span class="d-md-none d-lg-none d-xl-none d-xs-block d-sm-block">
+      Admin
+    </span>
 
 
 Batch Jobs

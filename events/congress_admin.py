@@ -440,6 +440,9 @@ def admin_event_csv(request, event_id):
         [
             "Primary Entrant",
             "Player",
+            "Player - First Name",
+            "Player - Last Name",
+            "Player - Number",
             "Payment Type",
             "Entry Fee",
             "Received",
@@ -448,8 +451,6 @@ def admin_event_csv(request, event_id):
             "Payment Status",
         ]
     )
-
-    payment_type_dict = dict(PAYMENT_TYPES)
 
     for entry in entries:
         for row in entry.evententryplayer_set.all():
@@ -461,7 +462,10 @@ def admin_event_csv(request, event_id):
                 [
                     entry.primary_entrant,
                     row.player,
-                    payment_type_dict[row.payment_type],
+                    row.player.first_name,
+                    row.player.last_name,
+                    row.player.system_number,
+                    row.payment_type,
                     row.entry_fee,
                     row.payment_received,
                     outstanding,
@@ -932,7 +936,5 @@ def admin_latest_news(request, congress_id):
         form = LatestNewsForm()
 
     return render(
-        request,
-        "events/admin_latest_news.html",
-        {"form": form, "congress": congress},
+        request, "events/admin_latest_news.html", {"form": form, "congress": congress},
     )

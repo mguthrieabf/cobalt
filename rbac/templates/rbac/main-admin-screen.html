@@ -12,7 +12,15 @@
     <h1>
       <div class="d-flex justify-content-between">
         <div>
-          Administration
+          <!-- Show on large screens, not small -->
+          <span class="d-none d-md-block d-lg-block">
+            Administration
+          </span>
+          <!-- Show on small screens, not large -->
+          <span class="d-md-none d-lg-none d-xl-none d-xs-block d-sm-block">
+            Admin
+          </span>
+
         </div>
         <div>
           <i class="material-icons" style="font-size:60px">power_settings_new</i>
