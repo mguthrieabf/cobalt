@@ -71,6 +71,16 @@ function clearModal{{ search_id }}(){
   $('#cobalt_general_member_search{{ search_id }}').modal('hide');
 }
 
+//
+// enter key listener function for single member view
+//
+function enterKeyListener{{ search_id }}(e) {
+  if (e.keyCode == 13) {
+    e.preventDefault();
+    document.removeEventListener('keyup', enterKeyListener{{ search_id }}, true);
+    okSearch{{ search_id }}({{ search_id }});
+  }
+}
 
 //
 // view with single user selected for confirmation
@@ -102,6 +112,9 @@ function showSingleMember{{search_id}}(id) {
 
       // hide search boxes
       $("#id-cobalt-search-top{{ search_id }}").hide();
+
+      // add listener for Enter
+      document.addEventListener('keyup', enterKeyListener{{ search_id }});
 
     })
  }
@@ -138,6 +151,7 @@ jQuery(document).ready(function() {
           system_number{{ search_id }}.val('');
           showSingleMember{{ search_id }}(id);
         });
+
       });
     }
   });
@@ -168,10 +182,31 @@ jQuery(document).ready(function() {
   });
 
 //
+// listen for escape and close dialog
+//
+
+  document.addEventListener('keyup', function(e) {
+    if (e.keyCode == 27) {
+      cancelSearch{{search_id}}();
+    }
+  });
+
+//
 // Fix for bootstrap on ios not showing the modal window
 //
   $(document).on('show.bs.modal', '.modal', function () {
     $(this).appendTo('body');
+  });
+
+
+// Link enter key to clicking the search button
+  var input = $("#id_system_number{{ search_id }}");
+
+  input.on("keyup", function(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      $("#system_number_search_button{{ search_id }}").click();
+    }
   });
 
 }); // end document ready
