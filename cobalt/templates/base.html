@@ -104,13 +104,14 @@
             </a>
             {% endif %}
           </li>
+          {% if show_admin_on_template %}
           <li class="nav-item">
             <a class="nav-link" href="{% url "rbac:main_admin_screen" %}">
               <i class="material-icons">recent_actors</i>
               <p>Admin</p>
             </a>
           </li>
-
+          {% endif %}
 
           <!-- </li>
           <li class="nav-item">

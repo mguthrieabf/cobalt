@@ -204,7 +204,7 @@ def payment_options_for_user_ajax(request):
         other_user_id = request.GET["other_user_id"]
         event_id = request.GET["event_id"]
 
-    # default to no 
+    # default to no
     reply = False
     response_data = {}
 
@@ -518,18 +518,19 @@ def change_player_entry_ajax(request):
         )
 
         # tell the conveners
-        msg = f"""{request.user.full_name} has changed an entry for {event.event_name} in {congress}.
+        email_msg = f"""{request.user.full_name} has changed an entry for {event.event_name} in {congress}.
                   <br><br>
                   <b>{old_player}</b> has been removed.
                   <br><br>
                   <b>{event_entry_player.player}</b> has been added.
                   <br><br>
                   """
+
         notify_conveners(
-            congress,
-            event,
-            f"{event} - {event_entry_player.player} added to entry",
-            msg,
+            congress=congress,
+            event=event,
+            subject=f"{event} - {event_entry_player.player} added to entry",
+            email_msg=email_msg,
         )
 
         # Check entry fee - they can keep an early entry discount but nothing else

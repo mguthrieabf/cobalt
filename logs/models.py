@@ -15,7 +15,7 @@ class Log(models.Model):
     ]
 
     event_date = models.DateTimeField(default=timezone.now)
-    user = models.CharField(max_length=30, blank="True", null=True)
+    user = models.CharField(max_length=80, blank="True", null=True)
     severity = models.CharField(max_length=8, choices=SEVERITY_CODES, default="INFO")
     source = models.CharField(max_length=40, blank="True", null=True)
     sub_source = models.CharField(max_length=50, blank="True", null=True)

@@ -44,6 +44,9 @@
                   <tr>
                     <td>
                       {{ event_entry_player.player|cobalt_user_link }}
+                      {% if event_entry_player.player.id == TBA_PLAYER %}
+                       - by {{ event_entry_player.event_entry.primary_entrant|cobalt_user_link }}
+                      {% endif %}
                     </td>
                     <td class="text-right">{{ event_entry_player.entry_fee }}</td>
                     <td class="text-right">{{ event_entry_player.payment_received }}</td>

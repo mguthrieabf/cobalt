@@ -43,6 +43,7 @@ from .models import (
     EventLog,
     Bulletin,
     PartnershipDesk,
+    PAYMENT_TYPES,
 )
 from .forms import (
     CongressMasterForm,
@@ -663,11 +664,15 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, "Payment successful", extra_tags="cobalt-message-success",
+                request,
+                "Payment successful",
+                extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, "Payment failed", extra_tags="cobalt-message-error",
+                request,
+                "Payment failed",
+                extra_tags="cobalt-message-error",
             )
 
     # valid payment methods
@@ -775,7 +780,9 @@ def delete_event_entry(request, event_entry_id):
         # Notify conveners
         player_string = f"<table><tr><td><b>Name</b><td><b>{GLOBAL_ORG} No.</b><td><b>Payment Method</b><td><b>Status</b></tr>"
         for event_entry_player in event_entry_players:
-            player_string += f"<tr><td>{event_entry_player.player.full_name}<td>{event_entry_player.player.system_number}<td>{event_entry_player.payment_type}<td>{event_entry_player.payment_status}</tr>"
+            PAYMENT_TYPES_DICT = dict(PAYMENT_TYPES)
+            payment_type_str = PAYMENT_TYPES_DICT[event_entry_player.payment_type]
+            player_string += f"<tr><td>{event_entry_player.player.full_name}<td>{event_entry_player.player.system_number}<td>{payment_type_str}<td>{event_entry_player.payment_status}</tr>"
         player_string += "</table>"
         message = "Entry cancelled.<br><br> %s" % player_string
         notify_conveners(
@@ -805,6 +812,10 @@ def delete_event_entry(request, event_entry_id):
                 # Check for blank paid_by - can happen if manually edited
                 if not event_entry_player.paid_by:
                     event_entry_player.paid_by = event_entry_player.player
+
+                # Check for TBA - if set electrocute the Convener and pay to primary entrant
+                if event_entry_player.paid_by.id == TBA_PLAYER:
+                    event_entry_player.paid_by = event_entry.primary_entrant
 
                 # create payments in org account
                 update_organisation(

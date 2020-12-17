@@ -22,7 +22,6 @@ from .models import (
     PAYMENT_TYPES,
     EVENT_PLAYER_FORMAT_SIZE,
     BasketItem,
-    PlayerBatchId,
     EventLog,
     EventPlayerDiscount,
     Bulletin,
@@ -232,7 +231,7 @@ def admin_evententry(request, evententry_id):
         event_entry=event_entry
     ).order_by("id")
 
-    event_logs = EventLog.objects.filter(event_entry=event_entry).order_by('-id')
+    event_logs = EventLog.objects.filter(event_entry=event_entry).order_by("-id")
 
     return render(
         request,
@@ -364,7 +363,7 @@ def admin_event_csv(request, event_id):
         return rbac_forbidden(request, role)
 
     # get details
-    entries = event.evententry_set.all()
+    entries = event.evententry_set.exclude(entry_status="Cancelled")
 
     local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
@@ -549,6 +548,10 @@ def admin_evententry_delete(request, evententry_id):
         if refund_form_set.is_valid():
             for form in refund_form_set:
                 player = get_object_or_404(User, pk=form.cleaned_data["player_id"])
+                # Check for TBA - if we have a TBA user who has been paid for then
+                # a refund is due. Give it to the person who made the entry.
+                if player.id == TBA_PLAYER:
+                    player = event_entry.primary_entrant
                 amount = float(form.cleaned_data["refund"])
                 amount_str = "%.2f credits" % amount
 
@@ -741,9 +744,11 @@ def admin_event_player_discount(request, event_id):
                     extra_tags="cobalt-message-error",
                 )
 
-            entered = EventEntryPlayer.objects.filter(
-                event_entry__event=event, player=player
-            ).exists()
+            entered = (
+                EventEntryPlayer.objects.filter(event_entry__event=event, player=player)
+                .exclude(event_entry__entry_status="Cancelled")
+                .exists()
+            )
 
             if entered:
                 messages.error(

@@ -170,7 +170,7 @@ class AbstractTransaction(models.Model):
     )
 
     description = models.CharField(
-        "Transaction Description", blank=True, null=True, max_length=80
+        "Transaction Description", blank=True, null=True, max_length=200
     )
 
     reference_no = models.CharField(

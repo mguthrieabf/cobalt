@@ -631,7 +631,8 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id, type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -906,33 +907,41 @@ def statement_admin_summary(request):
     # Member summary
     total_members = User.objects.count()
     auto_top_up = User.objects.filter(stripe_auto_confirmed="On").count()
-    #    total_balance_members_list = MemberTransaction.objects.distinct("member")
-    total_balance_members_list = (
-        MemberTransaction.objects.all()
-        .order_by("member", "-created_date")
-        .distinct("member")
-    )
+
+    members_list = MemberTransaction.objects.order_by(
+        "member", "-created_date"
+    ).distinct("member")
+
+    # exclude zeros
+    total_balance_members_list = []
+    for member in members_list:
+        if member.balance != 0:
+            total_balance_members_list.append(member)
+
     total_balance_members = 0
     members_with_balances = 0
     for item in total_balance_members_list:
         total_balance_members += item.balance
-        if item.balance != 0.0:
-            members_with_balances += 1
+        members_with_balances += 1
 
     # Organisation summary
     total_orgs = Organisation.objects.count()
-    #    total_balance_orgs_list = OrganisationTransaction.objects.distinct("organisation")
-    total_balance_orgs_list = (
-        OrganisationTransaction.objects.all()
-        .order_by("organisation", "-created_date")
-        .distinct("organisation")
-    )
+
+    orgs_list = OrganisationTransaction.objects.order_by(
+        "organisation", "-created_date"
+    ).distinct("organisation")
+
+    # exclude zeros
+    total_balance_orgs_list = []
+    for org in orgs_list:
+        if org.balance != 0:
+            total_balance_orgs_list.append(org)
+
     orgs_with_balances = 0
     total_balance_orgs = 0
     for item in total_balance_orgs_list:
         total_balance_orgs += item.balance
-        if item.balance != 0.0:
-            orgs_with_balances += 1
+        orgs_with_balances += 1
 
     # Stripe Summary
     today = timezone.now()
@@ -1319,11 +1328,15 @@ def admin_members_with_balance(request):
     if not rbac_user_has_role(request.user, "payments.global.view"):
         return rbac_forbidden(request, "payments.global.view")
 
-    members = (
-        MemberTransaction.objects.exclude(balance=0)
-        .order_by("member", "-created_date")
-        .distinct("member")
-    )
+    members_list = MemberTransaction.objects.order_by(
+        "member", "-created_date"
+    ).distinct("member")
+
+    # exclude zeros
+    members = []
+    for member in members_list:
+        if member.balance != 0:
+            members.append(member)
 
     things = cobalt_paginator(request, members)
 
@@ -1348,11 +1361,15 @@ def admin_orgs_with_balance(request):
     if not rbac_user_has_role(request.user, "payments.global.view"):
         return rbac_forbidden(request, "payments.global.view")
 
-    orgs = (
-        OrganisationTransaction.objects.exclude(balance=0)
-        .order_by("organisation", "-created_date")
-        .distinct("organisation")
-    )
+    orgs_list = OrganisationTransaction.objects.order_by(
+        "organisation", "-created_date"
+    ).distinct("organisation")
+
+    # exclude zeros
+    orgs = []
+    for org in orgs_list:
+        if org.balance != 0:
+            orgs.append(org)
 
     things = cobalt_paginator(request, orgs, 3)
 
@@ -1375,11 +1392,15 @@ def admin_members_with_balance_csv(request):
     if not rbac_user_has_role(request.user, "payments.global.view"):
         return rbac_forbidden(request, "payments.global.view")
 
-    members = (
-        MemberTransaction.objects.exclude(balance=0)
-        .order_by("member", "-created_date")
-        .distinct("member")
-    )
+    members_list = MemberTransaction.objects.order_by(
+        "member", "-created_date"
+    ).distinct("member")
+
+    # exclude zeros
+    members = []
+    for member in members_list:
+        if member.balance != 0:
+            members.append(member)
 
     local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
@@ -1424,11 +1445,15 @@ def admin_orgs_with_balance_csv(request):
     if not rbac_user_has_role(request.user, "payments.global.view"):
         return rbac_forbidden(request, "payments.global.view")
 
-    orgs = (
-        OrganisationTransaction.objects.exclude(balance=0)
-        .order_by("organisation", "-created_date")
-        .distinct("organisation")
-    )
+    orgs_list = OrganisationTransaction.objects.order_by(
+        "organisation", "-created_date"
+    ).distinct("organisation")
+
+    # exclude zeros
+    orgs = []
+    for org in orgs_list:
+        if org.balance != 0:
+            orgs.append(org)
 
     local_dt = timezone.localtime(timezone.now(), TZ)
     today = dateformat.format(local_dt, "Y-m-d H:i:s")
@@ -1780,7 +1805,11 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            msg = "Transferred %s%s to %s" % (
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+                member,
+            )
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:

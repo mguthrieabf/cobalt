@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from datetime import datetime, timedelta
 from rbac.core import rbac_get_users_with_role
 from django.urls import reverse
+from events.models import PAYMENT_TYPES
 
 
 def events_payments_secondary_callback(status, route_payload, tran):
@@ -333,9 +334,12 @@ def send_notifications(route_payload, payment_user):
         for event in email_dic[congress].keys():
             player_string = f"<table><tr><td><b>Name</b><td><b>{GLOBAL_ORG} No.</b><td><b>Payment Method</b><td><b>Status</b></tr>"
             for player in email_dic[congress][event]:
-                player_string += f"<tr><td>{player.player.full_name}<td>{player.player.system_number}<td>{player.payment_type}<td>{player.payment_status}</tr>"
+                PAYMENT_TYPES_DICT = dict(PAYMENT_TYPES)
+                payment_type_str = PAYMENT_TYPES_DICT[player.payment_type]
+                player_string += f"<tr><td>{player.player.full_name}<td>{player.player.system_number}<td>{payment_type_str}<td>{player.payment_status}</tr>"
             player_string += "</table>"
             message = "New entry received.<br><br> %s" % player_string
+            print("Notify conveners")
             notify_conveners(
                 congress, event, f"New Entry to {event.event_name}", message
             )
@@ -392,8 +396,11 @@ def get_conveners_for_congress(congress):
     return rbac_get_users_with_role(role)
 
 
-def notify_conveners(congress, event, subject, msg):
+def notify_conveners(congress, event, subject, email_msg, notify_msg=None):
     """ Let conveners know about things that change """
+
+    if not notify_msg:
+        notify_msg = subject
 
     conveners = get_conveners_for_congress(congress)
     link = reverse("events:admin_event_summary", kwargs={"event_id": event.id})
@@ -403,7 +410,7 @@ def notify_conveners(congress, event, subject, msg):
         context = {
             "name": convener.first_name,
             "title": "Convener Msg: " + subject,
-            "email_body": f"{msg}<br><br>",
+            "email_body": f"{email_msg}<br><br>",
             "host": COBALT_HOSTNAME,
             "link": link,
             "link_text": "View Event",
@@ -414,7 +421,7 @@ def notify_conveners(congress, event, subject, msg):
         # send
         contact_member(
             member=convener,
-            msg=msg,
+            msg=notify_msg,
             contact_type="Email",
             html_msg=html_msg,
             link=link,

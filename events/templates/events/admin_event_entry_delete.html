@@ -59,6 +59,9 @@
               {% for form in refund_form_set %}
                 <tr>
                   <td>{{ form.player.value }}
+                    {% if form.player.value == "TBA" %}
+                    (Refund will go to {{ event_entry.primary_entrant }})
+                    {% endif %}
                   {{ form.player_id.as_hidden }}
                   {{ form.player.as_hidden }}
                   <td class="text-right">{{ form.refund }}

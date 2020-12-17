@@ -889,3 +889,17 @@ def rbac_group_id_from_name(name_qualifier, name_item):
         return group.id
     else:
         return None
+
+
+def rbac_show_admin(request):
+    """Decide whether to show the admin link on the main template to this user
+
+    Args:
+        request(Request): Standard request object
+
+    Returns:
+        boolean:   True to show it, False to not show it
+    """
+
+    # Probably good enough for now just to show it if the user is in any RBAC group
+    return RBACUserGroup.objects.filter(member=request.user).exists()

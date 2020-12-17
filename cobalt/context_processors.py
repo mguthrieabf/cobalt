@@ -4,6 +4,7 @@ from django.conf import settings
 from notifications.views import get_notifications_for_user
 from events.core import get_basket_for_user
 from .version import COBALT_VERSION
+from rbac.core import rbac_show_admin
 
 
 def global_settings(request):
@@ -12,14 +13,17 @@ def global_settings(request):
         notifications = {}
         notification_count = 0
         basket_items = 0
+        show_admin_on_template = False
     else:
         (notification_count, notifications) = get_notifications_for_user(request.user)
         basket_items = get_basket_for_user(request.user)
+        show_admin_on_template = rbac_show_admin(request)
 
     return {
         "notification_count": notification_count,
         "notifications": notifications,
         "basket_items": basket_items,
+        "show_admin_on_template": show_admin_on_template,
         "COBALT_VERSION": COBALT_VERSION,
         "COBALT_HOSTNAME": settings.COBALT_HOSTNAME,
         "BRIDGE_CREDITS": settings.BRIDGE_CREDITS,
