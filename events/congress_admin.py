@@ -386,6 +386,7 @@ def admin_event_csv(request, event_id):
         "Status",
         "First Created Date",
         "Entry Complete Date",
+        "Notes",
     ]
 
     categories = Category.objects.filter(event=event).exists()
@@ -424,6 +425,7 @@ def admin_event_csv(request, event_id):
             row.entry_status,
             dateformat.format(local_dt, "Y-m-d H:i:s"),
             dateformat.format(local_dt2, "Y-m-d H:i:s"),
+            row.notes,
         ]
 
         if categories:
@@ -1088,7 +1090,7 @@ def admin_move_entry(request, event_entry_id):
             context = {
                 "name": recipient.player.first_name,
                 "title": "Entry moved to new event",
-                "email_body": f"{request.user.full_name} has moved your entry to {event_entry.event}.",
+                "email_body": f"{request.user.full_name} has moved your entry to {event_entry.event}.<br><br>",
                 "host": COBALT_HOSTNAME,
                 "link": "/events/view",
                 "link_text": "View Entry",

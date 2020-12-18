@@ -44,7 +44,6 @@
                 </div>
               </div>
 
-
             </div>
             <div class="float-right">
               <div class="btn-group">
@@ -58,11 +57,6 @@
               </div>
             </div>
           </div>
-
-
-
-
-
 
           <div class="card-body table-responsive">
             <table class="table table-hover">
@@ -88,6 +82,10 @@
 
                   <tr>
                     <td>
+                      {% if event_entry.notes %}
+                      <a href="javascript:void(0)" onclick='help("Notes", "{{ event_entry.notes }}");'>
+                        <i class="material-icons">sticky_note_2</i></a>
+                      {% endif %}
                     {% for event_entry_player in event_entry.players %}
                         {{ event_entry_player.player.full_name }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
@@ -121,12 +119,13 @@
                           <a class="dropdown-item cobalt-notes" id="notes_{{ event_entry.id }}">Notes</a>
                           <a class="dropdown-item" href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}">Withdraw</a>
                           <a class="dropdown-item" href="{% url "events:admin_move_entry" event_entry_id=event_entry.id %}">Move</a>
+                        </div>
                       </div>
                     </div>
-
-
                   </td>
 
+<!-- Hide the current notes value in page -->
+                  <input type="hidden" id="notes_value_{{ event_entry.id }}" value="{{ event_entry.notes|default_if_none:"" }}">
 
                   </tr>
                 {% endfor %}
@@ -163,12 +162,20 @@
 <script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
 <script>
 
+function help(title, html){
+  swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+  return false;
+}
+
 // report a post or comment to a moderator
 function editNotes(id) {
 
+  var current_value = $('#notes_value_' + id).val();
+
   Swal.fire({
     title: 'Notes',
-    input: 'textarea',
+    input: 'text',
+    inputValue: current_value,
     inputPlaceholder: 'Notes...',
     inputAttributes: {
       'aria-label': 'Notes'
@@ -196,6 +203,8 @@ function editNotes(id) {
             title: "Notes updated",
             html: response.message,
             icon: "success",
+          }).then(function() {
+            location.reload();
           });
         },
         error: function(jqXHR, textStatus, errorThrown) {

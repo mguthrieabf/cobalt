@@ -44,6 +44,7 @@ from django.contrib import messages
 import uuid
 from .core import notify_conveners
 from cobalt.settings import TBA_PLAYER, COBALT_HOSTNAME, BRIDGE_CREDITS
+import json
 
 
 @login_required()
@@ -948,9 +949,10 @@ def change_payment_method_on_existing_entry_ajax(request):
 def admin_event_entry_notes_ajax(request):
     """ Ajax call from event entry screen to update notes """
 
-    if request.method == "GET":
-        event_entry_id = request.GET["id"]
-        notes = request.GET["notes"]
+    if request.method == "POST":
+        data = json.loads(request.body.decode("utf-8"))
+        event_entry_id = int(data["id"])
+        notes = data["notes"]
 
         event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
 
