@@ -28,25 +28,28 @@
           </div>
 
           <div class="card-body table-responsive">
-            <h3>Entry</h3>
+            <h3>
             {% for event_entry_player in event_entry.evententryplayer_set.all %}
                 {{ event_entry_player.player.full_name }}{% if not forloop.last %}, {% endif %}
             {% endfor %}
+            </h3>
 
             {% if events %}
 
-            <h3>Move To</h3>
+            <br>
             <form method='post'>
               {% csrf_token %}
               <input type="hidden" name="event_entry_id" value="{{ event_entry.id }}">
-              <select name="new_event_id">
-                <option selected disabled>Select...</option>
+
+              <select class="selectpicker" data-style="btn btn-success cobalt-text-transform-off w-auto" name="new_event_id">
+                <option selected disabled>Move to...</option>
               {% for event in events %}
                 <option value="{{ event.id }}">{{ event }}</option>
               {% endfor %}
               </select>
               <br>
-              <button type="submit" class="btn btn-info">Change</button>
+              <br>
+              <button type="submit" class="btn btn-primary cobalt-save" disabled id="change_button">Change</button>
             </form>
 
             {% else %}
@@ -61,4 +64,19 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block footer %}
+<script src="{% static "assets/js/plugins/bootstrap-selectpicker.js" %}"></script>
+<script>
+$(document).ready(function(){
+
+  $('.selectpicker').selectpicker('refresh');
+
+  $('.selectpicker').change(function(){
+    $('#change_button').removeAttr('disabled');
+  });
+
+});
+</script>
 {% endblock %}

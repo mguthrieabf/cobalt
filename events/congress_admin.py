@@ -167,8 +167,10 @@ def admin_event_summary(request, event_id):
     if not rbac_user_has_role(request.user, role):
         return rbac_forbidden(request, role)
 
-    event_entries = EventEntry.objects.filter(event=event).exclude(
-        entry_status="Cancelled"
+    event_entries = (
+        EventEntry.objects.filter(event=event)
+        .exclude(entry_status="Cancelled")
+        .order_by("pk")
     )
 
     # build summary

@@ -29,6 +29,9 @@
           </div>
 
           <div class="card-body table-responsive">
+
+            {% if players %}
+
             <table class="table table-hover">
               <thead class="text-info">
                 <th>Player</th>
@@ -58,6 +61,13 @@
 
               </tbody>
             </table>
+
+            {% else %}
+
+              <h4>There are no unpaid entries in this event</h4>
+
+            {% endif %}
+
           </div>
         </div>
       </div>
