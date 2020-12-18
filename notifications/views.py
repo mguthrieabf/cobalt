@@ -9,11 +9,22 @@
 import boto3
 from cobalt.settings import AWS_SECRET_ACCESS_KEY, AWS_REGION_NAME, AWS_ACCESS_KEY_ID
 from .models import InAppNotification, NotificationMapping, Email
+from .forms import EmailContactForm
 from forums.models import Forum, Post
-from django.core.mail import send_mail
+from accounts.models import User
+
+# from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.utils import timezone
-from cobalt.settings import DEFAULT_FROM_EMAIL, GLOBAL_TITLE, TBA_PLAYER, RBAC_EVERYONE
+from cobalt.settings import (
+    DEFAULT_FROM_EMAIL,
+    GLOBAL_TITLE,
+    TBA_PLAYER,
+    RBAC_EVERYONE,
+    COBALT_HOSTNAME,
+)
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -23,10 +34,11 @@ from django.db import connection
 from rbac.views import rbac_forbidden
 from rbac.core import rbac_user_has_role
 from datetime import datetime, timedelta
+from django.contrib import messages
 import time
 
 
-def send_cobalt_email(to_address, subject, message, member=None):
+def send_cobalt_email(to_address, subject, message, member=None, reply_to=""):
     """Send single email. This sets off an async task to actually send the
         email to avoid delays for the user.
 
@@ -41,7 +53,13 @@ def send_cobalt_email(to_address, subject, message, member=None):
     """
 
     # Add to queue
-    email = Email(subject=subject, message=message, recipient=to_address, member=member)
+    email = Email(
+        subject=subject,
+        message=message,
+        recipient=to_address,
+        member=member,
+        reply_to=reply_to,
+    )
     email.save()
 
     # start thread
@@ -65,14 +83,29 @@ def send_cobalt_email_thread(email_id):
     time.sleep(2)
 
     email = Email.objects.get(pk=email_id)
+
     plain_message = strip_tags(email.message)
-    send_mail(
+
+    # send_mail(
+    #     email.subject,
+    #     plain_message,
+    #     DEFAULT_FROM_EMAIL,
+    #     [email.recipient],
+    #     html_message=email.message,
+    # )
+
+    message = EmailMultiAlternatives(
         email.subject,
         plain_message,
-        DEFAULT_FROM_EMAIL,
-        [email.recipient],
-        html_message=email.message,
+        to=[email.recipient],
+        from_email=DEFAULT_FROM_EMAIL,
+        reply_to=[email.reply_to],
     )
+
+    message.attach_alternative(email.message, "text/html")
+
+    message.send()
+
     email.status = "Sent"
     email.save()
 
@@ -450,3 +483,52 @@ def notifications_status_summary():
     last_hour = Email.objects.filter(created_date__gt=last_hour_date_time).count()
 
     return {"latest": latest, "pending": pending, "last_hour": last_hour}
+
+
+@login_required()
+def email_contact(request, member_id):
+    """ email contact form """
+
+    member = get_object_or_404(User, pk=member_id)
+
+    form = EmailContactForm(request.POST or None)
+
+    if request.method == "POST":
+        title = request.POST["title"]
+        message = request.POST["message"].replace("\n", "<br>")
+
+        msg = f"""
+                  Email from: {request.user} ({request.user.email})<br><br>
+                  <b>{title}</b>
+                  <br><br>
+                  {message}
+        """
+
+        context = {
+            "name": member.first_name,
+            "title": f"Email from: {request.user.full_name}",
+            "email_body": msg,
+            "host": COBALT_HOSTNAME,
+        }
+
+        html_msg = render_to_string("notifications/email.html", context)
+
+        send_cobalt_email(
+            to_address=member.email,
+            subject=title,
+            message=html_msg,
+            member=member,
+            reply_to=f"{request.user.email}",
+        )
+
+        messages.success(
+            request,
+            "Message sent successfully",
+            extra_tags="cobalt-message-success",
+        )
+
+        return redirect("dashboard:dashboard")
+
+    return render(
+        request, "notifications/email_form.html", {"form": form, "member": member}
+    )

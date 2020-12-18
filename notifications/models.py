@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 class InAppNotification(models.Model):
-    """ Temporary storage for notification messages.
+    """Temporary storage for notification messages.
 
     Stores any event that a Cobalt module wants to notify a user about.
     """
@@ -50,11 +50,11 @@ class NotificationMapping(models.Model):
 
 
 class AbstractEmail(models.Model):
-    """ Stores emails so that the sending of emails is decoupled from their production.
-        This is needed as there can be delays sending email which affect client responsiveness.
-        See the documentation for more information especially around setting up
-        the system so that emails get sent and don't sit in the queue forever.
-        This Abstract class is made concrete as Email and EmailArchive.
+    """Stores emails so that the sending of emails is decoupled from their production.
+    This is needed as there can be delays sending email which affect client responsiveness.
+    See the documentation for more information especially around setting up
+    the system so that emails get sent and don't sit in the queue forever.
+    This Abstract class is made concrete as Email and EmailArchive.
     """
 
     subject = models.CharField("Subject", max_length=200)
@@ -65,7 +65,10 @@ class AbstractEmail(models.Model):
         choices=[("Queued", "Queued to Send"), ("Sent", "Sent")],
         default="Queued",
     )
-    recipient = models.CharField("Recipients", max_length=50)
+    recipient = models.CharField("Recipients", max_length=100)
+    reply_to = models.CharField(
+        "Reply To", max_length=100, blank=True, null=True, default=""
+    )
     member = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

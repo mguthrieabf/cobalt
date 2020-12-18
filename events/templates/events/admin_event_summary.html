@@ -34,6 +34,7 @@
                 </button>
                 <div class="dropdown-menu">
                   <a class="dropdown-item" href="{% url 'events:admin_event_offsystem' event_id=event.id %}">Off System Payments</a>
+                  <a class="dropdown-item" href="{% url 'events:admin_event_unpaid' event_id=event.id %}">Unpaid Entries</a>
                   <a class="dropdown-item" href="{% url 'events:admin_event_log' event_id=event.id %}">View Logs</a>
                   <a class="dropdown-item" href="{% url 'events:admin_event_player_discount' event_id=event.id %}">Manage Player Discounts</a>
                   <a class="dropdown-item" href="{% url 'events:admin_event_email' event_id=event.id %}">Email Event Entrants</a>

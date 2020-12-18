@@ -504,9 +504,14 @@ def admin_event_csv_scoring(request, event_id):
         [event.event_name, "Downloaded by %s" % request.user.full_name, today]
     )
 
+    if event.player_format == "Pairs":
+        title = "Pair No"
+    else:
+        title = "Team No"
+
     # Event Entry details
     header = [
-        "Team/Pair No",
+        title,
         "Name",
         "ABF Number",
         "Team Name",
@@ -514,16 +519,33 @@ def admin_event_csv_scoring(request, event_id):
 
     writer.writerow(header)
 
+    count = 1
+
     for entry in entries:
+        entry_line = 1
         for row in entry.evententryplayer_set.all():
             writer.writerow(
                 [
-                    entry.id,
+                    count,
                     row.player.full_name.upper(),
                     row.player.system_number,
                     row.event_entry.primary_entrant.last_name.upper(),
                 ]
             )
+            entry_line += 1
+        # add extra blank rows for teams if needed
+        if event.player_format == "Teams":
+            for extra_lines in range(7 - entry_line):
+                writer.writerow(
+                    [
+                        count,
+                        "",
+                        "",
+                        entry.primary_entrant.last_name.upper(),
+                    ]
+                )
+
+        count += 1
 
     # Log it
     EventLog(
@@ -560,6 +582,31 @@ def admin_event_offsystem(request, event_id):
     return render(
         request,
         "events/admin_event_offsystem.html",
+        {"event": event, "players": players},
+    )
+
+
+@login_required()
+def admin_event_unpaid(request, event_id):
+    """ Unpaid Report """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # get players with unpaid entries
+    players = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .exclude(payment_status="Paid")
+        .exclude(event_entry__entry_status="Cancelled")
+    )
+
+    return render(
+        request,
+        "events/admin_event_unpaid.html",
         {"event": event, "players": players},
     )
 
@@ -989,5 +1036,7 @@ def admin_latest_news(request, congress_id):
         form = LatestNewsForm()
 
     return render(
-        request, "events/admin_latest_news.html", {"form": form, "congress": congress},
+        request,
+        "events/admin_latest_news.html",
+        {"form": form, "congress": congress},
     )
