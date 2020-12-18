@@ -942,3 +942,26 @@ def change_payment_method_on_existing_entry_ajax(request):
         return JsonResponse({"message": "Success"})
 
     return JsonResponse({"message": "Invalid call"})
+
+
+@login_required()
+def admin_event_entry_notes_ajax(request):
+    """ Ajax call from event entry screen to update notes """
+
+    if request.method == "GET":
+        event_entry_id = request.GET["id"]
+        notes = request.GET["notes"]
+
+        event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+        # check access
+        role = "events.org.%s.edit" % event_entry.event.congress.congress_master.org.id
+        if not rbac_user_has_role(request.user, role):
+            return rbac_forbidden(request, role)
+
+        event_entry.notes = notes
+        event_entry.save()
+
+        return JsonResponse({"message": "Success"})
+
+    return JsonResponse({"message": "Invalid call"})

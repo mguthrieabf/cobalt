@@ -41,7 +41,7 @@
 
       <tr>
         <td><a href="{% url "events:admin_event_summary" event_id=event.id %}">{{ event.event_name }}</a></td>
-        <td>{{ event.event_type }}</td>
+        <td>{{ event.event_type|default_if_none:"" }}</td>
         <td>{% if event.is_open %}Entries Open{% else %}Entries Closed{% endif %}</td>
         <td class="text-right">{{ event.entry_fee }}</td>
         <td class="text-right">{{ event.early_fee }}</td>

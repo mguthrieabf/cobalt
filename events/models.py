@@ -501,6 +501,7 @@ class EventEntry(models.Model):
     free_format_answer = models.CharField(
         "Free Format Answer", max_length=60, null=True, blank=True
     )
+    notes = models.CharField("Notes", max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Event entries"

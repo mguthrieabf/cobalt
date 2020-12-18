@@ -108,8 +108,26 @@
                     {% endif %}
 
                     <td class="text-right">{{ event_entry.entry_status }}</td>
-                    <td class="text-right"><a href="{% url "events:admin_evententry" evententry_id=event_entry.id %}" class="btn btn-sm btn-info">Details</a>
-                    <a href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}" class="btn btn-sm btn-danger">Withdraw</a></td>
+
+                    <td class="text-right">
+
+                    <div class="float-right">
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Actions
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="{% url "events:admin_evententry" evententry_id=event_entry.id %}">Details</a>
+                          <a class="dropdown-item cobalt-notes" id="notes_{{ event_entry.id }}">Notes</a>
+                          <a class="dropdown-item" href="{% url "events:admin_evententry_delete" evententry_id=event_entry.id %}">Withdraw</a>
+                          <a class="dropdown-item" href="{% url "events:admin_move_entry" event_entry_id=event_entry.id %}">Move</a>
+                      </div>
+                    </div>
+
+
+                  </td>
+
+
                   </tr>
                 {% endfor %}
 
@@ -142,10 +160,62 @@
 
 {% block footer %}
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
+<script src="{% static "assets/js/core/jquery.cookie.min.js" %}"></script>
 <script>
-  function help(title, html){
-    swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
-    return false;
-  }
+
+// report a post or comment to a moderator
+function editNotes(id) {
+
+  Swal.fire({
+    title: 'Notes',
+    input: 'textarea',
+    inputPlaceholder: 'Notes...',
+    inputAttributes: {
+      'aria-label': 'Notes'
+    },
+    showCancelButton: true
+  }).then(function(result) {
+    if (result.value) {
+      var url = "{% url "events:admin_event_entry_notes_ajax" %}";
+      var serializedData = {
+        "id": id,
+        "notes": result.value
+      };
+
+      $.ajax({
+        url: url,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": $.cookie("csrftoken") // This is needed to pass xsite scripting errors
+        },
+        type: "post",
+        data: JSON.stringify(serializedData),
+        dataType: "json",
+        success: function(response) {
+          swal.fire({
+            title: "Notes updated",
+            html: response.message,
+            icon: "success",
+          });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
+        }
+      });
+    }
+  })
+}
+
+
+
+$(document).ready(function(){
+
+  $('.cobalt-notes').click(function(event){
+  var id = $(this).attr('id').split("_")[1];
+  editNotes(id);
+});
+
+});
+
 </script>
 {% endblock %}

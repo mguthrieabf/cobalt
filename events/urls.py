@@ -349,6 +349,16 @@ urlpatterns = [
         ajax.admin_delete_bulletin_ajax,
         name="admin_delete_bulletin_ajax",
     ),
+    path(
+        "congress-admin/move-entry/<int:event_entry_id>",
+        congress_admin.admin_move_entry,
+        name="admin_move_entry",
+    ),
+    path(
+        "congress-admin/event-entry/notes",
+        ajax.admin_event_entry_notes_ajax,
+        name="admin_event_entry_notes_ajax",
+    ),
     #######################################################
     # higher level admin functions                        #
     #######################################################

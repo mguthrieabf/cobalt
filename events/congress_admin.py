@@ -11,6 +11,7 @@ from django.utils import timezone, dateformat
 from django.db.models import Sum, Q
 from notifications.views import contact_member
 from logs.views import log_event
+from django.db import transaction
 from .models import (
     Congress,
     Category,
@@ -1039,4 +1040,85 @@ def admin_latest_news(request, congress_id):
         request,
         "events/admin_latest_news.html",
         {"form": form, "congress": congress},
+    )
+
+
+@login_required()
+@transaction.atomic
+def admin_move_entry(request, event_entry_id):
+    """ Move an entry to another event """
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+    congress = event_entry.event.congress
+
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+        new_event_id = request.POST.get("new_event_id")
+        new_event = get_object_or_404(Event, pk=new_event_id)
+
+        old_entry = copy.copy(event_entry.event)
+
+        event_entry.event = new_event
+        event_entry.save()
+
+        # Log it
+
+        EventLog(
+            event=old_entry,
+            event_entry=event_entry,
+            actor=request.user,
+            action=f"Moved entry to {new_event}",
+        ).save()
+
+        EventLog(
+            event=event_entry.event,
+            event_entry=event_entry,
+            actor=request.user,
+            action=f"Moved entry from {old_entry}",
+        ).save()
+
+        # Notify players
+
+        for recipient in event_entry.evententryplayer_set.all():
+            context = {
+                "name": recipient.player.first_name,
+                "title": "Entry moved to new event",
+                "email_body": f"{request.user.full_name} has moved your entry to {event_entry.event}.",
+                "host": COBALT_HOSTNAME,
+                "link": "/events/view",
+                "link_text": "View Entry",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=recipient.player,
+                msg="Entry moved to new event",
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="Entry moved to new event",
+            )
+
+        messages.success(request, "Entry Moved", extra_tags="cobalt-message-success")
+
+        return redirect("events:admin_event_summary", event_id=event_entry.event.id)
+
+    # Events we can move to, must be in this congress and same format
+    events = (
+        Event.objects.filter(congress=congress)
+        .filter(player_format=event_entry.event.player_format)
+        .exclude(id=event_entry.event.id)
+    )
+
+    return render(
+        request,
+        "events/admin_move_entry.html",
+        {"events": events, "event_entry": event_entry},
     )
