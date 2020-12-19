@@ -194,12 +194,12 @@
         .done(response => {
           msg = response['data']['message'];
           if (msg == 'Success'){
-            swal.fire({ title:"User Added", html: "Success. User added to group.", icon: "success", buttonsStyling: false})
+            swal.fire({ title:"User Added", html: "Success. User added to group.", icon: "success"})
             .then((result) => {
               location.reload();
             });
           } else {
-            swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+            swal.fire({ title:"Error", html: msg, icon: "error"})
           }
         });
     }
@@ -236,12 +236,12 @@
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
-                  swal.fire({ title:"User Deleted", html: "Success. User deleted from group.", icon: "success", buttonsStyling: false})
+                  swal.fire({ title:"User Deleted", html: "Success. User deleted from group.", icon: "success"})
                   .then((result) => {
                     location.reload();
                   });
                 } else {
-                  swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+                  swal.fire({ title:"Error", html: msg, icon: "error"})
                 }
               });
           }
@@ -264,12 +264,12 @@
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
-                  swal.fire({ title:"Role Deleted", html: "Success. Role deleted from group.", icon: "success", buttonsStyling: false})
+                  swal.fire({ title:"Role Deleted", html: "Success. Role deleted from group.", icon: "success"})
                   .then((result) => {
                     location.reload();
                   });
                 } else {
-                  swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+                  swal.fire({ title:"Error", html: msg, icon: "error"})
                 }
               });
           }
@@ -301,12 +301,12 @@
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success'){
-              swal.fire({ title:"Role Added", html: "Success. Role added to group.", icon: "success", buttonsStyling: false})
+              swal.fire({ title:"Role Added", html: "Success. Role added to group.", icon: "success"})
               .then((result) => {
                 location.reload();
               });
             } else {
-              swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+              swal.fire({ title:"Error", html: msg, icon: "error"})
             }
         });
     }

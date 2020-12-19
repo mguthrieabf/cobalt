@@ -36,10 +36,7 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    (
-        "my-system-dollars",
-        BRIDGE_CREDITS,
-    ),
+    ("my-system-dollars", BRIDGE_CREDITS,),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
@@ -229,9 +226,7 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format",
-        max_length=14,
-        choices=EVENT_PLAYER_FORMAT,
+        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -522,7 +517,7 @@ class EventEntry(models.Model):
 
         all_complete = True
         for event_entry_player in self.evententryplayer_set.all():
-            if event_entry_player.payment_status != "Paid":
+            if event_entry_player.payment_status not in ["Paid", "Free"]:
                 all_complete = False
                 break
         if all_complete:

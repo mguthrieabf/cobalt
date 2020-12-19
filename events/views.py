@@ -324,6 +324,7 @@ def checkout(request):
         event_entry_players = (
             EventEntryPlayer.objects.filter(event_entry__in=event_entries)
             .exclude(payment_status="Paid")
+            .exclude(payment_status="Free")
             #        .filter(Q(player=request.user) | Q(payment_type="my-system-dollars"))
             .filter(payment_type="my-system-dollars")
             .distinct()
@@ -374,9 +375,11 @@ def checkout(request):
     event_entries = BasketItem.objects.filter(player=request.user).values_list(
         "event_entry"
     )
-    event_entry_players = EventEntryPlayer.objects.filter(
-        event_entry__in=event_entries
-    ).exclude(payment_status="Paid")
+    event_entry_players = (
+        EventEntryPlayer.objects.filter(event_entry__in=event_entries)
+        .exclude(payment_status="Paid")
+        .exclude(payment_status="Free")
+    )
 
     # get totals per congress
     congress_total = {}
@@ -469,6 +472,7 @@ def view_events(request):
     # check for pending payments
     pending_payments = (
         EventEntryPlayer.objects.exclude(payment_status="Paid")
+        .exclude(payment_status="Free")
         .filter(player=request.user)
         .exclude(event_entry__entry_status="Cancelled")
     )
@@ -488,6 +492,7 @@ def pay_outstanding(request):
     # Get outstanding payments for this user
     event_entry_players = (
         EventEntryPlayer.objects.exclude(payment_status="Paid")
+        .exclude(payment_status="Free")
         .filter(player=request.user)
         .exclude(event_entry__entry_status="Cancelled")
     )
@@ -664,15 +669,11 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request,
-                "Payment successful",
-                extra_tags="cobalt-message-success",
+                request, "Payment successful", extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request,
-                "Payment failed",
-                extra_tags="cobalt-message-error",
+                request, "Payment failed", extra_tags="cobalt-message-error",
             )
 
     # valid payment methods
@@ -1407,14 +1408,17 @@ def enter_event(request, congress_id, event_id):
             else:
                 event_entry_player.entry_fee = 0
                 event_entry_player.reason = "Team > 4"
-                event_entry_player.payment_status = "Paid"
+                event_entry_player.payment_status = "Free"
 
             # set payment status depending on payment type
-            if (
-                event_entry_player.payment_status != "Paid"
-                and event_entry_player.payment_type
-                in ["bank-transfer", "cash", "cheque"]
-            ):
+            if event_entry_player.payment_status not in [
+                "Paid",
+                "Free",
+            ] and event_entry_player.payment_type in [
+                "bank-transfer",
+                "cash",
+                "cheque",
+            ]:
                 event_entry_player.payment_status = "Pending Manual"
             event_entry_player.save()
 

@@ -150,7 +150,7 @@ def update_entries(route_payload, payment_user):
         for event_entry_player in event_entry.evententryplayer_set.all():
             if (
                 event_entry_player.payment_type == "their-system-dollars"
-                and event_entry_player.payment_status != "Paid"
+                and event_entry_player.payment_status not in ["Paid", "Free"]
             ):
                 payments_core.payment_api(
                     request=None,
@@ -274,6 +274,7 @@ def send_notifications(route_payload, payment_user):
             # Get details
             event_entry_players = (
                 EventEntryPlayer.objects.exclude(payment_status="Paid")
+                .exclude(payment_status="Free")
                 .filter(player=player)
                 .filter(event_entry__event__congress=congress)
                 .exclude(event_entry__entry_status="Cancelled")

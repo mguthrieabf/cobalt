@@ -59,18 +59,18 @@
                     <td class="text-right">{{ event_entry_player.paid_by.full_name }}</td>
                     <td class="text-right">{{ event_entry_player.reason|default_if_none:"" }}</td>
                     <td class="text-right">{{ event_entry_player.entry_complete_date|cobalt_nice_datetime|default_if_none:"-" }}</td>
-                    <td class="text-right"><a href="{% url "events:admin_evententryplayer" evententryplayer_id=event_entry_player.id %}" class="btn btn-sm btn-info">Edit</a></td>
-                    <td class="text-right"><a href="{% url "notifications:email_contact" member_id=event_entry_player.player.id %}" class="btn btn-sm btn-warning">Email</a></td>
+                    <td class="text-right"><a href="{% url "events:admin_evententryplayer" evententryplayer_id=event_entry_player.id %}" class="btn btn-sm btn-info">Edit</a>
+                    <a href="{% url "notifications:email_contact" member_id=event_entry_player.player.id %}" class="btn btn-sm btn-warning">Email</a></td>
                   </tr>
                 {% endfor %}
 
               </tbody>
             </table>
+            {% if event.free_format_question %}
+              <h3>Question: {{ event.free_format_question }}</h3>
+              <p><b>Answer: </b>{{ event_entry.free_format_answer|default_if_none:"No answer provided" }}</p>
+            {% endif %}
           </div>
-          {% if event.free_format_question %}
-            <h3>{{ event.free_format_question }}</h3>
-            <p>{{ event_entry.free_format_answer|default_if_none:" " }}</p>
-          {% endif %}
         </div>
       </div>
     </div>

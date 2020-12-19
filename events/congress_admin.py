@@ -542,12 +542,7 @@ def admin_event_csv_scoring(request, event_id):
         if event.player_format == "Teams":
             for extra_lines in range(7 - entry_line):
                 writer.writerow(
-                    [
-                        count,
-                        "",
-                        "",
-                        entry.primary_entrant.last_name.upper(),
-                    ]
+                    [count, "", "", entry.primary_entrant.last_name.upper()]
                 )
 
         count += 1
@@ -606,13 +601,12 @@ def admin_event_unpaid(request, event_id):
     players = (
         EventEntryPlayer.objects.filter(event_entry__event=event)
         .exclude(payment_status="Paid")
+        .exclude(payment_status="Free")
         .exclude(event_entry__entry_status="Cancelled")
     )
 
     return render(
-        request,
-        "events/admin_event_unpaid.html",
-        {"event": event, "players": players},
+        request, "events/admin_event_unpaid.html", {"event": event, "players": players},
     )
 
 
@@ -1041,9 +1035,7 @@ def admin_latest_news(request, congress_id):
         form = LatestNewsForm()
 
     return render(
-        request,
-        "events/admin_latest_news.html",
-        {"form": form, "congress": congress},
+        request, "events/admin_latest_news.html", {"form": form, "congress": congress},
     )
 
 
@@ -1125,4 +1117,117 @@ def admin_move_entry(request, event_entry_id):
         request,
         "events/admin_move_entry.html",
         {"events": events, "event_entry": event_entry},
+    )
+
+
+@login_required()
+@transaction.atomic
+def admin_event_entry_add(request, event_id):
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+
+        # Get the players from the form
+        players = []
+        for count in range(6):
+            player_id = request.POST.get(f"player_{count}", None)
+            if player_id:
+                player = get_object_or_404(User, pk=player_id)
+                players.append(player)
+
+        # create entry - make first entrant the primary_entrant
+        event_entry = EventEntry()
+        event_entry.event = event
+        event_entry.primary_entrant = players[0]
+        event_entry.notes = f"Entry added by convener {request.user.full_name}"
+
+        # see if we got a category
+        category = request.POST.get("category", None)
+        if category:
+            event_entry.category = get_object_or_404(Category, pk=category)
+
+        event_entry.save()
+
+        # Log it
+        EventLog(
+            event=event,
+            actor=request.user,
+            action=f"Event entry {event_entry.id} ({event_entry.primary_entrant}) created by convener",
+            event_entry=event_entry,
+        ).save()
+
+        # create event entry players
+        player_index = 0
+        for player in players:
+            event_entry_player = EventEntryPlayer()
+            event_entry_player.event_entry = event_entry
+            event_entry_player.player = player
+            event_entry_player.payment_type = "TBA"
+            entry_fee, discount, reason, description = event.entry_fee_for(
+                event_entry_player.player
+            )
+            if player_index < 4:
+                event_entry_player.entry_fee = entry_fee
+                event_entry_player.reason = reason
+            else:
+                event_entry_player.entry_fee = 0
+                event_entry_player.reason = "Team > 4"
+                event_entry_player.payment_status = "Free"
+            player_index += 1
+            event_entry_player.save()
+
+        # notify players
+        for recipient in players:
+            context = {
+                "name": recipient.first_name,
+                "title": "New convener entry",
+                "email_body": f"{request.user.full_name} has entered you into {event}.<br><br>",
+                "host": COBALT_HOSTNAME,
+                "link": "/events/view",
+                "link_text": "View Entry",
+            }
+
+            html_msg = render_to_string("notifications/email_with_button.html", context)
+
+            # send
+            contact_member(
+                member=recipient,
+                msg="New convener entry",
+                contact_type="Email",
+                html_msg=html_msg,
+                link="/events/view",
+                subject="New convener entry",
+            )
+
+            # Log it
+            EventLog(
+                event=event,
+                actor=request.user,
+                action=f"Player {recipient} added to entry: {event_entry.id} by convener",
+                event_entry=event_entry,
+            ).save()
+
+        messages.success(request, "Entry Added", extra_tags="cobalt-message-success")
+
+        return redirect("events:admin_evententry", evententry_id=event_entry.id)
+
+    player_count_number = EVENT_PLAYER_FORMAT_SIZE[event.player_format]
+    player_count = range(player_count_number)
+    categories = Category.objects.filter(event=event)
+
+    return render(
+        request,
+        "events/admin_event_entry_add.html",
+        {
+            "event": event,
+            "player_count": player_count,
+            "player_count_number": player_count_number,
+            "categories": categories,
+        },
     )

@@ -202,7 +202,6 @@
           title: "Picture Loaded",
           html: "If you like the picture don't forget to hit update to save it.",
           icon: "success",
-          buttonsStyling: false
         })
       };
       reader.readAsDataURL(input.files[0]);
@@ -243,13 +242,13 @@
         .done(response => {
           msg = response['data']['message'];
           if (msg == 'Success'){
-            swal.fire({ title:"Team Mate Added", html: "Success. Added a new team mate", icon: "success", buttonsStyling: false})
+            swal.fire({ title:"Team Mate Added", html: "Success. Added a new team mate", icon: "success"})
             .then((result) => {
               cobalt_form_data_changed = false;
               location.reload();
             });
           } else {
-            swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+            swal.fire({ title:"Error", html: msg, icon: "error"})
           }
         });
     }
@@ -307,12 +306,12 @@
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
-                  swal.fire({ title:"Team Mate Removed", html: "Success. Team mate has been removed.", icon: "success", buttonsStyling: false})
+                  swal.fire({ title:"Team Mate Removed", html: "Success. Team mate has been removed.", icon: "success"})
                   .then((result) => {
                     $('table#team_mate_table tr#div_for_' + member_id).remove();
                   });
                 } else {
-                  swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+                  swal.fire({ title:"Error", html: msg, icon: "error"})
                 }
               });
           }
@@ -320,7 +319,7 @@
     }
 
     function help(title, html){
-      swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+      swal.fire({ title:title, html: html, icon: "info"})
       return false;
     }
 

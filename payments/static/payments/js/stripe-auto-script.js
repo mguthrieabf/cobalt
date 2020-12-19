@@ -62,8 +62,7 @@ var setupElements = function(data) {
       swal.fire({
         title: "American Express Not Accepted",
         html: "Sorry, due to the high fees involved we do not accept American Express credit cards.",
-        icon: "info",
-        buttonsStyling: false
+        icon: "info"
       });
 
       card.clear();

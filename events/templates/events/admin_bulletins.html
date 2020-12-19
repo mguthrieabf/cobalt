@@ -95,7 +95,7 @@
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 <script>
 function help(title, html){
-  swal.fire({ title:title, html: html, icon: "info", buttonsStyling: false})
+  swal.fire({ title:title, html: html, icon: "info"})
   return false;
 }
 
@@ -114,12 +114,12 @@ function deleteBulletin(bulletin_id) {
           .done(response => {
             msg = response['data']['message'];
             if (msg == 'Success'){
-              swal.fire({ title:"Bulletin Deleted", html: "Success. Bulletin deleted from Congress.", icon: "success", buttonsStyling: false})
+              swal.fire({ title:"Bulletin Deleted", html: "Success. Bulletin deleted from Congress.", icon: "success"})
               .then((result) => {
                 location.reload();
               });
             } else {
-              swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+              swal.fire({ title:"Error", html: msg, icon: "error"})
             }
           });
       }

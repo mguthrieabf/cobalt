@@ -192,8 +192,6 @@
 
   function cobaltMemberSearchOk() {
 
-    console.log("in");
-
     $.get("{% url "rbac:rbac_add_user_to_admin_group_ajax" %}?member_id=" + member_id[1] + "&group_id=" + {{ group.id }})
       .done(response => {
         msg = response['data']['message'];
@@ -201,8 +199,7 @@
           swal.fire({
               title: "User Added",
               html: "Success. User added to admin group.",
-              icon: "success",
-              buttonsStyling: false
+              icon: 'success',
             })
             .then((result) => {
               location.reload();
@@ -211,8 +208,7 @@
           swal.fire({
             title: "Error",
             html: msg,
-            icon: "error",
-            buttonsStyling: false
+            icon: "error"
           })
         }
       });
@@ -237,8 +233,7 @@
               swal.fire({
                   title: "User Deleted",
                   html: "Success. User deleted from group.",
-                  icon: "success",
-                  buttonsStyling: false
+                  icon: "success"
                 })
                 .then((result) => {
                   location.reload();
@@ -247,8 +242,7 @@
               swal.fire({
                 title: "Error",
                 html: msg,
-                icon: "error",
-                buttonsStyling: false
+                icon: "error"
               })
             }
           });
@@ -275,8 +269,7 @@
               swal.fire({
                   title: "Role Deleted",
                   html: "Success. Role deleted from group.",
-                  icon: "success",
-                  buttonsStyling: false
+                  icon: "success"
                 })
                 .then((result) => {
                   location.reload();
@@ -285,8 +278,7 @@
               swal.fire({
                 title: "Error",
                 html: msg,
-                icon: "error",
-                buttonsStyling: false
+                icon: "error"
               })
             }
           });
@@ -321,8 +313,7 @@
           swal.fire({
               title: "Role Added",
               html: "Success. Role added to group.",
-              icon: "success",
-              buttonsStyling: false
+              icon: "success"
             })
             .then((result) => {
               location.reload();
@@ -331,8 +322,7 @@
           swal.fire({
             title: "Error",
             html: msg,
-            icon: "error",
-            buttonsStyling: false
+            icon: "error"
           })
         }
       });

@@ -179,8 +179,7 @@ function cobaltMemberSearchOk(search_id) {
     swal.fire({
         title: "Already Added",
         html: member_name[search_id] + " is already in your team.",
-        icon: "error",
-        buttonsStyling: false
+        icon: "error"
       })
   } else {
 
@@ -194,8 +193,7 @@ function cobaltMemberSearchOk(search_id) {
             swal.fire({
                 title: "Error",
                 html: member_name[search_id] + " is already entered in this event",
-                icon: "error",
-                buttonsStyling: false
+                icon: "error"
             })
         //    $("#id_player" + search_id).val('').selectpicker('refresh');
             if (previous[search_id]){  // if we have a previous then reset it
@@ -534,8 +532,7 @@ $(document).ready(function(){
     swal.fire({
         title: "{{ alert_msg.0 }}",
         html: "{{ alert_msg.1 }}",
-        icon: "success",
-        buttonsStyling: false
+        icon: "success"
       })
   }
 

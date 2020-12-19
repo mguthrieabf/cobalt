@@ -104,12 +104,12 @@
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
-                  swal.fire({ title:"Removed From Partnership Desk", html: "Success. You have been removed from this partnership desk.", icon: "success", buttonsStyling: false})
+                  swal.fire({ title:"Removed From Partnership Desk", html: "Success. You have been removed from this partnership desk.", icon: "success"})
                   .then((result) => {
                     location.reload();
                   });
                 } else {
-                  swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+                  swal.fire({ title:"Error", html: msg, icon: "error"})
                 }
               });
           }
@@ -136,12 +136,12 @@
               .done(response => {
                 msg = response['data']['message'];
                 if (msg == 'Success'){
-                  swal.fire({ title:"Details Shared", html: "Success. Your details have been sent.", icon: "success", buttonsStyling: false})
+                  swal.fire({ title:"Details Shared", html: "Success. Your details have been sent.", icon: "success"})
                   .then((result) => {
                     location.reload();
                   });
                 } else {
-                  swal.fire({ title:"Error", html: msg, icon: "error", buttonsStyling: false})
+                  swal.fire({ title:"Error", html: msg, icon: "error"})
                 }
               });
           }

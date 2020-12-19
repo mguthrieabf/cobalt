@@ -16,6 +16,9 @@ textarea {
     <div class="card col-lg-6 mx-auto">
       <div class="card-header card-header-info">
         <h3>Email to {{ member }}</h3>
+        {% if member.id == TBA_PLAYER or member.id == RBAC_EVERYONE %}
+          <h2>That's not a real user, you probably don't want to do this</h2>
+        {% endif %}
         <h4>Replies will go to {{ request.user.email }}</h4>
       </div>
       <div class="card-body">
