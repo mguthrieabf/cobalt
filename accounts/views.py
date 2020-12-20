@@ -743,3 +743,27 @@ def toggle_team_mate_ajax(request):
     response_data["message"] = msg
     response_data["first_name"] = team_mate.team_mate.first_name
     return JsonResponse({"data": response_data})
+
+
+@login_required()
+def user_signed_up_list(request):
+    """Show users who have signed up
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        Page
+    """
+
+    users = User.objects.order_by("-date_joined")
+
+    things = cobalt_paginator(request, users)
+
+    total_users = User.objects.count()
+
+    return render(
+        request,
+        "accounts/user_signed_up_list.html",
+        {"things": things, "total_users": total_users},
+    )

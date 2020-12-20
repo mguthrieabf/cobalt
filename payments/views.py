@@ -217,7 +217,7 @@ def statement(request):
     """
     (summary, club, balance, auto_button, events_list) = statement_common(request.user)
 
-    things = cobalt_paginator(request, events_list, 30)
+    things = cobalt_paginator(request, events_list)
 
     return render(
         request,

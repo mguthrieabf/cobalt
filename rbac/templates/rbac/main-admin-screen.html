@@ -64,6 +64,7 @@
               {% endif %}
             <li><a href="/logs">System Logs</a>
             <li><a href="{% url "utils:user_activity" %}">User Activity</a>
+            <li><a href="{% url "accounts:user_signed_up_list" %}">User Sign Ups</a>
               {% if user.is_superuser %}
             <li><a href="{% url "support:non_production_email_changer" %}">Non-production Email Changer</a>
               {% endif %}

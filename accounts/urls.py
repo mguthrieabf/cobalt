@@ -29,6 +29,7 @@ urlpatterns = [
     path("add-team-mate", views.add_team_mate_ajax, name="add_team_mate_ajax"),
     path("delete-team-mate", views.delete_team_mate_ajax, name="delete_team_mate_ajax"),
     path("toggle-team-mate", views.toggle_team_mate_ajax, name="toggle_team_mate_ajax"),
+    path("user-signed-up-list", views.user_signed_up_list, name="user_signed_up_list"),
 ]
 
 # def not_found_handler(request, exception=None):
