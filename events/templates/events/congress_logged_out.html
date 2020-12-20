@@ -40,154 +40,145 @@
 {{ congress.raw_html|safe }}
 {% else %}
 
+		<div class="event">
+				<br>
+        <h1>{{ congress.congress_master.org }}</h1>
+        <h2>{{ congress.date_string }}</h2>
+				<br>
+	 </div>
 
-<div class="boldfeature">
+	 <div class="arrow-down">
+	</div>
+		<br>
+		<br>
+				<button class="congresses"> <a href="#program">{{ congress.name }}</a>  </button>
+				<br>
 
-<button>
-    <h3>{{ congress.congress_master.org }}</h3>
-    <h4>{{ congress.date_string }}</h4>
-</button>
+							<div class="flex-container">
+                    {% if congress.sponsors %}
+                      <div>
+                        <h2>Sponsored by</h2>
+                        {{ congress.sponsors|safe }}
+                      </div>
+                    {% endif %}
 
+                    {% if congress.latest_news %}
+                      <div>
+                        <h2>Latest News</h2>
+                          {{ congress.latest_news|safe }}
+                      </div>
+                    {% endif %}
+
+                    {% if congress.people %}
+                      <div>
+                        <h2>People</h2>
+                          {{ congress.people|safe }}
+                      </div>
+                    {% endif %}
+
+                    {% if congress.links %}
+                      <div>
+                        <h2>Links</h2>
+                          {{ congress.links|safe }}
+                      </div>
+                    {% endif %}
+
+
+
+                    {% if bulletins %}
+                    <div>
+                      <h2>Bulletins</h2>
+                      <ul>
+                      {% for bulletin in bulletins %}
+                        <li><a href="{{ bulletin.document.url }}">{{ bulletin.description }}</a>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                    {% endif %}
+
+						</div>
+            
+
+	<div class="flex-container">
+    <div style="width: 50%">
+					 	<h2> GENERAL INFORMATION </h2>
+
+<span style="text-align: left;">
+									<p class="description">	{{ congress.general_info|safe}} </p>
+</span>
 </div>
 
 
-      <h1><a href="#program">{{ congress.name }}<a></h1>
+  </div>
+						<div class="map-container">
+								<div style="width: 80%">
+												<h2>Location - {{ congress.venue_name }}</h2>
+                        <div id="map"></div>
+								</div>
+
+						</div>
 
 
-      {% if congress.sponsors %}
-        <div class="congressbox">
-          <h3>Sponsored by</h3>
-          {{ congress.sponsors|safe }}
-          <br>
-          <br>
-        </div>
-        <br>
-      {% endif %}
+						<div class="flex-container">
 
-      {% if congress.latest_news %}
-          <div class="congressbox">
-            <h3>Latest News</h3>
-            {{ congress.latest_news|safe }}
-            <br>
-            <br>
-          </div>
-          <br>
-      {% endif %}
+                      {% if congress.venue_transport %}
+                        <div>
+                          <h2>Transport</h2>
+                          <span style="text-align: left;">
+                          {{ congress.venue_transport|safe }}
+                          </span>
+                        </div>
+                      {% endif %}
 
-      <div class="congressbox">
-        <h3>People</h3>
-        {{ congress.people|safe }}
-        <br>
-        <br>
-      </div>
-      <br>
+                      {% if congress.venue_catering %}
+                        <div>
+                          <h2>Catering</h2>
+                          <span style="text-align: left;">
+                          {{ congress.venue_catering|safe }}
+                          </span>
+                        </div>
+                      {% endif %}
 
-      <div class="congressbox">
-        <h3>Links</h3>
-        {{ congress.links|safe }}
-        <br>
-        <br>
-      </div>
-      <br>
+                      {% if congress.venue_additional_info %}
+                        <div>
+                          <h2>Addiional Information</h2>
+                          {{ congress.venue_additional_info|safe }}
+                        </div>
+                      {% endif %}
 
-      {% if bulletins %}
-      <div class="congressbox">
-        <h3>Bulletins</h3>
-        <ul>
-        {% for bulletin in bulletins %}
-          <li><a href="{{ bulletin.document.url }}">{{ bulletin.description }}</a>
-        {% endfor %}
-        </ul>
-        <br>
-        <br>
-      </div>
-      <br>
-      {% endif %}
+						</div>
 
-      <div class="congressbox">
-        <h3>General Information</h3>
-        <div class="boxbody">
-          {{ congress.general_info|safe }}
-        </div>
-        <br>
-        <br>
-      </div>
-      <br>
 
-      <div class="congressbox">
-        <h3>Location - {{ congress.venue_name }}</h3>
-        <div id="map"></div>
-        <br>
-        <br>
-      </div>
-      <br>
+						<div href="program" class="flex-container">
+								<div style="width: 80%">
+												<h2> PROGRAM </h2>
+												<br>
 
-      {% if congress.venue_transport %}
-        <div class="congressbox">
-          <h3>Transport</h3>
-          <div class="boxbody">
-          {{ congress.venue_transport|safe }}
-          </div>
-          <br>
-          <br>
-        </div>
-        <br>
-      {% endif %}
+												<table class="program">
+														  <tr>
+														    <th>Event</th>
+														    <th>Entry Fee</th>
+														    <th>Day</th>
+																<th>Time</th>
+																<th>Action</th>
+														  </tr>
+                              {% for program in program_list %}
+                              <tr>
+                                {{ program.event|safe }}
+                                {{ program.day|safe }}
+                                {{ program.time|safe }}
+                                {{ program.links|safe }}
+                              </tr>
+                              {% endfor %}
 
-      {% if congress.venue_catering %}
-        <div class="congressbox">
-          <h3>Catering</h3>
-          <div class="boxbody">
-          {{ congress.venue_catering|safe }}
-          </div>
-          <br>
-          <br>
-        </div>
-        <br>
-      {% endif %}
+													</table>
 
-      {% if congress.venue_additional_info %}
-        <div class="congressbox">
-          <h3>Venue Additional Information</h3>
-          <div class="boxbody">
-          {{ congress.venue_additional_info|safe }}
-          </div>
-          <br>
-          <br>
-        </div>
-        <br>
-      {% endif %}
+                          <p>{{ congress.additional_info|safe }}</p>
 
-      <div class="congressbox">
-        <h3>Program</h3>
-        <table border class="table">
-          <thead>
-            <th id="program">Event</th>
-            <th>Entry Fee</th>
-            <th>Day</th>
-            <th>Time</th>
-            <th>Action</th>
-          </thead>
-          <tbody>
-            {% for program in program_list %}
-            <tr>
-              {{ program.event|safe }}
-              {{ program.day|safe }}
-              {{ program.time|safe }}
-              {{ program.links|safe }}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <br>
-        <br>
-      </div>
 
-    <div class="congressbox">
-      {{ congress.additional_info|safe }}
-    </div>
-    <br>
+								</div>
 
+						</div>
 
 <!-- end raw HTML if/else -->
 {% endif %}

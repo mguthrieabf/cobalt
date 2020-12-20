@@ -4,51 +4,36 @@
 {% block content %}
 
 
-<div class="container">
+	<div class="content">
+
+				<br>
+				<h2> upcoming congresses </h2>
+				<br>
+
+        {% for month, congresses in grouped_by_month.items %}
+            <button class="congresses"> {{ month }} </button>
+            <br>
+
+            <div class="flex-container">
+            {% for congress in congresses %}
+                <div>
+                        <h2> {{ congress }} </h2>
+                        <p> Entries are now open for the Sydney Spring National Online Pairs </p>
+            <p>
+              by {{ congress.congress_master.org }}
+            </p>
+            <p>
+              {{ congress.date_string}}
+            </p>
+            <p>
+              {{ congress.msg }}
+            </p>
+              <button><a href="{% url "events:view_congress" congress_id=congress.id %}"> DETAILS </a></button>
+            </div>
 
 
-<div>
+            {% endfor %}
+            </div>
+            {% endfor %}
 </div>
-
-<button>UPCOMING CONGRESSES </button>
-
-</div>
-
-
-
-
-
-    {% for month, congresses in grouped_by_month.items %}
-    <div class="boldfeature" style="min-height: 120px;">
-
-    <h1>{{ month }}</h1>
-
-    </div>
-
-    <br>
-
-    {% for congress in congresses %}
-
-
-    <div class="newsitem">
-
-    <h2>{{ congress }}</h2>
-
-    <p>
-      by {{ congress.congress_master.org }}
-    </p>
-    <p>
-      {{ congress.date_string}}
-    </p>
-    <p>
-      {{ congress.msg }}
-    </p>
-      <button><a href="{% url "events:view_congress" congress_id=congress.id %}"> DETAILS </a></button>
-    </div>
-
-
-    {% endfor %}
-    {% endfor %}
-
-
 {% endblock %}

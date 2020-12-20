@@ -4,48 +4,68 @@
 
 {% block content %}
 
-<div class="container">
 
 
-<div class="parallax">
-</div>
+				<div class="container animate__animated animate__fadeInUp animate__delay-1s">
 
-<button> <a href="{% url "events:events" %}">VIEW CONGRESSES</a> </button>
 
-</div>
+						<div class="parallax">
+						</div>
 
-<div class="buttoncluster">
+					 	<a href="{% url "events:events" %}">	<button> VIEW CONGRESSES </button> </a>
 
-<button><a href="{{ GLOBAL_ABOUT }}"> MAIN ABF SITE</a> </button>
+				</div>
 
-<button style="float:right"><a href="https://www.abf.com.au/youth-bridge/"> YOUTH BRIDGE </a></button>
 
-</div>
+					<div class="buttoncluster">
 
-<div class="arrow-down">
-</div>
+								<button class="animate__animated animate__fadeInLeft animate__delay-2s"><a href="{{ GLOBAL_ABOUT }}"> MAIN ABF SITE </a></button>
 
-<div class="boldfeature">
+								<button class="animate__animated animate__fadeInRight animate__delay-2s" style="float:right"><a href="https://www.abf.com.au/youth-bridge/"> YOUTH BRIDGE <a></button>
 
-<button><a href="https://www.abf.com.au/education/getting-started/"> LEARN TO PLAY </a></button>
+					</div>
 
-</div>
 
-<br>
+								<div class="arrow-up">
+								</div>
 
-<h2> LATEST NEWS </h2>
+								<div class="boldfeature">
 
-{% for post in posts %}
 
-<div class="newsitem">
+<h3> What is Bridge? Get started with our in depth tutorials from expert Bridge players. </h3>
+<button><a href="https://www.abf.com.au/education/getting-started/"> LEARN TO PLAY <a></button>
+								</div>
 
-<h2> {{ post.title }} </h2>
 
-{{ post.text|truncatewords_html:15|safe }}
 
-<button><a href="{% url 'forums:post_detail' pk=post.pk %}"> READ MORE </a></button>
 
-</div>
-{% endfor %}
+					<br>
+
+
+								<br>
+								<h2> LATEST NEWS </h2>
+ 								<br>
+
+								<div class="flex-container">
+
+
+                  {% for post in posts %}
+
+                  <div>
+
+                  <h2> {{ post.title }} </h2>
+
+                  <p>{{ post.text|truncatewords_html:15|safe }}</p>
+
+                  <button><a href="{% url 'forums:post_detail' pk=post.pk %}"> READ MORE </a></button>
+
+                  </div>
+                  {% endfor %}
+
+
+
+							  </div>
+
+								<br>
 
 {% endblock %}

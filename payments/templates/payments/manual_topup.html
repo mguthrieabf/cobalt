@@ -40,10 +40,10 @@
 
         <div class="d-flex">
           <div>
-            <input type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success cobalt-save center-text">
+            <input id="submit" type="submit" onclick="checkForm(); return false;" value="Top Up" class="btn btn-success cobalt-save center-text">
           </div>
           <div class="ml-auto">
-            <a class="btn btn-info center-text cobalt-save" href="{% url "payments:payments" %}">Cancel</a>
+            <a class="btn btn-info center-text" href="{% url "payments:payments" %}">Cancel</a>
           </div>
         </div>
 
@@ -91,6 +91,13 @@
     amount.blur(function(e) {
       checkAmt();
     });
+
+   // reset button
+   amount.keypress(function() {
+    $('#submit').removeAttr('disabled');​​​
+    amount_err.html("ff");
+  });
+
   });
 </script>
 

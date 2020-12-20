@@ -76,7 +76,7 @@ class ManualTopup(forms.Form):
         if cleaned_data.get("amount"):
             amount = self.cleaned_data["amount"]
             if amount < AUTO_TOP_UP_MIN_AMT:
-                txt = "x Insufficient amount. Minimum is %s%s" % (
+                txt = "Insufficient amount. Minimum is %s%s" % (
                     GLOBAL_CURRENCY_SYMBOL,
                     AUTO_TOP_UP_MIN_AMT,
                 )
