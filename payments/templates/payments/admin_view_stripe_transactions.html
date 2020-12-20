@@ -13,6 +13,8 @@
     <div class="card-body table-responsive">
       <form method="post">
         {% csrf_token %}
+        <button type="submit" class="btn btn-primary" name="show">Show</button>
+        <button type="submit" class="btn btn-success" name="export">CSV Download</button>
 
         <div class="row">
           <div class="col-md-6">
@@ -66,8 +68,6 @@
           <br><br><br><br><br><br><br><br><br><br><br>
           {% endif %}
 
-          <button type="submit" class="btn btn-primary" name="show">Show</button>
-          <button type="submit" class="btn btn-success" name="export">CSV Download</button>
       </form>
     </div>
     {% include 'utils/pagination_footer.html' %}
