@@ -27,10 +27,13 @@
               <input type="text" name="to_date" id="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
             </div>
           </div>
+        </div>
 
+        <div class="row">
+          <div class="col">
           <button type="submit" class="btn btn-primary" name="show">Show</button>
           <button type="submit" class="btn btn-success" name="export">CSV Download</button>
-
+        </div>
           {% if things %}
 
           <div class="card">
