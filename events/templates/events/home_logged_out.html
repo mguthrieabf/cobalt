@@ -11,7 +11,7 @@
 				<br>
 
         {% for month, congresses in grouped_by_month.items %}
-            <button class="congresses"> {{ month }} </button>
+            <button class="congresses" disabled style="pointer-events:none;"> {{ month }} </button>
             <br>
 
             <div class="flex-container">
