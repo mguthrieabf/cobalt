@@ -631,8 +631,7 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id,
-                type="card",
+                customer=request.user.stripe_customer_id, type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -1498,7 +1497,7 @@ def admin_view_manual_adjustments(request):
             to_date_form = form.cleaned_data["to_date"]
             from_date_form = form.cleaned_data["from_date"]
             # date -> datetime
-            to_date = datetime.datetime.combine(to_date_form, datetime.time(0, 0))
+            to_date = datetime.datetime.combine(to_date_form, datetime.time(23, 59))
             from_date = datetime.datetime.combine(from_date_form, datetime.time(0, 0))
             # make aware
             to_date = make_aware(to_date, TZ)
@@ -1637,7 +1636,7 @@ def admin_view_stripe_transactions(request):
             to_date_form = form.cleaned_data["to_date"]
             from_date_form = form.cleaned_data["from_date"]
             # date -> datetime
-            to_date = datetime.datetime.combine(to_date_form, datetime.time(0, 0))
+            to_date = datetime.datetime.combine(to_date_form, datetime.time(23, 59))
             from_date = datetime.datetime.combine(from_date_form, datetime.time(0, 0))
             # make aware
             to_date = make_aware(to_date, TZ)
@@ -1658,7 +1657,7 @@ def admin_view_stripe_transactions(request):
                 response = HttpResponse(content_type="text/csv")
                 response[
                     "Content-Disposition"
-                ] = 'attachment; filename="manual-adjustments.csv"'
+                ] = 'attachment; filename="stripe-transactions.csv"'
 
                 writer = csv.writer(response)
                 writer.writerow(
@@ -1805,11 +1804,7 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (
-                GLOBAL_CURRENCY_SYMBOL,
-                amount,
-                member,
-            )
+            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
