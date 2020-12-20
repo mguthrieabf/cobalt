@@ -1370,7 +1370,7 @@ def admin_orgs_with_balance(request):
         if org.balance != 0:
             orgs.append(org)
 
-    things = cobalt_paginator(request, orgs, 3)
+    things = cobalt_paginator(request, orgs)
 
     return render(request, "payments/admin_orgs_with_balance.html", {"things": things})
 
@@ -1713,10 +1713,11 @@ def admin_view_stripe_transactions(request):
                 return response
 
             else:
+                things = cobalt_paginator(request, stripes)
                 return render(
                     request,
                     "payments/admin_view_stripe_transactions.html",
-                    {"form": form, "stripes": stripes},
+                    {"form": form, "things": things},
                 )
 
         else:

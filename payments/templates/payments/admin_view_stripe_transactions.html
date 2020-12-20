@@ -28,7 +28,7 @@
             </div>
           </div>
 
-          {% if stripes %}
+          {% if things %}
 
           <div class="card">
             <div class="card-header card-header-success">
@@ -48,14 +48,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for stripe in stripes %}
+                  {% for thing in things %}
                   <tr>
-                    <td>{{ stripe.created_date }}</td>
-                    <td>{{ stripe.member }}</td>
-                    <td>{{ stripe.description }}</td>
-                    <td>{{ stripe.stripe_reference }}</td>
-                    <td class="text-right">{{ stripe.amount|intcomma }}</td>
-                    <td class="text-right">{{ stripe.amount_settle|floatformat:2|intcomma }}</td>
+                    <td>{{ thing.created_date }}</td>
+                    <td>{{ thing.member }}</td>
+                    <td>{{ thing.description }}</td>
+                    <td>{{ thing.stripe_reference }}</td>
+                    <td class="text-right">{{ thing.amount|intcomma }}</td>
+                    <td class="text-right">{{ thing.amount_settle|floatformat:2|intcomma }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -69,7 +69,7 @@
           <button type="submit" class="btn btn-primary" name="show">Show</button>
           <button type="submit" class="btn btn-success" name="export">CSV Download</button>
       </form>
-
+    {% include 'utils/pagination_footer.html' %}
     </div>
   </div>
 </div>
