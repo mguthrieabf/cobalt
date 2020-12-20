@@ -13,8 +13,6 @@
     <div class="card-body table-responsive">
       <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary" name="show">Show</button>
-        <button type="submit" class="btn btn-success" name="export">CSV Download</button>
 
         <div class="row">
           <div class="col-md-6">
@@ -29,6 +27,9 @@
               <input type="text" name="to_date" id="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
             </div>
           </div>
+
+          <button type="submit" class="btn btn-primary" name="show">Show</button>
+          <button type="submit" class="btn btn-success" name="export">CSV Download</button>
 
           {% if things %}
 
