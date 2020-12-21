@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load cobalt_tags %}
+{% block content %}
+
+<div class="container">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h1>{{ BRIDGE_CREDITS }}</h1>
+      <h2>Stripe Transactions Details</h2>
+    </div>
+
+    <div class="card-body table-responsive">
+
+      <table class="table">
+        <tr><td><b>Member</b></td><td>{{ stripe_item.member }}</td></tr>
+        <tr><td><b>Stripe Reference</b></td><td>{{ stripe_item.stripe_reference }}</td></tr>
+        <tr><td><b>Description</b></td><td>{{ stripe_item.description }}</td></tr>
+        <tr><td><b>Stripe Created Date</b></td><td>{{ stripe_item.stripe_created_date|cobalt_nice_datetime }}</td></tr>
+        <tr><td><b>Our Created Date</b></td><td>{{ stripe_item.created_date|cobalt_nice_datetime }}</td></tr>
+        <tr><td><b>Stripe Available On</b></td><td>{{ stripe_item.stripe_available_on|cobalt_nice_datetime }}</td></tr>
+        <tr><td><b>Member Paid</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.amount }}</td></tr>
+        <tr><td><b>Stripe Fees</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.stripe_fees }}</td></tr>
+        {% for fees in stripe_item.stripe_fee_details %}
+          <tr><td>&nbsp;&nbsp; - {{ fees.description }} ({{ fees.type }})</td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ fees.amount }}</td></tr>
+        {% endfor %}
+        <tr><td><b>Stripe Settlement</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.stripe_settlement }}</td></tr>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

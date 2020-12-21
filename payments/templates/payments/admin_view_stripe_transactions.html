@@ -39,7 +39,7 @@
           <div class="card">
             <div class="card-header card-header-success">
               <h2>Stripe Transactions</h2>
-              <h4>There are more details in the CSV download</h4>
+
             </div>
             <div class="card-body">
               <table class="table table-responsive">
@@ -48,9 +48,10 @@
                     <th>Date</th>
                     <th>Member</th>
                     <th>Description</th>
-                    <th>Stripe Reference</th>
-                    <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }}</th>
+                    <th>Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                    <th>Stripe Fees({{ GLOBAL_CURRENCY_SYMBOL}})</th>
                     <th>Due Amount({{ GLOBAL_CURRENCY_SYMBOL }})</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -59,9 +60,10 @@
                     <td>{{ thing.created_date }}</td>
                     <td>{{ thing.member }}</td>
                     <td>{{ thing.description }}</td>
-                    <td>{{ thing.stripe_reference }}</td>
                     <td class="text-right">{{ thing.amount|intcomma }}</td>
-                    <td class="text-right">{{ thing.amount_settle|floatformat:2|intcomma }}</td>
+                    <td class="text-right">{{ thing.stripe_fees }}</td>
+                    <td class="text-right">{{ thing.stripe_settlement|floatformat:2|intcomma }}</td>
+                    <td><a href="{% url "payments:admin_view_stripe_transaction_detail" stripe_transaction_id=thing.id %}" class="btn btn-info">View</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>

@@ -5,6 +5,8 @@ from .models import (
     MemberTransaction,
     OrganisationTransaction,
     StripeLog,
+    PaymentStatic,
+    OrganisationSettlementFees,
 )
 
 
@@ -28,3 +30,5 @@ admin.site.register(MemberTransaction, MemberTransactionAdmin)
 admin.site.register(OrganisationTransaction, OrganisationTransactionAdmin)
 admin.site.register(StripeTransaction, StripeTransactionAdmin)
 admin.site.register(StripeLog, StripeLogAdmin)
+admin.site.register(OrganisationSettlementFees)
+admin.site.register(PaymentStatic)

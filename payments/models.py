@@ -63,7 +63,7 @@ class StripeTransaction(models.Model):
     )
     """ Link to the member(User object) that is associated with this transaction."""
 
-    description = models.CharField("Description", max_length=100)
+    description = models.TextField("Description")
     """ Description of the transaction."""
 
     amount = models.DecimalField("Amount", max_digits=8, decimal_places=2)
@@ -95,6 +95,10 @@ class StripeTransaction(models.Model):
         "Receipt URL", blank=True, null=True, max_length=200
     )
     """Stripe receipt URL. User can go directly to this for Stripe info."""
+
+    stripe_balance_transaction = models.CharField(
+        "Stripe Balance Transaction", blank=True, null=True, max_length=200
+    )
 
     stripe_brand = models.CharField("Card brand", blank=True, null=True, max_length=10)
 
@@ -169,9 +173,7 @@ class AbstractTransaction(models.Model):
         "Balance After Transaction", max_digits=12, decimal_places=2
     )
 
-    description = models.CharField(
-        "Transaction Description", blank=True, null=True, max_length=200
-    )
+    description = models.TextField("Transaction Description", blank=True, null=True)
 
     reference_no = models.CharField(
         "Reference No", max_length=14, blank=True, null=True
@@ -281,3 +283,35 @@ class StripeLog(models.Model):
 
     def __str__(self):
         return f"{self.event_type} - {self.created_date}"
+
+
+class PaymentStatic(models.Model):
+    """ single row table with static data on payments """
+
+    active = models.BooleanField("Active", default=True)
+    created_date = models.DateTimeField("Create Date", default=timezone.now)
+    # default fee to charge orgs when making a settlement
+    default_org_fee_percent = models.DecimalField(
+        "Default Organisation Settlement Fee Percent", max_digits=8, decimal_places=2
+    )
+    stripe_cost_per_transaction = models.DecimalField(
+        "Stripe Fee Per Transaction", max_digits=8, decimal_places=4
+    )
+    stripe_percentage_charge = models.DecimalField(
+        "Stripe Fee Percentage Charge", max_digits=8, decimal_places=4
+    )
+
+    def __str__(self):
+        return f"{self.active} - {self.created_date}"
+
+
+class OrganisationSettlementFees(models.Model):
+    """ ability to override default_org_fee_percent for an organisation """
+
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    org_fee_percent = models.DecimalField(
+        "Organisation Settlement Fee Percent", max_digits=8, decimal_places=2
+    )
+
+    def __str__(self):
+        return f"{self.organisation} - {self.org_fee_percent}"

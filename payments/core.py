@@ -787,6 +787,8 @@ def stripe_webhook_manual(event):
         tran.stripe_exp_month = charge.payment_method_details.card.exp_month
         tran.stripe_exp_year = charge.payment_method_details.card.exp_year
         tran.stripe_last4 = charge.payment_method_details.card.last4
+        tran.stripe_balance_transaction = event.data.object.balance_transaction
+
         tran.last_change_date = timezone.now()
         tran.status = "Complete"
         tran.save()
@@ -1348,6 +1350,7 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
         stripe_tran.stripe_exp_month = payload.payment_method_details.card.exp_month
         stripe_tran.stripe_exp_year = payload.payment_method_details.card.exp_year
         stripe_tran.stripe_last4 = payload.payment_method_details.card.last4
+        #        stripe.tran.stripe_balance_transaction = event.data.object.balance_transaction
         stripe_tran.last_change_date = timezone.now()
         stripe_tran.status = "Complete"
         stripe_tran.save()

@@ -36,7 +36,10 @@ ENTRY_STATUSES = [
 # other-system-dollars - we're not paying and we're not using their account
 # to pay
 PAYMENT_TYPES = [
-    ("my-system-dollars", BRIDGE_CREDITS,),
+    (
+        "my-system-dollars",
+        BRIDGE_CREDITS,
+    ),
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
@@ -226,7 +229,9 @@ class Event(models.Model):
         "Youth Discount Percentage", null=True, blank=True
     )
     player_format = models.CharField(
-        "Player Format", max_length=14, choices=EVENT_PLAYER_FORMAT,
+        "Player Format",
+        max_length=14,
+        choices=EVENT_PLAYER_FORMAT,
     )
     free_format_question = models.CharField(
         "Free Format Question", max_length=60, null=True, blank=True
@@ -496,7 +501,7 @@ class EventEntry(models.Model):
     free_format_answer = models.CharField(
         "Free Format Answer", max_length=60, null=True, blank=True
     )
-    notes = models.CharField("Notes", max_length=100, null=True, blank=True)
+    notes = models.TextField("Notes", null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Event entries"

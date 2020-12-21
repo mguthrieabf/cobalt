@@ -100,10 +100,10 @@ class RBACGroupRole(models.Model):
 
 
 class RBACModelDefault(models.Model):
-    """ Default behaviour for a model. Some models (e.g. forums.forum) need a
+    """Default behaviour for a model. Some models (e.g. forums.forum) need a
     default of allowing users access unless explicitly blocked. Other models
     (e.g. organisations.Organisation) need a default behaviour of blocking unless
-    explicitly allowed. """
+    explicitly allowed."""
 
     app = models.CharField(max_length=15)
     """ Application level hierarchy """
@@ -144,7 +144,7 @@ class RBACAdminGroup(models.Model):
     name_item = models.CharField(max_length=100)
     """ chosen by the admin. appends onto name_qualifier """
 
-    description = models.CharField(max_length=100)
+    description = models.TextField()
     """ Free format decription """
 
     created_date = models.DateTimeField("Create Date", default=timezone.now)

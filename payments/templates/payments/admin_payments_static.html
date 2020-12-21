@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<div class="container">
+  <div class="card">
+    <div class="card-header card-header-primary">
+      <h1>{{ BRIDGE_CREDITS }}</h1>
+      <h2>Static Data</h2>
+    </div>
+
+    <div class="card-body table-responsive">
+      <form method="post">
+        {% csrf_token %}
+        <table class="table">
+          {{ form.as_table }}
+        </table>
+        <button type="submit" class="btn btn-success cobalt-save">Save</button>
+        <a href="{% url "payments:statement_admin_summary" %}" class="btn btn-info">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

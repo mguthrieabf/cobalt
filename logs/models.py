@@ -19,7 +19,7 @@ class Log(models.Model):
     severity = models.CharField(max_length=8, choices=SEVERITY_CODES, default="INFO")
     source = models.CharField(max_length=40, blank="True", null=True)
     sub_source = models.CharField(max_length=50, blank="True", null=True)
-    message = models.CharField(max_length=200, blank="True", null=True)
+    message = models.TextField(blank="True", null=True)
     ip = models.CharField(max_length=15, blank="True", null=True)
 
     def __str__(self):

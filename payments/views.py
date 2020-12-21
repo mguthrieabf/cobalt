@@ -30,6 +30,7 @@ import datetime
 import requests
 import stripe
 import pytz
+import json
 from django.utils import timezone, dateformat
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
@@ -62,6 +63,7 @@ from .forms import (
     AdjustMemberForm,
     AdjustOrgForm,
     DateForm,
+    PaymentStaticForm,
 )
 from .core import (
     payment_api,
@@ -71,7 +73,13 @@ from .core import (
     update_account,
 )
 from organisations.views import org_balance
-from .models import MemberTransaction, StripeTransaction, OrganisationTransaction
+from .models import (
+    MemberTransaction,
+    StripeTransaction,
+    OrganisationTransaction,
+    PaymentStatic,
+    OrganisationSettlementFees,
+)
 from accounts.models import User, TeamMate
 from utils.utils import cobalt_paginator
 from organisations.models import Organisation
@@ -631,7 +639,8 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id, type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -989,7 +998,7 @@ def settlement(request):
         HTTPResponse
     """
     if not rbac_user_has_role(request.user, "payments.global.edit"):
-        return rbac_forbidden(request, "payments.global.view")
+        return rbac_forbidden(request, "payments.global.edit")
 
     # orgs with outstanding balances
     # Django is a bit too clever here so we actually have to include balance=0.0 and filter
@@ -1642,12 +1651,29 @@ def admin_view_stripe_transactions(request):
             to_date = make_aware(to_date, TZ)
             from_date = make_aware(from_date, TZ)
 
-            stripes = StripeTransaction.objects.filter().filter(
+            stripes = StripeTransaction.objects.filter(
                 created_date__range=(from_date, to_date)
-            )
+            ).order_by("-created_date")
 
             for stripe_item in stripes:
                 stripe_item.amount_settle = (float(stripe_item.amount) - 0.3) * 0.9825
+                stripe.api_key = STRIPE_SECRET_KEY
+                if stripe_item.stripe_balance_transaction:
+
+                    balance_tran = stripe.BalanceTransaction.retrieve(
+                        stripe_item.stripe_balance_transaction
+                    )
+                    stripe_item.stripe_fees = balance_tran.fee / 100.0
+                    stripe_item.stripe_fee_details = balance_tran.fee_details
+                    for row in stripe_item.stripe_fee_details:
+                        row.amount = row.amount / 100.0
+                    stripe_item.stripe_settlement = balance_tran.net / 100.0
+                    stripe_item.stripe_created_date = datetime.datetime.fromtimestamp(
+                        balance_tran.created
+                    )
+                    stripe_item.stripe_available_on = datetime.datetime.fromtimestamp(
+                        balance_tran.available_on
+                    )
 
             if "export" in request.POST:
 
@@ -1731,6 +1757,52 @@ def admin_view_stripe_transactions(request):
     )
 
 
+##########################################
+# admin_view_stripe_transaction_details  #
+##########################################
+@login_required()
+def admin_view_stripe_transaction_detail(request, stripe_transaction_id):
+    """Shows stripe transaction details for an admin
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.view"):
+        return rbac_forbidden(request, "payments.global.view")
+
+    stripe_item = get_object_or_404(StripeTransaction, pk=stripe_transaction_id)
+
+    stripe.api_key = STRIPE_SECRET_KEY
+    if stripe_item.stripe_balance_transaction:
+
+        balance_tran = stripe.BalanceTransaction.retrieve(
+            stripe_item.stripe_balance_transaction
+        )
+        stripe_item.stripe_fees = balance_tran.fee / 100.0
+        stripe_item.stripe_fee_details = balance_tran.fee_details
+        for row in stripe_item.stripe_fee_details:
+            row.amount = row.amount / 100.0
+        stripe_item.stripe_settlement = balance_tran.net / 100.0
+        stripe_item.stripe_created_date = datetime.datetime.fromtimestamp(
+            balance_tran.created
+        )
+        stripe_item.stripe_available_on = datetime.datetime.fromtimestamp(
+            balance_tran.available_on
+        )
+
+        print(balance_tran)
+
+    return render(
+        request,
+        "payments/admin_view_stripe_transaction_detail.html",
+        {"stripe_item": stripe_item},
+    )
+
+
 @login_required()
 def member_transfer_org(request, org_id):
     """Allows an organisation to transfer money to a member
@@ -1805,7 +1877,11 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            msg = "Transferred %s%s to %s" % (
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+                member,
+            )
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
@@ -1818,3 +1894,45 @@ def member_transfer_org(request, org_id):
         "payments/member_transfer_org.html",
         {"form": form, "balance": balance, "org": organisation},
     )
+
+
+@login_required()
+def admin_payments_static(request):
+    """Manage static data for payments
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return rbac_forbidden(request, "payments.global.edit")
+
+    payment_static = PaymentStatic.objects.filter(active=True).last()
+
+    if payment_static:
+        form = PaymentStaticForm(instance=payment_static)
+    else:
+        form = PaymentStaticForm()
+
+    if request.method == "POST":
+        form = PaymentStaticForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            # set all others to be inactive
+            PaymentStatic.objects.all().update(active=False)
+
+            # set this one active
+            payment_static = PaymentStatic.objects.order_by("id").last()
+            payment_static.active = True
+            payment_static.save()
+
+            messages.success(
+                request, "Settings updated", extra_tags="cobalt-message-success"
+            )
+            return redirect("payments:statement_admin_summary")
+
+    return render(request, "payments/admin_payments_static.html", {"form": form})

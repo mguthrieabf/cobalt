@@ -8,7 +8,12 @@ from cobalt.settings import (
     AUTO_TOP_UP_MAX_AMT,
     GLOBAL_CURRENCY_SYMBOL,
 )
-from .models import TRANSACTION_TYPE, MemberTransaction, OrganisationTransaction
+from .models import (
+    TRANSACTION_TYPE,
+    MemberTransaction,
+    OrganisationTransaction,
+    PaymentStatic,
+)
 from django.core.exceptions import ValidationError
 
 
@@ -104,7 +109,8 @@ class SettlementForm(forms.Form):
     ]
 
     settle_list = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        choices=CARD_CHOICES,
     )
 
     def __init__(self, *args, **kwargs):
@@ -143,3 +149,15 @@ class DateForm(forms.Form):
 
     from_date = forms.DateField(input_formats=["%d/%m/%Y"])
     to_date = forms.DateField(input_formats=["%d/%m/%Y"])
+
+
+class PaymentStaticForm(forms.ModelForm):
+    """ static data on payments """
+
+    class Meta:
+        model = PaymentStatic
+        fields = (
+            "default_org_fee_percent",
+            "stripe_cost_per_transaction",
+            "stripe_percentage_charge",
+        )

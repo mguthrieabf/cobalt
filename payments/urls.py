@@ -19,9 +19,19 @@ urlpatterns = [
     ),
     path("stripe-pending", views.stripe_pending, name="stripe_pending"),
     path(
+        "admin-payments-static",
+        views.admin_payments_static,
+        name="admin_payments_static",
+    ),
+    path(
         "admin-view-stripe-transactions",
         views.admin_view_stripe_transactions,
         name="admin_view_stripe_transactions",
+    ),
+    path(
+        "admin-view-stripe-transaction-detail/<int:stripe_transaction_id>",
+        views.admin_view_stripe_transaction_detail,
+        name="admin_view_stripe_transaction_detail",
     ),
     path("statement", views.statement, name="statement"),
     path("settlement", views.settlement, name="settlement"),
