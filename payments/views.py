@@ -1792,8 +1792,11 @@ def admin_view_stripe_transaction_detail(request, stripe_transaction_id):
         stripe_item.stripe_available_on = datetime.datetime.fromtimestamp(
             balance_tran.available_on
         )
-
-        print(balance_tran)
+        stripe_item.stripe_percentage_charge = (
+            100.0
+            * (float(stripe_item.amount) - float(stripe_item.stripe_settlement))
+            / float(stripe_item.amount)
+        )
 
     return render(
         request,
