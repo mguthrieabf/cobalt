@@ -49,6 +49,24 @@ class Organisation(models.Model):
     )
     last_updated = models.DateTimeField(default=timezone.now)
 
+    @property
+    def settlement_fee_percent(self):
+        """ return what our settlement fee is set to """
+
+        import payments.models as payments
+
+        # Check for specific setting for this org
+        override = payments.OrganisationSettlementFees.objects.filter(
+            organisation=self
+        ).first()
+        if override:
+            return override.org_fee_percent
+
+        # return default
+        default = payments.PaymentStatic.objects.filter(active=True).last()
+
+        return default.default_org_fee_percent
+
     def __str__(self):
         return self.name
 

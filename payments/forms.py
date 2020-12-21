@@ -108,13 +108,15 @@ class SettlementForm(forms.Form):
         ("Dummy", "Dummy"),
     ]
 
+    # Handle checkboxes
     settle_list = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        choices=CARD_CHOICES,
+        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
     )
 
     def __init__(self, *args, **kwargs):
         """ dynamic override of checkbox list """
+
+        # Get list of orgs
         self.orgs = kwargs.pop("orgs", None)
         super(SettlementForm, self).__init__(*args, **kwargs)
         self.fields["settle_list"].choices = self.orgs

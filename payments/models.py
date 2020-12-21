@@ -14,7 +14,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from organisations.models import Organisation
-from cobalt.settings import GLOBAL_CURRENCY_SYMBOL
+from cobalt.settings import GLOBAL_CURRENCY_SYMBOL, GLOBAL_ORG
 
 
 TRANSACTION_TYPE = [
@@ -270,6 +270,15 @@ class OrganisationTransaction(AbstractTransaction):
             )
         super(OrganisationTransaction, self).save(*args, **kwargs)
 
+    @property
+    def settlement_amount(self):
+        """ How much will org actually be paid for this BALANCE (not amount) after we deduct our fees """
+
+        percent = 1.0 - (float(self.organisation.settlement_fee_percent) / 100.0)
+        amt = float(self.balance) * percent
+
+        return round(amt, 2)
+
     def __str__(self):
         return f"{self.organisation.name} - {self.id}"
 
@@ -294,7 +303,7 @@ class PaymentStatic(models.Model):
     modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
     # default fee to charge orgs when making a settlement
     default_org_fee_percent = models.DecimalField(
-        "Settlement Fee Percent for Organisations (default)",
+        f"{GLOBAL_ORG} Settlement Fee Percent for Organisations (default)",
         max_digits=8,
         decimal_places=2,
     )

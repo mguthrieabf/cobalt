@@ -21,6 +21,9 @@
         <table class="table">
           {{ form.as_table }}
         </table>
+        <p>Note: Stripe also charge for security checks. Although the charges are small, we cannot predict
+        which transactions will require which checks. As a result we can never exactly reconcile the Stripe
+        transaction fees with what we expect. This static data is used to estimate only.</p>
         <button type="submit" class="btn btn-success cobalt-save">Save</button>
         <a href="{% url "payments:statement_admin_summary" %}" class="btn btn-info">Cancel</a>
       </form>

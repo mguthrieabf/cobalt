@@ -61,7 +61,7 @@
                     <td>{{ thing.member }}</td>
                     <td>{{ thing.description }}</td>
                     <td class="text-right">{{ thing.amount|intcomma }}</td>
-                    <td class="text-right">{{ thing.stripe_fees }}</td>
+                    <td class="text-right">{{ thing.stripe_fees|floatformat:2|intcomma }}</td>
                     <td class="text-right">{{ thing.stripe_settlement|floatformat:2|intcomma }}</td>
                     <td><a href="{% url "payments:admin_view_stripe_transaction_detail" stripe_transaction_id=thing.id %}" class="btn btn-info">View</a></td>
                   </tr>

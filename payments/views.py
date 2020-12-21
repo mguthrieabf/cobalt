@@ -37,6 +37,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.db.models import Sum
+from django.db import transaction
 from django.contrib import messages
 from notifications.views import contact_member
 from logs.views import log_event
@@ -978,6 +979,7 @@ def statement_admin_summary(request):
 # settlement #
 ##############
 @login_required()
+@transaction.atomic
 def settlement(request):
     """process payments to organisations. This is expected to be a monthly
         activity.
@@ -1011,7 +1013,6 @@ def settlement(request):
     non_zero_orgs = []
     for org in orgs:
         if org.balance != 0.0:
-            print(org.balance)
             org_list.append((org.id, org.organisation.name))
             non_zero_orgs.append(org)
 
@@ -1044,7 +1045,15 @@ def settlement(request):
                     ]
                 )
                 writer.writerow(
-                    ["CLub Number", "CLub Name", "BSB", "Account Number", "Amount"]
+                    [
+                        "CLub Number",
+                        "CLub Name",
+                        "BSB",
+                        "Account Number",
+                        "Gross Amount",
+                        f"{GLOBAL_ORG} fees %",
+                        "Settlement Amount",
+                    ]
                 )
 
                 for org in settlements:
@@ -1055,6 +1064,8 @@ def settlement(request):
                             org.organisation.bank_bsb,
                             org.organisation.bank_account,
                             org.balance,
+                            org.organisation.settlement_fee_percent,
+                            org.settlement_amount,
                         ]
                     )
 
@@ -1074,7 +1085,7 @@ def settlement(request):
                         organisation=item.organisation,
                         other_organisation=system_org,
                         amount=-item.balance,
-                        description=f"Settlement from {GLOBAL_ORG}",
+                        description=f"Settlement from {GLOBAL_ORG}. Fees {item.organisation.settlement_fee_percent}%. Net Bank Transfer: {GLOBAL_CURRENCY_SYMBOL}{item.settlement_amount}.",
                         log_msg=f"Settlement from {GLOBAL_ORG} to {item.organisation}",
                         source="payments",
                         sub_source="settlements",
@@ -1775,6 +1786,11 @@ def admin_view_stripe_transaction_detail(request, stripe_transaction_id):
 
     stripe_item = get_object_or_404(StripeTransaction, pk=stripe_transaction_id)
 
+    payment_static = PaymentStatic.objects.filter(active="True").last()
+
+    if not payment_static:
+        return HttpResponse("<h1>Payment Static has not been set up</h1>")
+
     stripe.api_key = STRIPE_SECRET_KEY
     if stripe_item.stripe_balance_transaction:
 
@@ -1797,7 +1813,12 @@ def admin_view_stripe_transaction_detail(request, stripe_transaction_id):
             * (float(stripe_item.amount) - float(stripe_item.stripe_settlement))
             / float(stripe_item.amount)
         )
-
+        our_estimate_fee = float(stripe_item.amount) * float(
+            payment_static.stripe_percentage_charge
+        ) / 100.0 + float(payment_static.stripe_cost_per_transaction)
+        our_estimate_fee_percent = our_estimate_fee * 100.0 / float(stripe_item.amount)
+        stripe_item.our_estimate_fee = "%.2f" % our_estimate_fee
+        stripe_item.our_estimate_fee_percent = "%.2f" % our_estimate_fee_percent
     return render(
         request,
         "payments/admin_view_stripe_transaction_detail.html",

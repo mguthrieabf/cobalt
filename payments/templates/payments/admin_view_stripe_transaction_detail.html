@@ -21,7 +21,7 @@
         <tr><td><b>Our Created Date</b></td><td>{{ stripe_item.created_date|cobalt_nice_datetime }}</td></tr>
         <tr><td><b>Stripe Available On</b></td><td>{{ stripe_item.stripe_available_on|cobalt_nice_datetime }}</td></tr>
         <tr><td><b>Member Paid</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.amount|floatformat:2 }}</td></tr>
-        <tr><td><b>Stripe Fees</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.stripe_fees|floatformat:2 }} <b>( = {{stripe_item.stripe_percentage_charge|floatformat:2 }}% )</b></td></tr>
+        <tr><td><b>Stripe Fees</b></td><td>{{ GLOBAL_CURRENCY_SYMBOL}}{{ stripe_item.stripe_fees|floatformat:2 }} <b>( = {{stripe_item.stripe_percentage_charge|floatformat:2 }}% )</b> <br>Our estimate ({{ GLOBAL_CURRENCY_SYMBOL }}{{ stripe_item.our_estimate_fee }} {{ stripe_item.our_estimate_fee_percent }}%)<br><b>Need to confirm exactly how Stripe calculate this with examples</b></td></tr>
         {% for fees in stripe_item.stripe_fee_details %}
           <tr><td>&nbsp;&nbsp; - {{ fees.description }} ({{ fees.type }})</td><td>&nbsp;&nbsp; = {{ GLOBAL_CURRENCY_SYMBOL}}{{ fees.amount|floatformat:2 }}</td></tr>
         {% endfor %}
