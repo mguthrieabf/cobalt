@@ -300,7 +300,10 @@ class PaymentStatic(models.Model):
 
     active = models.BooleanField("Active", default=True)
     created_date = models.DateTimeField("Create Date", default=timezone.now)
-    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+    modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     # default fee to charge orgs when making a settlement
     default_org_fee_percent = models.DecimalField(
         f"{GLOBAL_ORG} Settlement Fee Percent for Organisations (default)",
@@ -323,10 +326,13 @@ class PaymentStatic(models.Model):
 class OrganisationSettlementFees(models.Model):
     """ ability to override default_org_fee_percent for an organisation """
 
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    organisation = models.OneToOneField(Organisation, on_delete=models.CASCADE)
     org_fee_percent = models.DecimalField(
         "Organisation Settlement Fee Percent", max_digits=8, decimal_places=2
     )
+
+    class Meta:
+        verbose_name_plural = "organisation settlement fees"
 
     def __str__(self):
         return f"{self.organisation} - {self.org_fee_percent}"

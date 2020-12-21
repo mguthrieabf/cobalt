@@ -29,6 +29,21 @@ urlpatterns = [
         name="admin_payments_static_history",
     ),
     path(
+        "admin-payments-static-org-override",
+        views.admin_payments_static_org_override,
+        name="admin_payments_static_org_override",
+    ),
+    path(
+        "admin-payments-static-org-override-add",
+        views.admin_payments_static_org_override_add,
+        name="admin_payments_static_org_override_add",
+    ),
+    path(
+        "admin-payments-static-org-override-delete/<int:item_id>",
+        views.admin_payments_static_org_override_delete,
+        name="admin_payments_static_org_override_delete",
+    ),
+    path(
         "admin-view-stripe-transactions",
         views.admin_view_stripe_transactions,
         name="admin_view_stripe_transactions",

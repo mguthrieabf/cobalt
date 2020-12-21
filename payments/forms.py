@@ -13,6 +13,7 @@ from .models import (
     MemberTransaction,
     OrganisationTransaction,
     PaymentStatic,
+    OrganisationSettlementFees,
 )
 from django.core.exceptions import ValidationError
 
@@ -110,7 +111,8 @@ class SettlementForm(forms.Form):
 
     # Handle checkboxes
     settle_list = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        choices=CARD_CHOICES,
     )
 
     def __init__(self, *args, **kwargs):
@@ -163,3 +165,11 @@ class PaymentStaticForm(forms.ModelForm):
             "stripe_cost_per_transaction",
             "stripe_percentage_charge",
         )
+
+
+class OrgStaticOverrideForm(forms.ModelForm):
+    """ override default ABF fees for an organisation """
+
+    class Meta:
+        model = OrganisationSettlementFees
+        fields = ("organisation", "org_fee_percent")

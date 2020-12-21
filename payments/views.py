@@ -65,6 +65,7 @@ from .forms import (
     AdjustOrgForm,
     DateForm,
     PaymentStaticForm,
+    OrgStaticOverrideForm,
 )
 from .core import (
     payment_api,
@@ -640,7 +641,8 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id, type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -1900,7 +1902,11 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            msg = "Transferred %s%s to %s" % (
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+                member,
+            )
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
@@ -1984,3 +1990,83 @@ def admin_payments_static_history(request):
         "payments/admin_payments_static_history.html",
         {"payment_statics": payment_statics},
     )
+
+
+@login_required()
+def admin_payments_static_org_override(request):
+    """Manage static data for individual orgs (override default values)
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return rbac_forbidden(request, "payments.global.edit")
+
+    org_statics = OrganisationSettlementFees.objects.all()
+
+    return render(
+        request,
+        "payments/admin_payments_static_org_override.html",
+        {"org_statics": org_statics},
+    )
+
+
+@login_required()
+def admin_payments_static_org_override_add(request):
+    """Manage static data for individual orgs (override default values)
+    This screen adds an override
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return rbac_forbidden(request, "payments.global.edit")
+
+    form = OrgStaticOverrideForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Entry added", extra_tags="cobalt-message-success"
+            )
+            return redirect("payments:admin_payments_static_org_override")
+        else:
+            messages.error(request, form.errors, extra_tags="cobalt-message-error")
+
+    return render(
+        request,
+        "payments/admin_payments_static_org_override_add.html",
+        {"form": form},
+    )
+
+
+@login_required()
+def admin_payments_static_org_override_delete(request, item_id):
+    """Manage static data for individual orgs (override default values)
+    This screen deletes an override
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return rbac_forbidden(request, "payments.global.edit")
+
+    item = get_object_or_404(OrganisationSettlementFees, pk=item_id)
+
+    item.delete()
+
+    messages.success(request, "Entry deleted", extra_tags="cobalt-message-success")
+    return redirect("payments:admin_payments_static_org_override")
