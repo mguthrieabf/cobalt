@@ -14,6 +14,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from organisations.models import Organisation
+from cobalt.settings import GLOBAL_CURRENCY_SYMBOL
 
 
 TRANSACTION_TYPE = [
@@ -290,15 +291,20 @@ class PaymentStatic(models.Model):
 
     active = models.BooleanField("Active", default=True)
     created_date = models.DateTimeField("Create Date", default=timezone.now)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
     # default fee to charge orgs when making a settlement
     default_org_fee_percent = models.DecimalField(
-        "Default Organisation Settlement Fee Percent", max_digits=8, decimal_places=2
+        "Settlement Fee Percent for Organisations (default)",
+        max_digits=8,
+        decimal_places=2,
     )
     stripe_cost_per_transaction = models.DecimalField(
-        "Stripe Fee Per Transaction", max_digits=8, decimal_places=4
+        f"Stripe Fee Per Transaction {GLOBAL_CURRENCY_SYMBOL}",
+        max_digits=8,
+        decimal_places=4,
     )
     stripe_percentage_charge = models.DecimalField(
-        "Stripe Fee Percentage Charge", max_digits=8, decimal_places=4
+        "Stripe Fee Percentage (per transaction)", max_digits=8, decimal_places=4
     )
 
     def __str__(self):

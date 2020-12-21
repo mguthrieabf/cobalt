@@ -639,8 +639,7 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id,
-                type="card",
+                customer=request.user.stripe_customer_id, type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -1877,11 +1876,7 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (
-                GLOBAL_CURRENCY_SYMBOL,
-                amount,
-                member,
-            )
+            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
@@ -1920,7 +1915,9 @@ def admin_payments_static(request):
     if request.method == "POST":
         form = PaymentStaticForm(request.POST)
         if form.is_valid():
-            form.save()
+            obj = form.save(commit=False)
+            obj.modified_by = request.user
+            obj.save()
 
             # set all others to be inactive
             PaymentStatic.objects.all().update(active=False)
@@ -1935,4 +1932,31 @@ def admin_payments_static(request):
             )
             return redirect("payments:statement_admin_summary")
 
-    return render(request, "payments/admin_payments_static.html", {"form": form})
+    return render(
+        request,
+        "payments/admin_payments_static.html",
+        {"form": form, "payment_static_old": payment_static},
+    )
+
+
+@login_required()
+def admin_payments_static_history(request):
+    """history for static data for payments
+
+    Args:
+        request (HTTPRequest): standard request object
+
+    Returns:
+        HTTPResponse
+    """
+
+    if not rbac_user_has_role(request.user, "payments.global.edit"):
+        return rbac_forbidden(request, "payments.global.edit")
+
+    payment_statics = PaymentStatic.objects.order_by("-created_date")
+
+    return render(
+        request,
+        "payments/admin_payments_static_history.html",
+        {"payment_statics": payment_statics},
+    )

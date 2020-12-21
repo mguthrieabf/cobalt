@@ -24,6 +24,11 @@ urlpatterns = [
         name="admin_payments_static",
     ),
     path(
+        "admin-payments-static-history",
+        views.admin_payments_static_history,
+        name="admin_payments_static_history",
+    ),
+    path(
         "admin-view-stripe-transactions",
         views.admin_view_stripe_transactions,
         name="admin_view_stripe_transactions",
