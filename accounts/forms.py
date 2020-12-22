@@ -60,8 +60,8 @@ class UserUpdateForm(forms.ModelForm):
         ]
 
 
-class BlurbUpdateForm(forms.ModelForm):
-    """ Handles the sub-form on profile for picture and wordage """
+class PhotoUpdateForm(forms.ModelForm):
+    """ Handles the sub-form on profile for picture """
 
     x = forms.FloatField(widget=forms.HiddenInput())
     y = forms.FloatField(widget=forms.HiddenInput())
@@ -73,7 +73,6 @@ class BlurbUpdateForm(forms.ModelForm):
 
         model = User
         fields = (
-            "about",
             "pic",
             "x",
             "y",
@@ -89,7 +88,7 @@ class BlurbUpdateForm(forms.ModelForm):
         }
 
     def save(self):
-        photo = super(BlurbUpdateForm, self).save()
+        photo = super(PhotoUpdateForm, self).save()
 
         x = self.cleaned_data.get("x")
         y = self.cleaned_data.get("y")
@@ -102,6 +101,16 @@ class BlurbUpdateForm(forms.ModelForm):
         resized_image.save(photo.pic.path)
 
         return photo
+
+
+class BlurbUpdateForm(forms.ModelForm):
+    """ Handles the sub-form on profile for wordage """
+
+    class Meta:
+        """ Meta data """
+
+        model = User
+        fields = ("about",)
 
 
 class UserSettingsForm(forms.ModelForm):

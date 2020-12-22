@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 
-<div id="ignore_cobalt_savex"></div>
+<div id="ignore_cobalt_save"></div>
 <div class="container-fluid">
   <p>You can edit your profile here. You can also change less personal things in <a href="{% url "accounts:user_settings" %}" class="btn btn-sm btn-danger">settings</a></p>
   <h2>{{ form.errors }}</h2>
@@ -178,9 +178,6 @@
     </div>
 
     <div class="col-md-4">
-      <form method="post" id="pic_form" action="update-blurb" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="hidden" name="x" id="id_x" value="1"><input type="hidden" name="y" id="id_y" value="1"><input type="hidden" name="width" id="id_width" value="1"><input type="hidden" name="height" id="id_height" value="1">
         <div class="card card-profile">
           <div class="card-header card-header-info">
             <h4 class="card-title">About {{ request.user.first_name}}</h4>
@@ -189,18 +186,27 @@
           <div class="card-body">
             <img id="cobalt-pic" class="cobalt-rounded text-center" style="height: 140px; width: 140px;" src="/media/{{ form.pic.value }}" />
             <br>
+            <form method="post" id="pic_form" action="update-photo" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="x" id="id_x" value="1"><input type="hidden" name="y" id="id_y" value="1"><input type="hidden" name="width" id="id_width" value="1"><input type="hidden" name="height" id="id_height" value="1">
+
             <div class="fileinput fileinput-new text-center" data-provides="fileinput">
               <div class="fileinput-preview fileinput-exists thumbnail img-circle img-raised"></div>
               <div>
                 <span class="btn btn-sm btn-raised btn-round btn-rose btn-file">
                   <span class="fileinput-new">Change Photo</span>
+
                   <input type="file" name="pic" accept="image/*" id="id_pic" value="{{ form.pic.value }}"/></span>
+
                   <br>
                   <a href="{% url "accounts:delete_photo" %}" class="btn btn-sm">Delete Photo</a>
                 <br />
                 <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
               </div>
             </div>
+                  </form>
+            <form method="post" id="pic_form" action="update-blurb" enctype="multipart/form-data">
+              {% csrf_token %}
             <p class="card-description">
               <label class="bmd-label-floating">About You</label>
               <textarea rows=8 name="about" id="id_about" class="form-control" placeholder="Tell people about yourself in a few words.">{{ blurbform.about.value|default_if_none:"" }}</textarea>

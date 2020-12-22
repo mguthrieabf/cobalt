@@ -25,7 +25,13 @@ from logs.views import get_client_ip, log_event
 from organisations.models import MemberOrganisation
 from .models import User, TeamMate
 from .tokens import account_activation_token
-from .forms import UserRegisterForm, UserUpdateForm, BlurbUpdateForm, UserSettingsForm
+from .forms import (
+    UserRegisterForm,
+    UserUpdateForm,
+    PhotoUpdateForm,
+    BlurbUpdateForm,
+    UserSettingsForm,
+)
 from forums.models import Post, Comment1, Comment2
 from utils.utils import cobalt_paginator
 from cobalt.settings import GLOBAL_ORG, RBAC_EVERYONE, TBA_PLAYER, COBALT_HOSTNAME
@@ -504,6 +510,7 @@ def profile(request):
 
         form = UserUpdateForm(instance=request.user)
     blurbform = BlurbUpdateForm(instance=request.user)
+    photoform = PhotoUpdateForm(instance=request.user)
 
     team_mates = TeamMate.objects.filter(user=request.user).order_by(
         "team_mate__first_name"
@@ -512,6 +519,7 @@ def profile(request):
     context = {
         "form": form,
         "blurbform": blurbform,
+        "photoform": photoform,
         "team_mates": team_mates,
     }
     return render(request, "accounts/profile.html", context)
@@ -538,11 +546,31 @@ def blurb_form_upload(request):
             )
         else:
             print(blurbform.errors)
-    else:
-        blurbform = BlurbUpdateForm(data=request.POST, instance=request.user)
 
-    if request.user.dob:
-        request.user.dob = request.user.dob.strftime("%d/%m/%Y")
+    return redirect("accounts:user_profile")
+
+
+def picture_form_upload(request):
+    """Profile update sub-form. Handles the picture
+
+    Allows a user to change their profile settings.
+
+    Args:
+        request - standard request object
+
+    Returns:
+        HttpResponse
+    """
+
+    if request.method == "POST":
+        photoform = PhotoUpdateForm(request.POST, request.FILES, instance=request.user)
+        if photoform.is_valid():
+            photoform.save()
+            messages.success(
+                request, "Profile Updated", extra_tags="cobalt-message-success"
+            )
+        else:
+            print(photoform.errors)
 
     return redirect("accounts:user_profile")
 
@@ -777,9 +805,7 @@ def delete_photo(request):
     request.user.pic = "pic_folder/default-avatar.png"
     request.user.save()
     messages.success(
-        request,
-        "Your photo has been reset",
-        extra_tags="cobalt-message-success",
+        request, "Your photo has been reset", extra_tags="cobalt-message-success",
     )
 
     return redirect("accounts:user_profile")

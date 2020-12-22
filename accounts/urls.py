@@ -24,6 +24,7 @@ urlpatterns = [
     path("profile", views.profile, name="user_profile"),
     path("settings", views.user_settings, name="user_settings"),
     path("update-blurb", views.blurb_form_upload, name="user_blurb"),
+    path("update-photo", views.picture_form_upload, name="user_photo"),
     path("password_reset/", views.html_email_reset, name="html_email_reset"),
     path("public-profile/<int:pk>/", views.public_profile, name="public_profile"),
     path("add-team-mate", views.add_team_mate_ajax, name="add_team_mate_ajax"),
