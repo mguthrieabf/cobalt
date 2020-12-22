@@ -536,21 +536,15 @@ def blurb_form_upload(request):
             messages.success(
                 request, "Profile Updated", extra_tags="cobalt-message-success"
             )
+        else:
+            print(blurbform.errors)
     else:
         blurbform = BlurbUpdateForm(data=request.POST, instance=request.user)
 
     if request.user.dob:
         request.user.dob = request.user.dob.strftime("%d/%m/%Y")
 
-    # form = UserUpdateForm(instance=request.user)
-
     return redirect("accounts:user_profile")
-
-    # context = {
-    #     "form": form,
-    #     "blurbform": blurbform,
-    # }
-    # return render(request, "accounts/profile.html", context)
 
 
 @login_required
@@ -767,3 +761,25 @@ def user_signed_up_list(request):
         "accounts/user_signed_up_list.html",
         {"things": things, "total_users": total_users},
     )
+
+
+@login_required()
+def delete_photo(request):
+    """Removes a user picture and resets to default
+
+    Args:
+        request(HTTPRequest): standard request
+
+    Returns:
+        Page
+    """
+
+    request.user.pic = "pic_folder/default-avatar.png"
+    request.user.save()
+    messages.success(
+        request,
+        "Your photo has been reset",
+        extra_tags="cobalt-message-success",
+    )
+
+    return redirect("accounts:user_profile")

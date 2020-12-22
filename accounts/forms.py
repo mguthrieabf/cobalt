@@ -1,5 +1,6 @@
 """ Forms for Accounts App """
 
+from PIL import Image
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from masterpoints.views import system_number_available
@@ -62,11 +63,45 @@ class UserUpdateForm(forms.ModelForm):
 class BlurbUpdateForm(forms.ModelForm):
     """ Handles the sub-form on profile for picture and wordage """
 
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
+
     class Meta:
         """ Meta data """
 
         model = User
-        fields = ["about", "pic"]
+        fields = (
+            "about",
+            "pic",
+            "x",
+            "y",
+            "width",
+            "height",
+        )
+        widgets = {
+            "file": forms.FileInput(
+                attrs={
+                    "accept": "image/*"  # this is not an actual validation! don't rely on that!
+                }
+            )
+        }
+
+    def save(self):
+        photo = super(BlurbUpdateForm, self).save()
+
+        x = self.cleaned_data.get("x")
+        y = self.cleaned_data.get("y")
+        w = self.cleaned_data.get("width")
+        h = self.cleaned_data.get("height")
+
+        image = Image.open(photo.pic)
+        cropped_image = image.crop((x, y, w + x, h + y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        resized_image.save(photo.pic.path)
+
+        return photo
 
 
 class UserSettingsForm(forms.ModelForm):

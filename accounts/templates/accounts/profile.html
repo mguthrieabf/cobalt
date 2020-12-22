@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block header %}
+    <link href="{% static 'assets/css/cropper.min.css' %}" rel="stylesheet">
+    <script src="{% static 'assets/js/cropper.min.js' %}"></script>
+{% endblock %}
 {% block content %}
 
 <div id="ignore_cobalt_savex"></div>
@@ -143,9 +147,40 @@
       </div>
     </div>
 
+    <!-- MODAL TO CROP THE IMAGE -->
+    <div class="modal fade" id="modalCrop">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Crop the photo</h4>
+          </div>
+          <div class="modal-body">
+            <img src="" id="image" style="max-width: 100%;">
+          </div>
+          <div class="modal-footer">
+            <div class="btn-group pull-left" role="group">
+              <button type="button" class="btn btn-sm btn-default js-zoom-in">
+                <span class="text-large">+</span>
+              </button>
+              <button type="button" class="btn btn-sm btn-default js-zoom-out">
+                <span class="text-large">-</span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Discard</button>
+            &nbsp;
+            <button type="button" class="btn btn-sm btn-primary js-crop-and-upload">Crop and upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="col-md-4">
-      <form method="post" action="update-blurb" enctype="multipart/form-data">
+      <form method="post" id="pic_form" action="update-blurb" enctype="multipart/form-data">
         {% csrf_token %}
+        <input type="hidden" name="x" id="id_x" value="1"><input type="hidden" name="y" id="id_y" value="1"><input type="hidden" name="width" id="id_width" value="1"><input type="hidden" name="height" id="id_height" value="1">
         <div class="card card-profile">
           <div class="card-header card-header-info">
             <h4 class="card-title">About {{ request.user.first_name}}</h4>
@@ -157,10 +192,11 @@
             <div class="fileinput fileinput-new text-center" data-provides="fileinput">
               <div class="fileinput-preview fileinput-exists thumbnail img-circle img-raised"></div>
               <div>
-                <span class="btn btn-raised btn-round btn-rose btn-file">
+                <span class="btn btn-sm btn-raised btn-round btn-rose btn-file">
                   <span class="fileinput-new">Change Photo</span>
-                  <span class="fileinput-exists">Change</span>
-                  <input onchange="readURL(this);" type="file" name="pic" accept="image/*" id="id_pic" /></span>
+                  <input type="file" name="pic" accept="image/*" id="id_pic" value="{{ form.pic.value }}"/></span>
+                  <br>
+                  <a href="{% url "accounts:delete_photo" %}" class="btn btn-sm">Delete Photo</a>
                 <br />
                 <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
               </div>
@@ -169,6 +205,7 @@
               <label class="bmd-label-floating">About You</label>
               <textarea rows=8 name="about" id="id_about" class="form-control" placeholder="Tell people about yourself in a few words.">{{ blurbform.about.value|default_if_none:"" }}</textarea>
             </p>
+
             <button type="submit" class="btn btn-success cobalt-save">Update</button>
       </form>
     </div>
@@ -186,31 +223,66 @@
 <script src="{% static "assets/js/plugins/bootstrap-datetimepicker.min.js" %}"></script>
 <script src="{% static "assets/js/plugins/sweetalert2.js" %}"></script>
 
-<script>
+
+  <script>
+    $(function () {
+
+      /* SCRIPT TO OPEN THE MODAL WITH THE PREVIEW */
+      $("#id_pic").change(function () {
+        if (this.files && this.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            $("#image").attr("src", e.target.result);
+            $("#modalCrop").modal("show");
+          }
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+
+      /* SCRIPTS TO HANDLE THE CROPPER BOX */
+      var $image = $("#image");
+      var cropBoxData;
+      var canvasData;
+      $("#modalCrop").on("shown.bs.modal", function () {
+        $image.cropper({
+          viewMode: 1,
+          aspectRatio: 1/1,
+          minCropBoxWidth: 200,
+          minCropBoxHeight: 200,
+          ready: function () {
+            $image.cropper("setCanvasData", canvasData);
+            $image.cropper("setCropBoxData", cropBoxData);
+          }
+        });
+      }).on("hidden.bs.modal", function () {
+        cropBoxData = $image.cropper("getCropBoxData");
+        canvasData = $image.cropper("getCanvasData");
+        $image.cropper("destroy");
+      });
+
+      $(".js-zoom-in").click(function () {
+        $image.cropper("zoom", 0.1);
+      });
+
+      $(".js-zoom-out").click(function () {
+        $image.cropper("zoom", -0.1);
+      });
+
+      /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
+      $(".js-crop-and-upload").click(function () {
+        var cropData = $image.cropper("getData");
+        $("#id_x").val(cropData["x"]);
+        $("#id_y").val(cropData["y"]);
+        $("#id_height").val(cropData["height"]);
+        $("#id_width").val(cropData["width"]);
+        $("#pic_form").submit();
+      });
+
+    });
 
 {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
-  // show preview of profile picture
-  function readURL(input) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-
-      reader.onload = function(e) {
-        $('#cobalt-pic')
-          .attr('src', e.target.result);
-        swal.fire({
-          title: "Picture Loaded",
-          html: "If you like the picture don't forget to hit update to save it.",
-          icon: "success",
-        })
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
   $(document).ready(function() {
-    // initialise Datetimepicker and Sliders
-//    md.initFormExtendedDatetimepickers();
 
 // initialise date time picker
     $('#id_dob').datetimepicker({

@@ -30,6 +30,7 @@ urlpatterns = [
     path("delete-team-mate", views.delete_team_mate_ajax, name="delete_team_mate_ajax"),
     path("toggle-team-mate", views.toggle_team_mate_ajax, name="toggle_team_mate_ajax"),
     path("user-signed-up-list", views.user_signed_up_list, name="user_signed_up_list"),
+    path("delete-photo", views.delete_photo, name="delete_photo"),
 ]
 
 # def not_found_handler(request, exception=None):
