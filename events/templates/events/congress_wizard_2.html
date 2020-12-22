@@ -9,6 +9,7 @@
 {% include "events/congress_wizard_include_body.html" %}
 
 <div class="container">
+  <a class="btn btn-warning btn-sm" href="{% url "events:manage_congress_download" congress_id=congress.id %}">Manage Download Files</a>
   <div class="row">
     <div class="card">
       <div class="card-header card-header-primary">

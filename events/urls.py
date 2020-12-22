@@ -96,7 +96,11 @@ urlpatterns = [
         views.third_party_checkout_entry,
         name="third_party_checkout_entry",
     ),
-    path("congress/checkout", views.checkout, name="checkout",),
+    path(
+        "congress/checkout",
+        views.checkout,
+        name="checkout",
+    ),
     path(
         "congress/create/edit-session/<int:event_id>/<int:session_id>",
         congress_builder.edit_session,
@@ -158,7 +162,11 @@ urlpatterns = [
         ajax.delete_me_from_partnership_desk,
         name="delete_me_from_partnership_desk",
     ),
-    path("view", views.view_events, name="view_events",),
+    path(
+        "view",
+        views.view_events,
+        name="view_events",
+    ),
     path(
         "congress/event/partnership-desk-signup/<int:congress_id>/<int:event_id>",
         views.partnership_desk_signup,
@@ -191,6 +199,11 @@ urlpatterns = [
         "congress-builder/create/wizard/<int:congress_id>/<int:step>",
         congress_builder.create_congress_wizard,
         name="create_congress_wizard",
+    ),
+    path(
+        "congress-builder/create/wizard/downloads/<int:congress_id>",
+        congress_builder.manage_congress_download,
+        name="manage_congress_download",
     ),
     path(
         "congress-builder/get-conveners/<int:org_id>",
@@ -342,6 +355,11 @@ urlpatterns = [
         name="admin_delete_bulletin_ajax",
     ),
     path(
+        "congress-admin/download/delete",
+        ajax.admin_delete_download_ajax,
+        name="admin_delete_download_ajax",
+    ),
+    path(
         "congress-admin/move-entry/<int:event_entry_id>",
         congress_admin.admin_move_entry,
         name="admin_move_entry",
@@ -355,6 +373,16 @@ urlpatterns = [
         "congress-admin/event-entry/add/<int:event_id>",
         congress_admin.admin_event_entry_add,
         name="admin_event_entry_add",
+    ),
+    path(
+        "congress-admin/event-entry-player/add/<int:event_entry_id>",
+        congress_admin.admin_event_entry_player_add,
+        name="admin_event_entry_player_add",
+    ),
+    path(
+        "congress-admin/event-entry-player/delete/<int:event_entry_player_id>",
+        congress_admin.admin_event_entry_player_delete,
+        name="admin_event_entry_player_delete",
     ),
     #######################################################
     # higher level admin functions                        #

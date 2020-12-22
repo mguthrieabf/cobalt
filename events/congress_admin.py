@@ -606,7 +606,9 @@ def admin_event_unpaid(request, event_id):
     )
 
     return render(
-        request, "events/admin_event_unpaid.html", {"event": event, "players": players},
+        request,
+        "events/admin_event_unpaid.html",
+        {"event": event, "players": players},
     )
 
 
@@ -1035,7 +1037,9 @@ def admin_latest_news(request, congress_id):
         form = LatestNewsForm()
 
     return render(
-        request, "events/admin_latest_news.html", {"form": form, "congress": congress},
+        request,
+        "events/admin_latest_news.html",
+        {"form": form, "congress": congress},
     )
 
 
@@ -1230,4 +1234,92 @@ def admin_event_entry_add(request, event_id):
             "player_count_number": player_count_number,
             "categories": categories,
         },
+    )
+
+
+@login_required()
+@transaction.atomic
+def admin_event_entry_player_add(request, event_entry_id):
+    """ Add a player to a team """
+
+    event_entry = get_object_or_404(EventEntry, pk=event_entry_id)
+
+    # check access
+    role = "events.org.%s.edit" % event_entry.event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if event_entry.event.player_format != "Teams":
+        messages.error(
+            request,
+            "Not a teams event - cannot add player",
+            extra_tags="cobalt-message-error",
+        )
+        return redirect("events:admin_evententry", evententry_id=event_entry.id)
+
+    tba = User.objects.get(pk=TBA_PLAYER)
+
+    event_entry_player = EventEntryPlayer()
+    event_entry_player.event_entry = event_entry
+    event_entry_player.player = tba
+    event_entry_player.payment_type = "TBA"
+    event_entry_player.entry_fee = 0.0
+    event_entry_player.save()
+
+    # Log it
+    EventLog(
+        event=event_entry.event,
+        actor=request.user,
+        action=f"Player added to {event_entry.id} ({event_entry.primary_entrant}) created by convener",
+        event_entry=event_entry,
+    ).save()
+
+    messages.success(request, "Player Added", extra_tags="cobalt-message-success")
+
+    return redirect(
+        "events:admin_evententryplayer", evententryplayer_id=event_entry_player.id
+    )
+
+
+@login_required()
+@transaction.atomic
+def admin_event_entry_player_delete(request, event_entry_player_id):
+    """ Delete a player from a team """
+
+    event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
+    event_entry = event_entry_player.event_entry
+
+    # check access
+    role = "events.org.%s.edit" % event_entry.event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if event_entry.event.player_format != "Teams":
+        messages.error(
+            request,
+            "Not a teams event - cannot delete player",
+            extra_tags="cobalt-message-error",
+        )
+        return redirect("events:admin_evententry", evententry_id=event_entry.id)
+
+    if request.method == "POST":
+
+        # Log it
+        EventLog(
+            event=event_entry.event,
+            actor=request.user,
+            action=f"Player {event_entry_player.player} deleted from {event_entry.id} ({event_entry.primary_entrant}) by convener",
+            event_entry=event_entry,
+        ).save()
+
+        event_entry_player.delete()
+
+        messages.success(request, "Player Deleted", extra_tags="cobalt-message-success")
+
+        return redirect("events:admin_evententry", evententry_id=event_entry.id)
+
+    return render(
+        request,
+        "events/admin_event_entry_player_delete.html",
+        {"event_entry_player": event_entry_player},
     )

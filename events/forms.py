@@ -7,6 +7,7 @@ from .models import (
     EventPlayerDiscount,
     CongressMaster,
     Bulletin,
+    CongressDownload,
     PartnershipDesk,
 )
 from organisations.models import Organisation
@@ -358,6 +359,12 @@ class LatestNewsForm(forms.Form):
 class BulletinForm(forms.ModelForm):
     class Meta:
         model = Bulletin
+        fields = ("document", "congress", "description")
+
+
+class CongressDownloadForm(forms.ModelForm):
+    class Meta:
+        model = CongressDownload
         fields = ("document", "congress", "description")
 
 

@@ -613,13 +613,6 @@ class CongressNewsItem(models.Model):
         return "%s" % (self.congress)
 
 
-class CongressDownload(models.Model):
-    """ Downloadable items for Congresses """
-
-    congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
-    text = models.TextField()  # fix later
-
-
 class BasketItem(models.Model):
     """ items in a basket. We don't define basket itself as it isn't needed """
 
@@ -665,6 +658,19 @@ class Bulletin(models.Model):
     """ Regular PDF bulletins for congresses """
 
     document = models.FileField(upload_to="bulletins/%Y/%m/%d/")
+    create_date = models.DateTimeField(default=timezone.now)
+    congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
+    description = models.CharField("Description", max_length=200)
+
+    def __str__(self):
+        return f"{self.congress} - {self.description}"
+
+
+class CongressDownload(models.Model):
+    """Documents associated with the congress that a convener wants on the
+    congress page"""
+
+    document = models.FileField(upload_to="congress-downloads/%Y/%m/%d/")
     create_date = models.DateTimeField(default=timezone.now)
     congress = models.ForeignKey(Congress, on_delete=models.CASCADE)
     description = models.CharField("Description", max_length=200)

@@ -20,6 +20,7 @@ from .models import (
     EVENT_PLAYER_FORMAT_SIZE,
     Bulletin,
     PartnershipDesk,
+    CongressDownload,
 )
 from accounts.models import User, TeamMate
 from notifications.views import contact_member
@@ -837,6 +838,27 @@ def admin_delete_bulletin_ajax(request):
         return rbac_forbidden(request, role)
 
     bulletin.delete()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def admin_delete_download_ajax(request):
+    """ Ajax call to delete a download from a congress """
+
+    if request.method == "GET":
+        download_id = request.GET["download_id"]
+
+    download = get_object_or_404(CongressDownload, pk=download_id)
+
+    # check access
+    role = "events.org.%s.edit" % download.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    download.delete()
 
     response_data = {}
     response_data["message"] = "Success"

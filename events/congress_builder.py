@@ -25,6 +25,7 @@ from .models import (
     BasketItem,
     PlayerBatchId,
     EventLog,
+    CongressDownload,
 )
 from accounts.models import User, TeamMate
 from .forms import (
@@ -34,6 +35,7 @@ from .forms import (
     SessionForm,
     EventEntryPlayerForm,
     RefundForm,
+    CongressDownloadForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -758,4 +760,37 @@ def view_draft_congresses(request):
         request,
         "events/view_draft_congresses.html",
         {"congress_list": draft_congress_list},
+    )
+
+
+@login_required()
+def manage_congress_download(request, congress_id):
+    """ Manage download files """
+
+    congress = get_object_or_404(Congress, pk=congress_id)
+
+    # check access
+    role = "events.org.%s.edit" % congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    if request.method == "POST":
+        form = CongressDownloadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request, "Document uploaded", extra_tags="cobalt-message-success"
+            )
+
+    form = CongressDownloadForm()
+
+    # Get bulletins
+    downloads = CongressDownload.objects.filter(congress=congress).order_by("-pk")
+
+    return render(
+        request,
+        "events/congress_wizard_downloads.html",
+        {"form": form, "congress": congress, "downloads": downloads},
     )

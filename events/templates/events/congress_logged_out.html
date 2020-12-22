@@ -110,6 +110,28 @@
 
 
   </div>
+
+
+  {% if downloads %}
+  	<div class="flex-container">
+  <div style="width: 50%">
+          <h2> DOWNLOADS </h2>
+
+  <span style="text-align: left;">
+                <p class="description">
+
+                  <ul>
+                  {% for download in downloads %}
+                    <li><a href="{{ download.document.url }}" target="_blank">{{ download.description }}</a>
+                  {% endfor %}
+                  </ul>
+
+                </p>
+  </span>
+  </div>
+  </div>
+  {% endif %}
+
 						<div class="map-container">
 								<div style="width: 80%">
 												<h2>Location - {{ congress.venue_name }}</h2>

@@ -44,6 +44,7 @@ from .models import (
     Bulletin,
     PartnershipDesk,
     PAYMENT_TYPES,
+    CongressDownload,
 )
 from .forms import (
     CongressMasterForm,
@@ -160,10 +161,8 @@ def view_congress(request, congress_id, fullscreen=False):
         master_template = "base.html"
         template = "events/congress.html"
     else:
-        #        master_template = None
         template = "events/congress_logged_out.html"
         master_template = "empty.html"
-    #        template = "events/congress.html"
 
     congress = get_object_or_404(Congress, pk=congress_id)
 
@@ -292,6 +291,9 @@ def view_congress(request, congress_id, fullscreen=False):
     # Get bulletins
     bulletins = Bulletin.objects.filter(congress=congress).order_by("-pk")
 
+    # Get downloads
+    downloads = CongressDownload.objects.filter(congress=congress).order_by("pk")
+
     return render(
         request,
         template,
@@ -300,6 +302,7 @@ def view_congress(request, congress_id, fullscreen=False):
             "template": master_template,
             "program_list": program_list,
             "bulletins": bulletins,
+            "downloads": downloads,
             "msg": msg,
         },
     )
@@ -669,11 +672,15 @@ def edit_event_entry(request, congress_id, event_id, edit_flag=None, pay_status=
     if pay_status:
         if pay_status == "success":
             messages.success(
-                request, "Payment successful", extra_tags="cobalt-message-success",
+                request,
+                "Payment successful",
+                extra_tags="cobalt-message-success",
             )
         elif pay_status == "fail":
             messages.error(
-                request, "Payment failed", extra_tags="cobalt-message-error",
+                request,
+                "Payment failed",
+                extra_tags="cobalt-message-error",
             )
 
     # valid payment methods

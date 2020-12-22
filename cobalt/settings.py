@@ -323,7 +323,7 @@ SUMMERNOTE_CONFIG = {
     "attachment_require_authentication": True,
     "disable_attachment": False,
     "attachment_absolute_uri": False,
-    "attachment_filesize_limit": 1000000,
+    "attachment_filesize_limit": 20000000,
 }
 
 # Default user to be the everyone user for RBAC
