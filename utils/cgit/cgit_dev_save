@@ -4,6 +4,11 @@ BRANCH=`git branch --show-current`
 
 echo ""
 echo ""
+echo "Running collect static..."
+./manage.py collectstatic --noinput
+
+echo ""
+echo ""
 echo "Adding changes to $BRANCH..."
 
 git add -A
@@ -17,7 +22,7 @@ echo ""
 
 git commit -m "$BRANCH"
 if [ $? -ne 0 ];then
-  
+
   echo ""
   echo "Commit failed, possible due to black. Re-trying..."
   echo ""
