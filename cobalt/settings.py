@@ -51,11 +51,16 @@ SECRET_KEY = set_value("SECRET_KEY")
 DEBUG = set_value("DEBUG", False)
 
 # Set up ADMINS list from string
-ADMINS = [("Mark Guthrie", "m@rkguthrie.com")]
-admin_string = set_value("ADMINS", '("Mark Guthrie", "m@rkguthrie.com")')
-print("admin_string: " + admin_string)
-ADMINS = list(ast.literal_eval(admin_string))
-print(ADMINS[0])
+ADMINS = [
+    ("Mark Guthrie", "m@rkguthrie.com"),
+    ("Mark Guthrie", "mark.guthrie@17ways.com.au"),
+]
+
+# Fix later
+# admin_string = set_value("ADMINS", '("Mark Guthrie", "m@rkguthrie.com")')
+# print("admin_string: " + admin_string)
+# ADMINS = list(ast.literal_eval(admin_string))
+# print(ADMINS[0])
 
 SERVER_EMAIL = set_value("SERVER_EMAIL", "notset@abftech.com.au")
 
