@@ -113,20 +113,10 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
         chart_red["%s-%s" % (year, month)] = 0.0
         chart_green["%s-%s" % (year, month)] = 0.0
 
-    last_line_green = 0
-    last_line_red = 0
-    last_line_gold = 0
-
     # loop through the details and augment the data to pass to the template
     # we are just adding running total data for the table of details
     for d in details:
         counter = counter - d["mps"]
-
-        # we need to deduct the last entry from the opening total for all types
-        # just reset and work out which one it was later
-        last_line_green = 0
-        last_line_red = 0
-        last_line_gold = 0
 
         d["running_total"] = counter
         d["PostingDate"] = "%s-%02d" % (d["PostingYear"], d["PostingMonth"])
@@ -141,17 +131,14 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
 
         if d["MPColour"] == "Y":
             gold = gold - float(d["mps"])
-            last_line_gold = float(d["mps"])
             chart_gold[d["PostingDate"]] = chart_gold[d["PostingDate"]] + float(
                 d["mps"]
             )
         elif d["MPColour"] == "R":
             red = red - float(d["mps"])
-            last_line_red = float(d["mps"])
             chart_red[d["PostingDate"]] = chart_red[d["PostingDate"]] + float(d["mps"])
         elif d["MPColour"] == "G":
             green = green - float(d["mps"])
-            last_line_green = float(d["mps"])
             chart_green[d["PostingDate"]] = chart_green[d["PostingDate"]] + float(
                 d["mps"]
             )
@@ -185,13 +172,10 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
         "green": green_series,
     }
 
-    # update bottom line
-    total = "%.2f" % (
-        green + red + gold - last_line_gold - last_line_red - last_line_green
-    )
-    green = "%.2f" % (green - last_line_green)
-    red = "%.2f" % (red - last_line_red)
-    gold = "%.2f" % (gold - last_line_gold)
+    total = "%.2f" % (green + red + gold)
+    green = "%.2f" % green
+    red = "%.2f" % red
+    gold = "%.2f" % gold
 
     bottom = {"gold": gold, "red": red, "green": green, "total": total}
 

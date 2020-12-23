@@ -75,6 +75,11 @@ class ManualTopup(forms.Form):
         label="Card Option", choices=CARD_CHOICES, required=False
     )
 
+    # We need the balance to take it as a parameter
+    def __init__(self, *args, **kwargs):
+        self.balance = kwargs.pop("balance", 0.0)
+        super(ManualTopup, self).__init__(*args, **kwargs)
+
     def clean(self):
         """ validation for the amount field """
         cleaned_data = super(ManualTopup, self).clean()
@@ -88,9 +93,9 @@ class ManualTopup(forms.Form):
                 )
                 self._errors["amount"] = txt
                 raise forms.ValidationError(txt)
-            if amount > AUTO_TOP_UP_MAX_AMT:
+            if amount > AUTO_TOP_UP_MAX_AMT - self.balance:
 
-                txt = "Too large. Maximum is %s%s" % (
+                txt = "Too large. Maximum balance is %s%s" % (
                     GLOBAL_CURRENCY_SYMBOL,
                     AUTO_TOP_UP_MAX_AMT,
                 )
@@ -111,8 +116,7 @@ class SettlementForm(forms.Form):
 
     # Handle checkboxes
     settle_list = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        choices=CARD_CHOICES,
+        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
     )
 
     def __init__(self, *args, **kwargs):

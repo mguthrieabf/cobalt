@@ -1,6 +1,9 @@
 {% load static %}
 {% load humanize %}
 
+
+{% if things %}
+
 <div class="table_responsive">
 <table class="table table-hover">
   <thead class="text-info">
@@ -93,3 +96,27 @@
   </tbody>
 </table>
 </div>
+
+{% else %}
+
+<div class="card w-75 mx-auto">
+  <div class="card-header card-header-warning text-center">
+    <h2>Hey {{ request.user.first_name}}, Welcome to Bridge Credits!</h2>
+    <h2>Here's how it works...</h2>
+  </div>
+  <div class="card-body">
+    <p><b>Bridge Credits</b> are how you pay for your bridge. If you do nothing, then
+    when you need to spend <b>Bridge Credits</b> you will be taken to a secure checkout
+    where you can pay with a credit card. Your statements will be shown here. Easy.</p>
+    <p>But if you want to make things <b>EVEN EASIER</b> then you can enable <b>AUTO TOP UP</b>
+    by clicking on the toggle above. This will register your credit card (which is
+    totally secure and not saved on our servers). Once <b>AUTO TOP UP</b> is in place you never need to
+    worry again. The system will take care of payments for you provided your card
+    is accepted.</p>
+    <p>You can also top up your account any time using the manual top up botton above.</p>
+  </div>
+</div>
+
+
+
+{% endif %}

@@ -92,56 +92,56 @@ from django.utils.timezone import make_aware
 TZ = pytz.timezone(TIME_ZONE)
 
 
-@login_required()
-#################################
-# test_payment                  #
-#################################
-def test_payment(request):
-    """This is a temporary view that can be used to test making a payment against
-    a members account. This simulates them entering an event or paying a subscription."""
-
-    if request.method == "POST":
-        form = TestTransaction(request.POST)
-        if form.is_valid():
-            description = form.cleaned_data["description"]
-            amount = form.cleaned_data["amount"]
-            member = request.user
-            organisation = form.cleaned_data["organisation"]
-            url = form.cleaned_data["url"]
-            payment_type = form.cleaned_data["type"]
-
-            return payment_api(
-                request=request,
-                description=description,
-                amount=amount,
-                member=member,
-                route_code="MAN",
-                route_payload=None,
-                organisation=organisation,
-                log_msg=None,
-                payment_type=payment_type,
-                url=url,
-            )
-    else:
-        form = TestTransaction()
-
-    if request.user.auto_amount:
-        auto_amount = request.user.auto_amount
-    else:
-        auto_amount = None
-
-    balance = get_balance(request.user)
-
-    return render(
-        request,
-        "payments/test_payment.html",
-        {
-            "form": form,
-            "auto_amount": auto_amount,
-            "balance": balance,
-            "lowbalance": AUTO_TOP_UP_LOW_LIMIT,
-        },
-    )
+# @login_required()
+# #################################
+# # test_payment                  #
+# #################################
+# def test_payment(request):
+#     """This is a temporary view that can be used to test making a payment against
+#     a members account. This simulates them entering an event or paying a subscription."""
+#
+#     if request.method == "POST":
+#         form = TestTransaction(request.POST)
+#         if form.is_valid():
+#             description = form.cleaned_data["description"]
+#             amount = form.cleaned_data["amount"]
+#             member = request.user
+#             organisation = form.cleaned_data["organisation"]
+#             url = form.cleaned_data["url"]
+#             payment_type = form.cleaned_data["type"]
+#
+#             return payment_api(
+#                 request=request,
+#                 description=description,
+#                 amount=amount,
+#                 member=member,
+#                 route_code="MAN",
+#                 route_payload=None,
+#                 organisation=organisation,
+#                 log_msg=None,
+#                 payment_type=payment_type,
+#                 url=url,
+#             )
+#     else:
+#         form = TestTransaction()
+#
+#     if request.user.auto_amount:
+#         auto_amount = request.user.auto_amount
+#     else:
+#         auto_amount = None
+#
+#     balance = get_balance(request.user)
+#
+#     return render(
+#         request,
+#         "payments/test_payment.html",
+#         {
+#             "form": form,
+#             "auto_amount": auto_amount,
+#             "balance": balance,
+#             "lowbalance": AUTO_TOP_UP_LOW_LIMIT,
+#         },
+#     )
 
 
 ####################
@@ -205,7 +205,6 @@ def statement_common(user):
         "-created_date"
     )
 
-    print(summary)
     return (summary, club, balance, auto_button, events_list)
 
 
@@ -641,8 +640,7 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id,
-                type="card",
+                customer=request.user.stripe_customer_id, type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -822,8 +820,10 @@ def manual_topup(request):
 
     """
 
+    balance = get_balance(request.user)
+
     if request.method == "POST":
-        form = ManualTopup(request.POST)
+        form = ManualTopup(request.POST, balance=balance)
         if form.is_valid():
             if form.cleaned_data["card_choice"] == "Existing":  # Use Auto
                 (return_code, msg) = auto_topup_member(
@@ -850,9 +850,7 @@ def manual_topup(request):
         #     print(form.errors)
 
     else:
-        form = ManualTopup()
-
-    balance = get_balance(request.user)
+        form = ManualTopup(balance=balance)
 
     return render(
         request,
@@ -1902,11 +1900,7 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (
-                GLOBAL_CURRENCY_SYMBOL,
-                amount,
-                member,
-            )
+            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
@@ -2043,9 +2037,7 @@ def admin_payments_static_org_override_add(request):
             messages.error(request, form.errors, extra_tags="cobalt-message-error")
 
     return render(
-        request,
-        "payments/admin_payments_static_org_override_add.html",
-        {"form": form},
+        request, "payments/admin_payments_static_org_override_add.html", {"form": form},
     )
 
 

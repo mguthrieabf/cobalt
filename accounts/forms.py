@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from masterpoints.views import system_number_available
 from .models import User
+from django.core.exceptions import ValidationError
 
 
 class UserRegisterForm(UserCreationForm):
@@ -58,6 +59,17 @@ class UserUpdateForm(forms.ModelForm):
             "pic",
             "bbo_name",
         ]
+
+    def clean_email(self):
+        """ check the email is not already used """
+
+        email = self.cleaned_data["email"]
+        if email != self.instance.email:  # changed
+            if User.objects.filter(email=email).exists():  # already in use
+                raise ValidationError(
+                    f"Email already in use {email} {self.instance.email}"
+                )
+        return email
 
 
 class PhotoUpdateForm(forms.ModelForm):

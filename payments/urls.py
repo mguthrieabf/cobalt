@@ -7,7 +7,7 @@ app_name = "payments"  # pylint: disable=invalid-name
 
 urlpatterns = [
     path("", views.statement, name="payments"),
-    path("test-payment", views.test_payment, name="test_payment"),
+    #    path("test-payment", views.test_payment, name="test_payment"),
     path("stripe-webhook", core.stripe_webhook, name="stripe_webhook"),
     path(
         "create-payment-intent", core.stripe_manual_payment_intent, name="paymentintent"
