@@ -4,6 +4,13 @@
 
 {% block content %}
 
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url "rbac:main_admin_screen" %}">Admin</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Delete RBAC Group</li>
+  </ol>
+</nav>
+
 <div class="jumbotron">
 
   <h1>Role Based Access Controls</h1>
@@ -22,10 +29,10 @@
 
           <div class="d-flex">
             <div>
-              <input type="submit" value="Delete" class="btn btn-primary center-text">
+              <button type="submit" class="btn btn-primary center-text cobalt-save">Delete</button>
             </div>
             <div class="ml-auto">
-              <button class="btn btn-info center-text" onclick="history.back(); return false;">Cancel</button>
+              <a href="{% url "rbac:main_admin_screen" %}" class="btn btn-info center-text">Cancel</a>
             </div>
           </div>
         </form>

@@ -66,9 +66,7 @@ class UserUpdateForm(forms.ModelForm):
         email = self.cleaned_data["email"]
         if email != self.instance.email:  # changed
             if User.objects.filter(email=email).exists():  # already in use
-                raise ValidationError(
-                    f"Email already in use {email} {self.instance.email}"
-                )
+                raise ValidationError("Email already in use")
         return email
 
 

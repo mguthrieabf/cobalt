@@ -4,6 +4,13 @@
 
 {% block content %}
 
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url "rbac:main_admin_screen" %}">Admin</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Edit RBAC Group</li>
+  </ol>
+</nav>
+
 <div id="ignore_cobalt_save"></div>
 <div class="jumbotron">
 
@@ -190,7 +197,7 @@
 {% include 'utils/generic_user_search_footer.html' with search_id=1 %}
 
   function addUser(member_id){
-    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id[1] + "&group_id=" + {{ group.id }})
+    $.get("{% url "rbac:rbac_add_user_to_group_ajax" %}?member_id=" + member_id + "&group_id=" + {{ group.id }})
         .done(response => {
           msg = response['data']['message'];
           if (msg == 'Success'){
@@ -209,7 +216,7 @@
 
     function cobaltMemberSearchOk() {
 
-      addUser(member_id);
+      addUser(member_id[1]);
     }
 
     function addEveryone() {

@@ -52,6 +52,13 @@ transform: rotate(90deg);
 {% endblock %}
 {% block content %}
 
+<nav aria-label="breadcrumb" role="navigation">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url "rbac:main_admin_screen" %}">Admin</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Tree View</li>
+  </ol>
+</nav>
+
 <h1>Role Based Access Control</h1>
 
 <div>
