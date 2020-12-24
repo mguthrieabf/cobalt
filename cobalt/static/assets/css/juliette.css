@@ -1,6 +1,9 @@
 @charset "UTF-8";
 /* CSS Document */
 
+body{
+    overflow-x:hidden;
+}
 
 /* ------- TABLE ------ */
 
