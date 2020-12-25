@@ -139,4 +139,5 @@ class UserSettingsForm(forms.ModelForm):
             "receive_monthly_masterpoints_report",
             "receive_payments_emails",
             "system_number_search",
+            "windows_scrollbar",
         ]
