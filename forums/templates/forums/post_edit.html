@@ -7,7 +7,9 @@
 
 <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
 <script src="{% static "assets/js/core/popper.min.js" %}"></script>
+{% if not request.user.windows_scrollbar %}
 <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
+{% endif %}
 <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
 <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 <script src="{% static "assets/js/cobalt-core.js" %}"></script>

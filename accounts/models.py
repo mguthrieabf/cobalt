@@ -68,6 +68,9 @@ class User(AbstractUser):
     receive_payments_emails = models.BooleanField(
         "Receive Payments Emails", default=True
     )
+    windows_scrollbar = models.BooleanField(
+        "Show old scrollbar on Windows", default=False
+    )
     last_activity = models.DateTimeField(blank="True", null=True)
 
     REQUIRED_FIELDS = [

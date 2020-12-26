@@ -129,6 +129,7 @@ ALLOWED_HOSTS = [
     ".abftech.com.au",
     "127.0.0.1",
     "bs-local.com",
+    "localhost",
     ".eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
 ]
 

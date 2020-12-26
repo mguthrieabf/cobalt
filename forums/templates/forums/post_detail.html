@@ -12,7 +12,9 @@
 <link href="{% static "assets/css/material-dashboard.css" %}?v=2.1.1" rel="stylesheet" />
 <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
 <link rel="stylesheet" href="{% static "assets/css/bootstrap.4.0.0.min.css" %}">
+{% if not request.user.windows_scrollbar %}
 <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
+{% endif %}
 
 
 
