@@ -272,7 +272,8 @@ def system_number_lookup(request):
                 result = "Error: User already registered"
             else:
                 if member["IsActive"] == "Y":
-                    given_name = member["GivenNames"]
+                    # only use first name from given names
+                    given_name = member["GivenNames"].split(" ")[0]
                     surname = member["Surname"]
                     result = "%s %s" % (given_name, surname)
                     # convert special chars

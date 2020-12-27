@@ -277,7 +277,7 @@ MESSAGE_TAGS = {
 EMAIL_SUBJECT_PREFIX = "[%s] " % COBALT_HOSTNAME
 
 GLOBAL_ORG = "ABF"
-GLOBAL_TITLE = "ABF Technology"
+GLOBAL_TITLE = "My ABF"
 GLOBAL_CONTACT = "https://abf.com.au/contact"
 GLOBAL_ABOUT = "https://abf.com.au"
 GLOBAL_COOKIES = "/support/cookies"

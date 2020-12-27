@@ -29,7 +29,7 @@
             <img id="cobalt-pic" class="cobalt-rounded text-center" style="height: 140px; width: 140px;" src="/media/{{ profile.pic }}" />
             <p class="card-description">
                     <br>
-              {{ profile.about }}
+              {{ profile.about|default_if_none:"" }}
             </p>
           </div>
         </div>
