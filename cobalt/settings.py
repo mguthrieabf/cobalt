@@ -127,7 +127,7 @@ DUMMY_DATA_COUNT = int(set_value("DUMMY_DATA_COUNT", 20))
 #########################################
 ALLOWED_HOSTS = [
     ".abftech.com.au",
-    ".myabf.com.au",
+    "test.myabf.com.au",
     "127.0.0.1",
     "bs-local.com",
     "localhost",
