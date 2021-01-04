@@ -42,6 +42,7 @@ from accounts.models import User
 import json
 
 
+@login_required()
 def post_list_single_forum(request, forum_id):
     """shows posts for a single forum
 

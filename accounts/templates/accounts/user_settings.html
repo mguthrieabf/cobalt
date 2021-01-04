@@ -7,22 +7,22 @@
   <p>You can edit your settings here. You can also change more personal things in <a href="{% url "accounts:user_profile" %}" class="btn btn-sm btn-success">profile</a></p>
   <div class="content">
     <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-8">
-            <div class="card">
-              <div class="card-header card-header-warning">
-                <h2>Edit Settings</h2>
-              </div>
-              <div class="card-body">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header card-header-warning">
+              <h2>Edit Settings</h2>
+            </div>
+            <div class="card-body">
 
-            <form method="post">
-              {% csrf_token %}
+              <form method="post">
+                {% csrf_token %}
 
-            <input type="hidden" name="username" id="id_username" value="{{ form.username.value }}">
+                <input type="hidden" name="username" id="id_username" value="{{ form.username.value }}">
 
-<!-- Personal Notifications -->
+                <!-- Personal Notifications -->
 
-          <!-- <div class="card">
+                <!-- <div class="card">
               <div class="card-header card-header-primary">
                 <h4 class="card-title">Personal Notifications</h4>
                 <p class="card-category">SMS and Email</p>
@@ -65,11 +65,11 @@
             </div>
           </div> -->
 
-<!-- End Personal Notifications -->
+                <!-- End Personal Notifications -->
 
-<!-- General Notifications -->
+                <!-- General Notifications -->
 
-          <!-- <div class="card">
+                <!-- <div class="card">
             <div class="card-header card-header-primary">
               <h4 class="card-title">General Notifications</h4>
               <p class="card-category">Marketing and Communications</p>
@@ -130,11 +130,11 @@
               </div>
             </div>
           </div> -->
-<!-- End General Notifications -->
+                <!-- End General Notifications -->
 
-<!-- ABF Dollars -->
+                <!-- ABF Dollars -->
 
-          <!-- <div class="card">
+                <!-- <div class="card">
             <div class="card-header card-header-primary">
               <h4 class="card-title">{{ BRIDGE_CREDITS }}</h4>
               <p class="card-category">Payment System</p>
@@ -163,44 +163,44 @@
             </div>
           </div> -->
 
-<!-- End ABF Dollars -->
+                <!-- End ABF Dollars -->
 
-<!-- Site -->
+                <!-- Site -->
 
-          <div class="card">
-            <div class="card-header card-header-primary">
-              <h4 class="card-title">Site Settings</h4>
-              <p class="card-category">Preferences</p>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-12">
-
-                  <div class="col-md-12">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" id="id_system_number_search" name="system_number_search" type="checkbox" {% if form.system_number_search.value %}checked="Checked"{% endif %}>
-                            Show {{ GLOBAL_ORG }} Number on searches
-                            <span class="form-check-sign">
-                                <span class="check"></span>
-                            </span>
-                        </label>
-                    </div>
+                <div class="card">
+                  <div class="card-header card-header-primary">
+                    <h4 class="card-title">Site Settings</h4>
+                    <p class="card-category">Preferences</p>
                   </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
 
-                  <!-- <div class="col-md-12">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                          <input class="form-check-input" id="id_windows_scrollbar" name="windows_scrollbar" type="checkbox" {% if form.windows_scrollbar.value %}checked="Checked"{% endif %}>
-                            Show old scrollbar on Windows
-                            <span class="form-check-sign">
+                        <div class="col-md-12">
+                          <div class="form-check">
+                            <label class="form-check-label">
+                              <input class="form-check-input" id="id_system_number_search" name="system_number_search" type="checkbox" {% if form.system_number_search.value %}checked="Checked" {% endif %}>
+                              Show {{ GLOBAL_ORG }} Number on searches
+                              <span class="form-check-sign">
                                 <span class="check"></span>
-                            </span>
-                        </label>
-                    </div>
-                  </div> -->
+                              </span>
+                            </label>
+                          </div>
+                        </div>
 
-                  <!-- <div class="col-md-12">
+                        <div class="col-md-12">
+                          <div class="form-check">
+                            <label class="form-check-label">
+                              <input class="form-check-input" id="id_windows_scrollbar" name="windows_scrollbar" type="checkbox" {% if form.windows_scrollbar.value %}checked="Checked" {% endif %}>
+                              Use perfect-scrollbar on Windows
+                              <span class="form-check-sign">
+                                <span class="check"></span>
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <!-- <div class="col-md-12">
                     <div class="form-check">
                         <label class="form-check-label">
                             <input class="form-check-input" type="checkbox" value="" checked="Checked">
@@ -226,16 +226,16 @@
 
 
 
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
 
-<!-- End Site Settings -->
+                <!-- End Site Settings -->
 
-<!-- Club -->
+                <!-- Club -->
 
-          <!-- <div class="card" style="width: 400px">
+                <!-- <div class="card" style="width: 400px">
             <div class="card-header card-header-primary">
               <h4 class="card-title">Your Clubs</h4>
               <p class="card-category">Tick shows home club</p>
@@ -270,21 +270,21 @@
  -->
 
 
-<!-- Club Settings -->
+                <!-- Club Settings -->
 
 
 
 
-          <div class="col-md-12">
-            <button type="submit" class="btn btn-primary cobalt-save">Update Settings</button>
-            <div class="clearfix"></div>
+                <div class="col-md-12">
+                  <button type="submit" class="btn btn-primary cobalt-save">Update Settings</button>
+                  <div class="clearfix"></div>
+                </div>
+              </form>
+            </div>
           </div>
-          </form>
-</div>
-</div>
           <!-- system notifications -->
 
-<!-- <br>
+          <!-- <br>
           <div class="card">
             <div class="card-header card-header-success">
               <h4 class="card-title">Manage Notifications</h4>
@@ -329,7 +329,7 @@
           </div> -->
           <!-- system notifications -->
 
-      </div>
+        </div>
         <div class="col-md-4">
           <div class="card card-profile">
             <div class="card-body">
@@ -343,4 +343,8 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

@@ -640,7 +640,8 @@ def setup_autotopup(request):
     if request.user.stripe_auto_confirmed == "On":
         try:
             paylist = stripe.PaymentMethod.list(
-                customer=request.user.stripe_customer_id, type="card",
+                customer=request.user.stripe_customer_id,
+                type="card",
             )
         except stripe.error.InvalidRequestError as error:
             log_event(
@@ -1661,9 +1662,13 @@ def admin_view_stripe_transactions(request):
             to_date = make_aware(to_date, TZ)
             from_date = make_aware(from_date, TZ)
 
-            stripes = StripeTransaction.objects.filter(
-                created_date__range=(from_date, to_date)
-            ).order_by("-created_date")
+            stripes = (
+                StripeTransaction.objects.filter(
+                    created_date__range=(from_date, to_date)
+                )
+                .exclude(stripe_method=None)
+                .order_by("-created_date")
+            )
 
             for stripe_item in stripes:
                 stripe_item.amount_settle = (float(stripe_item.amount) - 0.3) * 0.9825
@@ -1900,7 +1905,11 @@ def member_transfer_org(request, org_id):
                 subject="Transfer from %s" % organisation,
             )
 
-            msg = "Transferred %s%s to %s" % (GLOBAL_CURRENCY_SYMBOL, amount, member,)
+            msg = "Transferred %s%s to %s" % (
+                GLOBAL_CURRENCY_SYMBOL,
+                amount,
+                member,
+            )
             messages.success(request, msg, extra_tags="cobalt-message-success")
             return redirect("payments:statement_org", org_id=organisation.id)
         else:
@@ -2037,7 +2046,9 @@ def admin_payments_static_org_override_add(request):
             messages.error(request, form.errors, extra_tags="cobalt-message-error")
 
     return render(
-        request, "payments/admin_payments_static_org_override_add.html", {"form": form},
+        request,
+        "payments/admin_payments_static_org_override_add.html",
+        {"form": form},
     )
 
 

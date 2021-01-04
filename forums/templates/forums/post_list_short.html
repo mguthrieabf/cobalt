@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load cobalt_tags %}
 
 {% block content %}
 
@@ -33,6 +34,7 @@
             <h3 class="p-0 m-0"><a href="{% url 'forums:post_detail' pk=thing.pk %}">{{ thing.title }}</a></h3>
             <h5 class="p-0 m-0"><a href="{% url "accounts:public_profile" pk=thing.author.id %}">{{ thing.author.full_name }}</a> posted in {{ thing.forum.title }}</h5>
             <p class="p-0 m-0 font-italic"><small>{{ thing.created_date|naturaltime }}</small></p>
+                        <p class="p-0 m-0"><small>{{ thing.created_date|cobalt_datetime_nice }}</small></p>
             <p class="p-0 m-0"><small>{{ thing.created_date|date:"n M Y P" }}</small></p>
           </div>
           <div class="col-2 my-auto">

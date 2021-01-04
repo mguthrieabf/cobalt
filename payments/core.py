@@ -691,35 +691,29 @@ def payment_api(
 
             if other_member:  # transfer to another member
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for transfer to %s (%s). <br>\
+                    msg = "Partial payment for transfer to %s (%s). <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            other_member,
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        other_member,
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment to %s (%s)" % (other_member, description)
 
             else:
                 if balance > 0.0:
-                    msg = (
-                        "Partial payment for %s. <br>\
+                    msg = "Partial payment for %s. <br>\
                            Also using your current balance \
-                           of %s%.2f to make total payment of %s%.2f."
-                        % (
-                            description,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            balance,
-                            GLOBAL_CURRENCY_SYMBOL,
-                            amount,
-                        )
+                           of %s%.2f to make total payment of %s%.2f." % (
+                        description,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        balance,
+                        GLOBAL_CURRENCY_SYMBOL,
+                        amount,
                     )
                 else:
                     msg = "Payment for: " + description
@@ -794,10 +788,23 @@ def stripe_webhook_manual(event):
         tran.stripe_exp_year = charge.payment_method_details.card.exp_year
         tran.stripe_last4 = charge.payment_method_details.card.last4
         tran.stripe_balance_transaction = event.data.object.balance_transaction
-
         tran.last_change_date = timezone.now()
         tran.status = "Complete"
-        tran.save()
+
+        already = StripeTransaction.objects.filter(
+            stripe_method=charge.payment_method
+        ).exists()
+
+        if not already:
+            tran.save()
+        else:
+            log_event(
+                user="Stripe API",
+                severity="CRITICAL",
+                source="Payments",
+                sub_source="stripe_webhook",
+                message=f"Duplicate transaction from Stripe. {charge.payment_method} already present",
+            )
 
         log_event(
             user="Stripe API",
@@ -1309,7 +1316,8 @@ def auto_topup_member(member, topup_required=None, payment_type="Auto Top Up"):
     # Get payment method id for this customer from Stripe
     try:
         paylist = stripe.PaymentMethod.list(
-            customer=member.stripe_customer_id, type="card",
+            customer=member.stripe_customer_id,
+            type="card",
         )
         pay_method_id = paylist.data[0].id
     except stripe.error.InvalidRequestError:
