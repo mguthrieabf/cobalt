@@ -69,7 +69,7 @@ class User(AbstractUser):
         "Receive Payments Emails", default=True
     )
     windows_scrollbar = models.BooleanField(
-        "Show old scrollbar on Windows", default=False
+        "Use Perfect Scrollbar on Windows", default=False
     )
     last_activity = models.DateTimeField(blank="True", null=True)
 

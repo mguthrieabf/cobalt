@@ -21,9 +21,7 @@
   <!-- These can cause problems, for example in forums with Summernote so we allow them to be overridden -->
   <script src="{% static "assets/js/core/jquery-3.4.1.min.js" %}"></script>
   <script src="{% static "assets/js/core/popper.min.js" %}"></script>
-  {% if not request.user.windows_scrollbar %}
   <script src="{% static "assets/js/plugins/perfect-scrollbar.jquery.min.js" %}"></script>
-  {% endif %}
   <script src="{% static "assets/js/core/bootstrap-material-design.min.js" %}"></script>
   {% endblock %}
   <script src="{% static "assets/js/cobalt-core.js" %}"></script>
@@ -284,8 +282,14 @@
     <!-- Library for adding dinamically elements
     -->
   <script src="{% static "assets/js/plugins/arrive.min.js" %}"></script>
-  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+
+<!-- Default is not to use perfect scrollbar  -->
+
+{% if request.user.windows_scrollbar %}
   <script src="{% static "assets/js/material-dashboard.js" %}?v=2.1.1" type="text/javascript"></script>
+{% else %}
+  <script src="{% static "assets/js/material-dashboard-noscroll.js" %}?v=2.1.1" type="text/javascript"></script>
+{% endif %}
 
 </body>
 
