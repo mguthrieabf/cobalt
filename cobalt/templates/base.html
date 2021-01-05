@@ -40,7 +40,6 @@
           {% if request.META.HTTP_HOST != GLOBAL_PRODUCTION %}
           {{ request.META.HTTP_HOST }}
           {% endif %}
-           <a href="{{ request.META.HTTP_REFERER }}">referring page</a>
           <br>
           <img src="{% static "assets/img/abftechlogo.png" %}" style="width:250px">
         </a>
