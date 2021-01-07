@@ -379,9 +379,10 @@ def checkout(request):
         "event_entry"
     )
     event_entry_players = (
-        EventEntryPlayer.objects.filter(event_entry__in=event_entries)
-        .exclude(payment_status="Paid")
-        .exclude(payment_status="Free")
+        EventEntryPlayer.objects.filter(event_entry__in=event_entries).exclude(
+            payment_status="Paid"
+        )
+        #        .exclude(payment_status="Free")
     )
 
     # get totals per congress
@@ -1391,6 +1392,9 @@ def enter_event(request, congress_id, event_id):
                 if p_string_value != "":
                     players[p_id] = get_object_or_404(User, pk=int(p_string_value))
                     player_payments[p_id] = request.POST.get(ppay_string)
+                # regardless of what we get sent - 5th and 6th players are free
+                if p_id > 3:
+                    player_payments[p_id] = "Free"
 
         # validate
         if (event.player_format == "Pairs" and len(players) != 2) or (

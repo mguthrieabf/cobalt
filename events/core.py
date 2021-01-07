@@ -374,10 +374,22 @@ def get_events(user):
         start_date = event_entry_player.event_entry.event.start_date()
         if start_date >= datetime.now().date():
             # Check if still in cart
-            in_cart = BasketItem.objects.filter(
-                event_entry=event_entry_player.event_entry
-            ).count()
+            in_cart = (
+                BasketItem.objects.filter(event_entry=event_entry_player.event_entry)
+                .filter(player=user)
+                .exists()
+            )
             event_entry_player.in_cart = in_cart
+
+            # Check if still in someone elses cart
+            in_other_cart = (
+                BasketItem.objects.filter(event_entry=event_entry_player.event_entry)
+                .exclude(player=user)
+                .first()
+            )
+            if in_other_cart:
+                event_entry_player.in_other_cart = in_other_cart.player
+
             upcoming[event_entry_player] = start_date
             # check if unpaid
             if event_entry_player.payment_status == "Unpaid":

@@ -858,7 +858,7 @@ def unblock_user(request, user_id, forum_id):
     user = get_object_or_404(User, pk=user_id)
     forum = get_object_or_404(Forum, pk=forum_id)
     group = RBACGroup.objects.filter(
-        name_qualifier=f"forums.forum.{forum_id}", name_item="create"
+        name_qualifier=f"forums.forum.{forum_id}", name_item="blocked_users"
     ).first()
     blocked = RBACUserGroup.objects.filter(member=user, group=group).first()
     blocked.delete()

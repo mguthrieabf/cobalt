@@ -25,22 +25,22 @@
           <div class="col-md-6">
             <div class="form-group">
               <label class="bmd-label-static" style="font-size:11px">Start Date</label>
-              <input type="text" name="from_date" id="id_from_date" class="form-control datepicker" value="{{ form.from_date.value|default_if_none:'' }}">
+              <input type="text" name="from_date" id="id_from_date" autocomplete="id_from_date" class="form-control datepicker" style="overflow: visible;" value="{{ form.from_date.value|default_if_none:'' }}">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label class="bmd-label-static" style="font-size:11px">End Date</label>
-              <input type="text" name="to_date" id="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
+              <input type="text" name="to_date" id="id_to_date" autocomplete="id_to_date" class="form-control datepicker" value="{{ form.to_date.value|default_if_none:'' }}">
             </div>
           </div>
         </div>
 
         <div class="row">
           <div class="col">
-          <button type="submit" class="btn btn-primary" name="show">Show</button>
-          <button type="submit" class="btn btn-success" name="export">CSV Download</button>
-        </div>
+            <button type="submit" class="btn btn-primary cobalt-save" name="show">Show</button>
+            <button type="submit" class="btn btn-success cobalt-save" name="export">CSV Download</button>
+          </div>
           {% if things %}
 
           <div class="card">

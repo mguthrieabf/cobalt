@@ -155,7 +155,9 @@
                     </td>
                     <td class="text-right">
                       {% if row.event_entry_player.payment_type != "my-system-dollars"%}
-                        {{ row.event_entry_player.entry_fee }}
+                        {% if row.event_entry_player.entry_fee != 0 %}
+                          {{ row.event_entry_player.entry_fee }}
+                        {% endif %}
                       {% endif %}
                     </td>
                     <td>{{ row.event_entry_player.get_payment_type_display }}</td>

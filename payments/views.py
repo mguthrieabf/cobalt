@@ -610,7 +610,11 @@ def stripe_create_customer(request):
     """
 
     stripe.api_key = STRIPE_SECRET_KEY
-    customer = stripe.Customer.create(metadata={"cobalt_tran_type": "Auto"})
+    customer = stripe.Customer.create(
+        name=request.user,
+        email=request.user.email,
+        metadata={"cobalt_tran_type": "Auto"},
+    )
     request.user.stripe_customer_id = customer.id
     request.user.auto_amount = AUTO_TOP_UP_DEFAULT_AMT
     request.user.save()

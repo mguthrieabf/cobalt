@@ -113,6 +113,9 @@
              {% if event.in_cart %}
               (in cart)
              {% endif %}
+             {% if event.in_other_cart %}
+              (in {{ event.in_other_cart.full_name }}'s cart)
+             {% endif %}
               {% if event.payment_status == "Pending Manual" and event.payment_type == "bank-transfer" %}
                 (transfer pending)
              {% endif %}
