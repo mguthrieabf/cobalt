@@ -62,7 +62,7 @@ ADMINS = [
 # ADMINS = list(ast.literal_eval(admin_string))
 # print(ADMINS[0])
 
-SERVER_EMAIL = set_value("SERVER_EMAIL", "notset@abftech.com.au")
+SERVER_EMAIL = set_value("SERVER_EMAIL", "notset@myabf.com.au")
 
 # masterpoints server
 GLOBAL_MPSERVER = set_value("GLOBAL_MPSERVER")
@@ -254,8 +254,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # External reference point to find static
 STATIC_URL = "/static/"
-# STATIC_URL = "https://test.abftech.com.au/static/"
-
 
 # append MD5 hash to filenames to prevent caching on version change
 STATICFILES_STORAGE = "utils.storage.ForgivingManifestStaticFilesStorage"

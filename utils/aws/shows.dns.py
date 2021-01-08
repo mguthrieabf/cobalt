@@ -3,7 +3,7 @@ import boto3
 import json
 import sys
 
-COBALT_ZONE = "abftech.com.au."
+COBALT_ZONE = "myabf.com.au."
 
 
 def format_json(response):
@@ -38,28 +38,5 @@ for record_set in record_sets:
         for resource_record in resource_records:
             print(resource_record)
             print(resource_record["Value"])
-
-# response = client.change_resource_record_sets(
-#     ChangeBatch={
-#         "Changes": [
-#             {
-#                 "Action": "CREATE",
-#                 #                'Action': 'DELETE',
-#                 "ResourceRecordSet": {
-#                     "Name": "uat4.abftech.com.au",
-#                     "ResourceRecords": [
-#                         {
-#                             "Value": "cobalt-uat-4.eba-4ngvp62w.ap-southeast-2.elasticbeanstalk.com",
-#                         },
-#                     ],
-#                     "TTL": 300,
-#                     "Type": "CNAME",
-#                 },
-#             },
-#         ],
-#         "Comment": "Added cobalt-uat-4",
-#     },
-#     HostedZoneId=cobalt_zone_id,
-# )
 
 print(response)

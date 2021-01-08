@@ -3,7 +3,7 @@ import boto3
 import json
 import sys
 
-COBALT_ZONE = "abftech.com.au."
+COBALT_ZONE = "myabf.com.au."
 
 client = boto3.client("route53")
 

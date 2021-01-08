@@ -49,7 +49,7 @@ def non_production_email_changer(request):
     if not request.user.is_superuser:
         raise SuspiciousOperation("This is only avaiable for admin users.")
 
-    if COBALT_HOSTNAME in ["abftech.com.au", "www.abftech.com.au"]:
+    if COBALT_HOSTNAME in ["myabf.com.au", "www.myabf.com.au"]:
         raise SuspiciousOperation(
             "Not for use in production. This cannot be used in a production system."
         )
@@ -64,7 +64,9 @@ def non_production_email_changer(request):
 
         count = all_users.count()
         messages.success(
-            request, f"{count} users updated.", extra_tags="cobalt-message-success",
+            request,
+            f"{count} users updated.",
+            extra_tags="cobalt-message-success",
         )
 
     return render(
@@ -104,7 +106,9 @@ def contact(request):
             send_cobalt_email(admin[1], f"Support Request: {title}", html_msg)
 
         messages.success(
-            request, "Message sent successfully", extra_tags="cobalt-message-success",
+            request,
+            "Message sent successfully",
+            extra_tags="cobalt-message-success",
         )
 
         return redirect("support:support")

@@ -258,6 +258,7 @@ def payment_options_for_user_ajax(request):
     else:
         response_data["add_entry"] = ""
         response_data["message"] = "Blocked"
+
     return JsonResponse({"data": response_data})
 
 

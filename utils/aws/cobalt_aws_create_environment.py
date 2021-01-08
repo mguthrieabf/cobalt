@@ -31,7 +31,7 @@ def build_environment(env_name, env_type, varfile, eb_dns_name):
     print("Environment: %s" % env_name)
     print("Type: %s" % env_type)
     print("Input file: %s" % varfile)
-    print("DNS: %s.abftech.com.au" % eb_dns_name)
+    print("DNS: %s.myabf.com.au" % eb_dns_name)
 
     result = subprocess.run(["git", "status", "--short"], stdout=subprocess.PIPE)
     output = result.stdout.decode("utf-8")

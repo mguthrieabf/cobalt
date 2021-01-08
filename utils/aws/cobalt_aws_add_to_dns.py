@@ -3,8 +3,8 @@ import boto3
 import json
 import sys
 
-COBALT_ZONE = "abftech.com.au."
-COBALT_ZONE_DNS = ".abftech.com.au"
+COBALT_ZONE = "myabf.com.au."
+COBALT_ZONE_DNS = ".myabf.com.au"
 
 
 def add_to_aws_dns(eb_dns_name, eb_environment_name):

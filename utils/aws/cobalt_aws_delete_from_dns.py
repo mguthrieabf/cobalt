@@ -3,8 +3,8 @@ import boto3
 import json
 import sys
 
-COBALT_ZONE = "abftech.com.au."
-COBALT_ZONE_DNS = ".abftech.com.au"
+COBALT_ZONE = "myabf.com.au."
+COBALT_ZONE_DNS = ".myabf.com.au"
 
 if len(sys.argv) != 2:
     print("\nUsage %s dns_name\n" % sys.argv[0])

@@ -184,7 +184,7 @@ def contact_member(member, msg, contact_type, link=None, html_msg=None, subject=
         return
 
     if not subject:
-        subject = "Notification from ABFTech"
+        subject = "Notification from My ABF"
 
     if not html_msg:
         html_msg = msg
