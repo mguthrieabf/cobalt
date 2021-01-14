@@ -20,6 +20,7 @@ class PostForm(forms.ModelForm):
         self.fields["forum"].label = False
         self.fields["title"].label = False
         self.fields["text"].label = False
+        # self.fields["get_notified_of_replies"].label = False
 
     title = forms.CharField(
         widget=forms.TextInput(attrs={"class": "cobalt-min-width-100"})
@@ -34,6 +35,8 @@ class PostForm(forms.ModelForm):
             }
         )
     )
+
+    get_notified_of_replies = forms.ChoiceField(choices=[(True, "Receive emails for all replies"),(False,"No emails, thank you")])
 
     class Meta:
         model = Post
