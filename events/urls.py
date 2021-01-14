@@ -325,9 +325,29 @@ urlpatterns = [
         name="admin_event_offsystem",
     ),
     path(
+        "congress-admin/event-offsystem-pp/<int:event_id>",
+        congress_admin.admin_event_offsystem_pp,
+        name="admin_event_offsystem_pp",
+    ),
+    path(
+        "congress-admin/event-offsystem-pp-batch/<int:event_id>",
+        congress_admin.admin_event_offsystem_pp_batch,
+        name="admin_event_offsystem_pp_batch",
+    ),
+    path(
         "congress-admin/off-system/pay",
         ajax.admin_offsystem_pay_ajax,
         name="admin_offsystem_pay_ajax",
+    ),
+    path(
+        "congress-admin/off-system-pp/unpay",
+        ajax.admin_offsystem_unpay_pp_ajax,
+        name="admin_offsystem_unpay_pp_ajax",
+    ),
+    path(
+        "congress-admin/off-system-pp/pay",
+        ajax.admin_offsystem_pay_pp_ajax,
+        name="admin_offsystem_pay_pp_ajax",
     ),
     path(
         "congress-admin/off-system/unpay",

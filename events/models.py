@@ -43,6 +43,7 @@ PAYMENT_TYPES = [
     ("their-system-dollars", f"Their {BRIDGE_CREDITS}"),
     ("other-system-dollars", "TBA"),
     ("bank-transfer", "Bank Transfer"),
+    ("off-system-pp", "Club PP System"),
     ("cash", "Cash"),
     ("cheque", "Cheque"),
     ("unknown", "Unknown"),
@@ -145,6 +146,7 @@ class Congress(models.Model):
     )
     payment_method_cash = models.BooleanField(default=False)
     payment_method_cheques = models.BooleanField(default=False)
+    payment_method_off_system_pp = models.BooleanField(default=False)
     cheque_details = models.TextField("Cheque Details", null=True, blank=True)
     allow_early_payment_discount = models.BooleanField(default=False)
     early_payment_discount_date = models.DateField(
@@ -204,6 +206,8 @@ class Congress(models.Model):
             pay_methods.append(("cash", "Cash on the day"))
         if self.payment_method_cheques:
             pay_methods.append(("cheque", "Cheque"))
+        if self.payment_method_off_system_pp:
+            pay_methods.append(("off-system-pp", "Club PP System"))
 
         return pay_methods
 

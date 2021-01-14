@@ -39,6 +39,7 @@ from .forms import (
     EmailForm,
     BulletinForm,
     LatestNewsForm,
+    OffSystemPPForm,
 )
 from rbac.core import (
     rbac_user_allowed_for_model,
@@ -582,6 +583,33 @@ def admin_event_offsystem(request, event_id):
     return render(
         request,
         "events/admin_event_offsystem.html",
+        {"event": event, "players": players},
+    )
+
+
+@login_required()
+def admin_event_offsystem_pp(request, event_id):
+    """ Handle Club PP system to allow clubs to use their existing PP system as a payment method """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # get players with pps
+    players = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .filter(
+            payment_type="off-system-pp"
+        )
+        .exclude(event_entry__entry_status="Cancelled")
+    )
+
+    return render(
+        request,
+        "events/admin_event_offsystem_pp.html",
         {"event": event, "players": players},
     )
 
@@ -1322,4 +1350,123 @@ def admin_event_entry_player_delete(request, event_entry_player_id):
         request,
         "events/admin_event_entry_player_delete.html",
         {"event_entry_player": event_entry_player},
+    )
+
+
+@login_required()
+@transaction.atomic
+def admin_event_offsystem_pp_batch(request, event_id):
+    """ Handle Club PP system to allow clubs to use their existing PP system
+        as a payment method. This handles batch work so upload a spreadsheet
+        to the external PP system """
+
+    event = get_object_or_404(Event, pk=event_id)
+
+    # check access
+    role = "events.org.%s.edit" % event.congress.congress_master.org.id
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # get players with pps
+    event_entry_players = (
+        EventEntryPlayer.objects.filter(event_entry__event=event)
+        .filter(
+            payment_type="off-system-pp"
+        )
+        .exclude(event_entry__entry_status="Cancelled")
+        .exclude(payment_status="Paid")
+    )
+
+    # calculate outstanding
+    for event_entry_player in event_entry_players:
+        event_entry_player.outstanding = event_entry_player.entry_fee - event_entry_player.payment_received
+
+    event_entry_players_list = []
+    for event_entry_player in event_entry_players:
+        event_entry_players_list.append((event_entry_player.id, event_entry_player.player.full_name))
+
+
+    if request.method == "POST":
+
+        form = OffSystemPPForm(request.POST, event_entry_players=event_entry_players_list)
+        if form.is_valid():
+
+            # event_entry_players_list is the full list, event-entry_players_ids is
+            # those that are selected
+
+            event_entry_player_ids = form.cleaned_data["event_entry_players_list"]
+
+            event_entry_players = EventEntryPlayer.objects.filter(id__in=event_entry_player_ids)
+
+            if "export" in request.POST:  # CSV download
+
+                local_dt = timezone.localtime(timezone.now(), TZ)
+                today = dateformat.format(local_dt, "Y-m-d H:i:s")
+
+                response = HttpResponse(content_type="text/csv")
+                response[
+                    "Content-Disposition"
+                ] = 'attachment; filename="my-abf-to-pp.csv"'
+
+                writer = csv.writer(response)
+                writer.writerow(
+                    [
+                        "My ABF to PP Export",
+                        "Downloaded by %s" % request.user.full_name,
+                        today,
+                    ]
+                )
+                writer.writerow(
+                    [
+                        f"{GLOBAL_ORG} No.",
+                        "Name",
+                        "Amount",
+                    ]
+                )
+
+                for event_entry_player in event_entry_players:
+                    writer.writerow(
+                        [
+                            event_entry_player.player.system_number,
+                            event_entry_player.player.full_name,
+                            event_entry_player.entry_fee - event_entry_player.payment_received,
+                        ]
+                    )
+
+                return response
+
+            else:  # confirm payments
+
+                for event_entry_player in event_entry_players:
+                    outstanding = event_entry_player.entry_fee - event_entry_player.payment_received
+                    event_entry_player.payment_status = "Paid"
+                    event_entry_player.payment_received = event_entry_player.entry_fee
+                    event_entry_player.save()
+
+                    event_entry_player.event_entry.check_if_paid()
+
+                    EventLog(
+                        event=event,
+                        event_entry=event_entry_player.event_entry,
+                        actor=request.user,
+                        action=f"{event_entry_player.player} paid {outstanding} through off system PP",
+                    ).save()
+
+                length = event_entry_players.count()
+
+                messages.success(
+                    request,
+                    f"Off System PP payments processed successfully. {length} players updated",
+                    extra_tags="cobalt-message-success",
+                )
+
+                return redirect(
+                    "events:admin_event_summary",
+                    event_id=event.id,
+                )
+    else:
+        form = OffSystemPPForm(event_entry_players=event_entry_players_list)
+
+    return render(
+        request, "events/admin_event_offsystem_pp_batch.html", {"event_entry_players": event_entry_players, "form": form, "event": event}
     )

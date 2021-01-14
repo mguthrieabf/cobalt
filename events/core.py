@@ -300,6 +300,11 @@ def send_notifications(route_payload, payment_user):
                         ].event_entry.event.congress.cheque_details
                     )
 
+                if event_entry_players.filter(payment_type="off-system-pp").exists():
+                    player_email[player] += (
+                        "<p>We are expecting payment from another pre-paid system. The convener will handle this for you.</p><br><br>"
+                    )
+
                 player_email[
                     player
                 ] += "You have outstanding payments to make to complete this entry. Click on the button below to view your payments. Note that entries are not complete until all payments have been received.<br><br>"

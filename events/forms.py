@@ -47,6 +47,7 @@ class CongressForm(forms.ModelForm):
         self.fields["payment_method_bank_transfer"].label = False
         self.fields["payment_method_cash"].label = False
         self.fields["payment_method_cheques"].label = False
+        self.fields["payment_method_off_system_pp"].label = False
         self.fields["entry_open_date"].label = False
         self.fields["entry_close_date"].label = False
         self.fields["allow_partnership_desk"].label = False
@@ -81,6 +82,7 @@ class CongressForm(forms.ModelForm):
         self.fields["payment_method_bank_transfer"].required = False
         self.fields["payment_method_cash"].required = False
         self.fields["payment_method_cheques"].required = False
+        self.fields["payment_method_off_system_pp"].required = False
         self.fields["entry_open_date"].required = False
         self.fields["entry_close_date"].required = False
         self.fields["allow_partnership_desk"].required = False
@@ -216,6 +218,7 @@ class CongressForm(forms.ModelForm):
             "payment_method_bank_transfer",
             "payment_method_cash",
             "payment_method_cheques",
+            "payment_method_off_system_pp",
             "entry_open_date",
             "entry_close_date",
             "allow_partnership_desk",
@@ -372,3 +375,24 @@ class PartnershipForm(forms.ModelForm):
     class Meta:
         model = PartnershipDesk
         fields = ("event", "private", "comment", "player")
+
+
+class OffSystemPPForm(forms.Form):
+    """ For off system PP payments """
+
+    CARD_CHOICES = [
+        ("Dummy", "Dummy"),
+    ]
+
+    # Handle checkboxes
+    event_entry_players_list = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple, choices=CARD_CHOICES,
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ dynamic override of checkbox list """
+
+        # Get list of event_entry_players
+        self.event_entry_players = kwargs.pop("event_entry_players", None)
+        super(OffSystemPPForm, self).__init__(*args, **kwargs)
+        self.fields["event_entry_players_list"].choices = self.event_entry_players
