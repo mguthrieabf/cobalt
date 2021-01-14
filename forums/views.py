@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.contrib import messages
+from django.db import transaction
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rbac.core import (
     rbac_user_blocked_for_model,
@@ -78,6 +79,7 @@ def post_list_single_forum(request, forum_id):
 
 
 @login_required()
+@transaction.atomic
 def post_detail(request, pk):
     """Main view for existing post.
 
@@ -123,28 +125,34 @@ def post_detail(request, pk):
                 post.comment1.save()
 
             # Tell people
-            link = reverse("forums:post_detail", args=[post.post.id])
+            base_link = reverse("forums:post_detail", args=[post.post.id])
             host = request.get_host()
-            absolute_link = "http://%s%s" % (host, link)
+
+            if "submit-c1" in request.POST:
+                link = f"{base_link}#target_{post.id}"
+            else:
+                link = f"{base_link}#target_{post.comment1.id}_{post.id}"
+
+            text_html = post.text.replace("\r", "<br>")
 
             email_body = "%s commented on %s in Forum: '%s.'<br><br>%s" % (
                 request.user,
                 post.post.title,
                 post.post.forum,
-                post.post.text,
+                text_html,
             )
 
             context = {
                 "name": "[NAME]",
                 "title": "New Comment on: %s" % post.post.title,
                 "email_body": email_body,
-                "absolute_link": absolute_link,
+                "link": link,
                 "host": host,
-                "link_text": "Go To Post",
+                "link_text": "Go To Reply",
             }
 
             html_msg = render_to_string(
-                "notifications/email-notification.html", context
+                "notifications/email_with_button.html", context
             )
 
             msg = "New Comment by %s on %s" % (request.user, post.post.title)
@@ -219,6 +227,7 @@ def post_detail(request, pk):
 
 
 @login_required()
+@transaction.atomic
 def post_new(request, forum_id=None):
     """ Create a new post in a forum """
 
@@ -254,6 +263,15 @@ def post_new(request, forum_id=None):
             post.text = text
 
             post.save()
+
+            notify_me = form.cleaned_data['get_notified_of_replies']
+            if notify_me == "True":
+                add_listener(
+                    member=request.user,
+                    application="Forums",
+                    event_type="forums.post.comment",
+                    topic=post.id,
+                )
 
             messages.success(
                 request, "Post created", extra_tags="cobalt-message-success"
@@ -323,6 +341,7 @@ def post_new(request, forum_id=None):
 
 
 @login_required()
+@transaction.atomic
 def post_edit(request, post_id):
     """Edit a post in a forum.
 

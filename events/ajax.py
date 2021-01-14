@@ -365,6 +365,84 @@ def admin_offsystem_unpay_ajax(request):
 
 
 @login_required()
+def admin_offsystem_pay_pp_ajax(request):
+    """ Ajax call to mark a pp payment as paid """
+
+    if request.method == "POST":
+        event_entry_player_id = request.POST["event_entry_player_id"]
+
+    event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
+
+    # check access
+    role = (
+        "events.org.%s.edit"
+        % event_entry_player.event_entry.event.congress.congress_master.org.id
+    )
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # Mark as paid
+    event_entry_player.payment_status = "Paid"
+    event_entry_player.payment_received = event_entry_player.entry_fee
+    # TODO: client side screen to capture who actually paid this so don't need to assume it was the player
+    event_entry_player.paid_by = event_entry_player.player
+    event_entry_player.save()
+
+    # Log it
+    EventLog(
+        event=event_entry_player.event_entry.event,
+        actor=request.user,
+        action=f"Marked {event_entry_player.player} as paid (pp)",
+        event_entry=event_entry_player.event_entry,
+    ).save()
+
+    # Check if parent complete
+    event_entry_player.event_entry.check_if_paid()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
+def admin_offsystem_unpay_pp_ajax(request):
+    """ Ajax call to mark a pp payment as no longer paid """
+
+    if request.method == "POST":
+        event_entry_player_id = request.POST["event_entry_player_id"]
+
+    event_entry_player = get_object_or_404(EventEntryPlayer, pk=event_entry_player_id)
+
+    # check access
+    role = (
+        "events.org.%s.edit"
+        % event_entry_player.event_entry.event.congress.congress_master.org.id
+    )
+    if not rbac_user_has_role(request.user, role):
+        return rbac_forbidden(request, role)
+
+    # Mark as unpaid
+    event_entry_player.payment_status = "Unpaid"
+    event_entry_player.payment_received = 0
+    event_entry_player.save()
+
+    # Log it
+    EventLog(
+        event=event_entry_player.event_entry.event,
+        actor=request.user,
+        action=f"Marked {event_entry_player.player} as unpaid (pp)",
+        event_entry=event_entry_player.event_entry,
+    ).save()
+
+    # Check if parent complete
+    event_entry_player.event_entry.check_if_paid()
+
+    response_data = {}
+    response_data["message"] = "Success"
+    return JsonResponse({"data": response_data})
+
+
+@login_required()
 def delete_basket_item_ajax(request):
     """ Delete an item from a users basket (and delete the event entry) """
 

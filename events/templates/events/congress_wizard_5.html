@@ -214,6 +214,20 @@
                   </div>
                 </div>
 
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input class="form-check-input" id="id_payment_method_off_system_pp" name="payment_method_off_system_pp" type="checkbox" {% if form.payment_method_off_system_pp.value %}checked="Checked" {% endif %}>
+                        Use your own pre-paid system (not My ABF)
+                        <span class="form-check-sign">
+                          <span class="check"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="row h-100" id="cheques" style="display:none;">
                     <div class="col-2 my-auto font-weight-bold" >Cheque Details:</div>
                   <div class="col-9">

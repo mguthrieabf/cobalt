@@ -1006,6 +1006,11 @@ def settlement(request):
     if not rbac_user_has_role(request.user, "payments.global.edit"):
         return rbac_forbidden(request, "payments.global.edit")
 
+    payment_static = PaymentStatic.objects.filter(active="True").last()
+
+    if not payment_static:
+        return HttpResponse("<h1>Payment Static has not been set up</h1>")
+
     # orgs with outstanding balances
     # Django is a bit too clever here so we actually have to include balance=0.0 and filter
     # it in the code, otherwise we get the most recent non-zero balance. There may be
@@ -1044,7 +1049,7 @@ def settlement(request):
                 writer = csv.writer(response)
                 writer.writerow(
                     [
-                        "Settlments Export",
+                        "Settlements Export",
                         "Downloaded by %s" % request.user.full_name,
                         today,
                     ]

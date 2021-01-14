@@ -331,6 +331,9 @@ def create_congress_wizard_5(request, step_list, congress):
             congress.payment_method_cheques = form.cleaned_data[
                 "payment_method_cheques"
             ]
+            congress.payment_method_off_system_pp = form.cleaned_data[
+                "payment_method_off_system_pp"
+            ]
             congress.entry_open_date = form.cleaned_data["entry_open_date"]
             congress.entry_close_date = form.cleaned_data["entry_close_date"]
             congress.automatic_refund_cutoff = form.cleaned_data[
@@ -390,6 +393,7 @@ def create_congress_wizard_5(request, step_list, congress):
     form.fields["payment_method_bank_transfer"].required = True
     form.fields["payment_method_cash"].required = True
     form.fields["payment_method_cheques"].required = True
+    form.fields["payment_method_off_system_pp"].required = True
     form.fields["entry_open_date"].required = True
     form.fields["entry_close_date"].required = True
     form.fields["automatic_refund_cutoff"].required = True
