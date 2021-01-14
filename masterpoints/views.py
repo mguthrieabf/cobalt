@@ -65,6 +65,14 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
     else:
         summary["IsActive"] = False
 
+    # Get provisional month and year, anything this date or later is provisional
+    qry = "%s/provisionaldate" % GLOBAL_MPSERVER
+    data = requests.get(qry).json()[0]
+    prov_month = "%02d" % int(data["month"])
+    prov_year = data["year"]
+
+    print(prov_year, prov_month)
+
     # Get home club name
     qry = "%s/club/%s" % (GLOBAL_MPSERVER, summary["HomeClubID"])
     club = requests.get(qry).json()[0]["ClubName"]
@@ -320,6 +328,7 @@ def get_masterpoints(system_number):
     ):
         points = "Not found"
         rank = "Not found"
+
     return {"points": points, "rank": rank}
 
 
