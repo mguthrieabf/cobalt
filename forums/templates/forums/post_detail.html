@@ -255,7 +255,6 @@
         },
         type: "post",
         success: function(response) {
-          console.log(response);
           if (response == "ok") {
             var likecount = $("#cobalt_post_likes");
             var newcount = parseInt(likecount.text()) + 1;
