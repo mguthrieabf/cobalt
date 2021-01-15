@@ -65,13 +65,17 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
     else:
         summary["IsActive"] = False
 
+    # Don't show inactives - should never get here so no need for a really nice message
+    if not summary["IsActive"]:
+        return HttpResponse("Player is inactive. Unable to show results")
+
     # Get provisional month and year, anything this date or later is provisional
     qry = "%s/provisionaldate" % GLOBAL_MPSERVER
     data = requests.get(qry).json()[0]
     prov_month = "%02d" % int(data["month"])
     prov_year = data["year"]
 
-    print(prov_year, prov_month)
+    prov_date = int(f"{prov_year}{prov_month}")
 
     # Get home club name
     qry = "%s/club/%s" % (GLOBAL_MPSERVER, summary["HomeClubID"])
@@ -111,6 +115,7 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
     for i in range(12 * years + 1):
         year = rolling_date.strftime("%Y")
         month = rolling_date.strftime("%m")
+
         labels_key.append("%s-%s" % (year, month))
         if years == 1:
             labels.append(rolling_date.strftime("%b"))
@@ -121,9 +126,22 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
         chart_red["%s-%s" % (year, month)] = 0.0
         chart_green["%s-%s" % (year, month)] = 0.0
 
+    # check for provisional and remove from list
+    provisional = []
+    for d in details:
+        ref_date = int("%s%02d" % (d["PostingYear"], d["PostingMonth"]))
+        if ref_date >= prov_date:
+            d["PostingDateDisplay"] = "%s-%s" % (
+                calendar.month_abbr[d["PostingMonth"]],
+                d["PostingYear"],
+            )
+            provisional.append(d)
+            details.remove(d)
+
     # loop through the details and augment the data to pass to the template
     # we are just adding running total data for the table of details
     for d in details:
+
         counter = counter - d["mps"]
 
         d["running_total"] = counter
@@ -218,6 +236,7 @@ def masterpoints_detail(request, system_number=None, years=1, retry=False):
             "points_every": points_every,
             "system_number": system_number,
             "timescale": timescale,
+            "provisional": provisional,
         },
     )
 
@@ -333,8 +352,8 @@ def get_masterpoints(system_number):
 
 
 def user_summary(system_number):
-    """ This is only here until we move masterpoints into Cobalt.
-        It gets basic things such as home club and masterpoints.
+    """This is only here until we move masterpoints into Cobalt.
+    It gets basic things such as home club and masterpoints.
     """
 
     # Get summary data
