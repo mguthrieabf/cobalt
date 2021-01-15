@@ -93,7 +93,17 @@
             {{ form.text|as_crispy_field }}
 
 
-                        Notifications: {{ form.get_notified_of_replies|as_crispy_field }}
+                        Notifications:
+
+                        <div id="div_id_get_notified_of_replies" class="form-group">
+                          <label for="id_get_notified_of_replies" class=" requiredField">
+                             Get notified of replies<span class="asteriskField">*</span>
+                         </label>
+                        <select name="get_notified_of_replies" class="form-control" id="id_get_notified_of_replies">
+                           <option value="True">Receive emails for all replies</option>
+                           <option value="False" selected>No emails, thank you</option>
+                       </select>
+                      </div>
 
             <div class="form-group row">
               <button type="submit" class="save btn btn-primary btn-sm cobalt-save" name="publish">Publish</button>
